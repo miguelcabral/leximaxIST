@@ -52,3 +52,12 @@ public:
 // first: read input package upgradeability formula and criteria.
 // create sorting network and encoding. Then, destroy sorting network?
 // 
+
+class Encoding
+{
+    // list of constraints
+    //
+    
+    
+    encode
+}
