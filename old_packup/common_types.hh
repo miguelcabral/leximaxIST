@@ -112,6 +112,14 @@ struct streq {
   {return strcmp(s1, s2) == 0;}
 };
 
+struct strhash {
+  bool operator()(const char* s) const {
+      size_t rv = 7;
+      for (; *s; s++) rv = rv * 31 + *s;
+      return rv;
+  }
+};
+
 const char* to_string (KeepValue value);
 const char* to_string (Criterion value);
 inline LINT neg(Variable v) { return -((LINT)v); }

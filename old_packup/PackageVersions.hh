@@ -77,7 +77,7 @@ struct eq_package_versions
   bool operator()(const PackageVersions& pvs1, const PackageVersions& pvs2) const
   {
       if (pvs1.op() != pvs2.op()) return false;
-      if ( (pvs1.op() != VERSIONS_NONE) && (pvs1.version() != pvs2.version()) ) return false;
+      if ((pvs1.op() != VERSIONS_NONE) && (pvs1.version() != pvs2.version()) ) return false;
       if (!SAME_PACKAGE_NAME(pvs1.name(),pvs2.name())) return false;
       return true;
   }
@@ -88,7 +88,7 @@ struct hash_package_versions
   size_t operator()(const PackageVersions& pvs) const
   {
       std::hash<string> h1;
-      return h1(pvs.name()) ^  ((size_t)pvs.op()) ^ ((size_t)pvs.version());
+      return h1(pvs.name()) ^ ((size_t)pvs.op()) ^ ((size_t)pvs.version());
   }
 };
 
