@@ -25,7 +25,7 @@ LIBS+=-lz
 # comment out if arbitrary precision not needed
 # LIBS+=-lgmpxx -lgmp
 # CFLAGS+=-DGMPDEF
-CFLAGS+=-DCONV_DBG
+# CFLAGS+=-DCONV_DBG
 
 .PHONY: build all objs
 
