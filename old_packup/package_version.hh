@@ -35,38 +35,40 @@ using std::string;
 using std::cerr;
 using std::stringstream;
 
-extern hash<int>         h2;
-extern hash<const char*> h1;
-
 class PackageVersion {
 public:
-    PackageVersion() : _version(0) {};
+    PackageVersion() : _version(0), _hash_code(7) {};
+
 
     PackageVersion(const PackageVersion& pv)
     : _name (pv._name), _version (pv._version), _hash_code(pv._hash_code) {}
 
     PackageVersion(const string& pname, Version pversion)
-    : _name(pname), _version(pversion),_hash_code(h1(pname.data()) ^ h2(pversion)) {}
+    : _name(pname), _version(pversion), _hash_code(h1(pname) ^ h2(pversion)) {}
+
+
+    PackageVersion& operator =(const PackageVersion& pv)  {
+        _name = pv._name;
+        _version = pv._version;
+        _hash_code = pv._hash_code;
+        return *this;
+    }
 
     void print () const {cerr << "[" << (name()) << "," << version() << "]";}
 
     string to_string() const {
-        string return_value =  string ("[");
-        return_value+=name();
-        return_value+=string (",");
-       
         stringstream ss;
-        ss << version();
-
-        return_value+=ss.str();
-        return_value+=string("]");
-        return return_value;
+        ss << "[" << name() << "," << version() << "]";
+        return ss.str();
     }
 
     size_t  hash_code() const {return _hash_code;}
     Version version()   const {return _version;}
     string  name()      const {return _name;}
 private:
+    static std::hash<int>    h2;
+    static std::hash<string> h1;
+
     string   _name;
     Version  _version;
     size_t   _hash_code;

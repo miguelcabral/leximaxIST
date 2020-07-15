@@ -66,7 +66,7 @@ typedef IVec2ClMap::iterator iv2cl_iterator;
 typedef vector<BasicClause*> BasicClauseVector;
 typedef BasicClauseVector::iterator ClVectIterator;
 
-typedef slist<BasicClause*> BasicClauseSList;
+/* typedef slist<BasicClause*> BasicClauseSList; */
 
 typedef list<BasicClause*> BasicClauseList;
 

@@ -31,6 +31,7 @@
 #ifndef _BASIC_CLAUSE_H
 #define _BASIC_CLAUSE_H 1
 
+#include<algorithm>
 #include "globals.hh"
 
 
@@ -176,7 +177,7 @@ protected:
     //copy(clits.begin(), clits.end(), ostream_iterator<int>(cout, " "));
     //cout << endl;
     //if (!is_sorted(clits.begin(), clits.end(), AbsLitLess())) { }
-    sort(clits.begin(), clits.end(), AbsLitLess());
+    std::sort(clits.begin(), clits.end(), AbsLitLess());
     //cout << "Lits B: ";
     //copy(clits.begin(), clits.end(), ostream_iterator<int>(cout, " "));
     //cout << endl;

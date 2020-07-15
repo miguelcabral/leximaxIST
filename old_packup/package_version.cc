@@ -23,5 +23,5 @@
  */
 
 #include "package_version.hh"
-hash<int> h2;
-hash<const char*> h1;
+std::hash<int>    PackageVersion::h2;
+std::hash<string> PackageVersion::h1;

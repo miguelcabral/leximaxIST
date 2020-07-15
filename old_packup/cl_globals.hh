@@ -38,7 +38,7 @@
 #include <unordered_set>       // Location of STL hash extensions
 
 using namespace std;
-using namespace __gnu_cxx;    // Required for STL hash extensions
+/* using namespace __gnu_cxx;    // Required for STL hash extensions */
 
 #include "globals.hh"
 #include "basic_clause.hh"

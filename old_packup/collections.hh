@@ -47,8 +47,8 @@ typedef unordered_map<string, VersionVector*> PackageToVersions;
 typedef unordered_map<string, Version> PackageToVersion;
 typedef unordered_map<PackageVersion, PackageVersionList*, hash_package_version, eq_package_version> FeaturesToPackages;
 typedef unordered_map<PackageVersion, PackageVersionsList*, hash_package_version, eq_package_version> PackageToFeatureVersions;
-typedef unordered_set <PackageVersion, hash_package_version,eq_package_version> PackageVersionSet;
-typedef unordered_set <PackageVersions, hash_package_versions,eq_package_versions> PackageVersionsSet;
+typedef unordered_set<PackageVersion, hash_package_version, eq_package_version> PackageVersionSet;
+typedef unordered_set<PackageVersions, hash_package_versions, eq_package_versions> PackageVersionsSet;
 typedef unordered_map<string, VersionSet*> FeatureToVersions;
 typedef unordered_set<string> StringSet;
 

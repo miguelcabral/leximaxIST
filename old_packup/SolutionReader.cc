@@ -99,7 +99,7 @@ void SolutionReader::read (const char* file_name)
         {
             package_read=false; version_read=false; installed_read = false;            
             if (package_installed) {
-                PackageVersion pv=PackageVersion(package_name, package_version);
+                PackageVersion pv(package_name, package_version);
                 installed_package_versions.insert(pv);
 
 #ifdef PARS_DBG

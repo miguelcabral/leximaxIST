@@ -157,12 +157,12 @@ struct eqint {
 #include <list>
 #include <map>
 #include <set>
-#include <ext/slist>          // Location of STL list extensions
+/* #include <ext/slist>          // Location of STL list extensions */
 #include <unordered_map>       // Location of STL hash extensions
 #include <unordered_set>       // Location of STL hash extensions
 
 using namespace std;
-using namespace __gnu_cxx;    // Required for STL hash extensions
+/* using namespace __gnu_cxx;    // Required for STL hash extensions */
 
 
 #ifdef USE_RBTREE_SETS

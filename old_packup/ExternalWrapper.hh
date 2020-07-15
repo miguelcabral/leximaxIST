@@ -104,6 +104,7 @@ private:
         return false;
     }
     ostream& print_constraint(const vector<LINT>& constraint,ostream& output);
+    void print_clause(XLINT weight, ostream& out, BasicClause& clause);
 };
 
 inline void ExternalWrapper::set_solver_command(const string& _solver_command) {

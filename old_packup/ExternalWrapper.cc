@@ -278,7 +278,7 @@ void ExternalWrapper::split() {
     }
 }
 
-ostream& ExternalWrapper::print_constraint (const vector<LINT>& constraint,ostream& output) {
+ostream& ExternalWrapper::print_constraint(const vector<LINT>& constraint,ostream& output) {
     const size_t sz = constraint.size();
     assert(sz>=2);
     for (size_t index=0; index<sz-1; ++index) {
@@ -356,31 +356,35 @@ void ExternalWrapper::_increase_weight(BasicClause* clause, XLINT weight) {
     clause_set.incr_cl_weight(clause, weight);
 }
 
+void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clause) {
+     out << weight;
+     for (auto l : clause) out << " " << l;
+     out << " 0" << endl;
+}
 
  void ExternalWrapper::dump(ostream& out) {
      size_t c = hard_clauses.size();
-     FOR_EACH(vector< BasicClauseVector >::const_iterator, i, clause_split) {
+     FOR_EACH(vector< BasicClauseVector >::const_iterator, i, clause_split)
          c+=i->size();
-     }
 
+     const auto top = get_top();
      out << "p wcnf"
              << " " << _id_manager.top_id()
              << " " << c
-             << " " << clause_set.get_top()
+             << " " << top
              << endl;
 
      FOR_EACH(cset_iterator, clause_index, hard_clauses) {
-            BasicClause& clause = **clause_index;
-            out << get_top() << " " << clause << endl;
+         BasicClause& clause = **clause_index;
+         out << get_top() << " " << clause << endl;
+         print_clause(top, out, clause);
      }
 
      for (size_t i=0;i<clause_split.size(); ++i) {
          const BasicClauseVector& clauses = clause_split[i];
          FOR_EACH(BasicClauseVector::const_iterator,clause_index,clauses) {
              BasicClause& clause = **clause_index;
-             out << clause.get_weight()
-                     << " " << clause
-                     << endl;
+             print_clause(clause.get_weight(), out, clause);
          }
      }
  }
