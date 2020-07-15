@@ -1,0 +1,35 @@
+preamble: 
+property: size: nat = [0]
+
+package: a
+version: 1
+size: 10
+installed: true
+
+package: f
+version: 1
+installed: true
+size: 20
+
+package: b
+version: 1
+depends: c
+size: 10
+
+package: b
+version: 2
+depends: d
+size: 1
+
+package: c
+version: 1
+conflicts: f
+size: 1
+
+package: d
+version: 1
+conflicts: a
+size: 1
+
+request: foo
+install: b
