@@ -36,7 +36,7 @@ using std::ostream;
 #define CNF_OUT(c)
 #define CONSTANT const
 #define CONTAINS(s,e) ( ((s).find(e))!=(s).end() )
-#define SAME_PACKAGE_NAME(n1,n2) (n1.data()==n2.data())
+#define SAME_PACKAGE_NAME(n1,n2) ((n1) == (n2))
 #define unordered_set unordered_set
 #define unordered_map unordered_map
 

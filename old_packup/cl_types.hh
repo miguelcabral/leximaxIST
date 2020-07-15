@@ -53,8 +53,8 @@ class BasicClauseSet;
 typedef BasicClause* BasicClausePtr;
 typedef BasicClause** BasicClausePtrPtr;
 
-/* typedef unordered_set<BasicClause*,ClauseHash,ClauseEqual> HashedClauseSet; */
-typedef unordered_set<BasicClause*,ClPtrHash,ClPtrEqual> HashedClauseSet;
+typedef unordered_set<BasicClause*,ClauseHash,ClauseEqual> HashedClauseSet;
+/* typedef unordered_set<BasicClause*,ClPtrHash,ClPtrEqual> HashedClauseSet; */
 typedef HashedClauseSet::iterator ClSetIterator;
 typedef HashedClauseSet::iterator cset_iterator;
 

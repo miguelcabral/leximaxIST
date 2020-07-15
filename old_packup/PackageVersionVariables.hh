@@ -46,10 +46,10 @@ public:
      *                 otherwise it is unchanged.
      * @return True iff the search was successful.
      */
-    inline bool find_variable (CONSTANT PackageVersion &pv, Variable& variable)
+    inline bool find_variable(CONSTANT PackageVersion &pv, Variable& variable)
     {
         PackageVersionMap::const_iterator i = variables.find(pv);
-        if (i ==  variables.end ()) return false;
+        if (i == variables.end ()) return false;
         variable = i->second;
         return true;
     }

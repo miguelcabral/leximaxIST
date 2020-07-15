@@ -87,8 +87,8 @@ struct hash_package_versions
 {
   size_t operator()(const PackageVersions& pvs) const
   {
-      hash<const char*> h1;
-      return h1(pvs.name().data()) ^  ((size_t)pvs.op()) ^ ((size_t)pvs.version());
+      std::hash<string> h1;
+      return h1(pvs.name()) ^  ((size_t)pvs.op()) ^ ((size_t)pvs.version());
   }
 };
 
