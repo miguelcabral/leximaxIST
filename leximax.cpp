@@ -5,42 +5,72 @@
 
 #include <string>
 #include <iostream>
-//#include <stack>
+#include <forward_list>
 
 // first: read input package upgradeability formula and criteria.
 // create sorting network and encoding. Then, destroy sorting network?
 // 
 
+void print_list(std::forward_list<std::forward_list<long>*> &hard_clauses)
+{
+    while(!hard_clauses.empty()){
+        std::forward_list<long> *clause = hard_clauses.front();
+    };
+}
+
 int main()
 {
-    std::list<std::list<std::string>> constraints;
+    std::forward_list<std::forward_list<long>*> hard_clauses;
+    std::forward_list<std::forward_list<long>*> soft_clauses;
+    std::forward_list<std::forward_list<unsigned long>*> objectives;
+    std::forward_list<unsigned long> objective_sizes;
+    unsigned long id_count;
     
     // read input problem.
     
     unsigned long num_vars, num_clauses;
-    std::cin >> num_vars >> num_clauses;
-    unsigned long i = 0;
-    std::list<std::string> clause;
+    short num_objectives;
+    std::cin >> num_vars >> num_clauses >> num_objectives;
+    id_count = num_vars;
+    unsigned long i = 1;
     while(i != num_clauses){
+        std::forward_list<long> *clause = new std::forward_list<long>;
         long literal;
         std::cin >> literal;
-        std::string l ("x");
         while(literal!=0){
-            if(literal < 0){
-                l = "-x";
-                literal = -literal;
-            }
-            l+=std::to_string(literal);
-            clause.push_back(l);
+            clause->push_front(literal);
             std::cin >> literal;
-        }
-        
-        
+        };
+        hard_clauses.push_front(clause);        
         i++;
-    }
-
+    };
     
-    std::string 
+    short j = 1;
+    while(j != num_objectives){
+        unsigned long num_terms = 0;
+        std::forward_list<unsigned long> *objective = new std::forward_list<unsigned long>;
+        unsigned long var;
+        std::cin >> var;
+        while(var!=0){
+            num_terms++;
+            objective->push_front(var);
+            std::cin >> var;
+        };
+        objectives.push_front(objective);
+        objective_sizes.push_front(num_terms);
+        num_terms = 0;
+        j++;
+    };
+    
+    std::cout << objectives.front()->front() << std::endl;
+    std::cout << objective_sizes.front() << std::endl;
+    objective_sizes.pop_front();
+    //std::cout << objective_sizes.front() << std::endl;
+    
+    // encode with odd even merge sorting network
+    
+    
+    
     
     return 0;
 }
