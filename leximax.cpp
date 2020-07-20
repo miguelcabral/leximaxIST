@@ -3,10 +3,14 @@
 #include <forward_list>
 #include <vector>
 #include <utility> // std::pair
-
-// first: read input package upgradeability formula and criteria.
-// create sorting network and encoding. Then, destroy sorting network?
-// 
+#include <old_packup/basic_clause.hh>
+#include <old_packup/basic_clset.hh>
+#include <old_packup/basic_types.h>
+#include <old_packup/clause_utils.hh>
+#include <old_packup/cl_registry.hh>
+#include <old_packup/cl_globals.hh>
+#include <old_packup/cl_types.hh>
+#include <old_packup/ReadCNF.hh>
 
 typedef std::vector<std::forward_list<std::pair<unsigned long, unsigned long>>> SNET;
 
@@ -18,77 +22,21 @@ void encode_network(std::forward_list<std::forward_list<long>*> &hard_clauses, s
     }
 }
 
-void print_list(std::forward_list<std::forward_list<long>*> &hard_clauses)
+int main(int argc, char *argv[])
 {
-    while(!hard_clauses.empty()){
-        std::forward_list<long> *clause = hard_clauses.front();
-        while(!clause->empty()){
-            std::cout << clause->front() << ' ';
-            clause->pop_front();
-        };
-        std::cout << 0 << std::endl;
-        hard_clauses.pop_front();
+    // read input problem
+    short num_objectives = argc-2;
+    ReadCNF hard = ReadCNF(argv[1]);
+    std::vector<ReadCNF*> objectives;
+    for(short i{2}; i < argc; ++i){
+        objectives.push_back(ReadCNF(argv[i]));
     };
-}
-
-int main()
-{
-    std::forward_list<std::forward_list<long>*> hard_clauses;
-    std::forward_list<std::forward_list<long>*> soft_clauses;
-    std::forward_list<std::forward_list<unsigned long>*> objectives;
-    std::forward_list<unsigned long> objective_sizes;
+    unsigned long id_count{ hard.get_max_id() };
     std::forward_list<std::pair<unsigned long, unsigned long>> sorted_vecs;
-    
-    unsigned long id_count;
-    
-    // read input problem.
-    
-    unsigned long num_vars, num_clauses;
-    short num_objectives;
-    std::cin >> num_vars >> num_clauses >> num_objectives;
-    id_count = num_vars;
-    unsigned long i = 0;
-    while(i != num_clauses){
-        std::forward_list<long> *clause = new std::forward_list<long>;
-        long literal;
-        std::cin >> literal;
-        while(literal!=0){
-            clause->push_front(literal);
-            std::cin >> literal;
-        };
-        hard_clauses.push_front(clause);        
-        i++;
-    };
-    
-    short j = 0;
-    while(j != num_objectives){
-        unsigned long num_terms = 0;
-        std::forward_list<unsigned long> *objective = new std::forward_list<unsigned long>;
-        unsigned long var;
-        std::cin >> var;
-        while(var!=0){
-            num_terms++;
-            objective->push_front(var);
-            std::cin >> var;
-        };
-        objectives.push_front(objective);
-        objective_sizes.push_front(num_terms);
-        num_terms = 0;
-        j++;
-    };
-    
-   
-    //print_list(hard_clauses);
 
-    
     // encode with odd even merge sorting network
-    std::forward_list<std::forward_list<unsigned long>*>::iterator it1;
-    std::forward_list<unsigned long>::iterator it2;
-    it2 = objective_sizes.begin();
-    it1 = objectives.begin();
-    while(it1 != objectives.end()){
-        unsigned long num_terms = *it2;
-        std::forward_list<unsigned long> *objective = *it1;
+    for(short i{0}; i < num_objectives; ++i){
+        unsigned long num_terms;
         std::pair<unsigned long, unsigned long> sorted_vec (id_count + 1, id_count + num_terms);
         sorted_vecs.push_front(sorted_vec);
         id_count += num_terms;
