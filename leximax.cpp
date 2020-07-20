@@ -27,18 +27,25 @@ int main(int argc, char *argv[])
     // read input problem
     short num_objectives = argc-2;
     ReadCNF hard = ReadCNF(argv[1]);
-    std::vector<ReadCNF*> objectives;
+    std::vector<ReadCNF*> read_objectives;
     for(short i{2}; i < argc; ++i){
-        objectives.push_back(ReadCNF(argv[i]));
+        read_objectives.push_back(ReadCNF(argv[i]));
     };
+    std::vector<std::forward_list<unsigned long>*> objectives(num_objectives);
     unsigned long id_count{ hard.get_max_id() };
-    std::forward_list<std::pair<unsigned long, unsigned long>> sorted_vecs;
+    std::vector<std::pair<unsigned long, unsigned long>> sorted_vecs(num_objectives);
+    // convert objective function clauses to a sum of variables
+    for(short i{0}; i < num_objectives; ++i){
+        
+    }
 
     // encode with odd even merge sorting network
     for(short i{0}; i < num_objectives; ++i){
-        unsigned long num_terms;
+        ReadCNF *objective = objectives[i];
+        
+        unsigned long num_terms = objective->get_clause_vector().size();
         std::pair<unsigned long, unsigned long> sorted_vec (id_count + 1, id_count + num_terms);
-        sorted_vecs.push_front(sorted_vec);
+        sorted_vecs[i]=sorted_vec;
         id_count += num_terms;
         SNET sorting_network(num_terms);
         std::vector<unsigned long> elems_to_sort(objective->begin(),objective->end());
