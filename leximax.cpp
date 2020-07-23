@@ -74,13 +74,17 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
     };    
 }
 
-void odd_even_merge(ReadCNF &hard, std::vector<LINT> &seq1, std::vector<LINT> &seq2, std::vector<LINT> *objective, SNET &sorting_network)
+void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, std::vector<LINT> *objective, SNET &sorting_network)
 {
-    // merge to elements with a single comparator.
-    if(elems_to_sort.size() == 2){
-        // single comparator.
-        LINT el1 = elems_to_sort[0];
-        LINT el2 = elems_to_sort[1];
+    LINT size1 = seq1.first.second;
+    LINT size2 = seq2.first.second;
+    if(size1 == 0 || size2 == 0){
+        // nothing to merge
+    };
+    if(size1 == 1 && size2 == 1){
+        // merge two elements with a single comparator.
+        LINT el1 = seq1.first.first;
+        LINT el2 = seq2.first.first;
         // if the entry is empty, then it is the first comparator for that wire
         LINT var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1].second;
         LINT var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2].second;
@@ -91,31 +95,68 @@ void odd_even_merge(ReadCNF &hard, std::vector<LINT> &seq1, std::vector<LINT> &s
         // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
         encode_max(hard, var_out_max, var_in1, var_in2);
         encode_min(hard, var_out_min, var_in1, var_in2);
-        std::pair<LINT,LINT> comp1 = (el1 > el2) ? &(std::make_pair(el2,var_out_max)) : &(std::make_pair(el2,var_out_min));
+        std::pair<LINT,LINT> comp1 = (el1 > el2) ? std::make_pair(el2,var_out_max) : std::make_pair(el2,var_out_min);
         sorting_network[el1] = &comp1;
-        std::pair<LINT,LINT> comp2 = (el2 > el1) ? &(std::make_pair(el1,var_out_max)) : &(std::make_pair(el1,var_out_min));
+        std::pair<LINT,LINT> comp2 = (el2 > el1) ? std::make_pair(el1,var_out_max) : std::make_pair(el1,var_out_min);
         sorting_network[el2] = &comp2;
-    }
-}
-
-void encode_network(ReadCNF &hard, std::vector<LINT> &elems_to_sort, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
-{   
-    if(elems_to_sort.size() == 1){
-        // do nothing - a single element is already sorted.
     };
-    if(elems_to_sort.size() > 1){
-        LINT m = elems_to_sort.size()/2;
-        LINT n = m;
-        if(elems_to_sort.size() % 2 != 0)
-            n++;
-        // recursively sort the first m elements and the last n elements
-        encode_network(hard, seq1, id_count, objective, sorting_network);
-        encode_network(hard, seq2, id_count, objective, sorting_network);
-        // merge the sorted m elements and the sorted n elements
-        odd_even_merge(hard, seq1, seq2);
+    if(size1*size2 > 1){
+        // merge odd subsequences
+        // size of odd subsequence is the ceiling of half of the size of the original sequence
+        LINT new_size = size1/2;
+        if(size1 % 2 != 1)
+            new_size++;
+        std::pair<LINT,LINT> p1(seq1.first.first,new_size);
+        LINT offset = 2*seq1.second;
+        std::pair<std::pair<LINT,LINT>,LINT> odd1(p1,offset);
+        new_size = size2/2;
+        if(size2 % 2 != 1)
+            new_size++;
+        std::pair<LINT,LINT> p2(seq2.first.first,new_size);
+        offset = 2*seq2.second;
+        std::pair<std::pair<LINT,LINT>,LINT> odd2(p2,offset);
+        odd_even_merge(hard, odd1, odd2, objective, sorting_network);
+        // merge even subsequences
+        // size of even subsequence is the floor of half of the size of the original sequence
+        new_size = size1/2;
+        offset = seq1.second;
+        std::pair<LINT,LINT> p1(seq1.first.first + offset, new_size);
+        offset = 2*offset;
+        std::pair<std::pair<LINT,LINT>,LINT> even1(p1,offset);
+        new_size = size2/2;
+        offset = seq2.second;
+        std::pair<LINT,LINT> p2(seq2.first.first + offset, new_size);
+        offset = 2*offset;
+        std::pair<std::pair<LINT,LINT>,LINT> even2(p2, offset);
+        odd_even_merge(hard, even1, even2, objective, sorting_network);
+        // comparison-interchange
+        
     }
     
+}
 
+void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
+{   
+    LINT size = elems_to_sort.second;
+    LINT first_elem = elems_to_sort.first;
+    if(size == 1){
+        // do nothing - a single element is already sorted.
+    };
+    if(size > 1){
+        LINT m = size/2;
+        LINT n = m;
+        if(size % 2 != 0)
+            n++;
+        std::pair<LINT,LINT> split1(first, m);
+        std::pair<LINT,LINT> split2(first + m, n);
+        // recursively sort the first m elements and the last n elements
+        encode_network(hard, split1, id_count, objective, sorting_network);
+        encode_network(hard, split2, id_count, objective, sorting_network);
+        // merge the sorted m elements and the sorted n elements
+        std::pair<std::pair<LINT,LINT>,LINT> seq1(split1,1);
+        std::pair<std::pair<LINT,LINT>,LINT> seq2(split2,1);
+        odd_even_merge(hard, seq1, seq2, id_count, objective, sorting_network);
+    }
 }
 
 int main(int argc, char *argv[])
