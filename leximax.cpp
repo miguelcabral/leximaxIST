@@ -129,7 +129,14 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
         offset = 2*offset;
         std::pair<std::pair<LINT,LINT>,LINT> even2(p2, offset);
         odd_even_merge(hard, even1, even2, objective, sorting_network);
-        // comparison-interchange
+        // comparison-interchange - suppose seq1 = a1 a2 a3. and seq2 = b1 b2 b3 b4. Then a1 a2-a3 b1-b2 b3-b4.
+        LINT offset1 = 
+        for(LINT i{2}; i <= size1; i = i + 2){
+            if(i == size1){
+                // connect to the first element of seq1
+            }
+            LINT el1 = seq1
+        }
         
     }
     
