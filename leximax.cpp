@@ -74,8 +74,9 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
     };    
 }
 
-void encode_network(ReadCNF &hard, std::vector<LINT> &elems_to_sort, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
-{    
+void odd_even_merge(ReadCNF &hard, std::vector<LINT> &seq1, std::vector<LINT> &seq2, std::vector<LINT> *objective, SNET &sorting_network)
+{
+    // merge to elements with a single comparator.
     if(elems_to_sort.size() == 2){
         // single comparator.
         LINT el1 = elems_to_sort[0];
@@ -95,6 +96,26 @@ void encode_network(ReadCNF &hard, std::vector<LINT> &elems_to_sort, LINT &id_co
         std::pair<LINT,LINT> comp2 = (el2 > el1) ? &(std::make_pair(el1,var_out_max)) : &(std::make_pair(el1,var_out_min));
         sorting_network[el2] = &comp2;
     }
+}
+
+void encode_network(ReadCNF &hard, std::vector<LINT> &elems_to_sort, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
+{   
+    if(elems_to_sort.size() == 1){
+        // do nothing - a single element is already sorted.
+    };
+    if(elems_to_sort.size() > 1){
+        LINT m = elems_to_sort.size()/2;
+        LINT n = m;
+        if(elems_to_sort.size() % 2 != 0)
+            n++;
+        // recursively sort the first m elements and the last n elements
+        encode_network(hard, seq1, id_count, objective, sorting_network);
+        encode_network(hard, seq2, id_count, objective, sorting_network);
+        // merge the sorted m elements and the sorted n elements
+        odd_even_merge(hard, seq1, seq2);
+    }
+    
+
 }
 
 int main(int argc, char *argv[])
