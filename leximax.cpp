@@ -56,6 +56,24 @@ void encode_min(ReadCNF &hard, LINT var_out_min, LINT var_in1, LINT var_in2)
     hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
 }
 
+void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::vector<LINT> *objective, sorting_network)
+{
+    // if the entry is empty, then it is the first comparator for that wire
+    var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1].second;
+    var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2].second;
+    var_out_min = id_count + 1;
+    id_count++;
+    var_out_max = id_count + 1;
+    id_count++;
+    // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
+    encode_max(hard, var_out_max, var_in1, var_in2);
+    encode_min(hard, var_out_min, var_in1, var_in2);
+    std::pair<LINT,LINT> comp1 = (el1 > el2) ? std::make_pair(el2,var_out_max) : std::make_pair(el2,var_out_min);
+    sorting_network[el1] = &comp1;
+    std::pair<LINT,LINT> comp2 = (el2 > el1) ? std::make_pair(el1,var_out_max) : std::make_pair(el1,var_out_min);
+    sorting_network[el2] = &comp2;
+}
+
 void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
 {
     // fresh_var implies cl
@@ -74,32 +92,25 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
     };    
 }
 
-void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, std::vector<LINT> *objective, SNET &sorting_network)
+void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
 {
+    LINT el1;
+    LINT el2;
+    LINT var_in1;
+    LINT var_in2;
+    LINT var_out_min;
+    LINT var_out_max;
     LINT size1 = seq1.first.second;
     LINT size2 = seq2.first.second;
     if(size1 == 0 || size2 == 0){
         // nothing to merge
-    };
+    }
     if(size1 == 1 && size2 == 1){
         // merge two elements with a single comparator.
-        LINT el1 = seq1.first.first;
-        LINT el2 = seq2.first.first;
-        // if the entry is empty, then it is the first comparator for that wire
-        LINT var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1].second;
-        LINT var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2].second;
-        LINT var_out_min = id_count + 1;
-        id_count++;
-        LINT var_out_max = id_count + 1;
-        id_count++;
-        // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
-        encode_max(hard, var_out_max, var_in1, var_in2);
-        encode_min(hard, var_out_min, var_in1, var_in2);
-        std::pair<LINT,LINT> comp1 = (el1 > el2) ? std::make_pair(el2,var_out_max) : std::make_pair(el2,var_out_min);
-        sorting_network[el1] = &comp1;
-        std::pair<LINT,LINT> comp2 = (el2 > el1) ? std::make_pair(el1,var_out_max) : std::make_pair(el1,var_out_min);
-        sorting_network[el2] = &comp2;
-    };
+        el1 = seq1.first.first;
+        el2 = seq2.first.first;
+        insert_comparator()
+    }
     if(size1*size2 > 1){
         // merge odd subsequences
         // size of odd subsequence is the ceiling of half of the size of the original sequence
@@ -130,16 +141,32 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
         std::pair<std::pair<LINT,LINT>,LINT> even2(p2, offset);
         odd_even_merge(hard, even1, even2, objective, sorting_network);
         // comparison-interchange - suppose seq1 = a1 a2 a3. and seq2 = b1 b2 b3 b4. Then a1 a2-a3 b1-b2 b3-b4.
-        LINT offset1 = 
+        LINT offset1 = seq1.second;
+        LINT offset2 = seq2.second;
+        LINT first1 = seq1.first.first;
+        LINT first2 = seq2.first.first;
         for(LINT i{2}; i <= size1; i = i + 2){
             if(i == size1){
-                // connect to the first element of seq1
+                // connect last of seq1 to first element of seq2
+                el1 = first1 + offset1*(size1-1);
+                el2 = first2;
+                insert_comparator(hard, el1, el2, id_count, objective, sorting_network);
             }
-            LINT el1 = seq1
+            else{
+                // connect i-th of seq1 with i+1-th of seq1
+                el1 = first1 + offset1*(i-1);
+                el2 = el1 + offset1;
+                insert_comparator(hard, el1, el2, id_count, objective, sorting_network);
+            }
         }
-        
+        LINT init = (size1 % 2 == 0) ? 2 : 1 ;
+        for(LINT i{init}; i < size2; i = i + 2){
+                // connect i-th of seq2 with i+1-th of seq2
+                el1 = first2 + offset2*(i-1);
+                el2 = el1 + offset2;
+                insert_comparator(hard, el1, el2, id_count, objective, sorting_network);            
+        }
     }
-    
 }
 
 void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
@@ -163,6 +190,23 @@ void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_
         std::pair<std::pair<LINT,LINT>,LINT> seq1(split1,1);
         std::pair<std::pair<LINT,LINT>,LINT> seq2(split2,1);
         odd_even_merge(hard, seq1, seq2, id_count, objective, sorting_network);
+    }
+}
+
+void print_clause(BasicClause *cl)
+{
+    for(Literator it = cl->begin(); it != cl->end(); ++it){
+        std::cout << *it << " ";
+    };
+    std::cout << "0" << std::endl;
+}
+
+void print_cnf(ReadCNF &hard, LINT id_count)
+{
+    std::vector<BasicClause*> *cls = hard.get_clause_vector();
+    std::cout << "p cnf " << id_count << " " << cls->size() << std::endl;
+    for(LINT i{0}; i < cls->size(); ++i){
+        print_clause(cls->at(i));
     }
 }
 
@@ -224,8 +268,10 @@ int main(int argc, char *argv[])
             lits.push_back(-output_j);
             hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
         };
-        sorting_network.clear();
+
     };
 
+    // check if sorting_network is working: print clauses and send to sat solver.
+    print_cnf(hard, id_count);
     return 0;
 }
