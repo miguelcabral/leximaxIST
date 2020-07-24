@@ -20,9 +20,9 @@ ReadCNF::~ReadCNF() {}
 void ReadCNF::read_cnf_clause(StreamBuffer& in, vector<LINT>& lits) {
   lits.clear();
   for (;;){
-    const LINT parsed_lit = parseInt(in);
+    LINT parsed_lit = parseInt(in);
     if (parsed_lit == 0) break;
-    const LINT var = _abs(parsed_lit);
+    LINT var = _abs(parsed_lit);
     if (var > mxid) mxid = var;
     lits.push_back(parsed_lit);
   }
@@ -32,7 +32,7 @@ void ReadCNF::read_cnf_clause(StreamBuffer& in, vector<LINT>& lits) {
 void ReadCNF::read()
 {
   StreamBuffer in(input_file);
-  vector<LINT> literals;
+  std::vector<LINT> literals;
   for (;;){
     skipWhitespace(in);
     if (*in == EOF)

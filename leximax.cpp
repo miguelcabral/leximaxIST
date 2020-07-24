@@ -56,14 +56,14 @@ void encode_min(ReadCNF &hard, LINT var_out_min, LINT var_in1, LINT var_in2)
     hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
 }
 
-void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::vector<LINT> *objective, sorting_network)
+void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
 {
     // if the entry is empty, then it is the first comparator for that wire
-    var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1].second;
-    var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2].second;
-    var_out_min = id_count + 1;
+    LINT var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1]->second;
+    LINT var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2]->second;
+    LINT var_out_min = id_count + 1;
     id_count++;
-    var_out_max = id_count + 1;
+    LINT var_out_max = id_count + 1;
     id_count++;
     // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
     encode_max(hard, var_out_max, var_in1, var_in2);
@@ -77,7 +77,7 @@ void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::v
 void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
 {
     // fresh_var implies cl
-    vector<LINT> *lits;
+    std::vector<LINT> *lits;
     lits->push_back(-fresh_var);
     for(Literator it = cl->begin(); it != cl->end(); ++it){
         lits->push_back(*it);
@@ -109,7 +109,7 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
         // merge two elements with a single comparator.
         el1 = seq1.first.first;
         el2 = seq2.first.first;
-        insert_comparator()
+        insert_comparator(hard, el1, el2, id_count, objective, sorting_network);
     }
     if(size1*size2 > 1){
         // merge odd subsequences
@@ -126,20 +126,20 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
         std::pair<LINT,LINT> p2(seq2.first.first,new_size);
         offset = 2*seq2.second;
         std::pair<std::pair<LINT,LINT>,LINT> odd2(p2,offset);
-        odd_even_merge(hard, odd1, odd2, objective, sorting_network);
+        odd_even_merge(hard, odd1, odd2, id_count, objective, sorting_network);
         // merge even subsequences
         // size of even subsequence is the floor of half of the size of the original sequence
         new_size = size1/2;
         offset = seq1.second;
-        std::pair<LINT,LINT> p1(seq1.first.first + offset, new_size);
+        p1 = std::make_pair(seq1.first.first + offset, new_size);
         offset = 2*offset;
         std::pair<std::pair<LINT,LINT>,LINT> even1(p1,offset);
         new_size = size2/2;
         offset = seq2.second;
-        std::pair<LINT,LINT> p2(seq2.first.first + offset, new_size);
+        p2 = std::make_pair(seq2.first.first + offset, new_size);
         offset = 2*offset;
         std::pair<std::pair<LINT,LINT>,LINT> even2(p2, offset);
-        odd_even_merge(hard, even1, even2, objective, sorting_network);
+        odd_even_merge(hard, even1, even2, id_count, objective, sorting_network);
         // comparison-interchange - suppose seq1 = a1 a2 a3. and seq2 = b1 b2 b3 b4. Then a1 a2-a3 b1-b2 b3-b4.
         LINT offset1 = seq1.second;
         LINT offset2 = seq2.second;
@@ -181,8 +181,8 @@ void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_
         LINT n = m;
         if(size % 2 != 0)
             n++;
-        std::pair<LINT,LINT> split1(first, m);
-        std::pair<LINT,LINT> split2(first + m, n);
+        std::pair<LINT,LINT> split1(first_elem, m);
+        std::pair<LINT,LINT> split2(first_elem + m, n);
         // recursively sort the first m elements and the last n elements
         encode_network(hard, split1, id_count, objective, sorting_network);
         encode_network(hard, split2, id_count, objective, sorting_network);
@@ -203,33 +203,47 @@ void print_clause(BasicClause *cl)
 
 void print_cnf(ReadCNF &hard, LINT id_count)
 {
-    std::vector<BasicClause*> *cls = hard.get_clause_vector();
-    std::cout << "p cnf " << id_count << " " << cls->size() << std::endl;
-    for(LINT i{0}; i < cls->size(); ++i){
-        print_clause(cls->at(i));
+    std::vector<BasicClause*> cls = hard.get_clause_vector();
+    std::cout << "p cnf " << id_count << " " << cls.size() << std::endl;
+    for(LINT i{0}; i < cls.size(); ++i){
+        print_clause(cls.at(i));
     }
 }
 
 int main(int argc, char *argv[])
 {
-    // read input problem
+    // read input problem: hard.cnf f_1.cnf f_2.cnf ...
     short num_objectives = argc-2;
-    ReadCNF hard = ReadCNF(argv[1]);
+    gzFile in = gzopen(argv[1], "rb");
+    if (in == Z_NULL) {
+       exit(0);
+    }
+    ReadCNF hard(in);
+    hard.read();
+    gzclose(in);
     std::vector<ReadCNF*> read_objectives;
     for(short i{2}; i < argc; ++i){
-        read_objectives.push_back(ReadCNF(argv[i]));
+        in = gzopen(argv[i], "rb");
+        if (in == Z_NULL) {
+            exit(0);
+        }
+        ReadCNF obj(in);
+        obj.read();
+        gzclose(in);
+        read_objectives.push_back(&obj);
     };
     std::vector<std::vector<LINT>*> objectives(num_objectives);
     LINT id_count{ hard.get_max_id() };
-    std::vector<std::pair<LINT, LINT>> sorted_vecs(num_objectives);
     // convert objective function clauses to a sum of variables.
     for(short i{0}; i < num_objectives; ++i){
         ReadCNF *obj = read_objectives[i];
-        vector<BasicClause*> cls = obj->get_clause_vector();
+        std::vector<BasicClause*> cls = obj->get_clause_vector();
         std::vector<LINT> *obj_conv;
         for(LINT j{0}; j < cls.size(); ++j){
             BasicClause *cl = cls[j];
-            if(cl->size() > 1 || cl->begin() < 0){
+            if(cl == nullptr)
+                std::cout << "clause is null" << std::endl;
+            if(cl->size() > 1 || *(cl->begin()) < 0){
                 LINT fresh_var = id_count + 1;
                 id_count++;
                 // encode fresh_var
@@ -237,26 +251,25 @@ int main(int argc, char *argv[])
                 obj_conv->push_back(fresh_var);
             }
             else
-                obj_conv->push_back(cl->begin());
+                obj_conv->push_back(*(cl->begin()));
         }
         objectives[i] = obj_conv;        
     }
-
     // encode with odd even merge sorting network
-    for(short i{0}; i < num_objectives; ++i){        
-        LINT num_terms = objectives[i]->size();
+    std::vector<std::pair<LINT, LINT>> sorted_vecs(num_objectives);
+    for(short i{0}; i < num_objectives; ++i){   
+        std::vector<LINT> *objective = objectives[i];
+        LINT num_terms = objective->size();
         std::pair<LINT, LINT> sorted_vec (id_count + 1, id_count + num_terms);
         sorted_vecs[i]=sorted_vec;
         id_count += num_terms;
         SNET sorting_network(num_terms); // sorting_network is initialized to a vector of nullptrs
-        std::vector<LINT> elems_to_sort;
-        for(LINT j{0}; j < num_terms; ++j){
-            elems_to_sort.push_back(j);
-        };
+        // elems_to_sort is represented by a pair (first element, number of elements).
+        std::pair<LINT,LINT> elems_to_sort(0,num_terms);
         encode_network(hard, elems_to_sort, id_count, objective, sorting_network);
         // relate outputs of sorting_network with sorted_vec variables
         for(LINT j{0}; j < num_terms; j++){
-            LINT output_j = sorting_network[j]->front().second;
+            LINT output_j = sorting_network[j]->second;
             LINT o = sorted_vec.first + j;
             // encode o is equivalent to output_j
             std::vector<LINT> lits;

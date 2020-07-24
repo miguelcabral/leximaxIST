@@ -28,13 +28,13 @@ public:
     ReadCNF(gzFile& input_file);
     virtual ~ReadCNF();
     void read();
-    LINT get_max_id() const {return mxid;}
+    LINT get_max_id() {return mxid;}
     BasicClauseSet& get_clauses()  {return clauses;}
-    const vector<BasicClause*>& get_clause_vector() const  {return clause_vector;}
+    std::vector<BasicClause*>& get_clause_vector() {return clause_vector;}
 private:
      gzFile input_file;
      LINT mxid;
-     vector<BasicClause*>  clause_vector;
+     std::vector<BasicClause*>  clause_vector;
      BasicClauseSet clauses;
      void read_cnf_clause(StreamBuffer& in, vector<LINT>& lits);
 };
