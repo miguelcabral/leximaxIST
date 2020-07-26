@@ -58,6 +58,8 @@ void encode_min(ReadCNF &hard, LINT var_out_min, LINT var_in1, LINT var_in2)
 
 void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
 {
+    if(el1 == 0 || el2 == 0)
+        std::cout << "Inserting comparator in entry 0" << std::endl;
     // if the entry is empty, then it is the first comparator for that wire
     LINT var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1]->second;
     LINT var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2]->second;
@@ -68,10 +70,20 @@ void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::v
     // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
     encode_max(hard, var_out_max, var_in1, var_in2);
     encode_min(hard, var_out_min, var_in1, var_in2);
-    std::pair<LINT,LINT> comp1 = (el1 > el2) ? std::make_pair(el2,var_out_max) : std::make_pair(el2,var_out_min);
-    sorting_network[el1] = &comp1;
-    std::pair<LINT,LINT> comp2 = (el2 > el1) ? std::make_pair(el1,var_out_max) : std::make_pair(el1,var_out_min);
-    sorting_network[el2] = &comp2;
+    std::pair<LINT,LINT> *comp1;
+    std::pair<LINT,LINT> *comp2;
+    if(el1 > el2){
+        comp1 = new std::pair<LINT,LINT>(el2,var_out_max);
+    }
+    else
+        comp1 = new std::pair<LINT,LINT>(el2,var_out_min);
+    sorting_network[el1] = comp1;
+    if(el2 > el1){
+        comp2 = new std::pair<LINT,LINT>(el1,var_out_max);
+    }
+    else
+        comp2 = new std::pair<LINT,LINT>(el1,var_out_min);;
+    sorting_network[el2] = comp2;
 }
 
 void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
@@ -255,7 +267,6 @@ int main(int argc, char *argv[])
         }
         objectives[i] = obj_conv;        
     }
-    std::cout << "aqui" << std::endl;
     // encode with odd even merge sorting network
     std::vector<std::pair<LINT, LINT>> sorted_vecs(num_objectives);
     for(short i{0}; i < num_objectives; ++i){   
@@ -270,6 +281,8 @@ int main(int argc, char *argv[])
         encode_network(hard, elems_to_sort, id_count, objective, sorting_network);
         // relate outputs of sorting_network with sorted_vec variables
         for(LINT j{0}; j < num_terms; j++){
+            if(sorting_network[j]==nullptr)
+                std::cout << "Entry " << j << " of the sorting network is null" << std::endl;
             LINT output_j = sorting_network[j]->second;
             LINT o = sorted_vec.first + j;
             // encode o is equivalent to output_j
@@ -284,7 +297,6 @@ int main(int argc, char *argv[])
         };
 
     };
-
     // check if sorting_network is working: print clauses and send to sat solver.
     print_cnf(hard, id_count);
     return 0;
