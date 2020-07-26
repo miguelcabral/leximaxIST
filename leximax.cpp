@@ -77,19 +77,19 @@ void insert_comparator(ReadCNF &hard, LINT el1, LINT el2, LINT &id_count, std::v
 void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
 {
     // fresh_var implies cl
-    std::vector<LINT> *lits;
-    lits->push_back(-fresh_var);
+    std::vector<LINT> lits;
+    lits.push_back(-fresh_var);
     for(Literator it = cl->begin(); it != cl->end(); ++it){
-        lits->push_back(*it);
+        lits.push_back(*it);
     };
-    hard.get_clause_vector().push_back(hard.get_clauses().create_clause(*lits));
+    hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
     // not fresh_var implies not cl
     for(Literator it = cl->begin(); it != cl->end(); ++it){
-        lits->clear();
-        lits->push_back(-*it);
-        lits->push_back(fresh_var);
-        hard.get_clause_vector().push_back(hard.get_clauses().create_clause(*lits));
-    };    
+        lits.clear();
+        lits.push_back(-*it);
+        lits.push_back(fresh_var);
+        hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
+    }  
 }
 
 void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
@@ -227,10 +227,10 @@ int main(int argc, char *argv[])
         if (in == Z_NULL) {
             exit(0);
         }
-        ReadCNF obj(in);
-        obj.read();
+        ReadCNF *obj = new ReadCNF(in);
+        obj->read();
         gzclose(in);
-        read_objectives.push_back(&obj);
+        read_objectives.push_back(obj);
     };
     std::vector<std::vector<LINT>*> objectives(num_objectives);
     LINT id_count{ hard.get_max_id() };
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
     for(short i{0}; i < num_objectives; ++i){
         ReadCNF *obj = read_objectives[i];
         std::vector<BasicClause*> cls = obj->get_clause_vector();
-        std::vector<LINT> *obj_conv;
+        std::vector<LINT> *obj_conv = new std::vector<LINT>();
         for(LINT j{0}; j < cls.size(); ++j){
             BasicClause *cl = cls[j];
             if(cl == nullptr)
@@ -255,6 +255,7 @@ int main(int argc, char *argv[])
         }
         objectives[i] = obj_conv;        
     }
+    std::cout << "aqui" << std::endl;
     // encode with odd even merge sorting network
     std::vector<std::pair<LINT, LINT>> sorted_vecs(num_objectives);
     for(short i{0}; i < num_objectives; ++i){   
