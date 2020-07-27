@@ -95,8 +95,8 @@ protected:
     return ncl;
   }
 
-  LINT num_cl_refs(BasicClause* cl) {
-    c2n_iterator cpos = c2n_map.find(cl);
+  LINT num_cl_refs(BasicClause* cl) const {
+    auto cpos = c2n_map.find(cl);
     assert(cpos != c2n_map.end());
     return cpos->second;
   }

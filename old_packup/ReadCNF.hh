@@ -9,6 +9,7 @@
 #define	READCNF_HH
 
 #include <zlib.h>
+#include <vector>
 #include "basic_types.h"
 #include "basic_clset.hh"
 #include "fmtutils.hh"
@@ -25,7 +26,7 @@
 
 class ReadCNF {
 public:
-    ReadCNF(gzFile& input_file);
+    explicit ReadCNF(gzFile& input_file);
     virtual ~ReadCNF();
     void read();
     LINT get_max_id() {return mxid;}
@@ -36,7 +37,7 @@ private:
      LINT mxid;
      std::vector<BasicClause*>  clause_vector;
      BasicClauseSet clauses;
-     void read_cnf_clause(StreamBuffer& in, vector<LINT>& lits);
+     void read_cnf_clause(StreamBuffer& in, std::vector<LINT>& lits);
 };
 #endif	/* READCNF_HH */
 

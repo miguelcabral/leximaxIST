@@ -62,9 +62,11 @@ bool ExternalWrapper::solve_it() {
     // generate hard clauses
     size_t i=constraints.size();
     constraints.resize(i+hard_clauses.size());
-    FOR_EACH(cset_iterator, clause_index, hard_clauses) {
+    /* FOR_EACH(cset_iterator, clause_index, hard_clauses) { */
+    for(BasicClause* pclause : hard_clauses) {
         vector<LINT>& constraint = constraints[i++];
-        clause_to_constraint(**clause_index, constraint);
+        /* clause_to_constraint(**clause_index, constraint); */
+        clause_to_constraint(*pclause, constraint);
     }
     bool solution_found = false;
     if (function_count==0) {
@@ -106,7 +108,7 @@ bool ExternalWrapper::solve(const size_t function_index) {
     if (temporary_model.empty())  return false; // stop here
     // copy solution to the output model
     model.clear();
-    model.insert (model.end(), temporary_model.begin(), temporary_model.end());
+    model.insert(model.end(), temporary_model.begin(), temporary_model.end());
     //constrain the following computation based on the score
     LINT score = 0;
     FOR_EACH(vector<LINT>::const_iterator,literal_index,relaxation_literals) {
@@ -164,7 +166,7 @@ int ExternalWrapper::external_solve(const vector<LINT>& function, vector< vector
     assert(of!=NULL);//TODO
     StreamBuffer r(of);
     bool sat=false;
-    tmp_model.resize((size_t)(_id_manager.top_id()+1),0);
+    tmp_model.resize(static_cast<size_t>(_id_manager.top_id()+1),0);
     while (*r != EOF) {
         if (*r != 'v') {// ignore all the other lines
             skipLine(r);
