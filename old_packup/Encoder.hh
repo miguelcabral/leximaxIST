@@ -54,8 +54,8 @@ public:
     inline void set_iv(UINT piv) {iv=piv;}
     inline void set_opt_edges(int v=1) {opt_edges=v;}
     inline void set_opt_not_removed(bool v=true) {opt_not_removed=v;}
-    inline bool get_opt_edges(bool v=true) const {return opt_edges;}
-    inline bool get_opt_not_removed(bool v=true) const {return opt_not_removed;}
+    inline bool get_opt_edges() const {return opt_edges;}
+    inline bool get_opt_not_removed() const {return opt_not_removed;}
     inline void enable_valuation() {valuation = true;}
     void encode();
     bool solution();

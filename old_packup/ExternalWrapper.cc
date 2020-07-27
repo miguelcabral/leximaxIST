@@ -31,7 +31,7 @@ using std::sort;
 
 ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 :min_cost(LONG_MAX)
-,solution_value (-1)
+,solution_value(-1)
 ,_id_manager(id_manager)
 ,solver_command("minisat+ -cs -ansi")
 ,multiplication_string("*")

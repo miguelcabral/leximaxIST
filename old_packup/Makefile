@@ -16,9 +16,11 @@ CXX?=g++
 CFLAGS+=-DEXTERNAL_SOLVER
 CFLAGS+=-DNDEBUG -DNCHECK
 CFLAGS+=-O3
-CFLAGS += -Wall -DBUILDDATE='"$(BUILDDATE)"' -DDISTDATE='"$(DISTDATE)"'
+CFLAGS += -std=c++17
+CFLAGS += -Wall -Wextra -Wno-deprecated-register -Wno-parentheses 
+CFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DDISTDATE='"$(DISTDATE)"'
 CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
-CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
+# CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
 LIBS+=-lz
 #LNFLAGS+=-static
 

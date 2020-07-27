@@ -44,7 +44,7 @@ class ClauseHash {
 public:
   ULINT operator()(BasicClause* clref) const {  // see below new hash functions
     //return clref->clhash(); // -> Very slow; unable to undertand why
-    register ULINT hashv = 0;
+    ULINT hashv = 0;
     for (auto l : *clref)
         hashv ^= l;
     /* for(Literator pos = clref->begin(); pos != clref->end(); ++pos) { */
@@ -83,8 +83,8 @@ class ClSizeIDLess {
 public:
   bool operator()(BasicClause* ptr1, BasicClause* ptr2) const {
     return
-      ptr1->size() < ptr2->size() ||
-      ptr1->size() == ptr2->size() && ptr1->get_id() < ptr2->get_id();
+      (ptr1->size() < ptr2->size()) ||
+      (ptr1->size() == ptr2->size() && ptr1->get_id() < ptr2->get_id());
   }
 };
 
@@ -92,8 +92,8 @@ class ClSizeIDGreater {
 public:
   bool operator()(BasicClause* ptr1, BasicClause* ptr2) const {
     return
-      ptr1->size() > ptr2->size() ||
-      ptr1->size() == ptr2->size() && ptr1->get_id() > ptr2->get_id();
+      (ptr1->size() > ptr2->size()) ||
+      (ptr1->size() == ptr2->size() && ptr1->get_id() > ptr2->get_id());
   }
 };
 
@@ -121,7 +121,7 @@ class LitVectHash {
 public:
   ULINT operator()(vector<LINT>* lvect) const {
     //cout << "VECT SIZE:" << lvect->size() <<endl;
-    register ULINT hashv = 0;
+    ULINT hashv = 0;
     //register ULINT hashv = 1;
     //cout << "Hash value: " << hashv << endl; cout.flush();
     for(vector<LINT>::iterator pos=lvect->begin(); pos!=lvect->end(); ++pos) {

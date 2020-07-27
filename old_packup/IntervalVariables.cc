@@ -22,29 +22,26 @@
  * Copyright (C) 2011, Mikolas Janota
  */
 
+#include <string>
 #include "IntervalVariables.hh"
 #include "EncoderTypes.hh"
 
 Variable IntervalVariables::get_variable(const PackageVersion& pv, PackageVersionMap& map,
         PackageToVersions& vvs,
-        const string& map_name, bool& is_fresh) {    
+        const string& map_name, bool& is_fresh) {
     PackageVersionMap::const_iterator index = map.find(pv);
     if (index != map.end()) {
         is_fresh = false;
         return index->second;
     }
-    //cerr << "adding " << pv.to_string() << " to " << map_name << endl;
     is_fresh = true;
     Variable nv = new_variable();
     map[pv] = nv;
-#ifdef MAPPING 
-    string nm= map_name + pv.to_string();
+#ifdef MAPPING
+    string nm = map_name + pv.to_string();
     variable_names[nv] = nm;
     mapping << nv << "->" << nm << endl;
 #endif
     record_version(vvs, pv.name(), pv.version());
     return nv;
 }
-
-
-

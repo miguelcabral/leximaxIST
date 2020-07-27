@@ -42,10 +42,13 @@
 #define CHUNK_LIMIT 1048576
 #define SMALL_CHUNK_LIMIT 1024
 
+#include <zlib.h>
+#include <cstdio>
+#include <string>
 class StreamBuffer {
 protected:
   gzFile  in;
-  char    *buf; //buf[CHUNK_LIMIT];
+  char    *buf;
   int     pos;
   int     size;
 
@@ -116,12 +119,12 @@ static bool skipText(B& in, char* text) {
     return true; }
 
 template<class B>
-static string readString(B& in) {
-  string rstr;
+static std::string readString(B& in) {
+  std::string rstr;
   skipWhitespace(in);
-  while (*in >= '0' && *in <= '9' ||
-	 *in >= 'a' && *in <= 'z' ||
-	 *in >= 'A' && *in <= 'Z' ||
+  while ((*in >= '0' && *in <= '9') ||
+	 (*in >= 'a' && *in <= 'z') ||
+	 (*in >= 'A' && *in <= 'Z') ||
 	 (*in == '_') || (*in == '.')) {
     rstr.push_back(*in); ++in;
   }
@@ -155,5 +158,4 @@ static XLINT parseLongInt(B& in) {
     return rval; }
 
 #endif /* _FMTUTILS_H */
-
 /*----------------------------------------------------------------------------*/

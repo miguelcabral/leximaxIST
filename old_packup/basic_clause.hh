@@ -185,7 +185,7 @@ protected:
 
   ULINT compute_hash() {    // Not being used: see below new hash functions
     exit(0);
-    register ULINT hashv = 0;
+    ULINT hashv = 0;
     for(vector<LINT>::iterator pos = clits.begin(); pos != clits.end(); ++pos) {
       hashv ^= (*pos>0) ? *pos : -*pos;
     }

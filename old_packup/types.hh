@@ -158,11 +158,10 @@ struct eqint {
 #include <map>
 #include <set>
 /* #include <ext/slist>          // Location of STL list extensions */
-#include <unordered_map>       // Location of STL hash extensions
-#include <unordered_set>       // Location of STL hash extensions
+#include <unordered_map>
+#include <unordered_set>
 
 using namespace std;
-/* using namespace __gnu_cxx;    // Required for STL hash extensions */
 
 
 #ifdef USE_RBTREE_SETS
@@ -177,13 +176,10 @@ public:
   }
   friend ostream & operator << (ostream& outs, StdSet<T>& ss) {
     ss.dump(outs); return outs; }
-  inline bool exists(T v) { return this->find(v) != this->end(); }
+  inline bool exists(T v) const { return this->find(v) != this->end(); }
 };
 
 typedef StdSet<int> IntSet;
-
-template <class K>    // K should be pointer type
-class RefSet : public StdSet<K> { };
 
 template <class TK, class TV>
 class StdMap : public multimap<TK,TV> {
@@ -223,33 +219,34 @@ class RefKeyMap : public StdMap<K,V> { };
 template <class T, class H, class E>
 class StdSet : public unordered_set<T,H,E> {
 public:
-  inline bool exists(T v) { return this->find(v) != this->end(); }
-  inline void insert(T v) {
-    unsigned int sz = this->size();
-    if (sz >= 2*this->bucket_count()) {  // Optimizing # resizes
-      //DBG(
-      cout<<"Resizing a ""T"" set "<<endl;
-      //);
-      this->resize(8*(sz+(sz==0)?1:0)+1); }
-    unordered_set<T,H,E>::insert(v); }
-  void dump(ostream& outs=std::cout) {
+  StdSet() {
+      this->max_load_factor(0.5);
+  }
+
+  inline bool exists(T v) const { return this->find(v) != this->end(); }
+
+  void dump(ostream& outs=std::cout) const {
     typename StdSet<T,H,E>::iterator npos = this->begin();
     typename StdSet<T,H,E>::iterator nend = this->end();
-    for (; npos != nend; ++npos) { outs << *npos << " "; }
+    for (; npos != nend; ++npos)
+      outs << *npos << " ";
   }
-  friend ostream & operator << (ostream& outs, StdSet<T,H,E>& ss) {
-    ss.dump(outs); return outs; }
+
+  friend ostream & operator << (ostream& outs, const StdSet<T,H,E>& ss) {
+    ss.dump(outs);
+    return outs;
+  }
 };
 
 typedef StdSet<int,IntHash,IntEqual> IntSet;
 
-template <class K>    // K should be pointer type
-class RefSet : public StdSet<K,PtrHash,PtrEqual> { };
-
 template <class TK, class TV, class H, class E>
 class StdMap : public unordered_multimap<TK,TV,H,E> {
 public:
-  inline bool exists(TK k) { return this->find(k) != this->end(); }
+  StdMap() {
+      this->max_load_factor(0.5);
+  }
+  inline bool exists(TK k) const { return this->find(k) != this->end(); }
   inline bool exists(TK k, TV v) {
     pair<typename StdMap<TK,TV,H,E>::iterator,
       typename StdMap<TK,TV,H,E>::iterator> pp = this->equal_range(k);
@@ -257,17 +254,9 @@ public:
     typename StdMap<TK,TV,H,E>::iterator pend = pp.second;
     for(; ppos != pend; ++ppos) { if (ppos->second == v) { return true; } }
     return false; }
-  inline void insert(pair<TK,TV> v) {
-    unsigned int sz = this->size();
-    if (sz >= 2*this->bucket_count()) {  // Optimizing # resizes
-      //DBG(
-      cout<<"Resizing a ""TK"" map "<<endl;
-      //);
-      this->resize(8*(sz+(sz==0)?1:0)+1); }
-    unordered_multimap<TK,TV,H,E>::insert(v); }
   inline void insert(TK v1, TV v2) {
     this->insert(make_pair(v1,v2)); }
-  inline TV lookup(TK k) { assert(exists(k)); return find(k)->second; }
+  inline TV lookup(TK k) const { assert(exists(k)); return find(k)->second; }
   void dump(ostream& outs=std::cout) {
     typename StdMap<TK,TV,H,E>::iterator npos = this->begin();
     typename StdMap<TK,TV,H,E>::iterator nend = this->end();

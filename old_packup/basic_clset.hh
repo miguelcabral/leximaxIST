@@ -166,11 +166,11 @@ public:
 
   ULINT get_cl_max_lit(BasicClause* cl) { return cl->get_max_lit(); }
 
-  void set_num_vars(ULINT nvars) { }
+  void set_num_vars(ULINT) { }
 
   ULINT get_num_vars() { return -1; }
 
-  void set_num_cls(ULINT ncls) { }
+  void set_num_cls(ULINT) { }
 
   ULINT get_num_cls() { return size(); }
 
