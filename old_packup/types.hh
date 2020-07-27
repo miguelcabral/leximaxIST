@@ -188,17 +188,20 @@ class RefSet : public StdSet<K> { };
 template <class TK, class TV>
 class StdMap : public multimap<TK,TV> {
 public:
-  inline bool exists(TK k) { return this->find(k) != this->end(); }
-  inline bool exists(TK k, TV v) {
-    pair<typename StdMap<TK,TV>::iterator,
-      typename StdMap<TK,TV>::iterator> pp = equal_range(k);
-    typename StdMap<TK,TV>::iterator ppos = pp.first;
-    typename StdMap<TK,TV>::iterator pend = pp.second;
-    for(; ppos != pend; ++ppos) { if (ppos->second == v) { return true; } }
-    return false; }
+  inline bool exists(TK k) const { return this->find(k) != this->end(); }
+  inline bool exists(TK k, TV v) const {
+      const auto pp = equal_range(k);
+      auto ppos = pp.first;
+      const auto pend = pp.second;
+      for(; ppos != pend; ++ppos) {
+          if (ppos->second == v)
+              return true;
+      }
+      return false;
+  }
   inline void insert(pair<TK,TV> v) { multimap<TK,TV>::insert(v); }
   inline void insert(TK v1,TV v2) { this->insert(make_pair(v1,v2)); }
-  inline TV lookup(TK k) { assert(exists(k)); return this->find(k)->second; }
+  inline TV lookup(TK k) const { assert(exists(k)); return this->find(k)->second; }
   void dump(ostream& outs=std::cout) {
     typename StdMap<TK,TV>::iterator npos = this->begin();
     typename StdMap<TK,TV>::iterator nend = this->end();
