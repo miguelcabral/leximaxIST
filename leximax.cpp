@@ -11,6 +11,7 @@
 #include "old_packup/cl_globals.hh"
 #include "old_packup/cl_types.hh"
 #include "old_packup/ReadCNF.hh"
+/* using std::make_pair; */
 
 /* a sorting network is a vector with size equal to the number of wires.
  * Entry i contains the last comparator (in the construction of the sorting network) that connects to wire i.
@@ -117,13 +118,13 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
     if(size1 == 0 || size2 == 0){
         // nothing to merge
     }
-    if(size1 == 1 && size2 == 1){
+    else if(size1 == 1 && size2 == 1){
         // merge two elements with a single comparator.
         el1 = seq1.first.first;
         el2 = seq2.first.first;
         insert_comparator(hard, el1, el2, id_count, objective, sorting_network);
     }
-    if(size1*size2 > 1){
+    else {
         // merge odd subsequences
         // size of odd subsequence is the ceiling of half of the size of the original sequence
         LINT new_size = size1/2;
@@ -187,10 +188,11 @@ void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_
     LINT first_elem = elems_to_sort.first;
     if(size == 1){
         // do nothing - a single element is already sorted.
-    };
+    }
     if(size > 1){
         LINT m = size/2;
         LINT n = m;
+        /* sera? const LINT n = size - m; */
         if(size % 2 != 0)
             n++;
         std::pair<LINT,LINT> split1(first_elem, m);
@@ -272,10 +274,9 @@ int main(int argc, char *argv[])
     for(short i{0}; i < num_objectives; ++i){   
         std::vector<LINT> *objective = objectives[i];
         LINT num_terms = objective->size();
-        std::pair<LINT, LINT> sorted_vec (id_count + 1, id_count + num_terms);
-        sorted_vecs[i]=sorted_vec;
+        sorted_vecs[i]= std::make_pair(id_count + 1, id_count + num_terms);
         id_count += num_terms;
-        SNET sorting_network(num_terms); // sorting_network is initialized to a vector of nullptrs
+        SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
         // elems_to_sort is represented by a pair (first element, number of elements).
         std::pair<LINT,LINT> elems_to_sort(0,num_terms);
         encode_network(hard, elems_to_sort, id_count, objective, sorting_network);
@@ -284,7 +285,7 @@ int main(int argc, char *argv[])
             if(sorting_network[j]==nullptr)
                 std::cout << "Entry " << j << " of the sorting network is null" << std::endl;
             LINT output_j = sorting_network[j]->second;
-            LINT o = sorted_vec.first + j;
+            LINT o = sorted_vecs[i].first + j;
             // encode o is equivalent to output_j
             std::vector<LINT> lits;
             lits.push_back(-o);
