@@ -23,18 +23,23 @@
  */
 
 #ifndef VESIONINSTALLED_HH
-#define	VESIONINSTALLED_HH
+#define VESIONINSTALLED_HH
 #include "common_types.hh"
 
 class VersionInstalled {
 public:
-    inline VersionInstalled(Version version,bool installed)
-    : _version(version),_installed(installed)  {}
-    
+    inline VersionInstalled(Version version, bool installed)
+    : _version(version), _installed(installed)  {}
+
     inline VersionInstalled(const VersionInstalled& orig)
-    : _version(_version), _installed(orig._installed) {}
-    
-    
+    : _version(orig._version), _installed(orig._installed) {}
+
+    VersionInstalled& operator =(const VersionInstalled& orig) {
+        _version = orig._version;
+        _installed = orig._installed;
+        return *this;
+    }
+
     inline Version version() const {return _version;}
     inline bool installed() const {return _installed;}
 private:
@@ -43,11 +48,10 @@ private:
 };
 
 struct VersionInstalledCmp {
- inline bool operator()(const VersionInstalled& v1,const VersionInstalled& v2) const
- {
-     return v1.version()<v2.version();
- }
+  inline bool operator()(const VersionInstalled& v1, const VersionInstalled& v2) const {
+    return v1.version() < v2.version();
+  }
 };
 
-#endif	/* VESIONINSTALLED_HH */
+#endif /*VESIONINSTALLED_HH*/
 
