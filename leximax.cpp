@@ -105,6 +105,16 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
     }  
 }
 
+LINT ceiling_of_half(LINT number)
+{
+    // floor
+    LINT result = number/2;
+    // if number is odd then add 1
+    if(number % 2 != 0)
+        result++;
+    return result;
+}
+
 void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, LINT &id_count, std::vector<LINT> *objective, SNET &sorting_network)
 {
     LINT el1;
@@ -127,29 +137,21 @@ void odd_even_merge(ReadCNF &hard, std::pair<std::pair<LINT,LINT>,LINT> seq1, st
     else {
         // merge odd subsequences
         // size of odd subsequence is the ceiling of half of the size of the original sequence
-        LINT new_size = size1/2;
-        if(size1 % 2 != 1)
-            new_size++;
-        std::pair<LINT,LINT> p1(seq1.first.first,new_size);
+        std::pair<LINT,LINT> p1(seq1.first.first,ceiling_of_half(size1));
         LINT offset = 2*seq1.second;
         std::pair<std::pair<LINT,LINT>,LINT> odd1(p1,offset);
-        new_size = size2/2;
-        if(size2 % 2 != 1)
-            new_size++;
-        std::pair<LINT,LINT> p2(seq2.first.first,new_size);
+        std::pair<LINT,LINT> p2(seq2.first.first,ceiling_of_half(size2));
         offset = 2*seq2.second;
         std::pair<std::pair<LINT,LINT>,LINT> odd2(p2,offset);
         odd_even_merge(hard, odd1, odd2, id_count, objective, sorting_network);
         // merge even subsequences
         // size of even subsequence is the floor of half of the size of the original sequence
-        new_size = size1/2;
         offset = seq1.second;
-        p1 = std::make_pair(seq1.first.first + offset, new_size);
+        p1 = std::make_pair(seq1.first.first + offset, size1/2);
         offset = 2*offset;
         std::pair<std::pair<LINT,LINT>,LINT> even1(p1,offset);
-        new_size = size2/2;
         offset = seq2.second;
-        p2 = std::make_pair(seq2.first.first + offset, new_size);
+        p2 = std::make_pair(seq2.first.first + offset, size2/2);
         offset = 2*offset;
         std::pair<std::pair<LINT,LINT>,LINT> even2(p2, offset);
         odd_even_merge(hard, even1, even2, id_count, objective, sorting_network);
@@ -191,10 +193,7 @@ void encode_network(ReadCNF &hard, std::pair<LINT,LINT> elems_to_sort, LINT &id_
     }
     if(size > 1){
         LINT m = size/2;
-        LINT n = m;
-        /* sera? const LINT n = size - m; */
-        if(size % 2 != 0)
-            n++;
+        LINT n = size - m;
         std::pair<LINT,LINT> split1(first_elem, m);
         std::pair<LINT,LINT> split2(first_elem + m, n);
         // recursively sort the first m elements and the last n elements
