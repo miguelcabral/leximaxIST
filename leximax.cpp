@@ -15,20 +15,13 @@
 
 void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
 {
-    // fresh_var implies cl
+    // fresh_var OR cl
     std::vector<LINT> lits;
-    lits.push_back(-fresh_var);
+    lits.push_back(fresh_var);
     for(Literator it = cl->begin(); it != cl->end(); ++it){
         lits.push_back(*it);
     }
     hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
-    // not fresh_var implies not cl
-    for(Literator it = cl->begin(); it != cl->end(); ++it){
-        lits.clear();
-        lits.push_back(-*it);
-        lits.push_back(fresh_var);
-        hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
-    }  
 }
 
 void print_clause(BasicClause *cl)
@@ -72,22 +65,18 @@ int main(int argc, char *argv[])
     }
     std::vector<std::vector<LINT>*> objectives(num_objectives);
     LINT id_count{ hard.get_max_id() };
-    // convert soft clauses to objective function.
+    // convert soft clauses to objective functions. Add fresh variable for each clause.
     for(int i{0}; i < num_objectives; ++i){
         ReadCNF *obj = read_objectives[i];
         std::vector<BasicClause*> cls = obj->get_clause_vector();
         std::vector<LINT> *obj_conv = new std::vector<LINT>();
         for(LINT j{0}; j < cls.size(); ++j){
             BasicClause *cl = cls[j];
-            if(cl->size() > 1 || *(cl->begin()) < 0){
-                LINT fresh_var = id_count + 1;
-                id_count++;
-                // encode fresh_var
-                encode_fresh(hard, cl, fresh_var);
-                obj_conv->push_back(fresh_var);
-            }
-            else
-                obj_conv->push_back(*(cl->begin()));
+            LINT fresh_var = id_count + 1;
+            id_count++;
+            // encode fresh_var
+            encode_fresh(hard, cl, fresh_var);
+            obj_conv->push_back(fresh_var);
         }
         objectives[i] = obj_conv;        
     }
