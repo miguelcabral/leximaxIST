@@ -12,6 +12,6 @@ p cnf 3 3
 ```
 
 #### Commands:
-- To compile: make
-- To run: ./leximax <SAT-constraints-file> <objective1-file> <objective2-file> ...
-- To remove leximax: make clean
+- To compile: `make`
+- To run: `./leximax <SAT-constraints-file> <objective1-file> <objective2-file> ...`
+- To remove leximax: `make clean`
