@@ -18,6 +18,7 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
     // fresh_var OR cl
     std::vector<LINT> lits;
     lits.push_back(fresh_var);
+    /* for (auto l : *cl) lits.push_back(l); */
     for(Literator it = cl->begin(); it != cl->end(); ++it){
         lits.push_back(*it);
     }
@@ -36,7 +37,7 @@ void print_cnf(ReadCNF &hard, LINT id_count)
 {
     std::vector<BasicClause*> cls = hard.get_clause_vector();
     std::cout << "p cnf " << id_count << " " << cls.size() << std::endl;
-    for(LINT i{0}; i < cls.size(); ++i){
+    for(size_t i{0}; i < cls.size(); ++i){
         print_clause(cls.at(i));
     }
 }
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
         ReadCNF *obj = read_objectives[i];
         std::vector<BasicClause*> cls = obj->get_clause_vector();
         std::vector<LINT> *obj_conv = new std::vector<LINT>();
-        for(LINT j{0}; j < cls.size(); ++j){
+        for(size_t j{0}; j < cls.size(); ++j){
             BasicClause *cl = cls[j];
             LINT fresh_var = id_count + 1;
             id_count++;
