@@ -30,7 +30,7 @@ public:
     virtual ~ReadCNF();
     void read();
     LINT get_max_id() {return mxid;}
-    BasicClauseSet& get_clauses()  {return clauses;}
+    BasicClauseSet get_clauses()  {return clauses;}
     std::vector<BasicClause*>& get_clause_vector() {return clause_vector;}
 private:
      gzFile input_file;

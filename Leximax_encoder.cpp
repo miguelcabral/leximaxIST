@@ -6,9 +6,10 @@ Leximax_encoder::Leximax_encoder(int num_objectives)
     m_num_objectives = num_objectives;
     m_objectives(num_objectives, nullptr);
     m_sorted_vecs(num_objectives);
+    m_id_count(0);
 }
 
-void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
+void Leximax_encoder::encode_fresh(BasicClause *cl, LINT fresh_var)
 {
     // fresh_var OR cl
     std::vector<LINT> lits;
@@ -22,8 +23,8 @@ void encode_fresh(ReadCNF &hard, BasicClause *cl, LINT fresh_var)
 
 void Leximax_encoder::print_clause(BasicClause *cl)
 {
-    for(Literator it = cl->begin(); it != cl->end(); ++it){
-        std::cout << *it << " ";
+    for (auto l : *cl)
+        std::cout << l << " ";
     };
     std::cout << "0" << std::endl;
 }
@@ -32,13 +33,12 @@ void Leximax_encoder::print_cnf(LINT id_count)
 {
     std::cout << "p cnf " << id_count << " " << m_constraints.size() << std::endl;
     for(size_t i{0}; i < cls.size(); ++i){
-        Leximax_encoder::print_clause(cls.at(i));
+        print_clause(cls.at(i));
     }
 }
 
-int Leximax_encoder::read(char *files[])
+int Leximax_encoder::read(char *argv[])
 {
-    
     gzFile in = gzopen(argv[1], "rb");
     if (in == Z_NULL) {
        exit(0);
@@ -46,8 +46,9 @@ int Leximax_encoder::read(char *files[])
     ReadCNF hard(in);
     hard.read();
     gzclose(in);
-    std::vector<ReadCNF*> read_objectives;
-    for(int i{2}; i < argc; ++i){
+    m_constraints = hard.get_clauses();
+    std::vector<ReadCNF*> read_objectives(m_num_objectives, nullptr);
+    for(int i{2}; i < m_num_objectives + 2; ++i){
         in = gzopen(argv[i], "rb");
         if (in == Z_NULL) {
             exit(0);
@@ -55,24 +56,24 @@ int Leximax_encoder::read(char *files[])
         ReadCNF *obj = new ReadCNF(in);
         obj->read();
         gzclose(in);
-        read_objectives.push_back(obj);
+        read_objectives[i-2] = obj;
     }
-    std::vector<std::vector<LINT>*> objectives(num_objectives);
-    LINT id_count{ hard.get_max_id() };
+    m_id_count = hard.get_max_id();
     // convert soft clauses to objective functions. Add fresh variable for each clause.
-    for(int i{0}; i < num_objectives; ++i){
+    for(int i{0}; i < m_num_objectives; ++i){
         ReadCNF *obj = read_objectives[i];
         std::vector<BasicClause*> cls = obj->get_clause_vector();
         std::vector<LINT> *obj_conv = new std::vector<LINT>();
         for(size_t j{0}; j < cls.size(); ++j){
             BasicClause *cl = cls[j];
-            LINT fresh_var = id_count + 1;
-            id_count++;
+            LINT fresh_var = m_id_count + 1;
+            m_id_count++;
             // encode fresh_var
-            encode_fresh(hard, cl, fresh_var);
-            obj_conv->push_back(fresh_var);
+            encode_fresh(cl, fresh_var);
         }
-        objectives[i] = obj_conv;        
+        m_objectives[i] = obj_conv;
+        // delete ReadCNF of i-th objective function
+        delete obj;
     }
 }
 
