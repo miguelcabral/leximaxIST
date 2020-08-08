@@ -13,12 +13,13 @@
 
 int main(int argc, char *argv[])
 {
-    // read input problem: hard.cnf f_1.cnf f_2.cnf ...
+    
     int num_objectives = argc-2;
     Leximax_encoder enc(num_objectives);
+    // read input problem: hard.cnf f_1.cnf f_2.cnf ...
     enc.read(argv);
     // encode sorted vectors with sorting network
-
+    enc.encode_sorted();/*
     // solve - iteratively call MaxSAT solver
     for(int i = 0; i < num_objectives; ++i){
         // in each iteration i there are sorted vectors after the i-th relaxation
@@ -49,8 +50,8 @@ int main(int argc, char *argv[])
         
         // call MaxSAT solver
     }
-    
+    */
     // check if sorting_network is working: print clauses and send to sat solver.
-    print_cnf(hard, id_count);
+    enc.print_cnf();
     return 0;
 }

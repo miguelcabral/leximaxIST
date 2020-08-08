@@ -5,7 +5,7 @@ Leximax_encoder::Leximax_encoder(int num_objectives)
 {
     m_num_objectives = num_objectives;
     m_objectives(num_objectives, nullptr);
-    m_sorted_vecs(num_objectives);
+    m_sorted_vecs(num_objectives, nullptr);
     m_id_count(0);
 }
 
@@ -29,9 +29,9 @@ void Leximax_encoder::print_clause(BasicClause *cl)
     std::cout << "0" << std::endl;
 }
 
-void Leximax_encoder::print_cnf(LINT id_count)
+void Leximax_encoder::print_cnf()
 {
-    std::cout << "p cnf " << id_count << " " << m_constraints.size() << std::endl;
+    std::cout << "p cnf " << m_id_count << " " << m_constraints.size() << std::endl;
     for(size_t i{0}; i < cls.size(); ++i){
         print_clause(cls.at(i));
     }
@@ -79,36 +79,25 @@ int Leximax_encoder::read(char *argv[])
 
 void Leximax_encoder::encode_sorted()
 {
-    std::vector<std::pair<LINT, LINT>> sorted_vecs(num_objectives);
-    for(int i{0}; i < num_objectives; ++i){   
-        std::vector<LINT> *objective = objectives[i];
+    for(int i{0}; i < m_num_objectives; ++i){   
+        std::vector<LINT> *objective = m_objectives[i];
         LINT num_terms = objective->size();
-        sorted_vecs[i]= std::make_pair(id_count + 1, id_count + num_terms);
-        id_count += num_terms;
+        m_sorted_vecs[i] = new std::vector(num_terms, 0);
         SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
         // elems_to_sort is represented by a pair (first element, number of elements).
-        std::pair<LINT,LINT> elems_to_sort(0,num_terms);
-        encode_network(hard, elems_to_sort, id_count, objective, sorting_network);
-        // relate outputs of sorting_network with sorted_vec variables
+        std::pair<LINT,LINT> elems_to_sort(0, num_terms);
+        encode_network(elems_to_sort, m_id_count, objective, sorting_network);
+        // sorted_vec variables are the outputs of sorting_network
         for(LINT j{0}; j < num_terms; j++){
             LINT output_j = sorting_network[j]->second;
-            LINT o = sorted_vecs[i].first + j;
-            // encode o is equivalent to output_j
-            std::vector<LINT> lits;
-            lits.push_back(-o);
-            lits.push_back(output_j);
-            hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
-            lits.clear();
-            lits.push_back(o);
-            lits.push_back(-output_j);
-            hard.get_clause_vector().push_back(hard.get_clauses().create_clause(lits));
+            m_sorted_vecs[i]->[j] = output_j;
         }
-
     }
 }
 
 int Leximax_encoder::solve()
 {
+    return 0;
 }
 
 
