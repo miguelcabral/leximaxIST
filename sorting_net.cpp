@@ -55,8 +55,8 @@ void Leximax_encoder::insert_comparator(LINT el1, LINT el2, std::vector<LINT> *o
     LINT var_out_max = m_id_count + 1;
     m_id_count++;
     // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
-    Leximax_encoder::encode_max(var_out_max, var_in1, var_in2);
-    Leximax_encoder::encode_min(var_out_min, var_in1, var_in2);
+    encode_max(var_out_max, var_in1, var_in2);
+    encode_min(var_out_min, var_in1, var_in2);
     std::pair<LINT,LINT> *comp1;
     std::pair<LINT,LINT> *comp2;
     if(el1 > el2)
@@ -107,14 +107,14 @@ void Leximax_encoder::odd_even_merge(std::pair<std::pair<LINT,LINT>,LINT> seq1, 
         std::pair<std::pair<LINT,LINT>,LINT> odd1(p1, 2*offset1);
         std::pair<LINT,LINT> p2(first2, ceiling_of_half(size2));
         std::pair<std::pair<LINT,LINT>,LINT> odd2(p2, 2*offset2);
-        Leximax_encoder::odd_even_merge(odd1, odd2, objective, sorting_network);
+        odd_even_merge(odd1, odd2, objective, sorting_network);
         // merge even subsequences
         // size of even subsequence is the floor of half of the size of the original sequence
         p1 = std::make_pair(first1 + offset1, size1/2);
         std::pair<std::pair<LINT,LINT>,LINT> even1(p1, 2*offset1);
         p2 = std::make_pair(first2 + offset2, size2/2);
         std::pair<std::pair<LINT,LINT>,LINT> even2(p2, 2*offset2);
-        Leximax_encoder::odd_even_merge(even1, even2, objective, sorting_network);
+        odd_even_merge(even1, even2, objective, sorting_network);
         // comparison-interchange
         for(LINT i{2}; i <= size1; i = i + 2){
             if(i == size1){
@@ -153,11 +153,11 @@ void Leximax_encoder::encode_network(std::pair<LINT,LINT> elems_to_sort, std::ve
         std::pair<LINT,LINT> split1(first_elem, m);
         std::pair<LINT,LINT> split2(first_elem + m, n);
         // recursively sort the first m elements and the last n elements
-        Leximax_encoder::encode_network(split1, objective, sorting_network);
-        Leximax_encoder::encode_network(split2, objective, sorting_network);
+        encode_network(split1, objective, sorting_network);
+        encode_network(split2, objective, sorting_network);
         // merge the sorted m elements and the sorted n elements
         std::pair<std::pair<LINT,LINT>,LINT> seq1(split1,1);
         std::pair<std::pair<LINT,LINT>,LINT> seq2(split2,1);
-        Leximax_encoder::odd_even_merge(seq1, seq2, objective, sorting_network);
+        odd_even_merge(seq1, seq2, objective, sorting_network);
     }
 }
