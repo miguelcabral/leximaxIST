@@ -13,8 +13,11 @@ p cnf 3 3
 
 #### Commands:
 - To compile: `make`
+
 - To run: `./leximax <SAT-constraints-file> <objective1-file> <objective2-file> ...`
+
 - To remove leximax: `make clean`
+
 - To create examples: `g++ -o produce_examples produce_examples.cpp && ./produce_examples <parameter>`, where `parameter` is the maximum number of variables.
 
-enumerate models, use `wget http://sat.inesc-id.pt/~mikolas/sw/pienum/pienum && chmod u+w pienum`
+- enumerate models, use `wget http://sat.inesc-id.pt/~mikolas/sw/pienum/pienum && chmod u+w pienum`

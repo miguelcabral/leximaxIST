@@ -34,6 +34,8 @@ public:
     
     int solve();
     
+    void debug();
+    
     void print_cnf();
     
 private:
