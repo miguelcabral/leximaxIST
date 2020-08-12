@@ -32,7 +32,9 @@ public:
     
     void encode_sorted();
     
-    int solve();
+    int solve_maxsat();
+    
+    int solve_pbo();
     
     void debug();
     

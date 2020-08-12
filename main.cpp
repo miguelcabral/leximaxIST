@@ -13,7 +13,6 @@
 
 int main(int argc, char *argv[])
 {
-    
     int num_objectives = argc-2;
     Leximax_encoder enc(num_objectives);
     // read input problem: hard.cnf f_1.cnf f_2.cnf ...
@@ -22,6 +21,7 @@ int main(int argc, char *argv[])
         return 1;
     // encode sorted vectors with sorting network
     enc.encode_sorted();
+    //enc.debug();
     // check if sorting_network is working: print clauses and send to sat solver.
     enc.print_cnf();
     return 0;

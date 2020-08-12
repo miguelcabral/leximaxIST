@@ -96,14 +96,14 @@ void Leximax_encoder::encode_sorted()
 {
     for(int i{0}; i < m_num_objectives; ++i){   
         std::vector<LINT> *objective = m_objectives[i];
-        LINT num_terms = objective->size();
+        size_t num_terms = objective->size();
         m_sorted_vecs[i] = new std::vector<LINT>(num_terms, 0);
         SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
         // elems_to_sort is represented by a pair (first element, number of elements).
         std::pair<LINT,LINT> elems_to_sort(0, num_terms);
         encode_network(elems_to_sort, objective, sorting_network);
         // sorted_vec variables are the outputs of sorting_network
-        for(LINT j{0}; j < num_terms; j++){
+        for(size_t j{0}; j < num_terms; j++){
             LINT output_j = sorting_network[j]->second;
             std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
             sorted_vec->at(j) = output_j;
@@ -114,10 +114,26 @@ void Leximax_encoder::encode_sorted()
 void Leximax_encoder::debug()
 {
     // create variables equivalent to the sorted vectors to easily check if they are sorted
+    for (int i = 0; i < m_num_objectives; ++i) {
+        std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
+        for (size_t j = 0; j < sorted_vec->size(); ++j) {
+            LINT s = sorted_vec->at(j);
+            LINT fresh = m_id_count + 1;
+            m_id_count++;
+            std::vector<LINT> lits;
+            lits.push_back(fresh);
+            lits.push_back(-s);
+            m_constraints.create_clause(lits);
+            lits.clear();
+            lits.push_back(-fresh);
+            lits.push_back(s);
+            m_constraints.create_clause(lits);
+        }
+    }
     
 }
 
-int Leximax_encoder::solve()
+int Leximax_encoder::solve_maxsat()
 {
     /*
     // solve - iteratively call MaxSAT solver
@@ -154,4 +170,8 @@ int Leximax_encoder::solve()
     return 0;
 }
 
+int Leximax_encoder::solve_pbo()
+{
+    
+}
 
