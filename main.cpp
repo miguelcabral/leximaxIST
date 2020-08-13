@@ -23,6 +23,6 @@ int main(int argc, char *argv[])
     enc.encode_sorted();
     //enc.debug();
     // check if sorting_network is working: print clauses and send to sat solver.
-    enc.print_cnf();
-    return 0;
+    //enc.print_cnf();
+    return enc.solve();
 }

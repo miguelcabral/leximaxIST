@@ -23,6 +23,8 @@ private:
     std::vector<std::vector<LINT>*> m_objectives;
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
+    std::string m_solver;
+    bool m_pbo;
     
 public:
     
@@ -32,9 +34,7 @@ public:
     
     void encode_sorted();
     
-    int solve_maxsat();
-    
-    int solve_pbo();
+    int solve();
     
     void debug();
     
@@ -55,6 +55,14 @@ private:
     void odd_even_merge(std::pair<std::pair<LINT,LINT>,LINT> seq1, std::pair<std::pair<LINT,LINT>,LINT> seq2, std::vector<LINT> *objective, SNET &sorting_network);
     
     void encode_network(std::pair<LINT,LINT> elems_to_sort, std::vector<LINT> *objective, SNET &sorting_network);
+    
+    size_t largest_obj();
+    
+    void encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs);
+    
+    int solve_maxsat();
+    
+    int solve_pbo();
 
 };
     
