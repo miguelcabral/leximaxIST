@@ -163,10 +163,15 @@ void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_v
             lits.push_back(first_sorted_relax + k);
             lits.push_back(-(sorted_vec->at(k)));
             m_constraints.create_clause(lits);
-            lits.clear();
         }
     }
     // cardinality constraint TODO
+    // at most i constraint with naive encoding - does not matter because m_num_objectives is small
+    // for every combination of i vars, one of them must be false
+    
+    
+    // at least i constraint -> should I put this one?
+    
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -185,7 +190,7 @@ int Leximax_encoder::solve()
     for (int i = 0; i < m_num_objectives; ++i) {
         // in each iteration i there are sorted vectors after the i-th relaxation
         std::vector<LINT> sorted_relax_vecs(m_num_objectives, 0); // In each sorted_relax vector we only store the first component
-        encode_relaxation(i, sorted_relax_vecs);
+        encode_relaxation(i, sorted_relax_vecs); // create the vars in sorted_relax_vecs and encode the relax vars
         // soft clauses
         // find size of largest objective function
         size_t largest = largest_obj();
