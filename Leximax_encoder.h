@@ -4,6 +4,7 @@
 #include <iostream> // std::cout, std::cin
 #include <vector> // std::vector
 #include <utility> // std::pair
+#include <forward_list> // std::forward_list
 #include "old_packup/basic_clause.hh"
 #include "old_packup/basic_clset.hh"
 #include "old_packup/basic_types.h"
@@ -57,6 +58,10 @@ private:
     void encode_network(std::pair<LINT,LINT> elems_to_sort, std::vector<LINT> *objective, SNET &sorting_network);
     
     size_t largest_obj();
+    
+    void all_subsets(std::forward_list<LINT> &set, int i, std::vector<LINT> &clause_vec);
+    
+    void at_most(std::forward_list<LINT> &set, int i);
     
     void encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs);
     

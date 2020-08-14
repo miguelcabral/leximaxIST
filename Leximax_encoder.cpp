@@ -135,6 +135,43 @@ void Leximax_encoder::debug()
     
 }
 
+int list_size(std::forward_list<LINT> &mylist)
+{
+    int s = 0;
+    for (LINT elem : mylist) {
+        s++;
+    }
+    return s;
+}
+
+void Leximax_encoder::all_subsets(std::forward_list<LINT> &set, int i, std::vector<LINT> &clause_vec)
+{
+    int size = clause_vec.size();
+    // Base of recursion: 
+    // when |set| = i, then set is the only subset of size i
+    int set_size = list_size(set);
+    if (set_size = i) {
+        int j = size - i;
+        for (LINT elem : set) {
+            clause_vec[j] = elem;
+            j++;
+        }
+        // add clause to constraints
+        m_constraints.create_clause(clause_vec);
+    }
+    // when i = 1, then each element of set is a subset of size 1
+    if (i == 1) {
+        
+    }
+    
+}
+
+void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
+{
+    std::vector<LINT> clause_vec(i, -1);
+    all_subsets(set, i, clause_vec);
+}
+
 void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs)
 {
     LINT first_relax_var = m_id_count + 1; // We only store the first relaxation variable
@@ -168,7 +205,7 @@ void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_v
     // cardinality constraint TODO
     // at most i constraint with naive encoding - does not matter because m_num_objectives is small
     // for every combination of i vars, one of them must be false
-    
+    //at_most(first_relax_var, i);
     
     // at least i constraint -> should I put this one?
     
