@@ -59,9 +59,9 @@ private:
     
     size_t largest_obj();
     
-    void all_subsets(std::forward_list<LINT> &set, int i, std::vector<LINT> &clause_vec);
+    void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
-    void at_most(std::forward_list<LINT> &set, int i);
+    public: void at_most(std::forward_list<LINT> &set, int i);
     
     void encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs);
     

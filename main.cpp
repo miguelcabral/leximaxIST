@@ -21,8 +21,14 @@ int main(int argc, char *argv[])
         return 1;
     // encode sorted vectors with sorting network
     enc.encode_sorted();
-    //enc.debug();
-    // check if sorting_network is working: print clauses and send to sat solver.
-    //enc.print_cnf();
-    return enc.solve();
+    // enc.debug();
+    enc.solve();
+    /* at_most test
+    std::forward_list<LINT> test_list({1,2,3,4,5,6});
+    for (LINT elem : test_list)
+        std::cout << "Element of list: " << elem << '\n';
+    enc.at_most(test_list, 3);
+    */
+    enc.print_cnf();
+    return 0;
 }

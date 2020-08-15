@@ -144,30 +144,53 @@ int list_size(std::forward_list<LINT> &mylist)
     return s;
 }
 
-void Leximax_encoder::all_subsets(std::forward_list<LINT> &set, int i, std::vector<LINT> &clause_vec)
+void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec)
 {
     int size = clause_vec.size();
     // Base of recursion: 
-    // when |set| = i, then set is the only subset of size i
+    // when |set| == i, then set is the only subset of size i
     int set_size = list_size(set);
-    if (set_size = i) {
+    if (set_size == i) {
         int j = size - i;
         for (LINT elem : set) {
             clause_vec[j] = elem;
             j++;
         }
         // add clause to constraints
+        std::cout << "Combination: ";
+        for (LINT lit : clause_vec) {
+            std::cout << lit << " ";
+        }
+        std::cout << '\n';
         m_constraints.create_clause(clause_vec);
     }
-    // when i = 1, then each element of set is a subset of size 1
-    if (i == 1) {
-        
+    // when i == 1, then each element of set is a subset of size 1
+    else if (i == 1) {
+        for (LINT elem : set) {
+            clause_vec[size-1] = elem;
+            // add clause to constraints
+            std::cout << "Combination: ";
+            for (LINT lit : clause_vec) {
+                std::cout << lit << " ";
+            }
+            std::cout << '\n';
+            m_constraints.create_clause(clause_vec);
+        }
     }
-    
+    else {
+    // Step of recursion: the combinations that include the first element of set + those that don't include it
+    LINT first_el = set.front();
+    set.pop_front();
+    clause_vec[size - i] = first_el;
+    all_subsets(set, i-1, clause_vec); // combinations that include first_el
+    all_subsets(set, i, clause_vec); // combinations that don't include first_el
+    }
 }
 
 void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 {
+    // implementation with naive encoding
+    // for every combination of i vars, one of them must be false
     std::vector<LINT> clause_vec(i, -1);
     all_subsets(set, i, clause_vec);
 }
@@ -203,12 +226,13 @@ void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_v
         }
     }
     // cardinality constraint TODO
-    // at most i constraint with naive encoding - does not matter because m_num_objectives is small
-    // for every combination of i vars, one of them must be false
-    //at_most(first_relax_var, i);
+    // at most i constraint 
+    std::forward_list<LINT> relax_vars;
+    for (int j = 0; j < m_num_objectives; ++j)
+        relax_vars.push_front(first_relax_var + j);
+    at_most(relax_vars, i);
     
     // at least i constraint -> should I put this one?
-    
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -225,27 +249,42 @@ int Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
     for (int i = 0; i < m_num_objectives; ++i) {
-        // in each iteration i there are sorted vectors after the i-th relaxation
-        std::vector<LINT> sorted_relax_vecs(m_num_objectives, 0); // In each sorted_relax vector we only store the first component
-        encode_relaxation(i, sorted_relax_vecs); // create the vars in sorted_relax_vecs and encode the relax vars
-        // soft clauses
-        // find size of largest objective function
-        size_t largest = largest_obj();
-        LINT first_soft = m_id_count + 1;
-        m_id_count += largest; // create the variables of the soft clauses of this iteration
-        // encode the componentwise OR between sorted_relax vectors
-        
-        // call solver
-        
-        if (m_pbo)
-            solve_pbo();
-        else
-            solve_maxsat();
-        
-        // read output file and fix values of current objective function
+        if (i == m_num_objectives) {
+            // last iteration is done differently
+        }
+        else {
+            if (i != 0) { // in the first iteration i == 0 there is no relaxation
+                std::vector<LINT> sorted_relax_vecs(m_num_objectives, 0); // In each sorted_relax vector we only store the first component
+                encode_relaxation(i, sorted_relax_vecs); // create the vars in sorted_relax_vecs and encode the relax vars
+            }
+            
+            // soft clauses
+            // find size of largest objective function
+            /*
+            size_t largest = largest_obj();
+            LINT first_soft = m_id_count + 1;
+            m_id_count += largest; // create the variables of the soft clauses of this iteration
+            // encode the componentwise OR between sorted_relax vectors
+            if (i == 0) {
+                // the OR is between sorted vecs
+            }
+            else {
+                // the OR is between sorted vecs after relaxation
+            }
+            */
+            // call solver
+            
+            if (m_pbo)
+                solve_pbo();
+            else
+                solve_maxsat();
+            
+            // read output file and fix values of current objective function
+        }
     }
     
     // print solution
+    return 0;
 }
 
 int Leximax_encoder::solve_maxsat()
