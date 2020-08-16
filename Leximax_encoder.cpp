@@ -35,11 +35,11 @@ void Leximax_encoder::print_clause(BasicClause *cl)
 
 void Leximax_encoder::print_cnf()
 {
-    std::cout << "c =========================================\n"
+    std::cout << "c =========================================\n";
     std::cout << "p cnf " << m_id_count << " " << m_constraints.size() << std::endl;
     for(BasicClause *cl : m_constraints)
         print_clause(cl);
-    std::cout << "c =========================================\n"
+    std::cout << "c =========================================\n";
 }
 
 int Leximax_encoder::read(char *argv[])
@@ -224,9 +224,9 @@ void Leximax_encoder::encode_relaxation(int i)
     }
     for (int j = 0; j < m_num_objectives; ++j) {
         // encode relaxation variable of the j-th objective
-        std::vector<LINT> *sorted_relax = m_sorted_relax_vecs[j];
         std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
-        sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
+        std::vector<LINT> *sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
+        m_sorted_relax_vecs[j] = sorted_relax;
         for (size_t k = 0; k < sorted_relax->size(); ++k) {
             // create sorted_relax variables
             sorted_relax->at(k) = m_id_count + 1;
@@ -278,7 +278,7 @@ size_t Leximax_encoder::largest_obj()
 
 void Leximax_encoder::componentwise_OR(int i)
 {
-    std::vector<*std::vector<LINT>> *sorted_vecs = nullptr;
+    std::vector<std::vector<LINT>*> *sorted_vecs(nullptr);
     if (i == 0) {
         // the OR is between sorted vecs
         sorted_vecs = &m_sorted_vecs;
@@ -292,6 +292,7 @@ void Leximax_encoder::componentwise_OR(int i)
         for (int j = 0; j < m_num_objectives; ++j) {
             std::vector<LINT> *sorted_vec = sorted_vecs->at(j);
             // padding with zeros to the left
+            ULINT largest = m_soft_clauses.size();
             if (j >= largest - sorted_vec->size()) {
                 // add component of sorted_vec to the disjunction
                 size_t position = j - (largest - sorted_vec->size());
@@ -300,7 +301,7 @@ void Leximax_encoder::componentwise_OR(int i)
             }
         }
         // disjunction implies soft variable
-        LINT soft_var = cl->begin();
+        LINT soft_var = *(cl->begin());
         std::vector<LINT> lits;
         for (LINT component : disjunction) {
             lits.push_back(soft_var);
@@ -315,23 +316,17 @@ void Leximax_encoder::componentwise_OR(int i)
 
 int Leximax_encoder::solve()
 {
-    // setup for sorted_relax_vecs
-    std::vector<*std::vector<LINT>> sorted_relax_vecs(m_num_objectives, nullptr);
-    for (int i = 0; i < m_num_objectives; ++i) {
-        std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
-        sorted_relax_vecs[i] = new std::vector<LINT>(sorted_vec->size(), 0);
-    }
     // iteratively call (MaxSAT or PBO) solver
     for (int i = 0; i < m_num_objectives; ++i) {
+        m_soft_clauses.clear();
         if (m_debug)
             std::cout << "------------------ ITERATION " << i << " ------------------\n";
-        if (i == m_num_objectives) {
+        if (i == m_num_objectives - 1) {
             // last iteration is done differently
         }
         else {
-            if (i != 0) { // in the first iteration i == 0 there is no relaxation
-                encode_relaxation(i, sorted_relax_vecs); // create the vars in sorted_relax_vecs and encode the relax vars
-            }
+            if (i != 0) // in the first iteration i == 0 there is no relaxation
+                encode_relaxation(i); // create the vars in sorted_relax_vecs and encode the relax vars
             
             // soft clauses
             // find size of largest objective function
@@ -349,8 +344,9 @@ int Leximax_encoder::solve()
                 lits.push_back(first_soft + j);
             m_soft_clauses.create_clause(lits);
             // encode the componentwise OR between sorted_relax vectors
+            std::cout << "began componentwise" << std::endl;
             componentwise_OR(i);
-            
+            std::cout << "ended componentwise" << std::endl;
             // call solver
             if (m_pbo)
                 solve_pbo();

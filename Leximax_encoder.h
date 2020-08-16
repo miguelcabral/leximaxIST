@@ -25,6 +25,7 @@ private:
     std::vector<std::vector<LINT>*> m_objectives;
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
+    std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::string m_solver;
     bool m_pbo;
     bool m_debug;
@@ -65,9 +66,9 @@ public:
     
     void at_most(std::forward_list<LINT> &set, int i);
     
-    void encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs);
+    void encode_relaxation(int i);
     
-    void componentwise_OR();
+    void componentwise_OR(int i);
     
     int solve_maxsat();
     
