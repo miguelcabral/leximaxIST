@@ -8,8 +8,10 @@ Leximax_encoder::Leximax_encoder(int num_objectives) :
     m_objectives(num_objectives, nullptr),
     m_num_objectives(num_objectives),
     m_sorted_vecs(num_objectives, nullptr),
+    m_sorted_relax_vecs(num_objectives, nullptr),
     m_solver("openwbo"),
-    m_pbo(false)
+    m_pbo(false),
+    m_debug(true)
 {
 // just initialization    
 }
@@ -33,9 +35,11 @@ void Leximax_encoder::print_clause(BasicClause *cl)
 
 void Leximax_encoder::print_cnf()
 {
+    std::cout << "c =========================================\n"
     std::cout << "p cnf " << m_id_count << " " << m_constraints.size() << std::endl;
     for(BasicClause *cl : m_constraints)
         print_clause(cl);
+    std::cout << "c =========================================\n"
 }
 
 int Leximax_encoder::read(char *argv[])
@@ -97,24 +101,32 @@ int Leximax_encoder::read(char *argv[])
 
 void Leximax_encoder::encode_sorted()
 {
-    for(int i{0}; i < m_num_objectives; ++i){   
+    for (int i{0}; i < m_num_objectives; ++i) {   
         std::vector<LINT> *objective = m_objectives[i];
         size_t num_terms = objective->size();
         m_sorted_vecs[i] = new std::vector<LINT>(num_terms, 0);
         SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
         // elems_to_sort is represented by a pair (first element, number of elements).
         std::pair<LINT,LINT> elems_to_sort(0, num_terms);
+        if (m_debug)
+            std::cout << "---------------- Sorting Network " << i << " ----------------\n";
         encode_network(elems_to_sort, objective, sorting_network);
         // sorted_vec variables are the outputs of sorting_network
-        for(size_t j{0}; j < num_terms; j++){
+        for (size_t j{0}; j < num_terms; j++) {
             LINT output_j = sorting_network[j]->second;
             std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
             sorted_vec->at(j) = output_j;
         }
+        if (m_debug) {
+            std::cout << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
+            for(size_t j{0}; j < num_terms; j++) {
+                std::cout << "sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
+            }
+        }
     }
 }
 
-void Leximax_encoder::debug()
+void Leximax_encoder::debug_sorted()
 {
     // create variables equivalent to the sorted vectors to easily check if they are sorted
     for (int i = 0; i < m_num_objectives; ++i) {
@@ -158,11 +170,13 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
             j++;
         }
         // add clause to constraints
-        std::cout << "Combination: ";
-        for (LINT lit : clause_vec) {
-            std::cout << lit << " ";
+        if (m_debug) {
+            std::cout << "Combination: ";
+            for (LINT lit : clause_vec) {
+                std::cout << lit << " ";
+            }
+            std::cout << '\n';
         }
-        std::cout << '\n';
         m_constraints.create_clause(clause_vec);
     }
     // when i == 1, then each element of set is a subset of size 1
@@ -170,11 +184,13 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
         for (LINT elem : set) {
             clause_vec[size-1] = elem;
             // add clause to constraints
-            std::cout << "Combination: ";
-            for (LINT lit : clause_vec) {
-                std::cout << lit << " ";
+            if (m_debug) {
+                std::cout << "Combination: ";
+                for (LINT lit : clause_vec) {
+                    std::cout << lit << " ";
+                }
+                std::cout << '\n';
             }
-            std::cout << '\n';
             m_constraints.create_clause(clause_vec);
         }
     }
@@ -196,15 +212,21 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
     all_subsets(set, i, clause_vec);
 }
 
-void Leximax_encoder::encode_relaxation(int i, std::vector<*std::vector<LINT>> &sorted_relax_vecs)
+void Leximax_encoder::encode_relaxation(int i)
 {
-    // TODO -> sorted_relax_vecs has different representation
     LINT first_relax_var = m_id_count + 1;
     m_id_count += m_num_objectives; // create the remaining relaxation vars
+    if (m_debug) {
+        std::cout << "------------ Relaxation variables of iteration " << i << " ------------\n";
+        for (int j = 0; j < m_num_objectives; ++j)
+            std::cout << first_relax_var + j << '\n';
+        std::cout << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
+    }
     for (int j = 0; j < m_num_objectives; ++j) {
         // encode relaxation variable of the j-th objective
-        std::vector<LINT> *sorted_relax = sorted_relax_vecs[j];
+        std::vector<LINT> *sorted_relax = m_sorted_relax_vecs[j];
         std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
+        sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
         for (size_t k = 0; k < sorted_relax->size(); ++k) {
             // create sorted_relax variables
             sorted_relax->at(k) = m_id_count + 1;
@@ -226,12 +248,20 @@ void Leximax_encoder::encode_relaxation(int i, std::vector<*std::vector<LINT>> &
             lits.push_back(-(sorted_vec->at(k)));
             m_constraints.create_clause(lits);
         }
+        if (m_debug) {
+            std::cout << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+            for (size_t k = 0; k < sorted_relax->size(); ++k) {
+                std::cout << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
+            }
+        }
     }
     // cardinality constraint TODO
     // at most i constraint 
     std::forward_list<LINT> relax_vars;
     for (int j = 0; j < m_num_objectives; ++j)
         relax_vars.push_front(first_relax_var + j);
+    if (m_debug)
+        std::cout << "---------------- At most " << i << " Constraint ----------------\n";
     at_most(relax_vars, i);
     // at least i constraint -> should I put this one?
 }
@@ -246,12 +276,21 @@ size_t Leximax_encoder::largest_obj()
     return largest;
 }
 
-void Leximax_encoder::componentwise_OR(std::vector<*std::vector<LINT>> &sorted_vecs)
+void Leximax_encoder::componentwise_OR(int i)
 {
-    for (size_t i = 0; i < largest; ++i) {
+    std::vector<*std::vector<LINT>> *sorted_vecs = nullptr;
+    if (i == 0) {
+        // the OR is between sorted vecs
+        sorted_vecs = &m_sorted_vecs;
+    }
+    else {
+        // the OR is between sorted vecs after relaxation
+        sorted_vecs = &m_sorted_relax_vecs;
+    }
+    for (BasicClause *cl : m_soft_clauses) {
         std::vector<LINT> disjunction;
         for (int j = 0; j < m_num_objectives; ++j) {
-            std::vector<LINT> *sorted_vec = sorted_vecs[j];
+            std::vector<LINT> *sorted_vec = sorted_vecs->at(j);
             // padding with zeros to the left
             if (j >= largest - sorted_vec->size()) {
                 // add component of sorted_vec to the disjunction
@@ -261,6 +300,16 @@ void Leximax_encoder::componentwise_OR(std::vector<*std::vector<LINT>> &sorted_v
             }
         }
         // disjunction implies soft variable
+        LINT soft_var = cl->begin();
+        std::vector<LINT> lits;
+        for (LINT component : disjunction) {
+            lits.push_back(soft_var);
+            lits.push_back(-component);
+            m_constraints.create_clause(lits);
+            lits.clear();
+        }
+        
+        // soft variable implies disjunction -> Should I put this one?
     }
 }
 
@@ -274,6 +323,8 @@ int Leximax_encoder::solve()
     }
     // iteratively call (MaxSAT or PBO) solver
     for (int i = 0; i < m_num_objectives; ++i) {
+        if (m_debug)
+            std::cout << "------------------ ITERATION " << i << " ------------------\n";
         if (i == m_num_objectives) {
             // last iteration is done differently
         }
@@ -284,36 +335,46 @@ int Leximax_encoder::solve()
             
             // soft clauses
             // find size of largest objective function
-            /*
+            
             size_t largest = largest_obj();
             LINT first_soft = m_id_count + 1;
             m_id_count += largest; // create the variables of the soft clauses of this iteration
+            if (m_debug) {
+                std::cout << "------------ Soft variables of iteration " << i << " ------------\n";
+                for (size_t j = 0; j < largest; ++j)
+                    std::cout << first_soft + j << '\n';
+            }
+            std::vector<LINT> lits;
+            for (size_t j = 0; j < largest; ++j)
+                lits.push_back(first_soft + j);
+            m_soft_clauses.create_clause(lits);
             // encode the componentwise OR between sorted_relax vectors
-            if (i == 0) {
-                // the OR is between sorted vecs
-                componentwise_OR(i);
-            }
-            else {
-                // the OR is between sorted vecs after relaxation
-                componentwise_OR(i);
-            }
-            */
-            // call solver
+            componentwise_OR(i);
             
+            // call solver
             if (m_pbo)
                 solve_pbo();
             else
                 solve_maxsat();
             
-            // read output file and fix values of current objective function
+            // read output file and fix values of current objective function //TODO
+            
+            // for now fix the values of the soft clauses to true
+            for (BasicClause *cl : m_soft_clauses) {
+                lits.clear();
+                for (LINT l : *cl)
+                    lits.push_back(l);
+                m_constraints.create_clause(lits);
+            }                
         }
     }
     
-    // print solution
+    // print solution TODO
+    
     return 0;
 }
 
-int Leximax_encoder::solve_maxsat()
+int Leximax_encoder::solve_maxsat()//TODO
 {
     // write input file of the solver
     
@@ -322,7 +383,7 @@ int Leximax_encoder::solve_maxsat()
     return 0;
 }
 
-int Leximax_encoder::solve_pbo()
+int Leximax_encoder::solve_pbo()//TODO
 {
     // write input file of the solver
     

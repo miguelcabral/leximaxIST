@@ -27,6 +27,7 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::string m_solver;
     bool m_pbo;
+    bool m_debug;
     
 public:
     
@@ -38,7 +39,7 @@ public:
     
     int solve();
     
-    void debug();
+    void debug_sorted();
     
     void print_cnf();
     
