@@ -4,6 +4,7 @@
 Leximax_encoder::Leximax_encoder(int num_objectives) :
     m_id_count(0),
     m_constraints(),
+    m_soft_clauses(),
     m_objectives(num_objectives, nullptr),
     m_num_objectives(num_objectives),
     m_sorted_vecs(num_objectives, nullptr),
@@ -195,32 +196,33 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
     all_subsets(set, i, clause_vec);
 }
 
-void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs)
+void Leximax_encoder::encode_relaxation(int i, std::vector<*std::vector<LINT>> &sorted_relax_vecs)
 {
-    LINT first_relax_var = m_id_count + 1; // We only store the first relaxation variable
+    // TODO -> sorted_relax_vecs has different representation
+    LINT first_relax_var = m_id_count + 1;
     m_id_count += m_num_objectives; // create the remaining relaxation vars
     for (int j = 0; j < m_num_objectives; ++j) {
         // encode relaxation variable of the j-th objective
-        std::vector<LINT> *objective = m_objectives[j];
-        LINT first_sorted_relax(m_id_count + 1); // first component
-        sorted_relax_vecs[j] = first_sorted_relax;
-        m_id_count += objective->size(); // create remaining sorted_relax_vec components
+        std::vector<LINT> *sorted_relax = sorted_relax_vecs[j];
         std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
-        for (size_t k = 0; k < objective->size(); ++k) {
+        for (size_t k = 0; k < sorted_relax->size(); ++k) {
+            // create sorted_relax variables
+            sorted_relax->at(k) = m_id_count + 1;
+            m_id_count++;
             // relax_j implies not sorted_relax_j_k
             std::vector<LINT> lits;
             lits.push_back(-(first_relax_var + j));
-            lits.push_back(-(first_sorted_relax + k));
+            lits.push_back(-sorted_relax->at(k));
             m_constraints.create_clause(lits);
             lits.clear();
             // not relax_j implies sorted_relax_j_k equals sorted_j_k
             lits.push_back(first_relax_var + j);
-            lits.push_back(-(first_sorted_relax + k));
+            lits.push_back(-sorted_relax->at(k));
             lits.push_back(sorted_vec->at(k));
             m_constraints.create_clause(lits);
             lits.clear();
             lits.push_back(first_relax_var + j);
-            lits.push_back(first_sorted_relax + k);
+            lits.push_back(sorted_relax->at(k));
             lits.push_back(-(sorted_vec->at(k)));
             m_constraints.create_clause(lits);
         }
@@ -231,7 +233,6 @@ void Leximax_encoder::encode_relaxation(int i, std::vector<LINT> &sorted_relax_v
     for (int j = 0; j < m_num_objectives; ++j)
         relax_vars.push_front(first_relax_var + j);
     at_most(relax_vars, i);
-    
     // at least i constraint -> should I put this one?
 }
 
@@ -245,8 +246,32 @@ size_t Leximax_encoder::largest_obj()
     return largest;
 }
 
+void Leximax_encoder::componentwise_OR(std::vector<*std::vector<LINT>> &sorted_vecs)
+{
+    for (size_t i = 0; i < largest; ++i) {
+        std::vector<LINT> disjunction;
+        for (int j = 0; j < m_num_objectives; ++j) {
+            std::vector<LINT> *sorted_vec = sorted_vecs[j];
+            // padding with zeros to the left
+            if (j >= largest - sorted_vec->size()) {
+                // add component of sorted_vec to the disjunction
+                size_t position = j - (largest - sorted_vec->size());
+                LINT component = sorted_vec->at(position);
+                disjunction.push_back(component);
+            }
+        }
+        // disjunction implies soft variable
+    }
+}
+
 int Leximax_encoder::solve()
 {
+    // setup for sorted_relax_vecs
+    std::vector<*std::vector<LINT>> sorted_relax_vecs(m_num_objectives, nullptr);
+    for (int i = 0; i < m_num_objectives; ++i) {
+        std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
+        sorted_relax_vecs[i] = new std::vector<LINT>(sorted_vec->size(), 0);
+    }
     // iteratively call (MaxSAT or PBO) solver
     for (int i = 0; i < m_num_objectives; ++i) {
         if (i == m_num_objectives) {
@@ -254,7 +279,6 @@ int Leximax_encoder::solve()
         }
         else {
             if (i != 0) { // in the first iteration i == 0 there is no relaxation
-                std::vector<LINT> sorted_relax_vecs(m_num_objectives, 0); // In each sorted_relax vector we only store the first component
                 encode_relaxation(i, sorted_relax_vecs); // create the vars in sorted_relax_vecs and encode the relax vars
             }
             
@@ -267,9 +291,11 @@ int Leximax_encoder::solve()
             // encode the componentwise OR between sorted_relax vectors
             if (i == 0) {
                 // the OR is between sorted vecs
+                componentwise_OR(i);
             }
             else {
                 // the OR is between sorted vecs after relaxation
+                componentwise_OR(i);
             }
             */
             // call solver

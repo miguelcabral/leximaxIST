@@ -21,6 +21,7 @@ private:
 
     LINT m_id_count;
     BasicClauseSet m_constraints;
+    BasicClauseSet m_soft_clauses;
     std::vector<std::vector<LINT>*> m_objectives;
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
@@ -41,7 +42,7 @@ public:
     
     void print_cnf();
     
-private:
+//private:
     
     void print_clause(BasicClause *cl);
     
@@ -61,9 +62,11 @@ private:
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
-    public: void at_most(std::forward_list<LINT> &set, int i);
+    void at_most(std::forward_list<LINT> &set, int i);
     
     void encode_relaxation(int i, std::vector<LINT> &sorted_relax_vecs);
+    
+    void componentwise_OR();
     
     int solve_maxsat();
     
