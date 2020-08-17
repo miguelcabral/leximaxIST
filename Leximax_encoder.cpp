@@ -53,7 +53,7 @@ int Leximax_encoder::read(char *argv[])
     hard.read();
     gzclose(in);
     // copy constraints from ReadCNF hard to m_constraints
-    BasicClauseSet constraints = hard.get_clauses();
+    BasicClauseSet &constraints = hard.get_clauses();
     std::vector<LINT> lits;
     for (BasicClause *cl : constraints) {
         lits.clear();
@@ -83,10 +83,10 @@ int Leximax_encoder::read(char *argv[])
     // convert soft clauses to obj functions - sum of vars. Add fresh variable for each clause
     for (int i = 0; i < m_num_objectives; ++i) {
         ReadCNF *obj = read_objectives[i];
-        std::vector<BasicClause*> cls = obj->get_clause_vector();
-        std::vector<LINT> *obj_conv = new std::vector<LINT>(cls.size(),0);
+        std::vector<BasicClause*> &cls = obj->get_clause_vector();
+        std::vector<LINT> *obj_conv = new std::vector<LINT>(cls.size(), 0);
         for (size_t j = 0; j < cls.size(); ++j) {
-            BasicClause *cl = cls[j];
+            BasicClause *cl = cls.at(j);
             LINT fresh_var = m_id_count + 1;
             m_id_count++;
             encode_fresh(cl, fresh_var);
@@ -168,6 +168,7 @@ int list_size(std::forward_list<LINT> &mylist)
 
 void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec)
 {
+    std::vector<LINT> lits;
     int size = clause_vec.size();
     // Base of recursion: 
     // when |set| == i, then set is the only subset of size i
@@ -186,11 +187,17 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
             }
             std::cout << '\n';
         }
-        m_constraints.create_clause(clause_vec);
+        lits.clear();
+        for (LINT lit : clause_vec)
+            lits.push_back(lit);
+        m_constraints.create_clause(lits);
     }
     // when i == 1, then each element of set is a subset of size 1
     else if (i == 1) {
         for (LINT elem : set) {
+            std::cout << elem << '\n';
+            std::cout << clause_vec[0] << '\n';
+            std::cout << size - 1 << '\n';
             clause_vec[size-1] = -elem;
             // add clause to constraints
             if (m_debug) {
@@ -200,7 +207,10 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
                 }
                 std::cout << '\n';
             }
-            m_constraints.create_clause(clause_vec);
+            lits.clear();
+            for (LINT lit : clause_vec)
+                lits.push_back(lit);
+            m_constraints.create_clause(lits);
         }
     }
     else {
@@ -209,6 +219,7 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
     set.pop_front();
     clause_vec[size - i] = -first_el;
     all_subsets(set, i-1, clause_vec); // combinations that include first_el
+    std::cout << "here" << '\n';
     all_subsets(set, i, clause_vec); // combinations that don't include first_el
     }
 }
@@ -254,6 +265,7 @@ void Leximax_encoder::encode_relaxation(int i)
                 for (LINT l : lits)
                     std::cout << l << " ";
                 std::cout << "0\n";
+                std::cout << "------- not relax_var " <<  first_relax_var + j << " implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
             }
             lits.clear();
             // not relax_j implies sorted_relax_j_k equals sorted_j_k
@@ -261,20 +273,24 @@ void Leximax_encoder::encode_relaxation(int i)
             lits.push_back(-sorted_relax->at(k));
             lits.push_back(sorted_vec->at(k));
             m_constraints.create_clause(lits);
+            if (m_debug) {
+                for (LINT l : lits)
+                    std::cout << l << " ";
+                std::cout << "0\n";
+            }
             lits.clear();
             lits.push_back(first_relax_var + j);
             lits.push_back(sorted_relax->at(k));
             lits.push_back(-(sorted_vec->at(k)));
             m_constraints.create_clause(lits);
-        }
-        if (m_debug) {
-            
-            for (size_t k = 0; k < sorted_relax->size(); ++k) {
-                
+            if (m_debug) {
+                for (LINT l : lits)
+                    std::cout << l << " ";
+                std::cout << "0\n";
             }
         }
     }
-    // cardinality constraint TODO
+    // cardinality constraint
     // at most i constraint 
     std::forward_list<LINT> relax_vars;
     for (int j = 0; j < m_num_objectives; ++j)
@@ -282,7 +298,7 @@ void Leximax_encoder::encode_relaxation(int i)
     if (m_debug)
         std::cout << "---------------- At most " << i << " Constraint ----------------\n";
     at_most(relax_vars, i);
-    // at least i constraint -> should I put this one?
+    // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -297,6 +313,8 @@ size_t Leximax_encoder::largest_obj()
 
 void Leximax_encoder::componentwise_OR(int i)
 {
+    if (m_debug)
+        std::cout << "------------ Componentwise OR ------------\n";
     std::vector<std::vector<LINT>*> *sorted_vecs(nullptr);
     if (i == 0) {
         // the OR is between sorted vecs
@@ -306,30 +324,36 @@ void Leximax_encoder::componentwise_OR(int i)
         // the OR is between sorted vecs after relaxation
         sorted_vecs = &m_sorted_relax_vecs;
     }
+    size_t k = 0;
     for (BasicClause *cl : m_soft_clauses) {
         std::vector<LINT> disjunction;
         for (int j = 0; j < m_num_objectives; ++j) {
             std::vector<LINT> *sorted_vec = sorted_vecs->at(j);
             // padding with zeros to the left
             ULINT largest = m_soft_clauses.size();
-            if (j >= largest - sorted_vec->size()) {
+            if (k >= largest - sorted_vec->size()) {
                 // add component of sorted_vec to the disjunction
-                size_t position = j - (largest - sorted_vec->size());
+                size_t position = k - (largest - sorted_vec->size());
                 LINT component = sorted_vec->at(position);
                 disjunction.push_back(component);
             }
         }
         // disjunction implies soft variable
-        LINT soft_var = *(cl->begin());
+        LINT soft_lit = *(cl->begin());
         std::vector<LINT> lits;
         for (LINT component : disjunction) {
-            lits.push_back(soft_var);
+            lits.push_back(-soft_lit);
             lits.push_back(-component);
             m_constraints.create_clause(lits);
+            if (m_debug) {
+                for (LINT l : lits)
+                    std::cout << l << " ";
+                std::cout << "0\n";
+            }
             lits.clear();
         }
-        
-        // soft variable implies disjunction -> Should I put this one?
+        ++k;        
+        // soft variable implies disjunction -> Should I put this one? -> experiment later on
     }
 }
 
@@ -346,10 +370,8 @@ int Leximax_encoder::solve()
         else {
             if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i); // create the vars in sorted_relax_vecs and encode the relax vars
-            
             // soft clauses
             // find size of largest objective function
-            
             size_t largest = largest_obj();
             LINT first_soft = m_id_count + 1;
             m_id_count += largest; // create the variables of the soft clauses of this iteration
@@ -359,9 +381,11 @@ int Leximax_encoder::solve()
                     std::cout << first_soft + j << '\n';
             }
             std::vector<LINT> lits;
-            for (size_t j = 0; j < largest; ++j)
-                lits.push_back(first_soft + j);
-            m_soft_clauses.create_clause(lits);
+            for (size_t j = 0; j < largest; ++j) {
+                lits.push_back(-(first_soft + j));
+                m_soft_clauses.create_clause(lits);
+                lits.clear();
+            }
             // encode the componentwise OR between sorted_relax vectors
             componentwise_OR(i);
             // call solver
@@ -372,13 +396,13 @@ int Leximax_encoder::solve()
             
             // read output file and fix values of current objective function //TODO
             
-            // for now fix the values of the soft clauses to true
+            /*// for now fix the values of the soft clauses to true
             for (BasicClause *cl : m_soft_clauses) {
                 lits.clear();
                 for (LINT l : *cl)
                     lits.push_back(l);
                 m_constraints.create_clause(lits);
-            }                
+            }  */              
         }
     }
     
