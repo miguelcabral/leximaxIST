@@ -108,8 +108,17 @@ void Leximax_encoder::encode_sorted()
         SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
         // elems_to_sort is represented by a pair (first element, number of elements).
         std::pair<LINT,LINT> elems_to_sort(0, num_terms);
-        if (m_debug)
+        if (m_debug) {
+            std::cout << "--------------- Objective Function " << i << " --------------\n";
+            for (size_t j = 0; j < num_terms; ++j) {
+                std::cout << objective->at(j);
+                if (j != num_terms - 1)
+                    std::cout << " + ";
+                else
+                    std::cout << '\n';
+            }
             std::cout << "---------------- Sorting Network " << i << " ----------------\n";
+        }
         encode_network(elems_to_sort, objective, sorting_network);
         // sorted_vec variables are the outputs of sorting_network
         for (size_t j{0}; j < num_terms; j++) {
@@ -166,7 +175,7 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
     if (set_size == i) {
         int j = size - i;
         for (LINT elem : set) {
-            clause_vec[j] = elem;
+            clause_vec[j] = -elem;
             j++;
         }
         // add clause to constraints
@@ -182,7 +191,7 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
     // when i == 1, then each element of set is a subset of size 1
     else if (i == 1) {
         for (LINT elem : set) {
-            clause_vec[size-1] = elem;
+            clause_vec[size-1] = -elem;
             // add clause to constraints
             if (m_debug) {
                 std::cout << "Combination: ";
@@ -198,7 +207,7 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
     // Step of recursion: the combinations that include the first element of set + those that don't include it
     LINT first_el = set.front();
     set.pop_front();
-    clause_vec[size - i] = first_el;
+    clause_vec[size - i] = -first_el;
     all_subsets(set, i-1, clause_vec); // combinations that include first_el
     all_subsets(set, i, clause_vec); // combinations that don't include first_el
     }
@@ -207,9 +216,9 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
 void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 {
     // implementation with naive encoding
-    // for every combination of i vars, one of them must be false
-    std::vector<LINT> clause_vec(i, -1);
-    all_subsets(set, i, clause_vec);
+    // for every combination of i + 1 vars, one of them must be false
+    std::vector<LINT> clause_vec(i + 1, -1);
+    all_subsets(set, i + 1, clause_vec);
 }
 
 void Leximax_encoder::encode_relaxation(int i)
@@ -227,15 +236,25 @@ void Leximax_encoder::encode_relaxation(int i)
         std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
         std::vector<LINT> *sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
         m_sorted_relax_vecs[j] = sorted_relax;
+        if (m_debug)
+            std::cout << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
         for (size_t k = 0; k < sorted_relax->size(); ++k) {
             // create sorted_relax variables
             sorted_relax->at(k) = m_id_count + 1;
             m_id_count++;
+            if (m_debug)
+                std::cout << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
             // relax_j implies not sorted_relax_j_k
             std::vector<LINT> lits;
             lits.push_back(-(first_relax_var + j));
             lits.push_back(-sorted_relax->at(k));
             m_constraints.create_clause(lits);
+            if (m_debug) {
+                std::cout << "-------------- relax_var " <<  first_relax_var + j << " implies not sorted_relax["<< k << "] ------\n";
+                for (LINT l : lits)
+                    std::cout << l << " ";
+                std::cout << "0\n";
+            }
             lits.clear();
             // not relax_j implies sorted_relax_j_k equals sorted_j_k
             lits.push_back(first_relax_var + j);
@@ -249,9 +268,9 @@ void Leximax_encoder::encode_relaxation(int i)
             m_constraints.create_clause(lits);
         }
         if (m_debug) {
-            std::cout << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+            
             for (size_t k = 0; k < sorted_relax->size(); ++k) {
-                std::cout << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
+                
             }
         }
     }
@@ -344,9 +363,7 @@ int Leximax_encoder::solve()
                 lits.push_back(first_soft + j);
             m_soft_clauses.create_clause(lits);
             // encode the componentwise OR between sorted_relax vectors
-            std::cout << "began componentwise" << std::endl;
             componentwise_OR(i);
-            std::cout << "ended componentwise" << std::endl;
             // call solver
             if (m_pbo)
                 solve_pbo();
