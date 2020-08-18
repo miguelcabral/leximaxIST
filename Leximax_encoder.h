@@ -1,5 +1,6 @@
 #ifndef LEXIMAX_ENCODER
 #define LEXIMAX_ENCODER
+#include <assert>
 #include <string>
 #include <iostream> // std::cout, std::cin
 #include <vector> // std::vector
@@ -19,7 +20,7 @@ class Leximax_encoder {
 
 private:
 
-    LINT m_id_count;
+    size_t m_id_count;
     BasicClauseSet m_constraints;
     BasicClauseSet m_soft_clauses;
     std::vector<std::vector<LINT>*> m_objectives;
@@ -27,7 +28,7 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
-    std::string m_solver;
+    std::string m_solver_command;
     std::string m_input_file_name;
     bool m_pbo;
     bool m_debug;
@@ -44,8 +45,9 @@ public:
         m_sorted_vecs(num_objectives, nullptr),
         m_sorted_relax_vecs(num_objectives, nullptr),
         m_relax_vars(),
-        m_solver("openwbo"),
+        m_solver_command("./default-solver/open-wbo-master/open-wbo_static"),
         m_input_file_name("tbd"),
+        m_leave_temporary_files(true),
         m_pbo(false),
         m_debug(true),
         m_multiplication_string("*")
@@ -87,9 +89,9 @@ private:
     
     int solve_maxsat();
     
-    void write_atmost_pb(int i);
+    void write_atmost_pb(int i, ostream &output);
     
-    int solve_pbo(int i);
+    int solve_pbo(int i, IntVector&  tmp_model);
 
 };
     

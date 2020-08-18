@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <time.h>
+#include <stdlib.h>
 
 int Leximax_encoder::solve_maxsat()//TODO
 {
@@ -28,7 +29,7 @@ void Leximax_encoder::write_atmost_pb(int i, ostream &output)
     output << " <= " << i << ";\n";
 }
 
-int Leximax_encoder::solve_pbo(int i)//TODO
+int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
     time_t stamp = time(NULL);
     std::string temporary_directory("tmp");
@@ -37,7 +38,7 @@ int Leximax_encoder::solve_pbo(int i)//TODO
     m_input_file_name = strstr.str();
     ofstream output(m_input_file_name.c_str());
     // prepare input for the solver
-    output << "* #variable= " << m_id_count << " #constraint= " << m_constraints.size() + 1 << endl; // + 1 because of card. const.
+    output << "* #variable= " << m_id_count << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function
         output << "min:";
         for (BasicClause *cl : m_soft_clauses) {
@@ -45,7 +46,7 @@ int Leximax_encoder::solve_pbo(int i)//TODO
             const bool sign = literal > 0;
             output << " " << (sign ? "+1" : "-1") << m_multiplication_string << "x" << (sign ? literal : -literal);
         }
-        output << ";\n"; // in packup there was << std::endl instead of \n
+        output << ";\n";
     }
     // print all constraints except for at most i
     for (BasicClause *cl : m_constraints) {
@@ -56,16 +57,16 @@ int Leximax_encoder::solve_pbo(int i)//TODO
     output.close();
     // call the solver
     stringstream scommand;
-    const string output_filename = input_file_name + ".out";
-    scommand << solver_command << " " << input_file_name << " >" << output_filename;
+    const string output_filename = m_input_file_name + ".out";
+    scommand << m_solver_command << " " << m_input_file_name << " >" << output_filename;
     const string command = scommand.str();
     const int retv = system (command.c_str());
-    cerr << "# " <<  "external command finished with exit value " << retv << endl;
-    gzFile of=gzopen(output_filename.c_str(), "rb");
-    assert(of!=NULL);//TODO
+    std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
+    gzFile of = gzopen(output_filename.c_str(), "rb");
+    assert(of!=NULL);
     StreamBuffer r(of);
-    bool sat=false;
-    tmp_model.resize(static_cast<size_t>(_id_manager.top_id()+1),0);
+    bool sat = false;
+    tmp_model.resize(static_cast<size_t>(m_id_count + 1), 0);
     while (*r != EOF) {
         if (*r != 'v') {// ignore all the other lines
             skipLine(r);
@@ -79,8 +80,6 @@ int Leximax_encoder::solve_pbo(int i)//TODO
                 if ((*r == 'x')) ++r;
                 if (*r < '0' || *r > '9') break;
                 const LINT l = parseInt(r);
-                // if ( model.size()<=(size_t)l )
-                //cerr << "# " << l << " " << (sign ? l : -l) << endl;
                 assert(tmp_model.size()>(size_t)l);
                 tmp_model[l] = (sign ? l : -l);
             }
@@ -89,16 +88,10 @@ int Leximax_encoder::solve_pbo(int i)//TODO
         }
     }
     if (!sat) tmp_model.clear();
-    if (!leave_temporary_files) {
+    if (!m_leave_temporary_files) {
         remove(input_file_name.c_str());
         remove(output_filename.c_str());
     }
-
     return retv;
-    // write input file of the solver
-    
-    // call solver and write its output to a file
-    
-    return 0;
 }
 

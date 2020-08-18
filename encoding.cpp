@@ -242,10 +242,14 @@ int Leximax_encoder::solve()
     // iteratively call (MaxSAT or PBO) solver
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
+        IntVector tmp_model(1, 0);
         if (m_debug)
             std::cout << "------------------ ITERATION " << i << " ------------------\n";
         if (i == m_num_objectives - 1) {
             // last iteration is done differently
+            
+            // print solution
+            print_solution(tmp_model);
         }
         else {
             if (i != 0) // in the first iteration i == 0 there is no relaxation
@@ -269,12 +273,17 @@ int Leximax_encoder::solve()
             // encode the componentwise OR between sorted_relax vectors
             componentwise_OR(i);
             // call solver
+            IntVector tmp_model(m_id_count + 1, 0); 
             if (m_pbo)
-                solve_pbo(i);
+                solve_pbo(i, tmp_model); // tmp_model[k] is the truth value of k under tmp_model.
             else
-                solve_maxsat();
-            
-            // read output file and fix values of current objective function //TODO
+                solve_maxsat(tmp_model);
+            // read tmp_model and fix values of current objective function
+            if (tmp_model.empty()){
+                m_sat = false;
+                break;
+            }
+                
             
             /*// for now fix the values of the soft clauses to true
             for (BasicClause *cl : m_soft_clauses) {
@@ -287,6 +296,7 @@ int Leximax_encoder::solve()
     }
     
     // print solution TODO
+    
     
     return 0;
 }
