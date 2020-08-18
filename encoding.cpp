@@ -1,103 +1,4 @@
 #include "Leximax_encoder.h"
-#include "old_packup/ReadCNF.hh"
-
-Leximax_encoder::Leximax_encoder(int num_objectives) :
-    m_id_count(0),
-    m_constraints(),
-    m_soft_clauses(),
-    m_objectives(num_objectives, nullptr),
-    m_num_objectives(num_objectives),
-    m_sorted_vecs(num_objectives, nullptr),
-    m_sorted_relax_vecs(num_objectives, nullptr),
-    m_solver("openwbo"),
-    m_pbo(false),
-    m_debug(true)
-{
-// just initialization    
-}
-
-void Leximax_encoder::encode_fresh(BasicClause *cl, LINT fresh_var)
-{
-    // fresh_var OR cl
-    std::vector<LINT> lits;
-    lits.push_back(fresh_var);
-    for (auto l : *cl) lits.push_back(l);
-    m_constraints.create_clause(lits);
-}
-
-
-void Leximax_encoder::print_clause(BasicClause *cl)
-{
-    for (auto l : *cl)
-        std::cout << l << " ";
-    std::cout << "0" << std::endl;
-}
-
-void Leximax_encoder::print_cnf()
-{
-    std::cout << "c =========================================\n";
-    std::cout << "p cnf " << m_id_count << " " << m_constraints.size() << std::endl;
-    for(BasicClause *cl : m_constraints)
-        print_clause(cl);
-    std::cout << "c =========================================\n";
-}
-
-int Leximax_encoder::read(char *argv[])
-{
-    gzFile in = gzopen(argv[1], "rb");
-    if (in == Z_NULL) {
-       std::cerr << "Could not open file " << argv[1] << std::endl;
-       return 1;
-    }
-    ReadCNF hard(in);
-    hard.read();
-    gzclose(in);
-    // copy constraints from ReadCNF hard to m_constraints
-    BasicClauseSet &constraints = hard.get_clauses();
-    std::vector<LINT> lits;
-    for (BasicClause *cl : constraints) {
-        lits.clear();
-        for (LINT l : *cl)
-            lits.push_back(l);
-        m_constraints.create_clause(lits);
-    }
-    std::vector<ReadCNF*> read_objectives(m_num_objectives, nullptr);
-    for (int i{2}; i < m_num_objectives + 2; ++i) {
-        in = gzopen(argv[i], "rb");
-        if (in == Z_NULL) {
-            std::cerr << "Could not open file " << argv[i] << std::endl;
-            return 1;
-        }
-        ReadCNF *obj = new ReadCNF(in);
-        obj->read();
-        gzclose(in);
-        read_objectives[i-2] = obj;
-    }
-    m_id_count = hard.get_max_id();
-    // Update m_id_count if necessary - check the obj functions
-    for (ReadCNF *obj : read_objectives) {
-        LINT id_obj = obj->get_max_id();
-        if (id_obj > m_id_count)
-            m_id_count = id_obj;
-    }
-    // convert soft clauses to obj functions - sum of vars. Add fresh variable for each clause
-    for (int i = 0; i < m_num_objectives; ++i) {
-        ReadCNF *obj = read_objectives[i];
-        std::vector<BasicClause*> &cls = obj->get_clause_vector();
-        std::vector<LINT> *obj_conv = new std::vector<LINT>(cls.size(), 0);
-        for (size_t j = 0; j < cls.size(); ++j) {
-            BasicClause *cl = cls.at(j);
-            LINT fresh_var = m_id_count + 1;
-            m_id_count++;
-            encode_fresh(cl, fresh_var);
-            obj_conv->at(j) = fresh_var;
-        }
-        m_objectives[i] = obj_conv;
-        // delete ReadCNF of i-th objective function
-        delete obj;
-    }
-    return 0;
-}
 
 void Leximax_encoder::encode_sorted()
 {
@@ -133,28 +34,6 @@ void Leximax_encoder::encode_sorted()
             }
         }
     }
-}
-
-void Leximax_encoder::debug_sorted()
-{
-    // create variables equivalent to the sorted vectors to easily check if they are sorted
-    for (int i = 0; i < m_num_objectives; ++i) {
-        std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
-        for (size_t j = 0; j < sorted_vec->size(); ++j) {
-            LINT s = sorted_vec->at(j);
-            LINT fresh = m_id_count + 1;
-            m_id_count++;
-            std::vector<LINT> lits;
-            lits.push_back(fresh);
-            lits.push_back(-s);
-            m_constraints.create_clause(lits);
-            lits.clear();
-            lits.push_back(-fresh);
-            lits.push_back(s);
-            m_constraints.create_clause(lits);
-        }
-    }
-    
 }
 
 int list_size(std::forward_list<LINT> &mylist)
@@ -219,7 +98,6 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
     set.pop_front();
     clause_vec[size - i] = -first_el;
     all_subsets(set, i-1, clause_vec); // combinations that include first_el
-    std::cout << "here" << '\n';
     all_subsets(set, i, clause_vec); // combinations that don't include first_el
     }
 }
@@ -235,6 +113,9 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 void Leximax_encoder::encode_relaxation(int i)
 {
     LINT first_relax_var = m_id_count + 1;
+    m_relax_vars.clear(); // clear from previous iteration
+    for (int j = 0; j < m_num_objectives; ++j)
+        m_relax_vars.push_front(first_relax_var + j);
     m_id_count += m_num_objectives; // create the remaining relaxation vars
     if (m_debug) {
         std::cout << "------------ Relaxation variables of iteration " << i << " ------------\n";
@@ -292,12 +173,11 @@ void Leximax_encoder::encode_relaxation(int i)
     }
     // cardinality constraint
     // at most i constraint 
-    std::forward_list<LINT> relax_vars;
-    for (int j = 0; j < m_num_objectives; ++j)
-        relax_vars.push_front(first_relax_var + j);
     if (m_debug)
         std::cout << "---------------- At most " << i << " Constraint ----------------\n";
-    at_most(relax_vars, i);
+    if (!m_pbo)
+        at_most(m_relax_vars, i);
+    
     // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
 }
 
@@ -390,7 +270,7 @@ int Leximax_encoder::solve()
             componentwise_OR(i);
             // call solver
             if (m_pbo)
-                solve_pbo();
+                solve_pbo(i);
             else
                 solve_maxsat();
             
@@ -410,22 +290,3 @@ int Leximax_encoder::solve()
     
     return 0;
 }
-
-int Leximax_encoder::solve_maxsat()//TODO
-{
-    // write input file of the solver
-    
-    // call solver and write its output to a file
-   
-    return 0;
-}
-
-int Leximax_encoder::solve_pbo()//TODO
-{
-    // write input file of the solver
-    
-    // call solver and write its output to a file
-    
-    return 0;
-}
-

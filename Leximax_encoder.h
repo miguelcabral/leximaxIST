@@ -26,13 +26,32 @@ private:
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
+    std::forward_list<LINT> m_relax_vars;
     std::string m_solver;
+    std::string m_input_file_name;
     bool m_pbo;
     bool m_debug;
+    std::string m_multiplication_string;
     
 public:
     
-    Leximax_encoder(int num_objectives);
+    Leximax_encoder(int num_objectives) :
+        m_id_count(0),
+        m_constraints(),
+        m_soft_clauses(),
+        m_objectives(num_objectives, nullptr),
+        m_num_objectives(num_objectives),
+        m_sorted_vecs(num_objectives, nullptr),
+        m_sorted_relax_vecs(num_objectives, nullptr),
+        m_relax_vars(),
+        m_solver("openwbo"),
+        m_input_file_name("tbd"),
+        m_pbo(false),
+        m_debug(true),
+        m_multiplication_string("*")
+    {
+    // just initialization    
+    }
     
     int read(char *argv[]);
     
@@ -40,13 +59,9 @@ public:
     
     int solve();
     
-    void debug_sorted();
-    
     void print_cnf();
     
-//private:
-    
-    void print_clause(BasicClause *cl);
+private:
     
     void encode_fresh(BasicClause *cl, LINT fresh_var);
     
@@ -72,7 +87,9 @@ public:
     
     int solve_maxsat();
     
-    int solve_pbo();
+    void write_atmost_pb(int i);
+    
+    int solve_pbo(int i);
 
 };
     
