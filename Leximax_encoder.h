@@ -1,6 +1,6 @@
 #ifndef LEXIMAX_ENCODER
 #define LEXIMAX_ENCODER
-#include <assert>
+#include <assert.h>
 #include <string>
 #include <iostream> // std::cout, std::cin
 #include <vector> // std::vector
@@ -29,7 +29,9 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
     std::string m_solver_command;
-    std::string m_input_file_name;
+    std::string m_input_file_name; // could be the concatenation of all input files
+    bool m_leave_temporary_files;
+    bool m_sat;
     bool m_pbo;
     bool m_debug;
     std::string m_multiplication_string;
@@ -48,6 +50,7 @@ public:
         m_solver_command("./default-solver/open-wbo-master/open-wbo_static"),
         m_input_file_name("tbd"),
         m_leave_temporary_files(true),
+        m_sat(true),
         m_pbo(false),
         m_debug(true),
         m_multiplication_string("*")
@@ -59,7 +62,7 @@ public:
     
     void encode_sorted();
     
-    int solve();
+    void solve();
     
     void print_cnf();
     
@@ -87,11 +90,15 @@ private:
     
     void componentwise_OR(int i);
     
-    int solve_maxsat();
+    int solve_maxsat(int i, IntVector &tmp_model);
     
     void write_atmost_pb(int i, ostream &output);
     
-    int solve_pbo(int i, IntVector&  tmp_model);
+    void write_pbconstraint(BasicClause *cl, ostream& output);
+    
+    int solve_pbo(int i, IntVector  &tmp_model);
+    
+    void print_solution(IntVector &tmp_model);
 
 };
     

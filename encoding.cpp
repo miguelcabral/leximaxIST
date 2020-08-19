@@ -1,4 +1,6 @@
 #include "Leximax_encoder.h"
+#include <stdlib.h>
+#include "old_packup/types.hh"
 
 void Leximax_encoder::encode_sorted()
 {
@@ -237,19 +239,21 @@ void Leximax_encoder::componentwise_OR(int i)
     }
 }
 
-int Leximax_encoder::solve()
+void Leximax_encoder::print_solution(IntVector &tmp_model)
+{
+    //TODO
+}
+
+void Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
+    IntVector tmp_model(1, 0);
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
-        IntVector tmp_model(1, 0);
         if (m_debug)
             std::cout << "------------------ ITERATION " << i << " ------------------\n";
         if (i == m_num_objectives - 1) {
             // last iteration is done differently
-            
-            // print solution
-            print_solution(tmp_model);
         }
         else {
             if (i != 0) // in the first iteration i == 0 there is no relaxation
@@ -272,31 +276,29 @@ int Leximax_encoder::solve()
             }
             // encode the componentwise OR between sorted_relax vectors
             componentwise_OR(i);
-            // call solver
-            IntVector tmp_model(m_id_count + 1, 0); 
+            // call solver 
+            int retv;
             if (m_pbo)
-                solve_pbo(i, tmp_model); // tmp_model[k] is the truth value of k under tmp_model.
+                retv = solve_pbo(i, tmp_model); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
             else
-                solve_maxsat(tmp_model);
+                retv = solve_maxsat(i, tmp_model);
+            if (retv != 0) {
+                std::cerr << "Something went wrong with the solver\n";
+                exit(retv);
+            }
             // read tmp_model and fix values of current objective function
             if (tmp_model.empty()){
                 m_sat = false;
                 break;
             }
-                
-            
-            /*// for now fix the values of the soft clauses to true
+            m_sat = true;
             for (BasicClause *cl : m_soft_clauses) {
-                lits.clear();
-                for (LINT l : *cl)
-                    lits.push_back(l);
-                m_constraints.create_clause(lits);
-            }  */              
+                LINT soft_var = -(*(cl->begin()));
+                LINT lit = tmp_model[soft_var];
+                m_constraints.create_unit_clause(lit);
+            }
         }
     }
-    
     // print solution TODO
-    
-    
-    return 0;
+    print_solution(tmp_model);
 }
