@@ -29,7 +29,7 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
     std::string m_solver_command;
-    std::string m_input_file_name; // could be the concatenation of all input files
+    std::string m_input_files;
     bool m_leave_temporary_files;
     bool m_sat;
     bool m_pbo;
@@ -47,8 +47,8 @@ public:
         m_sorted_vecs(num_objectives, nullptr),
         m_sorted_relax_vecs(num_objectives, nullptr),
         m_relax_vars(),
-        m_solver_command("./default-solver/open-wbo-master/open-wbo_static"),
-        m_input_file_name("tbd"),
+        m_solver_command("~/thesis/default-solver/open-wbo-master/open-wbo_static"),
+        m_input_files("tbd"),
         m_leave_temporary_files(true),
         m_sat(true),
         m_pbo(false),
@@ -68,7 +68,13 @@ public:
     
 private:
     
+    // reading.cpp
+    
     void encode_fresh(BasicClause *cl, LINT fresh_var);
+    
+    void set_input_name(char *argv[]);
+    
+    // sorting_net.cpp
     
     void encode_max(LINT var_out_max, LINT var_in1, LINT var_in2);
     
@@ -80,6 +86,8 @@ private:
     
     void encode_network(std::pair<LINT,LINT> elems_to_sort, std::vector<LINT> *objective, SNET &sorting_network);
     
+    // encoding.cpp
+    
     size_t largest_obj();
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
@@ -90,6 +98,8 @@ private:
     
     void componentwise_OR(int i);
     
+    // solver_call.cpp
+    
     int solve_maxsat(int i, IntVector &tmp_model);
     
     void write_atmost_pb(int i, ostream &output);
@@ -98,9 +108,13 @@ private:
     
     int solve_pbo(int i, IntVector  &tmp_model);
     
-    void print_solution(IntVector &tmp_model);
+    int call_solver(IntVector &tmp_model, std::string &file_name);
     
-    int call_solver(IntVector &tmp_model);
+    // printing.cpp
+    
+    void print_solution(IntVector &model);
+    
+    void print_optimum(IntVector &model);
 
 };
     

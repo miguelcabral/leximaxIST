@@ -7,11 +7,11 @@
 #include <zlib.h>
 #include "old_packup/fmtutils.hh"
 
-int Leximax_encoder::call_solver(IntVector &tmp_model)
+int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
 {
     stringstream scommand;
-    const string output_filename = m_input_file_name + ".out";
-    scommand << m_solver_command << " " << m_input_file_name << " >" << output_filename;
+    const string output_filename = file_name + ".out";
+    scommand << m_solver_command << " " << file_name << " > " << output_filename << " 2> solver_error.txt";
     const string command = scommand.str();
     const int retv = system (command.c_str());
     std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
@@ -42,8 +42,9 @@ int Leximax_encoder::call_solver(IntVector &tmp_model)
     }
     if (!sat) tmp_model.clear();
     if (!m_leave_temporary_files) {
-        remove(m_input_file_name.c_str());
+        remove(file_name.c_str());
         remove(output_filename.c_str());
+        remove("solver_error.txt");
     }
     return retv;
 }
@@ -58,14 +59,11 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight)
     }
 }
 
-int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)//TODO
+int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
 {
-    time_t stamp = time(NULL);
-    std::string temporary_directory("tmp");
-    stringstream strstr;
-    strstr << temporary_directory << "/" << "o" << stamp << "_" << i << ".wcnf";
-    m_input_file_name = strstr.str();
-    ofstream output(m_input_file_name.c_str());
+    std::string input_name = m_input_files;
+    input_name += "_" + to_string(i) + ".wcnf";
+    ofstream output(input_name.c_str());
     // prepare input for the solver
     size_t weight = m_soft_clauses.size() + 1;
     output << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
@@ -75,7 +73,7 @@ int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)//TODO
     write_clauses(output, m_soft_clauses, 1);
     output.close();
     // call the solver
-    return call_solver(tmp_model);
+    return call_solver(tmp_model, input_name);
 }
 
 void Leximax_encoder::write_pbconstraint(BasicClause *cl, ostream& output) {
@@ -96,12 +94,9 @@ void Leximax_encoder::write_atmost_pb(int i, ostream &output)
 
 int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
-    time_t stamp = time(NULL);
-    std::string temporary_directory("tmp");
-    stringstream strstr;
-    strstr << temporary_directory << "/" << "o" << stamp << "_" << i << ".opb";
-    m_input_file_name = strstr.str();
-    ofstream output(m_input_file_name.c_str());
+    std::string input_name = m_input_files;
+    input_name += "_" + to_string(i) + ".opb";
+    ofstream output(input_name.c_str());
     // prepare input for the solver
     output << "* #variable= " << m_id_count << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function
@@ -121,6 +116,6 @@ int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
     write_atmost_pb(i, output);
     output.close();
     // call the solver
-    return call_solver(tmp_model);
+    return call_solver(tmp_model, input_name);
 }
 

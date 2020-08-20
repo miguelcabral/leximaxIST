@@ -22,6 +22,6 @@ int main(int argc, char *argv[])
     // encode sorted vectors with sorting network
     enc.encode_sorted();
     enc.solve();
-    enc.print_cnf();
+    //enc.print_cnf();
     return 0;
 }

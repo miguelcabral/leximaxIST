@@ -16,11 +16,29 @@ void Leximax_encoder::print_cnf()
     std::cout << "c =========================================\n";
 }
 
-void Leximax_encoder::print_solution(IntVector &tmp_model)
+void Leximax_encoder::print_optimum(IntVector &model)
+{
+    if (m_sat) {
+        LINT optimum = 0;
+        for (BasicClause *cl : m_soft_clauses) {
+            LINT var = -(*(cl->begin()));
+            if (model[var] > 0)
+                optimum++;
+        }
+        std::cout << "o " << optimum << '\n';
+    }
+}
+
+void Leximax_encoder::print_solution(IntVector &model)
 {
     if (!m_sat)
         std::cout << "s UNSATISFIABLE\n";
     else {
-        
+        std::cout << "s SATISFIABLE\n";
+        std::cout << "v ";
+        for (size_t j = 0; j < model.size(); ++j) {
+            std::cout << model[j] << " ";
+        }
+        std::cout << '\n';
     }
 }
