@@ -15,3 +15,12 @@ void Leximax_encoder::print_cnf()
         print_clause(cl);
     std::cout << "c =========================================\n";
 }
+
+void Leximax_encoder::print_solution(IntVector &tmp_model)
+{
+    if (!m_sat)
+        std::cout << "s UNSATISFIABLE\n";
+    else {
+        
+    }
+}

@@ -239,11 +239,6 @@ void Leximax_encoder::componentwise_OR(int i)
     }
 }
 
-void Leximax_encoder::print_solution(IntVector &tmp_model)
-{
-    //TODO
-}
-
 void Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
@@ -298,6 +293,7 @@ void Leximax_encoder::solve()
                 m_constraints.create_unit_clause(lit);
             }
         }
+        // print i-th maximum ??
     }
     // print solution TODO
     print_solution(tmp_model);

@@ -99,6 +99,8 @@ private:
     int solve_pbo(int i, IntVector  &tmp_model);
     
     void print_solution(IntVector &tmp_model);
+    
+    int call_solver(IntVector &tmp_model);
 
 };
     

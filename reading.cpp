@@ -44,7 +44,7 @@ int Leximax_encoder::read(char *argv[])
     m_id_count = hard.get_max_id();
     // Update m_id_count if necessary - check the obj functions
     for (ReadCNF *obj : read_objectives) {
-        LINT id_obj = obj->get_max_id();
+        size_t id_obj = obj->get_max_id();
         if (id_obj > m_id_count)
             m_id_count = id_obj;
     }
