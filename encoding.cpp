@@ -122,64 +122,80 @@ void Leximax_encoder::encode_relaxation(int i)
         std::cerr << "------------ Relaxation variables of iteration " << i << " ------------\n";
         for (int j = 0; j < m_num_objectives; ++j)
             std::cerr << first_relax_var + j << '\n';
-        std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
+        if (i != m_num_objectives - 1)
+            std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
     }
-    for (int j = 0; j < m_num_objectives; ++j) {
-        // encode relaxation variable of the j-th objective
-        std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
-        std::vector<LINT> *sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
-        m_sorted_relax_vecs[j] = sorted_relax;
-        if (m_debug)
-            std::cerr << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
-        for (size_t k = 0; k < sorted_relax->size(); ++k) {
-            // create sorted_relax variables
-            sorted_relax->at(k) = m_id_count + 1;
-            m_id_count++;
+    if (i != m_num_objectives - 1) {
+        for (int j = 0; j < m_num_objectives; ++j) {
+            // encode relaxation variable of the j-th objective
+            std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
+            std::vector<LINT> *sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
+            m_sorted_relax_vecs[j] = sorted_relax;
             if (m_debug)
-                std::cerr << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
-            // relax_j implies not sorted_relax_j_k
-            std::vector<LINT> lits;
-            lits.push_back(-(first_relax_var + j));
-            lits.push_back(-sorted_relax->at(k));
-            m_constraints.create_clause(lits);
-            if (m_debug) {
-                std::cerr << "-------------- relax_var " <<  first_relax_var + j << " implies not sorted_relax["<< k << "] ------\n";
-                for (LINT l : lits)
-                    std::cerr << l << " ";
-                std::cerr << "0\n";
-                std::cerr << "------- not relax_var " <<  first_relax_var + j << " implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
-            }
-            lits.clear();
-            // not relax_j implies sorted_relax_j_k equals sorted_j_k
-            lits.push_back(first_relax_var + j);
-            lits.push_back(-sorted_relax->at(k));
-            lits.push_back(sorted_vec->at(k));
-            m_constraints.create_clause(lits);
-            if (m_debug) {
-                for (LINT l : lits)
-                    std::cerr << l << " ";
-                std::cerr << "0\n";
-            }
-            lits.clear();
-            lits.push_back(first_relax_var + j);
-            lits.push_back(sorted_relax->at(k));
-            lits.push_back(-(sorted_vec->at(k)));
-            m_constraints.create_clause(lits);
-            if (m_debug) {
-                for (LINT l : lits)
-                    std::cerr << l << " ";
-                std::cerr << "0\n";
+                std::cerr << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+            for (size_t k = 0; k < sorted_relax->size(); ++k) {
+                // create sorted_relax variables
+                sorted_relax->at(k) = m_id_count + 1;
+                m_id_count++;
+                if (m_debug)
+                    std::cerr << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
+                // relax_j implies not sorted_relax_j_k
+                std::vector<LINT> lits;
+                lits.push_back(-(first_relax_var + j));
+                lits.push_back(-sorted_relax->at(k));
+                m_constraints.create_clause(lits);
+                if (m_debug) {
+                    std::cerr << "-------------- relax_var " <<  first_relax_var + j << " implies not sorted_relax["<< k << "] ------\n";
+                    for (LINT l : lits)
+                        std::cerr << l << " ";
+                    std::cerr << "0\n";
+                    std::cerr << "------- not relax_var " <<  first_relax_var + j << " implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
+                }
+                lits.clear();
+                // not relax_j implies sorted_relax_j_k equals sorted_j_k
+                lits.push_back(first_relax_var + j);
+                lits.push_back(-sorted_relax->at(k));
+                lits.push_back(sorted_vec->at(k));
+                m_constraints.create_clause(lits);
+                if (m_debug) {
+                    for (LINT l : lits)
+                        std::cerr << l << " ";
+                    std::cerr << "0\n";
+                }
+                lits.clear();
+                lits.push_back(first_relax_var + j);
+                lits.push_back(sorted_relax->at(k));
+                lits.push_back(-(sorted_vec->at(k)));
+                m_constraints.create_clause(lits);
+                if (m_debug) {
+                    for (LINT l : lits)
+                        std::cerr << l << " ";
+                    std::cerr << "0\n";
+                }
             }
         }
+        // cardinality constraint
+        // at most i constraint 
+        if (m_debug)
+            std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
+        if (!m_pbo)
+            at_most(m_relax_vars, i);
+        
+        // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
     }
-    // cardinality constraint
-    // at most i constraint 
-    if (m_debug)
-        std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
-    if (!m_pbo)
-        at_most(m_relax_vars, i);
-    
-    // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
+    else { // last iteration
+        // choose exactly one obj function to minimise
+        int k = 0;
+        for (LINT relax_var: m_relax_vars) {
+            for (BasicClause *cl : m_soft_clauses) {
+                LINT soft_var = -(*(cl->begin()));
+                // relax_var implies obj_func implies soft_var
+                
+                // neg relax_var 
+            }
+            ++k;
+        }
+    }
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -238,57 +254,57 @@ void Leximax_encoder::componentwise_OR(int i)
     }
 }
 
+void Leximax_encoder::generate_soft_clauses()
+{
+    // find size of largest objective function
+    size_t largest = largest_obj();
+    LINT first_soft = m_id_count + 1;
+    m_id_count += largest; // create the variables of the soft clauses of this iteration
+    if (m_debug) {
+        std::cerr << "------------ Soft variables of iteration " << i << " ------------\n";
+        for (size_t j = 0; j < largest; ++j)
+            std::cerr << first_soft + j << '\n';
+    }
+    std::vector<LINT> lits;
+    for (size_t j = 0; j < largest; ++j) {
+        lits.push_back(-(first_soft + j));
+        m_soft_clauses.create_clause(lits);
+        lits.clear();
+    }
+}
+
 void Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
     IntVector tmp_model(1, 0);
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
+        generate_soft_clauses();
         if (m_debug)
             std::cerr << "------------------ ITERATION " << i << " ------------------\n";
-        if (i == m_num_objectives - 1) {
-            // last iteration is done differently
-            LINT first_relax = m_id_count + 1;
-            LINT first_soft
-        }
-        else {
-            if (i != 0) // in the first iteration i == 0 there is no relaxation
-                encode_relaxation(i); // create the vars in sorted_relax_vecs and encode the relax vars
-            // soft clauses
-            // find size of largest objective function
-            size_t largest = largest_obj();
-            LINT first_soft = m_id_count + 1;
-            m_id_count += largest; // create the variables of the soft clauses of this iteration
-            if (m_debug) {
-                std::cerr << "------------ Soft variables of iteration " << i << " ------------\n";
-                for (size_t j = 0; j < largest; ++j)
-                    std::cerr << first_soft + j << '\n';
-            }
-            std::vector<LINT> lits;
-            for (size_t j = 0; j < largest; ++j) {
-                lits.push_back(-(first_soft + j));
-                m_soft_clauses.create_clause(lits);
-                lits.clear();
-            }
-            // encode the componentwise OR between sorted_relax vectors
+        if (i != 0) // in the first iteration i == 0 there is no relaxation
+            encode_relaxation(i);
+        // encode the componentwise OR between sorted_relax vectors except in the last iteration
+        if (i != m_num_objectives - 1)
             componentwise_OR(i);
-            // call solver 
-            if (m_pbo)
-                solve_pbo(i, tmp_model); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
-            else
-                solve_maxsat(i, tmp_model);
-            /*
-            if (retv != 0) {
-                open_wbo returns 7680 , wtf???
-                std::cerr << "Something went wrong with the solver\n";
-                exit(retv);
-            }*/
-            // read tmp_model and fix values of current objective function
-            if (tmp_model.empty()){
-                m_sat = false;
-                break;
-            }
-            m_sat = true;
+        // call solver 
+        if (m_pbo)
+            solve_pbo(i, tmp_model); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
+        else
+            solve_maxsat(i, tmp_model);
+        /*
+        if (retv != 0) {
+            open_wbo returns 7680 , wtf???
+            std::cerr << "Something went wrong with the solver\n";
+            exit(retv);
+        }*/
+        // read tmp_model and fix values of current objective function
+        if (tmp_model.empty()){
+            m_sat = false;
+            break;
+        }
+        m_sat = true;
+        if (i != m_num_objectives - 1) { // in the last iteration we just print the solution
             for (BasicClause *cl : m_soft_clauses) {
                 LINT soft_var = -(*(cl->begin()));
                 LINT lit = tmp_model[soft_var];
