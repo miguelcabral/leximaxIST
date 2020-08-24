@@ -19,7 +19,7 @@ void Leximax_encoder::print_cnf()
 void Leximax_encoder::print_optimum(IntVector &model)
 {
     if (m_sat) {
-        LINT optimum = 0;
+        size_t optimum = 0;
         for (BasicClause *cl : m_soft_clauses) {
             LINT var = -(*(cl->begin()));
             if (model[var] > 0)
