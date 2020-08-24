@@ -1,3 +1,5 @@
+- How to test if this tool is printing leximax-optimal solutions? For small inputs -  use pienum to enumerate models of input problem and compute all objective vectors and then check which solutions minimise the objective vectors with respect to the leximax order. -> write the part of receiving input from pienum and check the Leximax-optimal solutions - brute force.
+
 - put options: specify external solver, if solving with pbo or maxsat, leave temporary files or not.
 
 - print_solution. Should I print the optimum of each iteration (the i-th maximum)?

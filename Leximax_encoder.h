@@ -51,8 +51,8 @@ public:
         m_input_files("tbd"),
         m_leave_temporary_files(true),
         m_sat(true),
-        m_pbo(false),
-        m_debug(true),
+        m_pbo(true),
+        m_debug(false),
         m_multiplication_string("*")
     {
     // just initialization    
@@ -90,6 +90,8 @@ private:
     
     size_t largest_obj();
     
+    void generate_soft_clauses(int i);
+    
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
     void at_most(std::forward_list<LINT> &set, int i);
@@ -105,6 +107,8 @@ private:
     void write_atmost_pb(int i, ostream &output);
     
     void write_pbconstraint(BasicClause *cl, ostream& output);
+    
+    void write_sum_equals_pb(int i, ostream &output);
     
     int solve_pbo(int i, IntVector  &tmp_model);
     

@@ -11,10 +11,13 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
 {
     stringstream scommand;
     const string output_filename = file_name + ".out";
-    scommand << m_solver_command << " " << file_name << " > " << output_filename << " 2> solver_error.txt";
+    scommand << m_solver_command << " ";
+    if (m_pbo)
+        scommand << "-formula=1 ";
+    scommand << file_name << " > " << output_filename << " 2> solver_error.txt";
     const string command = scommand.str();
     const int retv = system (command.c_str());
-    std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
+    //std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
     gzFile of = gzopen(output_filename.c_str(), "rb");
     assert(of!=NULL);
     StreamBuffer r(of);
@@ -77,20 +80,32 @@ int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
 }
 
 void Leximax_encoder::write_pbconstraint(BasicClause *cl, ostream& output) {
-    for (const LINT literal : *cl) {
-        const bool sign = literal > 0;
+    LINT num_negatives(0);
+    for (LINT literal : *cl) {
+        bool sign = literal > 0;
+        if (!sign)
+            ++num_negatives;
         output << (sign ? "+1" : "-1") << m_multiplication_string << "x" << (sign ? literal : -literal) << " ";
     }
-    output << " >= " << 0 << ";\n";
+    output << " >= " << 1 - num_negatives << ";\n";
 }
 
 void Leximax_encoder::write_atmost_pb(int i, ostream &output)
 {
-    for (const LINT var : m_relax_vars) {
+    for (LINT var : m_relax_vars) {
         output << "+1" << m_multiplication_string << "x" << var << " ";
     }
     output << " <= " << i << ";\n";
 }
+
+void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
+{
+    for (LINT var : m_relax_vars) {
+        output << "+1" << m_multiplication_string << "x" << var << " ";
+    }
+    output << " = " << i << ";\n";
+}
+
 
 int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
@@ -102,18 +117,19 @@ int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
     if (m_soft_clauses.size() > 0) {// print minimization function
         output << "min:";
         for (BasicClause *cl : m_soft_clauses) {
-            LINT literal = *(cl->begin()); // cl is unitary clause
-            const bool sign = literal > 0;
-            output << " " << (sign ? "+1" : "-1") << m_multiplication_string << "x" << (sign ? literal : -literal);
+            LINT soft_var = -(*(cl->begin())); // cl is unitary clause
+            output << " " << "+1" << m_multiplication_string << "x" << soft_var;
         }
         output << ";\n";
     }
-    // print all constraints except for at most i
+    // print all constraints except for cardinality constraint
     for (BasicClause *cl : m_constraints) {
         write_pbconstraint(cl, output);
     }
-    // print at most i constraint
-    write_atmost_pb(i, output);
+    if (i == m_num_objectives - 1)
+        write_sum_equals_pb(1, output); // in the last iteration print =1 cardinality constraint
+    else if (i != 0)
+        write_atmost_pb(i, output); // in other iterations print at most i constraint  
     output.close();
     // call the solver
     return call_solver(tmp_model, input_name);

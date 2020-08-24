@@ -174,26 +174,49 @@ void Leximax_encoder::encode_relaxation(int i)
                 }
             }
         }
-        // cardinality constraint
         // at most i constraint 
         if (m_debug)
             std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
         if (!m_pbo)
             at_most(m_relax_vars, i);
-        
         // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
     }
     else { // last iteration
         // choose exactly one obj function to minimise
         int k = 0;
-        for (LINT relax_var: m_relax_vars) {
+        std::vector<LINT> lits;
+        for (LINT relax_var : m_relax_vars) {
+            std::vector<LINT> *objective = m_objectives[k];
+            size_t j = 0;
             for (BasicClause *cl : m_soft_clauses) {
                 LINT soft_var = -(*(cl->begin()));
-                // relax_var implies obj_func implies soft_var
-                
-                // neg relax_var 
+                lits.clear();
+                if (j >= objective->size()) {
+                    // m_relax_vars[k] implies neg soft_var[j]
+                    lits.push_back(-relax_var);
+                    lits.push_back(-soft_var);
+                }
+                else {
+                    // m_relax_vars[k] implies objective[j] implies soft_var[j]
+                    lits.push_back(-relax_var);
+                    lits.push_back(-(objective->at(j)));
+                    lits.push_back(soft_var);
+                }
+                m_constraints.create_clause(lits);
+                ++j;
             }
             ++k;
+        }
+        if (!m_pbo) { // when solving with pbo, this constraint is written before calling the solver
+            // at most 1 constraint
+            if (m_debug)
+                std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
+            at_most(m_relax_vars, 1);
+            // at least 1 constraint
+            lits.clear();
+            for (LINT relax_var : m_relax_vars)
+                lits.push_back(relax_var);
+            m_constraints.create_clause(lits);
         }
     }
 }
@@ -254,7 +277,7 @@ void Leximax_encoder::componentwise_OR(int i)
     }
 }
 
-void Leximax_encoder::generate_soft_clauses()
+void Leximax_encoder::generate_soft_clauses(int i)
 {
     // find size of largest objective function
     size_t largest = largest_obj();
@@ -279,7 +302,7 @@ void Leximax_encoder::solve()
     IntVector tmp_model(1, 0);
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
-        generate_soft_clauses();
+        generate_soft_clauses(i);
         if (m_debug)
             std::cerr << "------------------ ITERATION " << i << " ------------------\n";
         if (i != 0) // in the first iteration i == 0 there is no relaxation
