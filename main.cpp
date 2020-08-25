@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
     // encode sorted vectors with sorting network
     enc.encode_sorted();
     enc.solve();
-    //enc.print_cnf();
+    enc.verify();
+    //enc.print_cnf(std::cout);
     return 0;
 }

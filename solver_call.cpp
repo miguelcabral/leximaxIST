@@ -1,7 +1,6 @@
 #include "Leximax_encoder.h"
 #include <fstream>
 #include <sstream>
-#include <time.h>
 #include <stdlib.h>
 #include "old_packup/types.hh"
 #include <zlib.h>

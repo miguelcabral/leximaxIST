@@ -35,6 +35,9 @@ private:
     bool m_pbo;
     bool m_debug;
     std::string m_multiplication_string;
+    // verification:
+    ofstream m_pienum_file;
+    std::string m_pienum_file_name;
     
 public:
     
@@ -53,7 +56,10 @@ public:
         m_sat(true),
         m_pbo(true),
         m_debug(false),
-        m_multiplication_string("*")
+        m_multiplication_string("*"),
+        m_pienum_file(),
+        
+        
     {
     // just initialization    
     }
@@ -64,7 +70,9 @@ public:
     
     void solve();
     
-    void print_cnf();
+    void print_cnf(ostream &out);
+    
+    void verify();
     
 private:
     

@@ -27,6 +27,10 @@ void Leximax_encoder::set_input_name(char *argv[])
 int Leximax_encoder::read(char *argv[])
 {
     set_input_name(argv);
+    // set name of pienum input file
+    size_t pos = m_input_files.find_first_of('.');
+    const std::string input_to_pienum = m_input_files.substr(0, pos - 1);
+    input_to_pienum += "_pienum.cnf";
     gzFile in = gzopen(argv[1], "rb");
     if (in == Z_NULL) {
        std::cerr << "Could not open file " << argv[1] << std::endl;

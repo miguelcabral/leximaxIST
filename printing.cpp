@@ -7,13 +7,13 @@ void print_clause(BasicClause *cl)
     std::cout << "0" << std::endl;
 }
 
-void Leximax_encoder::print_cnf()
+void Leximax_encoder::print_cnf(ostream &out)
 {
-    std::cout << "c =========================================\n";
-    std::cout << "p cnf " << m_id_count << " " << m_constraints.size() << std::endl;
+    out << "c =========================================\n";
+    out << "p cnf " << m_id_count << " " << m_constraints.size() << '\n';
     for(BasicClause *cl : m_constraints)
         print_clause(cl);
-    std::cout << "c =========================================\n";
+    out << "c =========================================\n";
 }
 
 void Leximax_encoder::print_optimum(IntVector &model)
