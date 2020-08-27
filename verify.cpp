@@ -6,22 +6,21 @@
 #include <zlib.h>
 #include "old_packup/fmtutils.hh"
 
-std::vector<LINT>* Leximax_encoder::compute_optimum(std::string &output_filename)
+void Leximax_encoder::brute_force_optimum(std::string &output_filename, std::vector<LINT> &pienum_opt)
 {
     gzFile of = gzopen(output_filename.c_str(), "rb");
     assert(of!=NULL);
     StreamBuffer r(of);
-    bool sat = false;
     // find the max id in m_objectives
     std::vector<LINT>* last_objective = m_objectives[m_num_objectives - 1];
     size_t max_id = last_objective->at(last_objective->size() - 1);
     IntVector model(max_id + 1, 0);
     size_t optimum(0);
+    int obj_index(0);
     while (*r != EOF) {
         if (*r != 'v') {// ignore all the other lines
             skipLine(r);
         } else {
-            sat=true;
             ++r; // skip 'v'
             while ( (*r != '\n')  && (*r != EOF)  && (*r != '\r') ) {
                 skipTrueWhitespace(r);
@@ -42,37 +41,42 @@ std::vector<LINT>* Leximax_encoder::compute_optimum(std::string &output_filename
                 if (model[var] > 0)
                     optimum++;
             }
+            pienum_opt[obj_index] = optimum;
+            ++obj_index;
         }
-    }
-    if (!sat) tmp_model.clear();
-    if (!m_leave_temporary_files) {
-        remove(file_name.c_str());
-        remove(output_filename.c_str());
     }
 }
 
 void Leximax_encoder::verify()
 {
+    if (!m_sat)
+        return;
     // call pienum
-    stringstream command_stream;
-    size_t pos = m_input_files.find_first_of('.'); // CHANGE THIS!!! -> pienum must receive constraints with encoding of obj funcs
-    const std::string input_to_pienum = m_input_files.substr(0, pos - 1);
-    input_to_pienum += "_pienum.cnf";
-    // write input file to pienum
-    
-    std::string output_filename = "all_models_" + m_input_to_pienum;
-    command_stream << "pienum -p ";
-    command_stream << input_to_pienum << " > " << output_filename;
+    stringstream command_stream;    
+    std::string output_filename = "all_models_" + m_pienum_file_name;
+    command_stream << "./pienum -p ";
+    command_stream << m_pienum_file_name << " > " << output_filename;
     const std::string command = command_stream.str();
     const int retv = system (command.c_str());
     std::cerr << "# " <<  "pienum finished with exit value " << retv << '\n';
     // open output file of pienum and compute optimum objective vector sorted in non-increasing order.
-    std::vector<LINT> *pienum_opt = compute_optimum(output_filename);
-    // call leximax with input file hard.cnf and objective functions given in the cmd line args
-    
-    // open output file of leximax and read optimum obj vector sorted in non-increasing order.
-    std::vector<LINT> *leximax_opt = read_optimum(output_filename)
-    // compare the two results and return OK if optimum coincides and false Problems!
-    compare(pienum_opt, leximax_opt);
-    return 0;
+    std::vector<LINT> pienum_opt(m_num_objectives, 0);
+    brute_force_optimum(output_filename, pienum_opt);
+    // clean up
+    if (!m_leave_temporary_files) {
+        remove(m_pienum_file_name.c_str());
+        remove(output_filename.c_str());
+    }
+    // compare the two results and return OK if optimum coincides and Problems! otherwise
+    bool ok(true);
+    for (int j(0); j < m_num_objectives; ++j) {
+        if (pienum_opt[j] != m_optimum[j]) {
+            ok = false;
+            break;
+        }
+    }
+    if (ok)
+        std::cerr << "OK\n";
+    else
+        std::cerr << "Problems!\n";
 }

@@ -38,6 +38,7 @@ private:
     // verification:
     ofstream m_pienum_file;
     std::string m_pienum_file_name;
+    std::vector<LINT> m_optimum;
     
 public:
     
@@ -57,9 +58,10 @@ public:
         m_pbo(true),
         m_debug(false),
         m_multiplication_string("*"),
+        // verification:
         m_pienum_file(),
-        
-        
+        m_pienum_file_name("tbd"),
+        m_optimum(num_objectives, 0)
     {
     // just initialization    
     }
@@ -82,6 +84,8 @@ private:
     
     void set_input_name(char *argv[]);
     
+    void set_pienum_input();
+    
     // sorting_net.cpp
     
     void encode_max(LINT var_out_max, LINT var_in1, LINT var_in2);
@@ -99,6 +103,8 @@ private:
     size_t largest_obj();
     
     void generate_soft_clauses(int i);
+    
+    size_t get_optimum(IntVector& model);
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
@@ -126,7 +132,9 @@ private:
     
     void print_solution(IntVector &model);
     
-    void print_optimum(IntVector &model);
+    // verify.cpp
+    
+    void brute_force_optimum(std::string &output_filename, std::vector<LINT> &pienum_opt);
 
 };
     

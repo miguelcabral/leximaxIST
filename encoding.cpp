@@ -296,6 +296,17 @@ void Leximax_encoder::generate_soft_clauses(int i)
     }
 }
 
+size_t Leximax_encoder::get_optimum(IntVector &model)
+{
+    size_t optimum = 0;
+    for (BasicClause *cl : m_soft_clauses) {
+        LINT var = -(*(cl->begin()));
+        if (model[var] > 0)
+            optimum++;
+    }
+    return optimum;
+}
+
 void Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
@@ -334,8 +345,8 @@ void Leximax_encoder::solve()
                 m_constraints.create_unit_clause(lit);
             }
         }
-        // print i-th maximum
-        print_optimum(tmp_model);
+        // store i-th maximum
+        m_optimum[i] = get_optimum(tmp_model);
     }
     // print solution
     print_solution(tmp_model);

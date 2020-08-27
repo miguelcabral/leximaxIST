@@ -24,13 +24,20 @@ void Leximax_encoder::set_input_name(char *argv[])
     }
 }
 
+void Leximax_encoder::set_pienum_input()
+{
+    // set name of pienum input file
+    size_t pos = m_input_files.find_first_of('.');
+    m_pienum_file_name = m_input_files.substr(0, pos - 1);
+    m_pienum_file_name += "_pienum.cnf";
+    // open pienum input file
+    m_pienum_file.open(m_pienum_file_name.c_str());
+}
+
 int Leximax_encoder::read(char *argv[])
 {
     set_input_name(argv);
-    // set name of pienum input file
-    size_t pos = m_input_files.find_first_of('.');
-    const std::string input_to_pienum = m_input_files.substr(0, pos - 1);
-    input_to_pienum += "_pienum.cnf";
+    set_pienum_input();
     gzFile in = gzopen(argv[1], "rb");
     if (in == Z_NULL) {
        std::cerr << "Could not open file " << argv[1] << std::endl;
@@ -83,5 +90,10 @@ int Leximax_encoder::read(char *argv[])
         // delete ReadCNF of i-th objective function
         delete obj;
     }
+    // verification -------------------------
+    // write input constraints + objective function variables to pienum input
+    print_cnf(m_pienum_file);
+    m_pienum_file.close();
+    // verification -------------------------
     return 0;
 }

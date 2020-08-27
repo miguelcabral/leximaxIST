@@ -1,10 +1,10 @@
 #include "Leximax_encoder.h"
 
-void print_clause(BasicClause *cl)
+void print_clause(ostream &out, BasicClause *cl)
 {
     for (auto l : *cl)
-        std::cout << l << " ";
-    std::cout << "0" << std::endl;
+        out << l << " ";
+    out << "0\n";
 }
 
 void Leximax_encoder::print_cnf(ostream &out)
@@ -12,21 +12,8 @@ void Leximax_encoder::print_cnf(ostream &out)
     out << "c =========================================\n";
     out << "p cnf " << m_id_count << " " << m_constraints.size() << '\n';
     for(BasicClause *cl : m_constraints)
-        print_clause(cl);
+        print_clause(out, cl);
     out << "c =========================================\n";
-}
-
-void Leximax_encoder::print_optimum(IntVector &model)
-{
-    if (m_sat) {
-        size_t optimum = 0;
-        for (BasicClause *cl : m_soft_clauses) {
-            LINT var = -(*(cl->begin()));
-            if (model[var] > 0)
-                optimum++;
-        }
-        std::cout << "o " << optimum << '\n';
-    }
 }
 
 void Leximax_encoder::print_solution(IntVector &model)
@@ -35,6 +22,9 @@ void Leximax_encoder::print_solution(IntVector &model)
         std::cout << "s UNSATISFIABLE\n";
     else {
         std::cout << "s SATISFIABLE\n";
+        for (int j = 0; j < m_num_objectives; ++j) {
+            std::cout << "o " << m_optimum[j] << '\n';
+        }
         std::cout << "v ";
         for (size_t j = 0; j < model.size(); ++j) {
             std::cout << model[j] << " ";
