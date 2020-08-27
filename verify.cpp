@@ -27,11 +27,13 @@ void Leximax_encoder::brute_force_optimum(std::string &output_filename, std::vec
                 const bool sign = (*r) != '-';
                 if ((*r == '+') || (*r == '-')) ++r;
                 if ((*r == 'x')) ++r;
-                if (*r < '0' || *r > '9') break;
+                if (*r < '0' || *r > '9')
+                    break;
                 const LINT l = parseInt(r);
                 assert(model.size()>(size_t)l);
                 model[l] = (sign ? l : -l);
             }
+            std::cout << (int)*r << std::endl;
             assert (*r=='\n');
             ++r; // skip '\n'
             // determine score of current model
@@ -52,8 +54,9 @@ void Leximax_encoder::verify()
     if (!m_sat)
         return;
     // call pienum
-    stringstream command_stream;    
-    std::string output_filename = "all_models_" + m_pienum_file_name;
+    stringstream command_stream;
+    size_t pos = m_pienum_file_name.find_first_of('.');
+    std::string output_filename = "all_models_" + m_pienum_file_name.substr(0, pos) + ".out";
     command_stream << "./pienum -p ";
     command_stream << m_pienum_file_name << " > " << output_filename;
     const std::string command = command_stream.str();

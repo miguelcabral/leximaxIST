@@ -28,7 +28,7 @@ void Leximax_encoder::set_pienum_input()
 {
     // set name of pienum input file
     size_t pos = m_input_files.find_first_of('.');
-    m_pienum_file_name = m_input_files.substr(0, pos - 1);
+    m_pienum_file_name = m_input_files.substr(0, pos);
     m_pienum_file_name += "_pienum.cnf";
     // open pienum input file
     m_pienum_file.open(m_pienum_file_name.c_str());

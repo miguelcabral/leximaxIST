@@ -26,7 +26,7 @@ void Leximax_encoder::print_solution(IntVector &model)
             std::cout << "o " << m_optimum[j] << '\n';
         }
         std::cout << "v ";
-        for (size_t j = 0; j < model.size(); ++j) {
+        for (size_t j = 1; j < model.size(); ++j) {
             std::cout << model[j] << " ";
         }
         std::cout << '\n';
