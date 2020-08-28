@@ -5,8 +5,11 @@
 #include "old_packup/types.hh"
 #include <zlib.h>
 #include "old_packup/fmtutils.hh"
+#include <algorithm>
 
-void Leximax_encoder::brute_force_optimum(std::string &output_filename, std::vector<LINT> &pienum_opt)
+bool comp(LINT i, LINT j) { return (i > j) };
+
+void Leximax_encoder::collect_sorted_obj_vecs(std::string &output_filename, std::forward_list<std::vector<LINT>> &sorted_obj_vectors)
 {
     gzFile of = gzopen(output_filename.c_str(), "rb");
     assert(of!=NULL);
@@ -14,9 +17,8 @@ void Leximax_encoder::brute_force_optimum(std::string &output_filename, std::vec
     // find the max id in m_objectives
     std::vector<LINT>* last_objective = m_objectives[m_num_objectives - 1];
     size_t max_id = last_objective->at(last_objective->size() - 1);
-    IntVector model(max_id + 1, 0);
-    size_t optimum(0);
-    int obj_index(0);
+    std::vector<LINT> model(max_id + 1, 0);
+    std::vector<LINT> obj_vec(m_num_objectives, 0);
     while (*r != EOF) {
         if (*r != 'v') {// ignore all the other lines
             skipLine(r);
@@ -30,21 +32,26 @@ void Leximax_encoder::brute_force_optimum(std::string &output_filename, std::vec
                 if (*r < '0' || *r > '9')
                     break;
                 const LINT l = parseInt(r);
+                std::cout << l << std::endl;
                 assert(model.size()>(size_t)l);
                 model[l] = (sign ? l : -l);
             }
-            std::cout << (int)*r << std::endl;
-            assert (*r=='\n');
+            assert(*r=='\n')
             ++r; // skip '\n'
-            // determine score of current model
-            optimum = 0;
-            for (BasicClause *cl : m_soft_clauses) {
-                LINT var = -(*(cl->begin()));
-                if (model[var] > 0)
-                    optimum++;
+            // determine objective vector for current model
+            for (int j(0); j < m_num_objectives; ++j) {
+                size_t score(0);
+                std::vector<LINT> *objective = m_objectives[j];
+                for (LINT var : *objective) {
+                    if (model[var] > 0)
+                        ++score;
+                }
+                obj_vec[j] = score;
             }
-            pienum_opt[obj_index] = optimum;
-            ++obj_index;
+            // sort objective vector in non-increasing order
+            std::sort(obj_vec.begin(), obj_vec.end(), comp);
+            // add the objective vector to the collection
+            sorted_obj_vectors.push_front(obj_vec);
         }
     }
 }
@@ -63,8 +70,11 @@ void Leximax_encoder::verify()
     const int retv = system (command.c_str());
     std::cerr << "# " <<  "pienum finished with exit value " << retv << '\n';
     // open output file of pienum and compute optimum objective vector sorted in non-increasing order.
+    std::forward_list<std::vector<LINT>> sorted_obj_vectors();
     std::vector<LINT> pienum_opt(m_num_objectives, 0);
-    brute_force_optimum(output_filename, pienum_opt);
+    collect_sorted_obj_vecs(output_filename, sorted_obj_vectors);
+    brute_force_optimum(pienum_opt, sorted_obj_vectors);
+    
     // clean up
     if (!m_leave_temporary_files) {
         remove(m_pienum_file_name.c_str());
