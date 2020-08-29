@@ -134,7 +134,9 @@ private:
     
     // verify.cpp
     
-    void brute_force_optimum(std::string &output_filename, std::vector<LINT> &pienum_opt);
+    void brute_force_optimum(std::vector<LINT> &pienum_opt, std::forward_list<std::vector<LINT>> &sorted_obj_vectors);
+    
+    void collect_sorted_obj_vecs(std::string &output_filename, std::forward_list<std::vector<LINT>> &sorted_obj_vectors);
 
 };
     
