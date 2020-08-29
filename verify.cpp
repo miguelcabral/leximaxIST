@@ -49,6 +49,12 @@ void Leximax_encoder::collect_sorted_obj_vecs(std::string &output_filename, std:
             }
             // sort objective vector in non-increasing order
             std::sort(obj_vec.begin(), obj_vec.end(), comp);
+            /*
+            std::cout << "Sorted objective vector:";
+            for (size_t j(0); j < obj_vec.size(); ++j)
+                std::cout << ' ' << obj_vec[j];
+            std::cout << '\n';
+            */
             // add the objective vector to the collection
             sorted_obj_vectors.push_front(obj_vec);
         }
