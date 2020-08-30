@@ -1,4 +1,6 @@
-CCFLAGS=-Wall -Wextra
+-include makeenv
+
+CCFLAGS=-Wall -Wextra -std=c++17 -pedantic
 
 ifdef DBG
 	CCFLAGS+=-g
