@@ -1,8 +1,15 @@
 # This is for running the checker on every example. Please change the directory to the correct one in your machine.
-for i in $(seq 2 5)
+rm check_output.txt
+for i in $(seq 1 5)
 do
-    for hard in ~/thesis/examples/hard_$i\_*
+    for j1 in $(seq 1 5)
     do
-        ./leximax $hard ~/thesis/examples/f_$i.cnf | ./lingeling -q | ./check_sorting $i >> check_output.txt
+        for j2 in $(seq 1 5)
+        do
+            for j3 in $(seq 1 5)
+            do
+                ./leximax ~/thesis/examples/hard_$i.cnf ~/thesis/examples/f_1_$j1.cnf ~/thesis/examples/f_2_$j2.cnf ~/thesis/examples/f_3_$j3.cnf 2>> check_output.txt
+            done
+        done
     done
 done
