@@ -1,5 +1,5 @@
 # This is for running the checker on every example. Please change the directory to the correct one in your machine.
-rm check_output.txt
+rm -f check_output.txt
 for i in $(seq 1 5)
 do
     for j1 in $(seq 1 5)

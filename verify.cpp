@@ -119,6 +119,14 @@ void Leximax_encoder::verify()
     }
     if (ok)
         std::cerr << "OK\n";
-    else
+    else {
         std::cerr << "Problems on " << m_input_files << '\n';
+        std::cerr << "Brute force: ";
+        for (int j(0); j < m_num_objectives; ++j)
+            std::cerr << pienum_opt[j] << ' ';
+        std::cerr << "; Tool: ";
+        for (int j(0); j < m_num_objectives; ++j)
+            std::cerr << m_optimum[j] << ' ';
+        std::cerr << '\n';
+    }
 }

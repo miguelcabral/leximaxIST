@@ -53,7 +53,7 @@ public:
         m_relax_vars(),
         m_solver_command("~/thesis/default-solver/open-wbo-master/open-wbo_static"),
         m_input_files("tbd"),
-        m_leave_temporary_files(true),
+        m_leave_temporary_files(false),
         m_sat(true),
         m_pbo(true),
         m_debug(false),
