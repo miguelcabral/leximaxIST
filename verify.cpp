@@ -120,5 +120,5 @@ void Leximax_encoder::verify()
     if (ok)
         std::cerr << "OK\n";
     else
-        std::cerr << "Problems!\n";
+        std::cerr << "Problems on " << m_input_files << '\n';
 }
