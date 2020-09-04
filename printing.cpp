@@ -22,9 +22,10 @@ void Leximax_encoder::print_solution(IntVector &model)
         std::cout << "s UNSATISFIABLE\n";
     else {
         std::cout << "s SATISFIABLE\n";
-        for (int j = 0; j < m_num_objectives; ++j) {
-            std::cout << "o " << m_optimum[j] << '\n';
-        }
+        std::cout << "o ";
+        for (int j = 0; j < m_num_objectives; ++j)
+            std::cout << m_optimum[j] << ' ';
+        std::cout << '\n';
         std::cout << "v ";
         for (size_t j = 1; j < model.size(); ++j) {
             std::cout << model[j] << " ";

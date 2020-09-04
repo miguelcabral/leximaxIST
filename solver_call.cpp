@@ -44,7 +44,7 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
     }
     if (!sat) tmp_model.clear();
     if (!m_leave_temporary_files) {
-        remove(file_name.c_str());
+        //remove(file_name.c_str());
         remove(output_filename.c_str());
         remove("solver_error.txt");
     }

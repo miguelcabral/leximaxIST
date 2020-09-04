@@ -55,8 +55,8 @@ public:
         m_input_files("tbd"),
         m_leave_temporary_files(false),
         m_sat(true),
-        m_pbo(true),
-        m_debug(false),
+        m_pbo(false),
+        m_debug(true),
         m_multiplication_string("*"),
         // verification:
         m_pienum_file(),

@@ -98,7 +98,7 @@ void Leximax_encoder::verify()
     command_stream << m_pienum_file_name << " > " << output_filename;
     const std::string command = command_stream.str();
     const int retv = system (command.c_str());
-    std::cerr << "# " <<  "pienum finished with exit value " << retv << '\n';
+    //std::cerr << "# " <<  "pienum finished with exit value " << retv << '\n';
     // open output file of pienum and compute optimum objective vector sorted in non-increasing order.
     std::forward_list<std::vector<LINT>> sorted_obj_vectors;
     std::vector<LINT> pienum_opt(m_num_objectives, 0);
