@@ -92,8 +92,7 @@ void Leximax_encoder::verify()
     }
     // call pienum
     stringstream command_stream;
-    size_t pos = m_pienum_file_name.find_first_of('.');
-    std::string output_filename = "all_models_" + m_pienum_file_name.substr(0, pos) + ".out";
+    std::string output_filename = m_pienum_file_name + ".out";
     command_stream << "./pienum -p ";
     command_stream << m_pienum_file_name << " > " << output_filename;
     const std::string command = command_stream.str();
@@ -105,10 +104,10 @@ void Leximax_encoder::verify()
     collect_sorted_obj_vecs(output_filename, sorted_obj_vectors);
     brute_force_optimum(pienum_opt, sorted_obj_vectors);
     // clean up
-    if (!m_leave_temporary_files) {
+    /*if (!m_leave_temporary_files) {
         remove(m_pienum_file_name.c_str());
         remove(output_filename.c_str());
-    }
+    }*/
     // compare the two results and return OK if optimum coincides and Problems! otherwise
     bool ok(true);
     for (int j(0); j < m_num_objectives; ++j) {

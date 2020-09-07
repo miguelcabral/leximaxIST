@@ -23,6 +23,5 @@ int main(int argc, char *argv[])
     enc.encode_sorted();
     enc.solve();
     enc.verify();
-    //enc.print_cnf(std::cout);
     return 0;
 }

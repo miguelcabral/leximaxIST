@@ -195,14 +195,21 @@ void Leximax_encoder::encode_relaxation(int i)
                     // m_relax_vars[k] implies neg soft_var[j]
                     lits.push_back(-relax_var);
                     lits.push_back(-soft_var);
+                    m_constraints.create_clause(lits);
                 }
                 else {
                     // m_relax_vars[k] implies objective[j] implies soft_var[j]
                     lits.push_back(-relax_var);
                     lits.push_back(-(objective->at(j)));
                     lits.push_back(soft_var);
+                    m_constraints.create_clause(lits);
+                    lits.clear();
+                    // let's check: m_relax_vars[k] implies soft_var[j] implies objective[j]
+                    lits.push_back(-relax_var);
+                    lits.push_back(objective->at(j));
+                    lits.push_back(-soft_var);
+                    m_constraints.create_clause(lits);
                 }
-                m_constraints.create_clause(lits);
                 ++j;
             }
             ++k;
@@ -274,6 +281,8 @@ void Leximax_encoder::componentwise_OR(int i)
         }
         ++k;        
         // soft variable implies disjunction -> Should I put this one? -> experiment later on
+        disjunction.push_back(soft_lit);
+        m_constraints.create_clause(disjunction);
     }
 }
 

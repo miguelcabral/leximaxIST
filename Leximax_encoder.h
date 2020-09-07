@@ -53,17 +53,28 @@ public:
         m_relax_vars(),
         m_solver_command("~/thesis/default-solver/open-wbo-master/open-wbo_static"),
         m_input_files("tbd"),
-        m_leave_temporary_files(false),
+        m_leave_temporary_files(true),
         m_sat(true),
         m_pbo(false),
-        m_debug(true),
+        m_debug(false),
         m_multiplication_string("*"),
         // verification:
         m_pienum_file(),
         m_pienum_file_name("tbd"),
         m_optimum(num_objectives, 0)
     {
-    // just initialization    
+        // create temporary directory
+        std::string command_make_tmp("mkdir -p tmp");
+        system(command_make_tmp.c_str());
+    }
+    
+    ~Leximax_encoder()
+    {
+        // remove temporary files
+        if (!m_leave_temporary_files) {
+            std::string command_remove_tmp("rm -rf tmp");
+            system(command_remove_tmp.c_str());
+        }
     }
     
     int read(char *argv[]);
