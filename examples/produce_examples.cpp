@@ -5,8 +5,6 @@
 #include <time.h> // time
 #include <stdlib.h> // rand
 
-// create 200 cases: 5*5*5*5 files - hard, f_1, f_2, f_3. Then combine all...
-
 void write_random_clauses(std::ostream &out, int num_clauses, int num_vars)
 {
     out << "p cnf " << num_vars << ' ' <<  num_clauses << '\n';
@@ -26,7 +24,7 @@ void write_random_clauses(std::ostream &out, int num_clauses, int num_vars)
 
 int main()
 {
-    for (int i(1); i < 6; ++i) {
+    for (int i(1); i <= 30; ++i) {
         std::string file_name ("hard_");
         file_name += std::to_string(i);
         file_name += ".cnf";
@@ -35,14 +33,14 @@ int main()
             std::cerr << "Could not open " << file_name << " for writing" << std::endl;
             return 1;
         }
-        // create 3 random clauses from a set of 5 variables
-        write_random_clauses(of, 3, 5);
+        // create 3 random clauses from a set of 3 variables
+        write_random_clauses(of, 3, 3);
         of.close();
     }
     for (int i(1); i < 4; ++i) {
         std::string base_name ("f_");
         base_name += std::to_string(i);
-        for (int j(1); j < 6; ++j) {
+        for (int j(1); j <= 30; ++j) {
             std::string file_name (base_name);
             file_name += '_' + std::to_string(j);
             file_name += ".cnf";
@@ -51,8 +49,8 @@ int main()
                 std::cerr << "Could not open " << file_name << " for writing" << std::endl;
                 return 1;
             }
-            // create 3 random clauses from a set of 5 variables
-            write_random_clauses(of, 3, 5);
+            // create 3 random clauses from a set of 3 variables
+            write_random_clauses(of, 3, 3);
             of.close();
         }
     }
