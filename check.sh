@@ -8,7 +8,7 @@ do
         do
             for j3 in $(seq 1 30)
             do
-                ./leximax ~/thesis/examples/hard_$i.cnf ~/thesis/examples/f_1_$j1.cnf ~/thesis/examples/f_2_$j2.cnf ~/thesis/examples/f_3_$j3.cnf 2>> check_output.txt
+                nohup ./leximax ~/thesis/examples/hard_$i.cnf ~/thesis/examples/f_1_$j1.cnf ~/thesis/examples/f_2_$j2.cnf ~/thesis/examples/f_3_$j3.cnf 2>> check_output.txt
             done
         done
     done

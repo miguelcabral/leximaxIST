@@ -1,6 +1,8 @@
-- How to test if this tool is printing leximax-optimal solutions? For small inputs -  use pienum to enumerate models of input problem and compute all objective vectors and then compute the Leximax-minimal objective vectors by brute force. Then open solution given by leximax tool and check if the optimum coincides.
+- How to test if this tool is printing leximax-optimal solutions? For small inputs -  use pienum to enumerate models of input problem and compute all objective vectors and then compute the Leximax-minimal objective vectors by brute force. Then get solution given by leximax tool and check if the optimum coincides.
 
 - Testing ?? How to come up with many simple instances? Random?? - produce_examples.cpp 
+
+- FIND THE ERROR WITH MANY SIMPLE EXAMPLES - run in INESC servers.
 
 - put options: specify external solver, if solving with pbo or maxsat, leave temporary files or not.
 

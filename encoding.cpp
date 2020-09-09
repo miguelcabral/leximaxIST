@@ -281,8 +281,8 @@ void Leximax_encoder::componentwise_OR(int i)
         }
         ++k;        
         // soft variable implies disjunction -> Should I put this one? -> experiment later on
-        disjunction.push_back(soft_lit);
-        m_constraints.create_clause(disjunction);
+        /*disjunction.push_back(soft_lit);
+        m_constraints.create_clause(disjunction);*/
     }
 }
 

@@ -102,6 +102,14 @@ void Leximax_encoder::verify()
     std::forward_list<std::vector<LINT>> sorted_obj_vectors;
     std::vector<LINT> pienum_opt(m_num_objectives, 0);
     collect_sorted_obj_vecs(output_filename, sorted_obj_vectors);
+    // Print sorted_obj_vectors:
+    int k(5);
+    for (std::vector<LINT> &obj_vec : sorted_obj_vectors) {
+        std::cerr << "Sorted objective vector " << k << '\n';
+        for (LINT elm : obj_vec)
+            std::cerr << elm << ' ';
+        std::cerr << '\n';
+    }
     brute_force_optimum(pienum_opt, sorted_obj_vectors);
     // clean up
     /*if (!m_leave_temporary_files) {
