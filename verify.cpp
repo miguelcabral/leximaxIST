@@ -49,12 +49,6 @@ void Leximax_encoder::collect_sorted_obj_vecs(std::string &output_filename, std:
             }
             // sort objective vector in non-increasing order
             std::sort(obj_vec.begin(), obj_vec.end(), comp);
-            /*
-            std::cout << "Sorted objective vector:";
-            for (size_t j(0); j < obj_vec.size(); ++j)
-                std::cout << ' ' << obj_vec[j];
-            std::cout << '\n';
-            */
             // add the objective vector to the collection
             sorted_obj_vectors.push_front(obj_vec);
         }
@@ -78,8 +72,12 @@ void Leximax_encoder::brute_force_optimum(std::vector<LINT> &optimum, std::forwa
                     break;
                 }
             }
-            if (!ignore && vec[pos] < optimum[pos])
-                optimum[pos] = vec[pos];
+            if (!ignore && vec[pos] < optimum[pos]) {
+                // update optimum
+                for (int k(pos); k < m_num_objectives; ++k) {
+                    optimum[k] = vec[k];
+                }
+            }
         }
     }
 }
@@ -102,20 +100,7 @@ void Leximax_encoder::verify()
     std::forward_list<std::vector<LINT>> sorted_obj_vectors;
     std::vector<LINT> pienum_opt(m_num_objectives, 0);
     collect_sorted_obj_vecs(output_filename, sorted_obj_vectors);
-    // Print sorted_obj_vectors:
-    int k(5);
-    for (std::vector<LINT> &obj_vec : sorted_obj_vectors) {
-        std::cerr << "Sorted objective vector " << k << '\n';
-        for (LINT elm : obj_vec)
-            std::cerr << elm << ' ';
-        std::cerr << '\n';
-    }
     brute_force_optimum(pienum_opt, sorted_obj_vectors);
-    // clean up
-    /*if (!m_leave_temporary_files) {
-        remove(m_pienum_file_name.c_str());
-        remove(output_filename.c_str());
-    }*/
     // compare the two results and return OK if optimum coincides and Problems! otherwise
     bool ok(true);
     for (int j(0); j < m_num_objectives; ++j) {
