@@ -50,7 +50,7 @@ int main()
                 return 1;
             }
             // create 3 random clauses from a set of 3 variables
-            write_random_clauses(of, 3, 10);
+            write_random_clauses(of, 4, 10);
             of.close();
         }
     }
