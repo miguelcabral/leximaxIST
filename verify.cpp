@@ -100,6 +100,10 @@ void Leximax_encoder::verify()
     std::forward_list<std::vector<LINT>> sorted_obj_vectors;
     std::vector<LINT> pienum_opt(m_num_objectives, 0);
     collect_sorted_obj_vecs(output_filename, sorted_obj_vectors);
+    if (!m_leave_temporary_files) {
+        remove(m_pienum_file_name.c_str());
+        remove(output_filename.c_str());
+    }
     brute_force_optimum(pienum_opt, sorted_obj_vectors);
     // compare the two results and return OK if optimum coincides and Problems! otherwise
     bool ok(true);

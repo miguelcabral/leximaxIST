@@ -9,7 +9,7 @@ void write_random_clauses(std::ostream &out, int num_clauses, int num_vars)
 {
     out << "p cnf " << num_vars << ' ' <<  num_clauses << '\n';
     for (int i(1); i <= num_clauses; ++i) {
-        int rand_num_of_lits ((rand() % 5) + 1); // random number of literals
+        int rand_num_of_lits ((rand() % 4) + 1); // random number of literals
         for (int j(1); j <= rand_num_of_lits; ++j) {
             // generate random literal
             int rand_sign (rand() % 2);
@@ -34,7 +34,7 @@ int main()
             return 1;
         }
         // create 3 random clauses from a set of 3 variables
-        write_random_clauses(of, 5, 10);
+        write_random_clauses(of, 4, 8);
         of.close();
     }
     for (int i(1); i < 4; ++i) {
@@ -50,7 +50,7 @@ int main()
                 return 1;
             }
             // create 3 random clauses from a set of 3 variables
-            write_random_clauses(of, 4, 10);
+            write_random_clauses(of, 3, 10);
             of.close();
         }
     }

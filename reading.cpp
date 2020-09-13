@@ -27,7 +27,7 @@ void Leximax_encoder::set_input_name(char *argv[])
 void Leximax_encoder::set_pienum_input()
 {
     // set name of pienum input file
-    m_pienum_file_name = "tmp/" + m_input_files;
+    m_pienum_file_name = m_input_files;
     m_pienum_file_name += "_pienum.cnf";
     // open pienum input file
     m_pienum_file.open(m_pienum_file_name.c_str());

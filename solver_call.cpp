@@ -43,11 +43,11 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
         }
     }
     if (!sat) tmp_model.clear();
-    /*if (!m_leave_temporary_files) {
-        //remove(file_name.c_str());
+    if (!m_leave_temporary_files) {
+        remove(file_name.c_str());
         remove(output_filename.c_str());
         remove("solver_error.txt");
-    }*/
+    }
     return retv;
 }
 
@@ -63,7 +63,7 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight)
 
 int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
 {
-    std::string input_name = "tmp/" + m_input_files;
+    std::string input_name = m_input_files;
     input_name += "_" + to_string(i) + ".wcnf";
     ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -108,7 +108,7 @@ void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
 
 int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
-    std::string input_name = "tmp/" + m_input_files;
+    std::string input_name = m_input_files;
     input_name += "_" + to_string(i) + ".opb";
     ofstream output(input_name.c_str());
     // prepare input for the solver
