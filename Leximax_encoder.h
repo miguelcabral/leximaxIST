@@ -62,20 +62,7 @@ public:
         m_pienum_file(),
         m_pienum_file_name("tbd"),
         m_optimum(num_objectives, 0)
-    {
-        // create temporary directory
-        std::string command_make_tmp("mkdir -p tmp");
-        system(command_make_tmp.c_str());
-    }
-    
-    ~Leximax_encoder()
-    {
-        // remove temporary files
-        if (!m_leave_temporary_files) {
-            std::string command_remove_tmp("rm -rf tmp");
-            system(command_remove_tmp.c_str());
-        }
-    }
+    {}
     
     int read(char *argv[]);
     
