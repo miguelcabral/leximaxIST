@@ -51,7 +51,7 @@ public:
         m_sorted_vecs(num_objectives, nullptr),
         m_sorted_relax_vecs(num_objectives, nullptr),
         m_relax_vars(),
-        m_solver_command("~/thesis/default-solver/open-wbo-master/open-wbo_static"),
+        m_solver_command("~/thesis/default-solver/open-wbo/open-wbo_static"),
         m_input_files("tbd"),
         m_leave_temporary_files(false),
         m_sat(true),
