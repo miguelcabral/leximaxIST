@@ -1,5 +1,5 @@
 #include "Leximax_encoder.h"
-#include "old_packup/ReadCNF.hh"
+#include "ReadCNF.hh"
 
 void Leximax_encoder::encode_fresh(BasicClause *cl, LINT fresh_var)
 {
@@ -8,20 +8,6 @@ void Leximax_encoder::encode_fresh(BasicClause *cl, LINT fresh_var)
     lits.push_back(fresh_var);
     for (auto l : *cl) lits.push_back(l);
     m_constraints.create_clause(lits);
-}
-
-void Leximax_encoder::set_input_name(char *argv[])
-{
-    m_input_files = argv[1];
-    size_t position = m_input_files.find_last_of("/\\");
-    m_input_files = m_input_files.substr(position + 1);
-    for (int i{2}; i < m_num_objectives + 2; ++i) {
-        m_input_files.append("_");
-        std::string next_file = argv[i];
-        position = next_file.find_last_of("/\\");
-        next_file = next_file.substr(position + 1);
-        m_input_files.append(next_file);
-    }
 }
 
 void Leximax_encoder::set_pienum_input()
@@ -33,9 +19,8 @@ void Leximax_encoder::set_pienum_input()
     m_pienum_file.open(m_pienum_file_name.c_str());
 }
 
-int Leximax_encoder::read(char *argv[])
+int Leximax_encoder::read()
 {
-    set_input_name(argv);
     set_pienum_input();
     gzFile in = gzopen(argv[1], "rb");
     if (in == Z_NULL) {

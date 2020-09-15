@@ -6,13 +6,13 @@
 #include <vector> // std::vector
 #include <utility> // std::pair
 #include <forward_list> // std::forward_list
-#include "old_packup/basic_clause.hh"
-#include "old_packup/basic_clset.hh"
-#include "old_packup/basic_types.h"
-#include "old_packup/clause_utils.hh"
-#include "old_packup/cl_registry.hh"
-#include "old_packup/cl_globals.hh"
-#include "old_packup/cl_types.hh"
+#include "basic_clause.hh"
+#include "basic_clset.hh"
+#include "basic_types.h"
+#include "clause_utils.hh"
+#include "cl_registry.hh"
+#include "cl_globals.hh"
+#include "cl_types.hh"
 
 typedef std::vector<std::pair<LINT, LINT>*> SNET;
 
@@ -42,27 +42,38 @@ private:
     
 public:
     
-    Leximax_encoder(int num_objectives) :
+    Leximax_encoder(Options &options) :
         m_id_count(0),
         m_constraints(),
         m_soft_clauses(),
-        m_objectives(num_objectives, nullptr),
-        m_num_objectives(num_objectives),
-        m_sorted_vecs(num_objectives, nullptr),
-        m_sorted_relax_vecs(num_objectives, nullptr),
+        m_objectives(options.m_num_objectives, nullptr),
+        m_num_objectives(options.m_num_objectives),
+        m_sorted_vecs(options.m_num_objectives, nullptr),
+        m_sorted_relax_vecs(options.m_num_objectives, nullptr),
         m_relax_vars(),
-        m_solver_command("~/thesis/default-solver/open-wbo/open-wbo_static"),
-        m_input_files("tbd"),
-        m_leave_temporary_files(false),
+        m_solver_command(options.m_solver),
+        m_input_files(),
+        m_leave_temporary_files(options.m_leave_temporary_files),
         m_sat(true),
-        m_pbo(false),
+        m_pbo(options.m_pbo),
         m_debug(false),
-        m_multiplication_string("*"),
+        m_multiplication_string(options.m_multiplication_string),
         // verification:
         m_pienum_file(),
         m_pienum_file_name("tbd"),
-        m_optimum(num_objectives, 0)
-    {}
+        m_optimum(options.m_num_objectives, 0)
+    {
+        std::string m_input_files = options.m_input_files[0];
+        size_t position = m_input_files.find_last_of("/\\");
+        m_input_files = m_input_files.substr(position + 1);
+        for (int i{1}; i < m_num_objectives; ++i) {
+            m_input_files.append("_");
+            std::string next_file = options.m_input_files[i];
+            position = next_file.find_last_of("/\\");
+            next_file = next_file.substr(position + 1);
+            m_input_files.append(next_file);
+        }
+    }
     
     int read(char *argv[]);
     

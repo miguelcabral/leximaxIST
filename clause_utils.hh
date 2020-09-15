@@ -14,35 +14,32 @@
  *    You should have received a copy of the GNU General Public License       *
  *    along with packup.  If not, see <http://www.gnu.org/licenses/>.         *            
 \******************************************************************************/           
-/* 
- * File:   Options.hh
- * Author: mikolas
+//jpms:bc
+/*----------------------------------------------------------------------------*\
+ * File:        clause_utils.hh
  *
- * Created on April 23, 2011, 4:23 PM
- * Copyright (C) 2011, Mikolas Janota
- */
+ * Description: Utilities for the 
+ *
+ * Author:      jpms
+ * 
+ * Revision:    $Id$.
+ *
+ *                                     Copyright (c) 2009, Joao Marques-Silva
+\*----------------------------------------------------------------------------*/
+//jpms:ec
 
-#ifndef OPTIONS_HH
-#define	OPTIONS_HH
-#include <getopt.h>
-#include <assert.h>
-#include <string>
-#include <vector>
-using std::string;
+#ifndef _CLAUSE_UTILS_H
+#define _CLAUSE_UTILS_H 1
 
-class Options {
-public:
-    Options();
-    bool   parse(int count,char** arguments);
-    
-    int    m_help;
-    string  m_solver;
-    std::vector<string>  m_input_files;
-    string  m_multiplication_string;
-    int    m_leave_temporary_files;
-    int    m_pbo;
-    int m_num_objectives;
-};
+#include "basic_clause.hh"
 
-#endif	/* OPTIONS_HH */
 
+/*----------------------------------------------------------------------------*\
+ * Classes to be used in the definition of hash sets and maps
+\*----------------------------------------------------------------------------*/
+
+
+
+#endif /* _CLAUSE_UTILS_H */
+
+/*----------------------------------------------------------------------------*/

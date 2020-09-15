@@ -14,35 +14,51 @@
  *    You should have received a copy of the GNU General Public License       *
  *    along with packup.  If not, see <http://www.gnu.org/licenses/>.         *            
 \******************************************************************************/           
-/* 
- * File:   Options.hh
- * Author: mikolas
+//jpms:bc
+/*----------------------------------------------------------------------------*\
+ * File:        basic_types.h
  *
- * Created on April 23, 2011, 4:23 PM
- * Copyright (C) 2011, Mikolas Janota
- */
+ * Description: Basic types used by BOLT.
+ *
+ * Author:      jpms
+ * 
+ * Revision:    $Id$.
+ *
+ *                                     Copyright (c) 2009, Joao Marques-Silva
+\*----------------------------------------------------------------------------*/
+//jpms:ec
 
-#ifndef OPTIONS_HH
-#define	OPTIONS_HH
-#include <getopt.h>
-#include <assert.h>
-#include <string>
-#include <vector>
-using std::string;
+#ifndef _BASIC_TYPES_H
+#define _BASIC_TYPES_H 1
 
-class Options {
-public:
-    Options();
-    bool   parse(int count,char** arguments);
-    
-    int    m_help;
-    string  m_solver;
-    std::vector<string>  m_input_files;
-    string  m_multiplication_string;
-    int    m_leave_temporary_files;
-    int    m_pbo;
-    int m_num_objectives;
-};
 
-#endif	/* OPTIONS_HH */
+/*----------------------------------------------------------------------------*\
+ * Values besides 0 and 1
+\*----------------------------------------------------------------------------*/
 
+#ifdef __LP64__
+typedef unsigned long long int ULINT;
+typedef long long int LINT;
+#define MAXLINT LLONG_MAX;
+#define MINLINT LLONG_MIN;
+#define MAXULINT ULLONG_MAX;
+#else
+typedef unsigned long int ULINT;
+typedef long int LINT;
+#define MAXLINT LONG_MAX;
+#define MINLINT LONG_MIN;
+#define MAXULINT ULONG_MAX;
+#endif
+
+#ifdef GMPDEF
+#include <gmpxx.h>
+typedef mpz_class XLINT;
+#define ToLint(x) x.get_si()
+#else
+typedef LINT XLINT;
+#define ToLint(x) (LINT)x
+#endif
+
+#endif /* _BASIC_TYPES_H */
+
+/*----------------------------------------------------------------------------*/

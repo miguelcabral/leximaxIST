@@ -14,35 +14,38 @@
  *    You should have received a copy of the GNU General Public License       *
  *    along with packup.  If not, see <http://www.gnu.org/licenses/>.         *            
 \******************************************************************************/           
-/* 
- * File:   Options.hh
- * Author: mikolas
+//jpms:bc
+/*----------------------------------------------------------------------------*\
+ * File:        cl_globals.hh
  *
- * Created on April 23, 2011, 4:23 PM
- * Copyright (C) 2011, Mikolas Janota
- */
+ * Description: Complete definitions for clauses and clause sets.
+ *
+ * Author:      jpms
+ * 
+ * Revision:    $Id$.
+ *
+ *                                     Copyright (c) 2009, Joao Marques-Silva
+\*----------------------------------------------------------------------------*/
+//jpms:ec
 
-#ifndef OPTIONS_HH
-#define	OPTIONS_HH
-#include <getopt.h>
-#include <assert.h>
-#include <string>
+#ifndef _CL_GLOBALS_H
+#define _CL_GLOBALS_H 1
+
+#include <cmath>
 #include <vector>
-using std::string;
 
-class Options {
-public:
-    Options();
-    bool   parse(int count,char** arguments);
-    
-    int    m_help;
-    string  m_solver;
-    std::vector<string>  m_input_files;
-    string  m_multiplication_string;
-    int    m_leave_temporary_files;
-    int    m_pbo;
-    int m_num_objectives;
-};
+#include <unordered_map>       // Location of STL hash extensions
+#include <unordered_set>       // Location of STL hash extensions
 
-#endif	/* OPTIONS_HH */
+using namespace std;
+/* using namespace __gnu_cxx;    // Required for STL hash extensions */
 
+#include "globals.hh"
+#include "basic_clause.hh"
+#include "cl_functors.hh"
+#include "cl_types.hh"
+#include "cl_registry.hh"
+
+#endif /* _CL_GLOBALS_H */
+
+/*----------------------------------------------------------------------------*/

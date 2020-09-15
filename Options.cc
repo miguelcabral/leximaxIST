@@ -31,9 +31,12 @@ using std::cerr;
 using std::endl;
 
 Options::Options()
-: m_help (0)
+: m_help(0)
 , m_leave_temporary_files(0)
 , m_pbo(0)
+, m_num_objectives(0)
+, m_multiplication_string("*")
+, m_solver("~/thesis/default-solver/open-wbo/open-wbo_static")
 {}
 
 bool Options::parse(int argc,char **argv) {
@@ -52,20 +55,18 @@ bool Options::parse(int argc,char **argv) {
     while (1) {
        /* getopt_long stores the option index here. */
        int option_index = 0;
-       c = getopt_long(argc, argv, "hu:pt", long_options, &option_index);
+       c = getopt_long(argc, argv, "h", long_options, &option_index);
        opterr = 0;
        /* Detect the end of the options. */
        if (c == -1) break;
        switch (c) {
             case 0: if (long_options[option_index].flag != 0) break;
                     else return false;
-            case 'h': help     = 1; break;
-            case 500: external_solver = optarg; break;
-            case 501: multiplication_string = optarg; break;
+            case 'h': m_help     = 1; break;
+            case 500: m_solver = optarg; break;
+            case 501: m_multiplication_string = optarg; break;
             case '?':
-             if ( (optopt == 'u') )
-               fprintf(stderr, "Option -%c requires an argument.\n", optopt);
-             else if (isprint (optopt))
+             if (isprint (optopt))
                fprintf (stderr, "Unknown option `-%c'.\n", optopt);
              else
                fprintf (stderr,"Unknown option character `\\x%x'.\n",optopt);
@@ -82,8 +83,8 @@ bool Options::parse(int argc,char **argv) {
             return_value = false;
         } else {
             while (optind < argc) {
-                // store name of input files??
-                input_file_name=argv[optind++];
+                // store name of input files
+                m_input_files.push_back(argv[optind++]);
             }
         }
     }
@@ -94,6 +95,4 @@ bool Options::parse(int argc,char **argv) {
     
     return return_value;
 }
-
-Options::~Options() {}
 

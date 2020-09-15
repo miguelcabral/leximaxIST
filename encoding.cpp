@@ -1,6 +1,6 @@
 #include "Leximax_encoder.h"
 #include <stdlib.h>
-#include "old_packup/types.hh"
+#include "types.hh"
 
 void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight);
 

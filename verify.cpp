@@ -2,9 +2,9 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
-#include "old_packup/types.hh"
+#include "types.hh"
 #include <zlib.h>
-#include "old_packup/fmtutils.hh"
+#include "fmtutils.hh"
 #include <algorithm>
 
 bool comp(LINT i, LINT j) { return (i > j); }
