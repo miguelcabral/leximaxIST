@@ -6,35 +6,37 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight);
 
 void Leximax_encoder::encode_sorted()
 {
-    for (int i{0}; i < m_num_objectives; ++i) {   
-        std::vector<LINT> *objective = m_objectives[i];
-        size_t num_terms = objective->size();
-        m_sorted_vecs[i] = new std::vector<LINT>(num_terms, 0);
-        SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
-        // elems_to_sort is represented by a pair (first element, number of elements).
-        std::pair<LINT,LINT> elems_to_sort(0, num_terms);
-        if (m_debug) {
-            std::cerr << "--------------- Objective Function " << i << " --------------\n";
-            for (size_t j = 0; j < num_terms; ++j) {
-                std::cerr << objective->at(j);
-                if (j != num_terms - 1)
-                    std::cerr << " + ";
-                else
-                    std::cerr << '\n';
+    if (m_num_objectives != 1) { // when there is only one objective function there is no need for this
+        for (int i{0}; i < m_num_objectives; ++i) {   
+            std::vector<LINT> *objective = m_objectives[i];
+            size_t num_terms = objective->size();
+            m_sorted_vecs[i] = new std::vector<LINT>(num_terms, 0);
+            SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
+            // elems_to_sort is represented by a pair (first element, number of elements).
+            std::pair<LINT,LINT> elems_to_sort(0, num_terms);
+            if (m_debug) {
+                std::cerr << "--------------- Objective Function " << i << " --------------\n";
+                for (size_t j = 0; j < num_terms; ++j) {
+                    std::cerr << objective->at(j);
+                    if (j != num_terms - 1)
+                        std::cerr << " + ";
+                    else
+                        std::cerr << '\n';
+                }
+                std::cerr << "---------------- Sorting Network " << i << " ----------------\n";
             }
-            std::cerr << "---------------- Sorting Network " << i << " ----------------\n";
-        }
-        encode_network(elems_to_sort, objective, sorting_network);
-        // sorted_vec variables are the outputs of sorting_network
-        for (size_t j{0}; j < num_terms; j++) {
-            LINT output_j = sorting_network[j]->second;
-            std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
-            sorted_vec->at(j) = output_j;
-        }
-        if (m_debug) {
-            std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
-            for(size_t j{0}; j < num_terms; j++) {
-                std::cerr << "sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
+            encode_network(elems_to_sort, objective, sorting_network);
+            // sorted_vec variables are the outputs of sorting_network
+            for (size_t j{0}; j < num_terms; j++) {
+                LINT output_j = sorting_network[j]->second;
+                std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
+                sorted_vec->at(j) = output_j;
+            }
+            if (m_debug) {
+                std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
+                for(size_t j{0}; j < num_terms; j++) {
+                    std::cerr << "sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
+                }
             }
         }
     }
@@ -319,13 +321,13 @@ size_t Leximax_encoder::get_optimum(IntVector &model)
 void Leximax_encoder::solve()
 {
     // iteratively call (MaxSAT or PBO) solver
-    IntVector tmp_model(1, 0);
+    IntVector tmp_model(1, 0);        
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
         generate_soft_clauses(i);
         if (m_debug)
             std::cerr << "------------------ ITERATION " << i << " ------------------\n";
-        if (i != 0) // in the first iteration i == 0 there is no relaxation
+        if (i != 0 && m_num_objectives != 1) // in the first iteration i == 0 there is no relaxation
             encode_relaxation(i);
         // encode the componentwise OR between sorted_relax vectors except in the last iteration
         if (i != m_num_objectives - 1)

@@ -11,8 +11,6 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
     stringstream scommand;
     const string output_filename = file_name + ".out";
     scommand << m_solver_command << " ";
-    if (m_pbo)
-        scommand << "-formula=1 ";
     scommand << file_name << " > " << output_filename << " 2> solver_error.txt";
     const string command = scommand.str();
     const int retv = system (command.c_str());
@@ -63,7 +61,7 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight)
 
 int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
 {
-    std::string input_name = m_input_name;
+    std::string input_name (m_input_name);
     input_name += "_" + to_string(i) + ".wcnf";
     ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -107,7 +105,7 @@ void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
 
 int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
-    std::string input_name = m_input_name;
+    std::string input_name (m_input_name);
     input_name += "_" + to_string(i) + ".opb";
     ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -124,7 +122,7 @@ int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
     for (BasicClause *cl : m_constraints) {
         write_pbconstraint(cl, output);
     }
-    if (i == m_num_objectives - 1)
+    if (i == m_num_objectives - 1 && m_num_objectives != 1)
         write_sum_equals_pb(1, output); // in the last iteration print =1 cardinality constraint
     else if (i != 0)
         write_atmost_pb(i, output); // in other iterations print at most i constraint  

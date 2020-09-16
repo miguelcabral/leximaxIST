@@ -65,10 +65,10 @@ public:
         m_pienum_file_name()        
     {
         // input name
-        std::string m_input_name = options.m_input_files[0];
+        m_input_name = options.m_input_files[0];
         size_t position = m_input_name.find_last_of("/\\");
         m_input_name = m_input_name.substr(position + 1);
-        for (int i{1}; i < m_num_objectives; ++i) {
+        for (int i{1}; i < m_num_objectives + 1; ++i) {
             m_input_name.append("_");
             std::string next_file = options.m_input_files[i];
             position = next_file.find_last_of("/\\");
@@ -78,6 +78,13 @@ public:
         // pienum input file name
         m_pienum_file_name = m_input_name;
         m_pienum_file_name += "_pienum.cnf";
+    }
+    
+    ~Leximax_encoder()
+    {
+        if (!m_leave_temporary_files) {
+            remove(m_pienum_file_name.c_str());
+        }
     }
     
     int read();
