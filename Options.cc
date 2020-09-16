@@ -34,7 +34,7 @@ Options::Options()
 : m_help(0)
 , m_leave_temporary_files(0)
 , m_pbo(0)
-, m_num_objectives(0)
+, m_num_objectives(-1) // starts with -1 to ignore first file (hard clauses)
 , m_multiplication_string("*")
 , m_solver("~/thesis/default-solver/open-wbo/open-wbo_static")
 {}
@@ -77,7 +77,7 @@ bool Options::parse(int argc,char **argv) {
         }
     }
 
-    if (!get_help()) {
+    if (!m_help) {
         if (optind >= argc) {
             cerr << "cnf files expected" << endl;
             return_value = false;
@@ -85,6 +85,7 @@ bool Options::parse(int argc,char **argv) {
             while (optind < argc) {
                 // store name of input files
                 m_input_files.push_back(argv[optind++]);
+                m_num_objectives++;
             }
         }
     }

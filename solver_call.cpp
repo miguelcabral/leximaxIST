@@ -63,7 +63,7 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight)
 
 int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
 {
-    std::string input_name = m_input_files;
+    std::string input_name = m_input_name;
     input_name += "_" + to_string(i) + ".wcnf";
     ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -107,7 +107,7 @@ void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
 
 int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
 {
-    std::string input_name = m_input_files;
+    std::string input_name = m_input_name;
     input_name += "_" + to_string(i) + ".opb";
     ofstream output(input_name.c_str());
     // prepare input for the solver

@@ -16,8 +16,8 @@ all: info
 info: leximax
 	$(info DBG Mode : $(DBG))
 
-leximax : main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp printing.cpp solver_call.cpp ReadCNF.cc old_packup/cl_registry.cc
-	g++ $(CCFLAGS) -o leximax main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp printing.cpp solver_call.cpp ReadCNF.cc old_packup/cl_registry.cc -lz
+leximax : main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp printing.cpp solver_call.cpp ReadCNF.cc cl_registry.cc Options.cc
+	g++ $(CCFLAGS) -o leximax main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp printing.cpp solver_call.cpp ReadCNF.cc cl_registry.cc Options.cc -lz
 	
 clean :
 	rm -f leximax

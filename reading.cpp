@@ -10,21 +10,11 @@ void Leximax_encoder::encode_fresh(BasicClause *cl, LINT fresh_var)
     m_constraints.create_clause(lits);
 }
 
-void Leximax_encoder::set_pienum_input()
-{
-    // set name of pienum input file
-    m_pienum_file_name = m_input_files;
-    m_pienum_file_name += "_pienum.cnf";
-    // open pienum input file
-    m_pienum_file.open(m_pienum_file_name.c_str());
-}
-
 int Leximax_encoder::read()
 {
-    set_pienum_input();
-    gzFile in = gzopen(argv[1], "rb");
+    gzFile in = gzopen(m_input_files[0].c_str(), "rb");
     if (in == Z_NULL) {
-       std::cerr << "Could not open file " << argv[1] << std::endl;
+       std::cerr << "Could not open file " << m_input_files[0] << std::endl;
        return 1;
     }
     ReadCNF hard(in);
@@ -40,16 +30,16 @@ int Leximax_encoder::read()
         m_constraints.create_clause(lits);
     }
     std::vector<ReadCNF*> read_objectives(m_num_objectives, nullptr);
-    for (int i{2}; i < m_num_objectives + 2; ++i) {
-        in = gzopen(argv[i], "rb");
+    for (int i{1}; i < m_num_objectives + 1; ++i) {
+        in = gzopen(m_input_files[i].c_str(), "rb");
         if (in == Z_NULL) {
-            std::cerr << "Could not open file " << argv[i] << std::endl;
+            std::cerr << "Could not open file " << m_input_files[i] << std::endl;
             return 1;
         }
         ReadCNF *obj = new ReadCNF(in);
         obj->read();
         gzclose(in);
-        read_objectives[i-2] = obj;
+        read_objectives[i-1] = obj;
     }
     m_id_count = hard.get_max_id();
     // Update m_id_count if necessary - check the obj functions
@@ -76,8 +66,10 @@ int Leximax_encoder::read()
     }
     // verification -------------------------
     // write input constraints + objective function variables to pienum input
-    print_cnf(m_pienum_file);
-    m_pienum_file.close();
+    ofstream pienum_file;
+    pienum_file.open(m_pienum_file_name.c_str());
+    print_cnf(pienum_file);
+    pienum_file.close();
     // verification -------------------------
     return 0;
 }

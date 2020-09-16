@@ -13,6 +13,7 @@
 #include "cl_registry.hh"
 #include "cl_globals.hh"
 #include "cl_types.hh"
+#include "Options.hh"
 
 typedef std::vector<std::pair<LINT, LINT>*> SNET;
 
@@ -29,16 +30,16 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
     std::string m_solver_command;
-    std::string m_input_files;
+    std::vector<std::string> m_input_files;
+    std::string m_input_name;
     bool m_leave_temporary_files;
     bool m_sat;
     bool m_pbo;
     bool m_debug;
     std::string m_multiplication_string;
-    // verification:
-    ofstream m_pienum_file;
-    std::string m_pienum_file_name;
     std::vector<LINT> m_optimum;
+    // verification:
+    std::string m_pienum_file_name;
     
 public:
     
@@ -52,30 +53,34 @@ public:
         m_sorted_relax_vecs(options.m_num_objectives, nullptr),
         m_relax_vars(),
         m_solver_command(options.m_solver),
-        m_input_files(),
+        m_input_files(options.m_input_files),
+        m_input_name(),
         m_leave_temporary_files(options.m_leave_temporary_files),
         m_sat(true),
         m_pbo(options.m_pbo),
         m_debug(false),
         m_multiplication_string(options.m_multiplication_string),
+        m_optimum(options.m_num_objectives, 0),
         // verification:
-        m_pienum_file(),
-        m_pienum_file_name("tbd"),
-        m_optimum(options.m_num_objectives, 0)
+        m_pienum_file_name()        
     {
-        std::string m_input_files = options.m_input_files[0];
-        size_t position = m_input_files.find_last_of("/\\");
-        m_input_files = m_input_files.substr(position + 1);
+        // input name
+        std::string m_input_name = options.m_input_files[0];
+        size_t position = m_input_name.find_last_of("/\\");
+        m_input_name = m_input_name.substr(position + 1);
         for (int i{1}; i < m_num_objectives; ++i) {
-            m_input_files.append("_");
+            m_input_name.append("_");
             std::string next_file = options.m_input_files[i];
             position = next_file.find_last_of("/\\");
             next_file = next_file.substr(position + 1);
-            m_input_files.append(next_file);
+            m_input_name.append(next_file);
         }
+        // pienum input file name
+        m_pienum_file_name = m_input_name;
+        m_pienum_file_name += "_pienum.cnf";
     }
     
-    int read(char *argv[]);
+    int read();
     
     void encode_sorted();
     
@@ -90,10 +95,6 @@ private:
     // reading.cpp
     
     void encode_fresh(BasicClause *cl, LINT fresh_var);
-    
-    void set_input_name(char *argv[]);
-    
-    void set_pienum_input();
     
     // sorting_net.cpp
     
