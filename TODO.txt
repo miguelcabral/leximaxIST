@@ -1,11 +1,6 @@
-- How to test if this tool is printing leximax-optimal solutions? For small inputs -  use pienum to enumerate models of input problem and compute all objective vectors and then compute the Leximax-minimal objective vectors by brute force. Then get solution given by leximax tool and check if the optimum coincides.
-
-- Testing ?? How to come up with many simple instances? Random?? - produce_examples.cpp 
-
-- FIND THE ERROR WITH MANY SIMPLE EXAMPLES - run in INESC servers.
-
-- put options: specify external solver, if solving with pbo or maxsat, leave temporary files or not.
-
-- print_solution. Should I print the optimum of each iteration (the i-th maximum)?
+Next step: use the tool with packup. How? system call? Library (-how?)?
+Test with CUDF examples.
+Collect results.
+Finish thesis.
 
 Improvements: Incremental MaxSAT? Encoding of comparators - should we put the equivalence? Or implication suffices? Dealing with time restrictions - approximation tecniques? In each iteration we have guarantee of minimising the first maxima.

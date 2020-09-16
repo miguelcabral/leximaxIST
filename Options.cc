@@ -36,7 +36,7 @@ Options::Options()
 , m_pbo(0)
 , m_num_objectives(-1) // starts with -1 to ignore first file (hard clauses)
 , m_multiplication_string("*")
-, m_solver("~/thesis/default-solver/open-wbo/open-wbo_static")
+, m_solver("~/thesis/default-solver/RC2/bin/rc2.py -vv")
 {}
 
 bool Options::parse(int argc,char **argv) {
@@ -92,6 +92,11 @@ bool Options::parse(int argc,char **argv) {
 
     if (optind < argc) {
         cerr << "WARNING: Unprocessed options at the end." << endl;
+    }
+    
+    if (m_num_objectives == 0) {
+        cerr << "objective function(s) expected" << endl;
+        return_value = false;
     }
     
     return return_value;
