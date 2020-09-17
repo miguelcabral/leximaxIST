@@ -36,7 +36,7 @@ Options::Options()
 , m_pbo(0)
 , m_num_objectives(-1) // starts with -1 to ignore first file (hard clauses)
 , m_multiplication_string("*")
-, m_solver("~/thesis/default-solver/RC2/bin/rc2.py -vv")
+, m_solver("rc2.py -vv")
 {}
 
 bool Options::parse(int argc,char **argv) {
