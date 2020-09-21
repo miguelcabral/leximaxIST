@@ -17,7 +17,7 @@ else
 	CCFLAGS+=-O3
 endif
 
-.PHONY: all info clean
+.PHONY: all info clean lib
 
 all: info
 
@@ -36,10 +36,9 @@ $(COBJS2): %.o: %.cpp
 	@echo Compiling: $@
 	g++ $(CCFLAGS) -c -o $@ $<
 	
-#leximax : main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp \
-		printing.cpp solver_call.cpp ReadCNF.cc cl_registry.cc Options.cc
-#	g++ $(CCFLAGS) -o leximax main.cpp verify.cpp sorting_net.cpp encoding.cpp reading.cpp \
-		printing.cpp solver_call.cpp ReadCNF.cc cl_registry.cc Options.cc -lz
-	
 clean :
 	rm -f leximax *.o
+	
+lib : $(COBJS)
+	ar -rcs libleximax.a $(COBJS:main.o=)
+	@echo $(COBJS:main.o=)

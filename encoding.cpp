@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "types.hh"
 
-void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight);
-
 void Leximax_encoder::encode_sorted()
 {
     if (m_num_objectives != 1) { // when there is only one objective function there is no need for this

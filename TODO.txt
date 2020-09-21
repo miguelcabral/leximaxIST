@@ -1,4 +1,9 @@
 Next step: use the tool with packup. How? system call? Library (-how?)?
+Doing the library:
+Do the destructor to free memory - check code for memory leaks
+Do the constructor to use as a library, without reading from file
+Check code for vector.clear() <- might make sense to use shrink_to_fit to free space
+
 Test with CUDF examples.
 Collect results.
 Finish thesis.
