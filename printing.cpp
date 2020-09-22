@@ -16,7 +16,7 @@ void Leximax_encoder::print_cnf(ostream &out)
     out << "c =========================================\n";
 }
 
-void Leximax_encoder::print_solution(IntVector &model)
+void Leximax_encoder::print_solution()
 {
     if (!m_sat)
         std::cout << "s UNSATISFIABLE\n";
@@ -27,8 +27,8 @@ void Leximax_encoder::print_solution(IntVector &model)
             std::cout << m_optimum[j] << ' ';
         std::cout << '\n';
         std::cout << "v ";
-        for (size_t j = 1; j < model.size(); ++j) {
-            std::cout << model[j] << " ";
+        for (size_t j = 1; j < m_solution.size(); ++j) {
+            std::cout << m_solution[j] << " ";
         }
         std::cout << '\n';
     }

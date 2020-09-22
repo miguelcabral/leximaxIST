@@ -1,5 +1,4 @@
 #include "Leximax_encoder.h"
-#define _abs(x) (  ( (x) < 0 ) ? (-(x)): (x) )
 
 Leximax_encoder::Leximax_encoder(Options &options) :
     m_id_count(0),
@@ -19,6 +18,7 @@ Leximax_encoder::Leximax_encoder(Options &options) :
     m_debug(false),
     m_multiplication_string(options.m_multiplication_string),
     m_optimum(options.m_num_objectives, 0),
+    m_solution,
     // verification:
     m_pienum_file_name()        
 {
@@ -38,7 +38,7 @@ Leximax_encoder::Leximax_encoder(Options &options) :
     m_pienum_file_name += "_pienum.cnf";
 }
 
-Leximax_encoder::update_id_count(std::vector<LINT> &clause)
+void Leximax_encoder::update_id_count(std::vector<LINT> &clause)
 {
     for (LINT lit : clause) {
         LINT var( lit < 0 ? -lit : lit );
@@ -65,6 +65,7 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_debug(false),
     m_multiplication_string("*"),
     m_optimum(objective_functions.size(), 0),
+    m_solution(),
     // verification:
     m_pienum_file_name()
 {
@@ -95,8 +96,6 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
             lits.clear();
             j++;
         }
-        
         ++i;
     }
-    
 }

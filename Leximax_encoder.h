@@ -39,28 +39,35 @@ private:
     bool m_debug;
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
+    std::vector<LINT> m_solution;
     // verification:
     std::string m_pienum_file_name;
     
 public:
     
-    Leximax_encoder(Options &options);
+    Leximax_encoder(Options &options); // constructor for command line tool
     
-    Leximax_encoder(std::unordered_set<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions);
+    Leximax_encoder(std::unordered_set<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); // constructor for library
     
     ~Leximax_encoder();
     
     int read();
     
-    void encode_sorted();
-    
     void solve();
     
-    void print_cnf(ostream &out);
+    std::vector<LINT>& get_solution() { return m_solution; }
+    
+    std::vector<LINT>& get_optimum() { return m_optimum; }
+    
+    void print_solution();
     
     void verify();
     
 private:
+    
+    // constructors.cpp
+    
+    void update_id_count(std::vector<LINT> &clause);
     
     // reading.cpp
     
@@ -78,7 +85,11 @@ private:
     
     void encode_network(std::pair<LINT,LINT> elems_to_sort, std::vector<LINT> *objective, SNET &sorting_network);
     
+    void delete_snet(SNET &sorting_network);
+    
     // encoding.cpp
+    
+    void encode_sorted();
     
     size_t largest_obj();
     
@@ -110,7 +121,7 @@ private:
     
     // printing.cpp
     
-    void print_solution(IntVector &model);
+    void print_cnf(ostream &out);
     
     // verify.cpp
     

@@ -64,11 +64,15 @@ void Leximax_encoder::insert_comparator(LINT el1, LINT el2, std::vector<LINT> *o
         comp1 = new std::pair<LINT,LINT>(el2, var_out_max);
     else
         comp1 = new std::pair<LINT,LINT>(el2, var_out_min);
+    // free memory occupied by previous comparator
+    delete sorting_network[el1];
     sorting_network[el1] = comp1;
     if(el2 > el1)
         comp2 = new std::pair<LINT,LINT>(el1, var_out_max);
     else
         comp2 = new std::pair<LINT,LINT>(el1, var_out_min);
+    // free memory occupied by previous comparator
+    delete sorting_network[el2];
     sorting_network[el2] = comp2;
 }
 
@@ -161,4 +165,11 @@ void Leximax_encoder::encode_network(std::pair<LINT,LINT> elems_to_sort, std::ve
         std::pair<std::pair<LINT,LINT>,LINT> seq2(split2,1);
         odd_even_merge(seq1, seq2, objective, sorting_network);
     }
+}
+
+void Leximax_encoder::delete_snet(SNET &sorting_network)
+{
+    // free memory allocated for the comparators
+    for (std::pair<LINT, LINT> *comp : sorting_network)
+        delete comp;
 }

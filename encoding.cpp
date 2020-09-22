@@ -30,6 +30,8 @@ void Leximax_encoder::encode_sorted()
                 std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
                 sorted_vec->at(j) = output_j;
             }
+            // free memory allocated for the comparators of the sorting network
+            delete_snet(sorting_network);
             if (m_debug) {
                 std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
                 for(size_t j{0}; j < num_terms; j++) {
@@ -305,7 +307,7 @@ void Leximax_encoder::generate_soft_clauses(int i)
     }
 }
 
-size_t Leximax_encoder::get_optimum(IntVector &model)
+size_t Leximax_encoder::get_obj_value(std::vector<LINT> &model)
 {
     size_t optimum = 0;
     for (BasicClause *cl : m_soft_clauses) {
@@ -318,8 +320,9 @@ size_t Leximax_encoder::get_optimum(IntVector &model)
 
 void Leximax_encoder::solve()
 {
-    // iteratively call (MaxSAT or PBO) solver
-    IntVector tmp_model(1, 0);        
+    // encode sorted vectors with sorting network
+    encode_sorted();
+    // iteratively call (MaxSAT or PBO) solver       
     for (int i = 0; i < m_num_objectives; ++i) {
         m_soft_clauses.clear();
         generate_soft_clauses(i);
@@ -332,17 +335,17 @@ void Leximax_encoder::solve()
             componentwise_OR(i);
         // call solver 
         if (m_pbo)
-            solve_pbo(i, tmp_model); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
+            solve_pbo(i); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
         else
-            solve_maxsat(i, tmp_model);
+            solve_maxsat(i);
         /*
         if (retv != 0) {
             open_wbo returns 7680 , wtf???
             std::cerr << "Something went wrong with the solver\n";
             exit(retv);
         }*/
-        // read tmp_model and fix values of current objective function
-        if (tmp_model.empty()){
+        // read model returned by the solver and fix value of current maximum
+        if (m_solution.empty()){
             m_sat = false;
             break;
         }
@@ -350,13 +353,11 @@ void Leximax_encoder::solve()
         if (i != m_num_objectives - 1) { // in the last iteration we just print the solution
             for (BasicClause *cl : m_soft_clauses) {
                 LINT soft_var = -(*(cl->begin()));
-                LINT lit = tmp_model[soft_var];
+                LINT lit = m_solution[soft_var];
                 m_constraints.create_unit_clause(lit);
             }
         }
         // store i-th maximum
-        m_optimum[i] = get_optimum(tmp_model);
+        m_optimum[i] = get_obj_value(m_solution);
     }
-    // print solution
-    print_solution(tmp_model);
 }

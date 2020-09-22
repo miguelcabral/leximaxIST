@@ -43,8 +43,8 @@ int main(int argc, char *argv[])
     if (retv == 1)
         return 1;
     // encode sorted vectors with sorting network
-    enc.encode_sorted();
     enc.solve();
+    enc.print_solution();
     //enc.verify();
     return 0;
 }

@@ -6,7 +6,7 @@
 #include <zlib.h>
 #include "fmtutils.hh"
 
-int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
+int Leximax_encoder::call_solver(std::string &file_name)
 {
     stringstream scommand;
     const string output_filename = file_name + ".out";
@@ -19,7 +19,7 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
     assert(of!=NULL);
     StreamBuffer r(of);
     bool sat = false;
-    tmp_model.resize(static_cast<size_t>(m_id_count + 1), 0);
+    m_solution.resize(static_cast<size_t>(m_id_count + 1), 0);
     while (*r != EOF) {
         if (*r != 'v') {// ignore all the other lines
             skipLine(r);
@@ -33,14 +33,14 @@ int Leximax_encoder::call_solver(IntVector &tmp_model, std::string &file_name)
                 if ((*r == 'x')) ++r;
                 if (*r < '0' || *r > '9') break;
                 const LINT l = parseInt(r);
-                assert(tmp_model.size()>(size_t)l);
-                tmp_model[l] = (sign ? l : -l);
+                assert(m_solution.size()>(size_t)l);
+                m_solution[l] = (sign ? l : -l);
             }
             assert (*r=='\n');
             ++r; // skip '\n'
         }
     }
-    if (!sat) tmp_model.clear();
+    if (!sat) m_solution.clear();
     if (!m_leave_temporary_files) {
         remove(file_name.c_str());
         remove(output_filename.c_str());
@@ -59,7 +59,7 @@ void write_clauses(ostream &output, BasicClauseSet &clauses, size_t weight)
     }
 }
 
-int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
+int Leximax_encoder::solve_maxsat(int i)
 {
     std::string input_name (m_input_name);
     input_name += "_" + to_string(i) + ".wcnf";
@@ -73,7 +73,7 @@ int Leximax_encoder::solve_maxsat(int i, IntVector &tmp_model)
     write_clauses(output, m_soft_clauses, 1);
     output.close();
     // call the solver
-    return call_solver(tmp_model, input_name);
+    return call_solver(input_name);
 }
 
 void Leximax_encoder::write_pbconstraint(BasicClause *cl, ostream& output) {
@@ -103,7 +103,7 @@ void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
     output << " = " << i << ";\n";
 }
 
-int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
+int Leximax_encoder::solve_pbo(int i)
 {
     std::string input_name (m_input_name);
     input_name += "_" + to_string(i) + ".opb";
@@ -128,6 +128,6 @@ int Leximax_encoder::solve_pbo(int i, IntVector&  tmp_model)
         write_atmost_pb(i, output); // in other iterations print at most i constraint  
     output.close();
     // call the solver
-    return call_solver(tmp_model, input_name);
+    return call_solver(input_name);
 }
 
