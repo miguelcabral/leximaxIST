@@ -6,7 +6,6 @@
 #include <vector> // std::vector
 #include <utility> // std::pair
 #include <forward_list> // std::forward_list
-#include <unordered_set>
 #include "basic_clause.hh"
 #include "basic_clset.hh"
 #include "basic_types.h"
@@ -14,7 +13,6 @@
 #include "cl_registry.hh"
 #include "cl_globals.hh"
 #include "cl_types.hh"
-#include "Options.hh"
 
 typedef std::vector<std::pair<LINT, LINT>*> SNET;
 
@@ -31,7 +29,6 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
     std::string m_solver_command;
-    std::vector<std::string> m_input_files;
     std::string m_input_name;
     bool m_leave_temporary_files;
     bool m_sat;
@@ -40,24 +37,15 @@ private:
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
     std::vector<LINT> m_solution;
-    // verification:
-    std::string m_pienum_file_name;
     
-public:
-    
-    // constructor for command line tool
-    Leximax_encoder(Options &options);
-    
-    // constructor for library: 
+public:    
+
     // constraints is a set of hard clauses;
     // objective_functions is a collection of objective functions, each one being a vector of soft clauses;
     // each objective function is the sum of its falsified soft clauses.
-    Leximax_encoder(std::unordered_set<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
+    Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
     
     ~Leximax_encoder();
-    
-    // read input files
-    int read();
     
     void solve();
     
@@ -67,21 +55,17 @@ public:
     
     void set_solver_command(std::string &command) { m_solver_command = command; }
     
-    // print to standard output
-    void print_solution();
+    void set_pbo(bool val) { m_pbo = val; }
     
-    // for debuging
-    void verify();
+    void set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
+    
+    void set_multiplication_string(std::string &str) { m_multiplication_string = str; }
     
 private:
     
     // constructors.cpp
     
     void update_id_count(std::vector<LINT> &clause);
-    
-    // reading.cpp
-    
-    void encode_fresh(BasicClause *cl, LINT fresh_var);
     
     // sorting_net.cpp
     
@@ -105,7 +89,7 @@ private:
     
     void generate_soft_clauses(int i);
     
-    size_t get_optimum(IntVector& model);
+    size_t get_obj_value(std::vector<LINT> &model);
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
@@ -117,7 +101,7 @@ private:
     
     // solver_call.cpp
     
-    int solve_maxsat(int i, IntVector &tmp_model);
+    int solve_maxsat(int i);
     
     void write_atmost_pb(int i, ostream &output);
     
@@ -125,19 +109,9 @@ private:
     
     void write_sum_equals_pb(int i, ostream &output);
     
-    int solve_pbo(int i, IntVector  &tmp_model);
+    int solve_pbo(int i);
     
-    int call_solver(IntVector &tmp_model, std::string &file_name);
-    
-    // printing.cpp
-    
-    void print_cnf(ostream &out);
-    
-    // verify.cpp
-    
-    void brute_force_optimum(std::vector<LINT> &pienum_opt, std::forward_list<std::vector<LINT>> &sorted_obj_vectors);
-    
-    void collect_sorted_obj_vecs(std::string &output_filename, std::forward_list<std::vector<LINT>> &sorted_obj_vectors);
+    int call_solver(std::string &file_name);
 
 };
     
