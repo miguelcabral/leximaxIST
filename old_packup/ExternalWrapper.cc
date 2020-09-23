@@ -390,3 +390,16 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          }
      }
  }
+
+ bool ExternalWrapper::solve_leximax() {
+     // create constraints and objective functions as vectors of vectors...
+     
+     // create Leximax_encoder object
+     
+     // set external solver for Leximax_encoder
+     
+     // solve and put solution in model member variable
+     
+     // return satisfiable or not?
+ }
+ 

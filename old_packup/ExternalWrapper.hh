@@ -39,6 +39,7 @@ public:
     virtual XLINT get_top();
     virtual void  set_top(XLINT top);
     virtual bool  solve();  
+    bool solve_leximax();
 
     virtual IntVector& get_model()          { return model; }
     virtual XLINT      get_min_unsat_cost() {return min_cost;}
