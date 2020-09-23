@@ -45,18 +45,10 @@ private:
     
 public:
     
-    // constructor for command line tool
     Leximax_encoder(Options &options);
-    
-    // constructor for library: 
-    // constraints is a set of hard clauses;
-    // objective_functions is a collection of objective functions, each one being a vector of soft clauses;
-    // each objective function is the sum of its falsified soft clauses.
-    Leximax_encoder(std::unordered_set<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
     
     ~Leximax_encoder();
     
-    // read input files
     int read();
     
     void solve();
@@ -99,13 +91,13 @@ private:
     
     // encoding.cpp
     
+    size_t get_obj_value(std::vector<LINT> &model);
+    
     void encode_sorted();
     
     size_t largest_obj();
     
     void generate_soft_clauses(int i);
-    
-    size_t get_optimum(IntVector& model);
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
@@ -117,7 +109,7 @@ private:
     
     // solver_call.cpp
     
-    int solve_maxsat(int i, IntVector &tmp_model);
+    int solve_maxsat(int i);
     
     void write_atmost_pb(int i, ostream &output);
     
@@ -125,9 +117,9 @@ private:
     
     void write_sum_equals_pb(int i, ostream &output);
     
-    int solve_pbo(int i, IntVector  &tmp_model);
+    int solve_pbo(int i);
     
-    int call_solver(IntVector &tmp_model, std::string &file_name);
+    int call_solver(std::string &file_name);
     
     // printing.cpp
     

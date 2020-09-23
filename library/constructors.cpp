@@ -1,5 +1,15 @@
 #include "Leximax_encoder.h"
 #include <time.h>
+#include <sstream>
+
+void Leximax_encoder::update_id_count(std::vector<LINT> &clause)
+{
+    for (LINT lit : clause) {
+        LINT var( lit < 0 ? -lit : lit );
+        if (var > m_id_count)
+            m_id_count = var;
+    }
+}
 
 Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions) : 
     m_id_count(0),
@@ -11,14 +21,14 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_sorted_relax_vecs(objective_functions.size(), nullptr),
     m_relax_vars(),
     m_solver_command("rc2.py -vv"),
-    m_input_name(time(NULL)),
+    m_input_name(),
     m_leave_temporary_files(false),
     m_sat(true),
     m_pbo(false),
     m_debug(false),
     m_multiplication_string("*"),
     m_optimum(objective_functions.size(), 0),
-    m_solution(),
+    m_solution()
 {
     for (std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count
@@ -49,4 +59,8 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
         }
         ++i;
     }
+    // name for temporary files
+    stringstream strstr;
+    strstr << time(NULL);
+    m_input_name = strstr.str();
 }

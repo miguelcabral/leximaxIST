@@ -49,6 +49,8 @@ public:
     
     void solve();
     
+    bool get_sat() { return m_sat; }
+    
     std::vector<LINT>& get_solution() { return m_solution; }
     
     std::vector<LINT>& get_optimum() { return m_optimum; }
