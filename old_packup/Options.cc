@@ -36,6 +36,7 @@ Options::Options()
 , paranoid(0)
 , trendy(0)
 , leave_temporary_files(0)
+, leximax(0)
 , max_solver(0)
 {}
 
@@ -54,6 +55,7 @@ bool Options::parse(int argc,char **argv) {
        ,{"temporary-directory",    required_argument,  0, 504}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"max-sat", no_argument,  &max_solver, 1}
+       ,{"leximax", no_argument,  &leximax, 1}
        ,{0, 0, 0, 0}
              };
 

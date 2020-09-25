@@ -48,6 +48,8 @@ public:
     int    get_leave_temporary_files() const { return leave_temporary_files; }
     int    get_max_solver()            const { return max_solver; }
     int    get_help() const { return help; }
+    int    get_leximax() const { return leximax; }
+    
 private:
     int    help;
     int    solving_disabled;
@@ -63,6 +65,7 @@ private:
     int    leave_temporary_files;
     string temporary_directory;
     int    max_solver;
+    int    leximax;
 };
 
 #endif	/* OPTIONS_HH */

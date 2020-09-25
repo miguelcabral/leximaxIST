@@ -10,8 +10,8 @@ CCC?=g++
 XTRGT = packup
 CSRCS      = $(wildcard *.cc) 
 COBJS      = $(CSRCS:.cc=.o)
-LIBD =
-LIBS =
+LIBD = -L .
+LIBS = -lleximax
 CXX?=g++
 CFLAGS+=-DEXTERNAL_SOLVER
 CFLAGS+=-DNDEBUG -DNCHECK

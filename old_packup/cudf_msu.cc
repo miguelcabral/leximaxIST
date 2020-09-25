@@ -79,7 +79,8 @@ void print_usage(ostream &output) {
     output << "\t--temporary-directory DIR\t where temporary files should be placed"<< endl;
     output << "\t\t\t\t\t default '/tmp'"<< endl;
     output << "\t--leave-temporary-files\t\t do not delete temporary files" << endl;
-    output << "\t--max-sat\t\t\t The external solver is a MaxSAT solver, only one call is made to the solver." << endl;
+    output << "\t--max-sat\t\t\t The external solver is a MaxSAT solver, only one call is made to the solver" << endl;
+    output << "\t--leximax\t\t\t The user criteria are optimised with the leximax order" << endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
@@ -168,6 +169,7 @@ int main(int argc, char** argv) {
     if (!options.get_external_solver().empty ())       solver.set_solver_command(options.get_external_solver ());
     if (!options.get_multiplication_string().empty ()) solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
+    if (options.get_leximax())                         solver.set_leximax();
     if (options.get_max_solver())                      solver.set_iterative(false);
     if (!options.get_temporary_directory().empty ()) {
         solver.set_temporary_directory(options.get_temporary_directory());

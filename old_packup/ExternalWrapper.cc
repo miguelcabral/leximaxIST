@@ -27,6 +27,7 @@
 #include <iostream>
 #include "ExternalWrapper.hh"
 #include "fmtutils.hh"
+#include "Leximax_encoder.h"
 using std::sort;
 
 ExternalWrapper::ExternalWrapper(IDManager& id_manager)
@@ -37,6 +38,7 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,multiplication_string("*")
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
+,leximax(false)
 ,iterative(true)
 {}
 
@@ -53,8 +55,11 @@ bool ExternalWrapper::solve() {
     functions.resize(function_count);
     clause_split.resize(function_count);
     split(); // split clauses into the classes according to weight
-    min_cost=get_top();    
-    return iterative ? solve_it() : solve_max();
+    min_cost=get_top(); 
+    if (leximax)
+        return solve_leximax();
+    else 
+        return iterative ? solve_it() : solve_max();
 }
 
 bool ExternalWrapper::solve_it() {
@@ -393,7 +398,36 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
 
  bool ExternalWrapper::solve_leximax() {
      // create constraints and objective functions as vectors of vectors...
-     
+     std::vector<std::vector<LINT>> input_constraints(hard_clauses.size());
+     size_t j(0);
+     for (BasicClause *clause : hard_clauses) {
+         std::vector<LINT> &con(input_constraints[j]);
+         con.resize(clause->size());
+         size_t k(0);
+         for (LINT lit : *clause) {
+             con[k] = lit;
+             ++k;
+         }
+         ++j;
+     }
+     std::vector<std::vector<std::vector<LINT>>> obj_functions(clause_split.size());
+     j = 0;
+     for (BasicClauseVector &soft_cls: clause_split) {
+         std::vector<std::vector<LINT>> &obj = obj_functions[j];
+         obj.resize(soft_cls.size());
+         size_t k(0);
+         for (BasicClause *clause : soft_cls) {
+            std::vector<LINT> &literals(obj[k]);
+            literals.resize(clause->size());
+            size_t i(0);
+            for (LINT lit : *clause) {
+                literals[i] = lit;
+                ++i;
+            }
+            ++k;
+         }
+         ++j;
+     }
      // create Leximax_encoder object
      
      // set external solver for Leximax_encoder

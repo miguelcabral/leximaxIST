@@ -53,6 +53,7 @@ public:
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
+    inline void set_leximax(bool value=true);
 
     void _output_clause (/*const*/ LiteralVector& literals);
     void _output_unary_clause(LINT l);
@@ -85,6 +86,7 @@ private:
     string multiplication_string;
     string temporary_directory;
     bool   leave_temporary_files;
+    bool   leximax;
     bool   iterative;
 
     vector< vector<LINT> > constraints;
@@ -116,5 +118,7 @@ inline void ExternalWrapper::set_temporary_directory(const string& value) {
     temporary_directory = value; }
 inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
+inline void ExternalWrapper::set_leximax(bool value) {
+    leximax = true; }
 #endif	/* EXTERNALWRAPPER_HH */
 
