@@ -429,11 +429,16 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     
-     // set external solver for Leximax_encoder
-     
+     Leximax_encoder l_enc(input_constraints, obj_functions);
+     // set external solver and parameters of Leximax_encoder
+     l_enc.set_solver_command(solver_command);
+     l_enc.set_multiplication_string(multiplication_string);
+     l_enc.set_leave_temporary_files(leave_temporary_files);
+     l_enc.set_pbo(iterative);
      // solve and put solution in model member variable
-     
+     l_enc.solve();
+     model = l_enc.get_solution();
      // return satisfiable or not?
+     return l_enc.get_sat();
  }
  

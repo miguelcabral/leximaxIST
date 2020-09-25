@@ -25,10 +25,16 @@ void Leximax_encoder::encode_sorted()
             }
             encode_network(elems_to_sort, objective, sorting_network);
             // sorted_vec variables are the outputs of sorting_network
-            for (size_t j{0}; j < num_terms; j++) {
-                LINT output_j = sorting_network[j]->second;
+            if (num_terms == 1) { // in this case the sorting network is empty
                 std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
-                sorted_vec->at(j) = output_j;
+                sorted_vec->at(0) = objective->at(0);
+            }
+            else {
+                for (size_t j{0}; j < num_terms; j++) {
+                    LINT output_j = sorting_network[j]->second;
+                    std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
+                    sorted_vec->at(j) = output_j;
+                }
             }
             // free memory allocated for the comparators of the sorting network
             delete_snet(sorting_network);

@@ -79,8 +79,10 @@ void print_usage(ostream &output) {
     output << "\t--temporary-directory DIR\t where temporary files should be placed"<< endl;
     output << "\t\t\t\t\t default '/tmp'"<< endl;
     output << "\t--leave-temporary-files\t\t do not delete temporary files" << endl;
-    output << "\t--max-sat\t\t\t The external solver is a MaxSAT solver, only one call is made to the solver" << endl;
-    output << "\t--leximax\t\t\t The user criteria are optimised with the leximax order" << endl;
+    output << "\t--max-sat\t\t\t The external solver is a MaxSAT solver;" << endl;
+    output << "\t\t\t\t\t otherwise it is a PBO solver"<< endl;
+    output << "\t--leximax\t\t\t The user criteria are optimised with the leximax order;" << endl;
+    output << "\t\t\t\t\t otherwise the lexicographic order is used"<< endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
