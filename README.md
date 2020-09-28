@@ -20,3 +20,9 @@ p cnf 3 3
 - To remove leximax: `make clean`
 
 - enumerate models, use `wget http://sat.inesc-id.pt/~mikolas/sw/pienum/pienum && chmod u+w pienum`
+
+- Compile statically mccs (with lpsolve ILP solver): `make clean && make mccs-static`
+
+- Use mccs with trendy criterium (without the recommends property): `./mccs -v1 -i input.cudf -leximax[-removed,-notuptodate,-new] &> mccs-trendy.txt`
+
+- Use packup with trendy criterium (without the recommends property): `./packup -t --max-sat --leximax --external-solver 'rc2.py -vv' input.cudf &> packup-trendy.txt`

@@ -1,0 +1,156 @@
+
+
+mccs (which stands for Multi Criteria CUDF Solver) provides
+a mean to solve cudf problems as defined in the MANCOOSI european project (http://www.mancoosi.org)
+and was partially supported by the European Community's 7th Framework Programme (FP7/2007-2013),
+MANCOOSI project, grant agreement n. 214898.
+
+mccs has been developed under linux and has not been tested on other platforms.
+The provided mccs is statically linked and run under linux 32 bits.
+
+mccs translate the cudf problem into an integer linear program which is then
+solved by an underlying solver.
+
+
+Using mccs:
+=================
+
+mccs -h gives a small help and displays the available solvers and solver interfaces for
+the current version.
+
+To run mccs, you need a cudf problem description written in cudf 2.0
+like the legacy.cudf provided in the examples directory.
+The most simple way to test mccs is to type:
+
+mccs -i examples/legacy.cudf
+
+which print out the solution on stdout. With such a call
+mccs will resort to the default underlying solver and
+use a default criteria to solve the problem.
+
+example 2:
+mccs -i examples/legacy.cudf -o sol -lexagregate[-removed,-changed] -lpsolve
+
+Here, mccs put the solution in file "sol" and solve the problem
+using lpsolve solver with paranoid criteria (a variation of a stability criteria).
+
+example 3:
+mccs -i examples/legacy.cudf -o sol -lexsemiagregate[-removed,-notuptodate,-nunsat[recommends:,true],-new]
+
+The criteria used here is the trendy criteria. Note that, due to the lack of the recommends: property
+in the legacy.cudf example, the nunsat criteria will be ignored.
+
+Using file based solvers:
+=========================
+
+mccs can also be used with solvers which are either lp compliant (see cplex documentation) or 
+pblib (pseudo boolean library) compliant. It has been tested with cbc and scip for the lp interface
+and wbo for the pblib interface. Note that none of these solvers are provided. 
+
+Three small batch files are provided to handle these solvers. For example, to solve a problem using cbc,
+use the lp interface with the cbclp script:
+mccs -i examples/legacy.cudf -o sol -lexagregate[-removed,-changed] -lp cbclp
+
+To allow such calls, the user will first have to edit the related batch files (cbclp, sciplp and/or wbopb) and
+change the path which point to the solver.
+
+Other batch files:
+==================
+
+solverparanoid and solvertrendy are two batch files which solve a cudf problem according to the
+criteria defined for the MANCOOSI competition (see http://www.mancoosi.org for more information).
+
+
+Compiling mccs:
+=====================
+
+mccs can be compiled with the following underlying solvers:
+- glpk (see http://www.gnu.org/software/glpk/)
+- lpsolve (see http://lpsolve.sourceforge.net/)
+- cplex (see http://www-01.ibm.com/software/integration/optimization/cplex/)
+- gurobi (see http://www.gurobi.com)
+
+Depending of its configuration, it can be compiled with all these solvers,
+a subset of these solvers, or none of these solvers.
+
+mccs can also use external pseudo boolean solvers through the pblib interface.
+It has been tested with:
+- wbo (see http://sat.inesc-id.pt/~vmm/research/index.html)
+
+mccs can also use external (cplex) lp compliant solvers through the lp interface.
+It has been tested with:
+- scip (see http://scip.zib.de/)
+- cbc (see https://projects.coin-or.org/Cbc)
+
+These two last interfaces are always compiled whatever your choosen options are.
+
+Note that mccs compilation relies on g++, bison and flex which are supposed
+to be available on your platform.
+
+To compile mccs, you must first edit make.local and modify the options,
+pathes and variables according to your needs and available libraries.
+This file is self explained.
+
+Once make.local has been modified, a call to make will produce mccs
+(a dynamically linked version of mccs). Note that running this version
+might need the setting of LD_LIBRARY_PATH and other shell variables.
+
+A statically linked version of mccs can be obtain by make cudf-static
+(provided the availability of the required static libraries).
+
+
+Licence:
+========
+
+Read the LICENCE file (a modified BSD licence).
+
+
+Solver sources:
+=================
+
+libsrcs: CUDF reader and tools sources
+--------------------------------------
+cudf.h : main include file (CUDF classes and function templates)
+cudf.l : a lexical analyser for CUDF problems
+cudf.y : a syntactic analyser for CUDF problems
+cudf_tools.c : class implementations and CUDF printing functions
+
+sources: CUDF solver sources
+----------------------------
+cudf.c : main function
+
+cudf_types.h : a few common types shared by most files
+
+constraint_generation.h & constraint_generation.c : translate a CUDF problem into a MILP problem
+cudf_reductions.h & cudf_reductions.c : simplify the problem whenever possible
+
+abstract_solver.h : abstract class interface for underlying solver
+scoeff_solver.h : template to ease handling solver coefficients
+cplex_solver.h & cplex_solver.c : cplex solver interface
+lpsolve_solver.h & lpsolve_solver.c : lpsolve solver interface
+glpk_solver.h & glpk_solver.c : glpk solver interface
+gurobi_solver.h & gurobi_solver.c : gurobi solver interface
+pblib_solver.h & pblib_solver.c : pblib compliant solvers interface
+lp_solver.h & lp_solver.c : cplex lp compliant solvers interface
+
+abstract_combiner.h : abstract class for combiners
+combiner.h  : gather all combiner definitions
+agregate_combiner.h &  agregate_combiner.c : implements an agregate combiner
+lexagregate_combiner.h & lexagregate_combiner.c : implements a lexicographic agregate combiner
+lexicographic_combiner.h & lexicographic_combiner.c : implements a lexicographic combiner
+leximax_combiner.h & leximax_combiner.c : implements a leximax order
+leximin_combiner.h & leximin_combiner.c : implements a leximin order
+lexleximax_combiner.h & lexleximax_combiner.c : implements a lexleximax combiner
+lexleximin_combiner.h & lexleximin_combiner.c : implements a lexleximin combiner
+lexsemiagregate_combiner.h & lexsemiagregate_combiner.c : implements a lexsemiagregate combiner
+
+abstract_criteria.h : abstract class for criteria
+criteria.h : gather all criteria definition
+changed_criteria.h & changed_criteria.c : implements the changed criteria
+count_criteria.h & count_criteria.c : implements the count criteria
+new_criteria.h & new_criteria.c : implements the new criteria
+notuptodate_criteria.h & notuptodate_criteria.c : implements the notuptodate criteria
+nunsat_criteria.h & nunsat_criteria.c : implements the nunsat criteria
+removed_criteria.h & removed_criteria.c : implements the removed criteria
+
+

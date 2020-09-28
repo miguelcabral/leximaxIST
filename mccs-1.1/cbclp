@@ -1,0 +1,5 @@
+#!/bin/sh
+(
+  echo "import $1"
+  echo "solve"
+  echo "solution \$" ) | ../cbc/Cbc-2.6.4/build/bin/cbc 

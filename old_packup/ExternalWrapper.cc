@@ -438,6 +438,11 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      // solve and put solution in model member variable
      l_enc.solve();
      model = l_enc.get_solution();
+     std::vector<LINT> optimum(l_enc.get_optimum());
+     std::cout << "# Optimum sorted objective vector: ";
+     for (LINT o : optimum)
+         std::cout << o << ' ';
+     std::cout << std::endl;
      // return satisfiable or not?
      return l_enc.get_sat();
  }

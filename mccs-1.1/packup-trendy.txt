@@ -1,0 +1,37 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# Optimum sorted objective vector: 2 2 1 
+# beginning of solution from packup
+package: turbo
+version: 1
+installed: true
+
+package: bicycle
+version: 7
+installed: true
+
+package: battery
+version: 3
+installed: true
+
+package: door
+version: 1
+installed: true
+
+package: car
+version: 1
+installed: true
+
+package: wheel
+version: 3
+installed: true
+
+package: electric-engine
+version: 1
+installed: true
+
+# end of solution from packup

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# solving CUDF problems with trendy criteria
+# first parameter = CUDF problem
+# second parameter = solution file
+
+mccs -i $1 -o $2 -lexsemiagregate[-removed,-notuptodate,-nunsat[recommends:,true],-new]

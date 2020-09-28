@@ -1,0 +1,7 @@
+
+mccs 1.1 (26/07/11):
+ * add unaligned criteria
+
+mccs 1.01 (24/05/11):
+ * correct some bugs in lp_solver.c: there was some troubleshot in reading solutions from underlying solvers
+ 

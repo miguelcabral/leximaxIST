@@ -1,0 +1,113 @@
+
+#======================================================
+# GLPK settings (required)
+# see http://www.gnu.org/software/glpk/
+#======================================================
+
+# if you want to use cplex uncomment next line (or use USEGLPK=1 as make parameter) 
+#USEGLPK=1
+
+
+ifeq ($(USEGLPK),1)
+
+# Path to GLPK main dir
+GLPKDIR=$(PWD)/../glpk
+
+# Path to the GPLK include files
+GLPKINC=$(GLPKDIR)/include/
+
+# GPLK library path and options
+GLPKLD=-L${GLPKDIR}/lib -lglpk -Wl,-rpath,${GLPKDIR}/lib
+
+endif
+
+
+#======================================================
+# LPSOLVE settings (required)
+# see http://lpsolve.sourceforge.net/
+#======================================================
+
+# if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
+USELPSOLVE=1
+
+
+ifeq ($(USELPSOLVE),1)
+
+# Path to the LPSOLVE main dir
+LPSOLVEDIR=~/Downloads/mccs-1.1/lp_solve_5.5/lp_solve/bin/ux64/
+
+# Path to the LPSOLVE include files
+LPSOLVEINC= ~/Downloads/mccs-1.1/lp_solve_5.5/
+
+# LPSOLVE library path and options
+LPSOLVELD=-L ~/Downloads/mccs-1.1/lp_solve_5.5/lpsolve55/bin/ux64/ -llpsolve55 -Wl,-rpath,${LPSOLVEDIR}
+
+endif
+
+
+#======================================================
+# CPLEX settings (optional)
+# see http://www-01.ibm.com/software/integration/optimization/cplex/
+#======================================================
+
+# if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
+#USECPLEX=1
+
+
+ifeq ($(USECPLEX),1)
+
+# Path to the CPLEX main dir
+CPXDIR=/usr/local/ilog_academic/cplex_studio_12.2
+
+# path to cplex include directory
+CPXINC=$(CPXDIR)/cplex/include/
+
+# path to cplex library
+CPXLIB=$(CPXDIR)/cplex/lib/x86-64_sles10_4.1/static_pic
+
+# cplex ld flags
+CPXLD=-L$(CPXLIB) -lcplex -lm -lpthread
+
+endif
+
+
+#======================================================
+# Gurobi settings (optional)
+# see http://www.gurobi.com
+#======================================================
+
+# if you want to use gurobi uncomment next line (or use USEGUROBI=1 as make parameter) 
+#USEGUROBI=1
+
+
+ifeq ($(USEGUROBI),1)
+
+# Path to the main GUROBI dir
+GUROBIDIR=/usr/local/gurobi/gurobi451/linux64
+
+# path to gurobi include directory
+GUROBIINC=$(GUROBIDIR)/include/ 
+
+# path to gurobi library
+GUROBILIB=$(GUROBIDIR)/lib/
+
+# gurobi ld flags
+GUROBILD=-L$(GUROBILIB) -lgurobi45 -lpthread -lm -Wl,-rpath,$(GUROBILIB)
+
+endif
+
+
+#####################################################################
+# compiler setting (must be compiled using a C++ compiler (only tested with g++))
+#####################################################################
+
+SRCLIB=libsrcs
+SRCDIR=sources
+OBJDIR=objs
+
+INC=-I$(OBJDIR) -I$(SRCDIR) -I$(SRCLIB)
+#CCCOPT=-g -Wall
+CCCOPT=-Wall -O6
+CCC=g++ $(CCCOPT)
+
+

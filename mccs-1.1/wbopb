@@ -1,0 +1,2 @@
+#!/bin/sh
+../PB/wbo-static -file-format=opb $*

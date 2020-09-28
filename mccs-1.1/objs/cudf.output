@@ -1,0 +1,1543 @@
+Grammar
+
+    0 $accept: cudf $end
+
+    1 cudf: preambles
+    2     | preambles package_declarations
+    3     | problem_declaration
+    4     | preambles package_declarations problem_declaration
+
+    5 preambles: %empty
+    6          | PREAMBLE property_definitions
+
+    7 property_definitions: typedecls
+    8                     | PROPERTYDEF typedecls
+
+    9 typedecls: typedecl
+   10          | typedecls ',' typedecl
+
+   11 typedecl: PIDENT IDENT
+   12         | PIDENT IDENT EQ '[' TRUE ']'
+   13         | PIDENT IDENT EQ '[' FALSE ']'
+   14         | PIDENT IDENT EQ '[' INTEGER ']'
+   15         | PIDENT IDENT EQ '[' STRING ']'
+   16         | PIDENT IDENT '[' enums ']'
+   17         | PIDENT IDENT '[' enums ']' EQ '[' IDENT ']'
+   18         | PIDENT IDENT EQ '[' ']'
+   19         | PIDENT IDENT EQ '[' vpkgformula ']'
+
+   20 enums: IDENT
+   21      | enums ',' IDENT
+
+   22 package_declarations: package_declaration
+   23                     | package_declarations package_declaration
+
+   24 package_declaration: package_version package_options
+
+   25 package_version: PACKAGE IDENT
+
+   26 package_options: %empty
+   27                | package_options package_option
+
+   28 package_option: version
+   29               | depends
+   30               | conflicts
+   31               | provides
+   32               | installed
+   33               | wasinstalled
+   34               | keep
+   35               | property
+
+   36 problem_declaration: problem
+   37                    | problem problem_actions
+
+   38 problem_actions: problem_action
+   39                | problem_actions problem_action
+
+   40 problem_action: install
+   41               | remove
+   42               | upgrade
+
+   43 version: VERSION INTEGER
+
+   44 depends: DEPENDS
+   45        | DEPENDS vpkgformula
+
+   46 conflicts: CONFLICTS
+   47          | CONFLICTS vpkglist
+
+   48 provides: PROVIDES
+   49         | PROVIDES veqpkglist
+
+   50 installed: INSTALLED TRUE
+   51          | INSTALLED FALSE
+
+   52 wasinstalled: WASINSTALLED TRUE
+   53             | WASINSTALLED FALSE
+
+   54 keep: KEEP keepvalue
+
+   55 property: PIDENT_BOOL TRUE
+   56         | PIDENT_BOOL FALSE
+   57         | PIDENT_INT INTEGER
+   58         | PIDENT_NAT INTEGER
+   59         | PIDENT_POSINT INTEGER
+   60         | PIDENT_ENUM IDENT
+   61         | PIDENT_STRING STRING
+   62         | PIDENT_VPKG vpkg
+   63         | PIDENT_VEQPKG veqpkg
+   64         | PIDENT_VPKGLIST
+   65         | PIDENT_VPKGLIST vpkglist
+   66         | PIDENT_VEQPKGLIST
+   67         | PIDENT_VEQPKGLIST veqpkglist
+   68         | PIDENT_VPKGFORMULA vpkgformula
+
+   69 problem: PROBLEM
+
+   70 install: INSTALL
+   71        | INSTALL vpkglist
+
+   72 remove: REMOVE
+   73       | REMOVE vpkglist
+
+   74 upgrade: UPGRADE
+   75        | UPGRADE vpkglist
+
+   76 keepvalue: KEEPVERSION
+   77          | KEEPPACKAGE
+   78          | KEEPFEATURE
+   79          | KEEPNONE
+
+   80 vpkgformula: VTRUE
+   81            | VFALSE
+   82            | avpkgformula
+
+   83 avpkgformula: vpkgor
+   84             | avpkgformula ',' vpkgor
+
+   85 vpkgor: vpkg
+   86       | vpkgor '|' vpkg
+
+   87 veqpkg: IDENT
+   88       | IDENT EQ INTEGER
+
+   89 vpkg: veqpkg
+   90     | IDENT NEQ INTEGER
+   91     | IDENT SUP INTEGER
+   92     | IDENT SUPEQ INTEGER
+   93     | IDENT INF INTEGER
+   94     | IDENT INFEQ INTEGER
+
+   95 vpkglist: vpkg
+   96         | vpkglist ',' vpkg
+
+   97 veqpkglist: veqpkg
+   98           | veqpkglist ',' veqpkg
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+',' (44) 10 21 84 96 98
+'[' (91) 12 13 14 15 16 17 18 19
+']' (93) 12 13 14 15 16 17 18 19
+'|' (124) 86
+error (256)
+PREAMBLE (258) 6
+PROPERTYDEF (259) 8
+PACKAGE (260) 25
+VERSION (261) 43
+DEPENDS (262) 44 45
+CONFLICTS (263) 46 47
+PROVIDES (264) 48 49
+INSTALLED (265) 50 51
+KEEP (266) 54
+KEEPVERSION (267) 76
+KEEPPACKAGE (268) 77
+KEEPFEATURE (269) 78
+KEEPNONE (270) 79
+EQ (271) 12 13 14 15 17 18 19 88
+NEQ (272) 90
+SUP (273) 91
+SUPEQ (274) 92
+INF (275) 93
+INFEQ (276) 94
+TRUE (277) 12 50 52 55
+FALSE (278) 13 51 53 56
+VTRUE (279) 80
+VFALSE (280) 81
+PROBLEM (281) 69
+INSTALL (282) 70 71
+WASINSTALLED (283) 52 53
+REMOVE (284) 72 73
+UPGRADE (285) 74 75
+PIDENT_BOOL (286) 55 56
+PIDENT_INT (287) 57
+PIDENT_NAT (288) 58
+PIDENT_POSINT (289) 59
+PIDENT_ENUM (290) 60
+PIDENT_STRING (291) 61
+PIDENT_VPKG (292) 62
+PIDENT_VEQPKG (293) 63
+PIDENT_VPKGLIST (294) 64 65
+PIDENT_VEQPKGLIST (295) 66 67
+PIDENT_VPKGFORMULA (296) 68
+INTEGER (297) 14 43 57 58 59 88 90 91 92 93 94
+IDENT (298) 11 12 13 14 15 16 17 18 19 20 21 25 60 87 88 90 91 92 93
+    94
+PIDENT (299) 11 12 13 14 15 16 17 18 19
+STRING (300) 15 61
+
+
+Nonterminals, with rules where they appear
+
+$accept (50)
+    on left: 0
+cudf (51)
+    on left: 1 2 3 4, on right: 0
+preambles (52)
+    on left: 5 6, on right: 1 2 4
+property_definitions (53)
+    on left: 7 8, on right: 6
+typedecls (54)
+    on left: 9 10, on right: 7 8 10
+typedecl (55)
+    on left: 11 12 13 14 15 16 17 18 19, on right: 9 10
+enums (56)
+    on left: 20 21, on right: 16 17 21
+package_declarations (57)
+    on left: 22 23, on right: 2 4 23
+package_declaration (58)
+    on left: 24, on right: 22 23
+package_version (59)
+    on left: 25, on right: 24
+package_options (60)
+    on left: 26 27, on right: 24 27
+package_option (61)
+    on left: 28 29 30 31 32 33 34 35, on right: 27
+problem_declaration (62)
+    on left: 36 37, on right: 3 4
+problem_actions (63)
+    on left: 38 39, on right: 37 39
+problem_action (64)
+    on left: 40 41 42, on right: 38 39
+version (65)
+    on left: 43, on right: 28
+depends (66)
+    on left: 44 45, on right: 29
+conflicts (67)
+    on left: 46 47, on right: 30
+provides (68)
+    on left: 48 49, on right: 31
+installed (69)
+    on left: 50 51, on right: 32
+wasinstalled (70)
+    on left: 52 53, on right: 33
+keep (71)
+    on left: 54, on right: 34
+property (72)
+    on left: 55 56 57 58 59 60 61 62 63 64 65 66 67 68, on right: 35
+problem (73)
+    on left: 69, on right: 36 37
+install (74)
+    on left: 70 71, on right: 40
+remove (75)
+    on left: 72 73, on right: 41
+upgrade (76)
+    on left: 74 75, on right: 42
+keepvalue (77)
+    on left: 76 77 78 79, on right: 54
+vpkgformula (78)
+    on left: 80 81 82, on right: 19 45 68
+avpkgformula (79)
+    on left: 83 84, on right: 82 84
+vpkgor (80)
+    on left: 85 86, on right: 83 84 86
+veqpkg (81)
+    on left: 87 88, on right: 63 89 97 98
+vpkg (82)
+    on left: 89 90 91 92 93 94, on right: 62 85 86 95 96
+vpkglist (83)
+    on left: 95 96, on right: 47 65 71 73 75 96
+veqpkglist (84)
+    on left: 97 98, on right: 49 67 98
+
+
+State 0
+
+    0 $accept: . cudf $end
+
+    PREAMBLE  shift, and go to state 1
+    PROBLEM   shift, and go to state 2
+
+    $default  reduce using rule 5 (preambles)
+
+    cudf                 go to state 3
+    preambles            go to state 4
+    problem_declaration  go to state 5
+    problem              go to state 6
+
+
+State 1
+
+    6 preambles: PREAMBLE . property_definitions
+
+    PROPERTYDEF  shift, and go to state 7
+    PIDENT       shift, and go to state 8
+
+    property_definitions  go to state 9
+    typedecls             go to state 10
+    typedecl              go to state 11
+
+
+State 2
+
+   69 problem: PROBLEM .
+
+    $default  reduce using rule 69 (problem)
+
+
+State 3
+
+    0 $accept: cudf . $end
+
+    $end  shift, and go to state 12
+
+
+State 4
+
+    1 cudf: preambles .
+    2     | preambles . package_declarations
+    4     | preambles . package_declarations problem_declaration
+
+    PACKAGE  shift, and go to state 13
+
+    $default  reduce using rule 1 (cudf)
+
+    package_declarations  go to state 14
+    package_declaration   go to state 15
+    package_version       go to state 16
+
+
+State 5
+
+    3 cudf: problem_declaration .
+
+    $default  reduce using rule 3 (cudf)
+
+
+State 6
+
+   36 problem_declaration: problem .
+   37                    | problem . problem_actions
+
+    INSTALL  shift, and go to state 17
+    REMOVE   shift, and go to state 18
+    UPGRADE  shift, and go to state 19
+
+    $default  reduce using rule 36 (problem_declaration)
+
+    problem_actions  go to state 20
+    problem_action   go to state 21
+    install          go to state 22
+    remove           go to state 23
+    upgrade          go to state 24
+
+
+State 7
+
+    8 property_definitions: PROPERTYDEF . typedecls
+
+    PIDENT  shift, and go to state 8
+
+    typedecls  go to state 25
+    typedecl   go to state 11
+
+
+State 8
+
+   11 typedecl: PIDENT . IDENT
+   12         | PIDENT . IDENT EQ '[' TRUE ']'
+   13         | PIDENT . IDENT EQ '[' FALSE ']'
+   14         | PIDENT . IDENT EQ '[' INTEGER ']'
+   15         | PIDENT . IDENT EQ '[' STRING ']'
+   16         | PIDENT . IDENT '[' enums ']'
+   17         | PIDENT . IDENT '[' enums ']' EQ '[' IDENT ']'
+   18         | PIDENT . IDENT EQ '[' ']'
+   19         | PIDENT . IDENT EQ '[' vpkgformula ']'
+
+    IDENT  shift, and go to state 26
+
+
+State 9
+
+    6 preambles: PREAMBLE property_definitions .
+
+    $default  reduce using rule 6 (preambles)
+
+
+State 10
+
+    7 property_definitions: typedecls .
+   10 typedecls: typedecls . ',' typedecl
+
+    ','  shift, and go to state 27
+
+    $default  reduce using rule 7 (property_definitions)
+
+
+State 11
+
+    9 typedecls: typedecl .
+
+    $default  reduce using rule 9 (typedecls)
+
+
+State 12
+
+    0 $accept: cudf $end .
+
+    $default  accept
+
+
+State 13
+
+   25 package_version: PACKAGE . IDENT
+
+    IDENT  shift, and go to state 28
+
+
+State 14
+
+    2 cudf: preambles package_declarations .
+    4     | preambles package_declarations . problem_declaration
+   23 package_declarations: package_declarations . package_declaration
+
+    PACKAGE  shift, and go to state 13
+    PROBLEM  shift, and go to state 2
+
+    $default  reduce using rule 2 (cudf)
+
+    package_declaration  go to state 29
+    package_version      go to state 16
+    problem_declaration  go to state 30
+    problem              go to state 6
+
+
+State 15
+
+   22 package_declarations: package_declaration .
+
+    $default  reduce using rule 22 (package_declarations)
+
+
+State 16
+
+   24 package_declaration: package_version . package_options
+
+    $default  reduce using rule 26 (package_options)
+
+    package_options  go to state 31
+
+
+State 17
+
+   70 install: INSTALL .
+   71        | INSTALL . vpkglist
+
+    IDENT  shift, and go to state 32
+
+    $default  reduce using rule 70 (install)
+
+    veqpkg    go to state 33
+    vpkg      go to state 34
+    vpkglist  go to state 35
+
+
+State 18
+
+   72 remove: REMOVE .
+   73       | REMOVE . vpkglist
+
+    IDENT  shift, and go to state 32
+
+    $default  reduce using rule 72 (remove)
+
+    veqpkg    go to state 33
+    vpkg      go to state 34
+    vpkglist  go to state 36
+
+
+State 19
+
+   74 upgrade: UPGRADE .
+   75        | UPGRADE . vpkglist
+
+    IDENT  shift, and go to state 32
+
+    $default  reduce using rule 74 (upgrade)
+
+    veqpkg    go to state 33
+    vpkg      go to state 34
+    vpkglist  go to state 37
+
+
+State 20
+
+   37 problem_declaration: problem problem_actions .
+   39 problem_actions: problem_actions . problem_action
+
+    INSTALL  shift, and go to state 17
+    REMOVE   shift, and go to state 18
+    UPGRADE  shift, and go to state 19
+
+    $default  reduce using rule 37 (problem_declaration)
+
+    problem_action  go to state 38
+    install         go to state 22
+    remove          go to state 23
+    upgrade         go to state 24
+
+
+State 21
+
+   38 problem_actions: problem_action .
+
+    $default  reduce using rule 38 (problem_actions)
+
+
+State 22
+
+   40 problem_action: install .
+
+    $default  reduce using rule 40 (problem_action)
+
+
+State 23
+
+   41 problem_action: remove .
+
+    $default  reduce using rule 41 (problem_action)
+
+
+State 24
+
+   42 problem_action: upgrade .
+
+    $default  reduce using rule 42 (problem_action)
+
+
+State 25
+
+    8 property_definitions: PROPERTYDEF typedecls .
+   10 typedecls: typedecls . ',' typedecl
+
+    ','  shift, and go to state 27
+
+    $default  reduce using rule 8 (property_definitions)
+
+
+State 26
+
+   11 typedecl: PIDENT IDENT .
+   12         | PIDENT IDENT . EQ '[' TRUE ']'
+   13         | PIDENT IDENT . EQ '[' FALSE ']'
+   14         | PIDENT IDENT . EQ '[' INTEGER ']'
+   15         | PIDENT IDENT . EQ '[' STRING ']'
+   16         | PIDENT IDENT . '[' enums ']'
+   17         | PIDENT IDENT . '[' enums ']' EQ '[' IDENT ']'
+   18         | PIDENT IDENT . EQ '[' ']'
+   19         | PIDENT IDENT . EQ '[' vpkgformula ']'
+
+    EQ   shift, and go to state 39
+    '['  shift, and go to state 40
+
+    $default  reduce using rule 11 (typedecl)
+
+
+State 27
+
+   10 typedecls: typedecls ',' . typedecl
+
+    PIDENT  shift, and go to state 8
+
+    typedecl  go to state 41
+
+
+State 28
+
+   25 package_version: PACKAGE IDENT .
+
+    $default  reduce using rule 25 (package_version)
+
+
+State 29
+
+   23 package_declarations: package_declarations package_declaration .
+
+    $default  reduce using rule 23 (package_declarations)
+
+
+State 30
+
+    4 cudf: preambles package_declarations problem_declaration .
+
+    $default  reduce using rule 4 (cudf)
+
+
+State 31
+
+   24 package_declaration: package_version package_options .
+   27 package_options: package_options . package_option
+
+    VERSION             shift, and go to state 42
+    DEPENDS             shift, and go to state 43
+    CONFLICTS           shift, and go to state 44
+    PROVIDES            shift, and go to state 45
+    INSTALLED           shift, and go to state 46
+    KEEP                shift, and go to state 47
+    WASINSTALLED        shift, and go to state 48
+    PIDENT_BOOL         shift, and go to state 49
+    PIDENT_INT          shift, and go to state 50
+    PIDENT_NAT          shift, and go to state 51
+    PIDENT_POSINT       shift, and go to state 52
+    PIDENT_ENUM         shift, and go to state 53
+    PIDENT_STRING       shift, and go to state 54
+    PIDENT_VPKG         shift, and go to state 55
+    PIDENT_VEQPKG       shift, and go to state 56
+    PIDENT_VPKGLIST     shift, and go to state 57
+    PIDENT_VEQPKGLIST   shift, and go to state 58
+    PIDENT_VPKGFORMULA  shift, and go to state 59
+
+    $default  reduce using rule 24 (package_declaration)
+
+    package_option  go to state 60
+    version         go to state 61
+    depends         go to state 62
+    conflicts       go to state 63
+    provides        go to state 64
+    installed       go to state 65
+    wasinstalled    go to state 66
+    keep            go to state 67
+    property        go to state 68
+
+
+State 32
+
+   87 veqpkg: IDENT .
+   88       | IDENT . EQ INTEGER
+   90 vpkg: IDENT . NEQ INTEGER
+   91     | IDENT . SUP INTEGER
+   92     | IDENT . SUPEQ INTEGER
+   93     | IDENT . INF INTEGER
+   94     | IDENT . INFEQ INTEGER
+
+    EQ     shift, and go to state 69
+    NEQ    shift, and go to state 70
+    SUP    shift, and go to state 71
+    SUPEQ  shift, and go to state 72
+    INF    shift, and go to state 73
+    INFEQ  shift, and go to state 74
+
+    $default  reduce using rule 87 (veqpkg)
+
+
+State 33
+
+   89 vpkg: veqpkg .
+
+    $default  reduce using rule 89 (vpkg)
+
+
+State 34
+
+   95 vpkglist: vpkg .
+
+    $default  reduce using rule 95 (vpkglist)
+
+
+State 35
+
+   71 install: INSTALL vpkglist .
+   96 vpkglist: vpkglist . ',' vpkg
+
+    ','  shift, and go to state 75
+
+    $default  reduce using rule 71 (install)
+
+
+State 36
+
+   73 remove: REMOVE vpkglist .
+   96 vpkglist: vpkglist . ',' vpkg
+
+    ','  shift, and go to state 75
+
+    $default  reduce using rule 73 (remove)
+
+
+State 37
+
+   75 upgrade: UPGRADE vpkglist .
+   96 vpkglist: vpkglist . ',' vpkg
+
+    ','  shift, and go to state 75
+
+    $default  reduce using rule 75 (upgrade)
+
+
+State 38
+
+   39 problem_actions: problem_actions problem_action .
+
+    $default  reduce using rule 39 (problem_actions)
+
+
+State 39
+
+   12 typedecl: PIDENT IDENT EQ . '[' TRUE ']'
+   13         | PIDENT IDENT EQ . '[' FALSE ']'
+   14         | PIDENT IDENT EQ . '[' INTEGER ']'
+   15         | PIDENT IDENT EQ . '[' STRING ']'
+   18         | PIDENT IDENT EQ . '[' ']'
+   19         | PIDENT IDENT EQ . '[' vpkgformula ']'
+
+    '['  shift, and go to state 76
+
+
+State 40
+
+   16 typedecl: PIDENT IDENT '[' . enums ']'
+   17         | PIDENT IDENT '[' . enums ']' EQ '[' IDENT ']'
+
+    IDENT  shift, and go to state 77
+
+    enums  go to state 78
+
+
+State 41
+
+   10 typedecls: typedecls ',' typedecl .
+
+    $default  reduce using rule 10 (typedecls)
+
+
+State 42
+
+   43 version: VERSION . INTEGER
+
+    INTEGER  shift, and go to state 79
+
+
+State 43
+
+   44 depends: DEPENDS .
+   45        | DEPENDS . vpkgformula
+
+    VTRUE   shift, and go to state 80
+    VFALSE  shift, and go to state 81
+    IDENT   shift, and go to state 32
+
+    $default  reduce using rule 44 (depends)
+
+    vpkgformula   go to state 82
+    avpkgformula  go to state 83
+    vpkgor        go to state 84
+    veqpkg        go to state 33
+    vpkg          go to state 85
+
+
+State 44
+
+   46 conflicts: CONFLICTS .
+   47          | CONFLICTS . vpkglist
+
+    IDENT  shift, and go to state 32
+
+    $default  reduce using rule 46 (conflicts)
+
+    veqpkg    go to state 33
+    vpkg      go to state 34
+    vpkglist  go to state 86
+
+
+State 45
+
+   48 provides: PROVIDES .
+   49         | PROVIDES . veqpkglist
+
+    IDENT  shift, and go to state 87
+
+    $default  reduce using rule 48 (provides)
+
+    veqpkg      go to state 88
+    veqpkglist  go to state 89
+
+
+State 46
+
+   50 installed: INSTALLED . TRUE
+   51          | INSTALLED . FALSE
+
+    TRUE   shift, and go to state 90
+    FALSE  shift, and go to state 91
+
+
+State 47
+
+   54 keep: KEEP . keepvalue
+
+    KEEPVERSION  shift, and go to state 92
+    KEEPPACKAGE  shift, and go to state 93
+    KEEPFEATURE  shift, and go to state 94
+    KEEPNONE     shift, and go to state 95
+
+    keepvalue  go to state 96
+
+
+State 48
+
+   52 wasinstalled: WASINSTALLED . TRUE
+   53             | WASINSTALLED . FALSE
+
+    TRUE   shift, and go to state 97
+    FALSE  shift, and go to state 98
+
+
+State 49
+
+   55 property: PIDENT_BOOL . TRUE
+   56         | PIDENT_BOOL . FALSE
+
+    TRUE   shift, and go to state 99
+    FALSE  shift, and go to state 100
+
+
+State 50
+
+   57 property: PIDENT_INT . INTEGER
+
+    INTEGER  shift, and go to state 101
+
+
+State 51
+
+   58 property: PIDENT_NAT . INTEGER
+
+    INTEGER  shift, and go to state 102
+
+
+State 52
+
+   59 property: PIDENT_POSINT . INTEGER
+
+    INTEGER  shift, and go to state 103
+
+
+State 53
+
+   60 property: PIDENT_ENUM . IDENT
+
+    IDENT  shift, and go to state 104
+
+
+State 54
+
+   61 property: PIDENT_STRING . STRING
+
+    STRING  shift, and go to state 105
+
+
+State 55
+
+   62 property: PIDENT_VPKG . vpkg
+
+    IDENT  shift, and go to state 32
+
+    veqpkg  go to state 33
+    vpkg    go to state 106
+
+
+State 56
+
+   63 property: PIDENT_VEQPKG . veqpkg
+
+    IDENT  shift, and go to state 87
+
+    veqpkg  go to state 107
+
+
+State 57
+
+   64 property: PIDENT_VPKGLIST .
+   65         | PIDENT_VPKGLIST . vpkglist
+
+    IDENT  shift, and go to state 32
+
+    $default  reduce using rule 64 (property)
+
+    veqpkg    go to state 33
+    vpkg      go to state 34
+    vpkglist  go to state 108
+
+
+State 58
+
+   66 property: PIDENT_VEQPKGLIST .
+   67         | PIDENT_VEQPKGLIST . veqpkglist
+
+    IDENT  shift, and go to state 87
+
+    $default  reduce using rule 66 (property)
+
+    veqpkg      go to state 88
+    veqpkglist  go to state 109
+
+
+State 59
+
+   68 property: PIDENT_VPKGFORMULA . vpkgformula
+
+    VTRUE   shift, and go to state 80
+    VFALSE  shift, and go to state 81
+    IDENT   shift, and go to state 32
+
+    vpkgformula   go to state 110
+    avpkgformula  go to state 83
+    vpkgor        go to state 84
+    veqpkg        go to state 33
+    vpkg          go to state 85
+
+
+State 60
+
+   27 package_options: package_options package_option .
+
+    $default  reduce using rule 27 (package_options)
+
+
+State 61
+
+   28 package_option: version .
+
+    $default  reduce using rule 28 (package_option)
+
+
+State 62
+
+   29 package_option: depends .
+
+    $default  reduce using rule 29 (package_option)
+
+
+State 63
+
+   30 package_option: conflicts .
+
+    $default  reduce using rule 30 (package_option)
+
+
+State 64
+
+   31 package_option: provides .
+
+    $default  reduce using rule 31 (package_option)
+
+
+State 65
+
+   32 package_option: installed .
+
+    $default  reduce using rule 32 (package_option)
+
+
+State 66
+
+   33 package_option: wasinstalled .
+
+    $default  reduce using rule 33 (package_option)
+
+
+State 67
+
+   34 package_option: keep .
+
+    $default  reduce using rule 34 (package_option)
+
+
+State 68
+
+   35 package_option: property .
+
+    $default  reduce using rule 35 (package_option)
+
+
+State 69
+
+   88 veqpkg: IDENT EQ . INTEGER
+
+    INTEGER  shift, and go to state 111
+
+
+State 70
+
+   90 vpkg: IDENT NEQ . INTEGER
+
+    INTEGER  shift, and go to state 112
+
+
+State 71
+
+   91 vpkg: IDENT SUP . INTEGER
+
+    INTEGER  shift, and go to state 113
+
+
+State 72
+
+   92 vpkg: IDENT SUPEQ . INTEGER
+
+    INTEGER  shift, and go to state 114
+
+
+State 73
+
+   93 vpkg: IDENT INF . INTEGER
+
+    INTEGER  shift, and go to state 115
+
+
+State 74
+
+   94 vpkg: IDENT INFEQ . INTEGER
+
+    INTEGER  shift, and go to state 116
+
+
+State 75
+
+   96 vpkglist: vpkglist ',' . vpkg
+
+    IDENT  shift, and go to state 32
+
+    veqpkg  go to state 33
+    vpkg    go to state 117
+
+
+State 76
+
+   12 typedecl: PIDENT IDENT EQ '[' . TRUE ']'
+   13         | PIDENT IDENT EQ '[' . FALSE ']'
+   14         | PIDENT IDENT EQ '[' . INTEGER ']'
+   15         | PIDENT IDENT EQ '[' . STRING ']'
+   18         | PIDENT IDENT EQ '[' . ']'
+   19         | PIDENT IDENT EQ '[' . vpkgformula ']'
+
+    TRUE     shift, and go to state 118
+    FALSE    shift, and go to state 119
+    VTRUE    shift, and go to state 80
+    VFALSE   shift, and go to state 81
+    INTEGER  shift, and go to state 120
+    IDENT    shift, and go to state 32
+    STRING   shift, and go to state 121
+    ']'      shift, and go to state 122
+
+    vpkgformula   go to state 123
+    avpkgformula  go to state 83
+    vpkgor        go to state 84
+    veqpkg        go to state 33
+    vpkg          go to state 85
+
+
+State 77
+
+   20 enums: IDENT .
+
+    $default  reduce using rule 20 (enums)
+
+
+State 78
+
+   16 typedecl: PIDENT IDENT '[' enums . ']'
+   17         | PIDENT IDENT '[' enums . ']' EQ '[' IDENT ']'
+   21 enums: enums . ',' IDENT
+
+    ','  shift, and go to state 124
+    ']'  shift, and go to state 125
+
+
+State 79
+
+   43 version: VERSION INTEGER .
+
+    $default  reduce using rule 43 (version)
+
+
+State 80
+
+   80 vpkgformula: VTRUE .
+
+    $default  reduce using rule 80 (vpkgformula)
+
+
+State 81
+
+   81 vpkgformula: VFALSE .
+
+    $default  reduce using rule 81 (vpkgformula)
+
+
+State 82
+
+   45 depends: DEPENDS vpkgformula .
+
+    $default  reduce using rule 45 (depends)
+
+
+State 83
+
+   82 vpkgformula: avpkgformula .
+   84 avpkgformula: avpkgformula . ',' vpkgor
+
+    ','  shift, and go to state 126
+
+    $default  reduce using rule 82 (vpkgformula)
+
+
+State 84
+
+   83 avpkgformula: vpkgor .
+   86 vpkgor: vpkgor . '|' vpkg
+
+    '|'  shift, and go to state 127
+
+    $default  reduce using rule 83 (avpkgformula)
+
+
+State 85
+
+   85 vpkgor: vpkg .
+
+    $default  reduce using rule 85 (vpkgor)
+
+
+State 86
+
+   47 conflicts: CONFLICTS vpkglist .
+   96 vpkglist: vpkglist . ',' vpkg
+
+    ','  shift, and go to state 75
+
+    $default  reduce using rule 47 (conflicts)
+
+
+State 87
+
+   87 veqpkg: IDENT .
+   88       | IDENT . EQ INTEGER
+
+    EQ  shift, and go to state 69
+
+    $default  reduce using rule 87 (veqpkg)
+
+
+State 88
+
+   97 veqpkglist: veqpkg .
+
+    $default  reduce using rule 97 (veqpkglist)
+
+
+State 89
+
+   49 provides: PROVIDES veqpkglist .
+   98 veqpkglist: veqpkglist . ',' veqpkg
+
+    ','  shift, and go to state 128
+
+    $default  reduce using rule 49 (provides)
+
+
+State 90
+
+   50 installed: INSTALLED TRUE .
+
+    $default  reduce using rule 50 (installed)
+
+
+State 91
+
+   51 installed: INSTALLED FALSE .
+
+    $default  reduce using rule 51 (installed)
+
+
+State 92
+
+   76 keepvalue: KEEPVERSION .
+
+    $default  reduce using rule 76 (keepvalue)
+
+
+State 93
+
+   77 keepvalue: KEEPPACKAGE .
+
+    $default  reduce using rule 77 (keepvalue)
+
+
+State 94
+
+   78 keepvalue: KEEPFEATURE .
+
+    $default  reduce using rule 78 (keepvalue)
+
+
+State 95
+
+   79 keepvalue: KEEPNONE .
+
+    $default  reduce using rule 79 (keepvalue)
+
+
+State 96
+
+   54 keep: KEEP keepvalue .
+
+    $default  reduce using rule 54 (keep)
+
+
+State 97
+
+   52 wasinstalled: WASINSTALLED TRUE .
+
+    $default  reduce using rule 52 (wasinstalled)
+
+
+State 98
+
+   53 wasinstalled: WASINSTALLED FALSE .
+
+    $default  reduce using rule 53 (wasinstalled)
+
+
+State 99
+
+   55 property: PIDENT_BOOL TRUE .
+
+    $default  reduce using rule 55 (property)
+
+
+State 100
+
+   56 property: PIDENT_BOOL FALSE .
+
+    $default  reduce using rule 56 (property)
+
+
+State 101
+
+   57 property: PIDENT_INT INTEGER .
+
+    $default  reduce using rule 57 (property)
+
+
+State 102
+
+   58 property: PIDENT_NAT INTEGER .
+
+    $default  reduce using rule 58 (property)
+
+
+State 103
+
+   59 property: PIDENT_POSINT INTEGER .
+
+    $default  reduce using rule 59 (property)
+
+
+State 104
+
+   60 property: PIDENT_ENUM IDENT .
+
+    $default  reduce using rule 60 (property)
+
+
+State 105
+
+   61 property: PIDENT_STRING STRING .
+
+    $default  reduce using rule 61 (property)
+
+
+State 106
+
+   62 property: PIDENT_VPKG vpkg .
+
+    $default  reduce using rule 62 (property)
+
+
+State 107
+
+   63 property: PIDENT_VEQPKG veqpkg .
+
+    $default  reduce using rule 63 (property)
+
+
+State 108
+
+   65 property: PIDENT_VPKGLIST vpkglist .
+   96 vpkglist: vpkglist . ',' vpkg
+
+    ','  shift, and go to state 75
+
+    $default  reduce using rule 65 (property)
+
+
+State 109
+
+   67 property: PIDENT_VEQPKGLIST veqpkglist .
+   98 veqpkglist: veqpkglist . ',' veqpkg
+
+    ','  shift, and go to state 128
+
+    $default  reduce using rule 67 (property)
+
+
+State 110
+
+   68 property: PIDENT_VPKGFORMULA vpkgformula .
+
+    $default  reduce using rule 68 (property)
+
+
+State 111
+
+   88 veqpkg: IDENT EQ INTEGER .
+
+    $default  reduce using rule 88 (veqpkg)
+
+
+State 112
+
+   90 vpkg: IDENT NEQ INTEGER .
+
+    $default  reduce using rule 90 (vpkg)
+
+
+State 113
+
+   91 vpkg: IDENT SUP INTEGER .
+
+    $default  reduce using rule 91 (vpkg)
+
+
+State 114
+
+   92 vpkg: IDENT SUPEQ INTEGER .
+
+    $default  reduce using rule 92 (vpkg)
+
+
+State 115
+
+   93 vpkg: IDENT INF INTEGER .
+
+    $default  reduce using rule 93 (vpkg)
+
+
+State 116
+
+   94 vpkg: IDENT INFEQ INTEGER .
+
+    $default  reduce using rule 94 (vpkg)
+
+
+State 117
+
+   96 vpkglist: vpkglist ',' vpkg .
+
+    $default  reduce using rule 96 (vpkglist)
+
+
+State 118
+
+   12 typedecl: PIDENT IDENT EQ '[' TRUE . ']'
+
+    ']'  shift, and go to state 129
+
+
+State 119
+
+   13 typedecl: PIDENT IDENT EQ '[' FALSE . ']'
+
+    ']'  shift, and go to state 130
+
+
+State 120
+
+   14 typedecl: PIDENT IDENT EQ '[' INTEGER . ']'
+
+    ']'  shift, and go to state 131
+
+
+State 121
+
+   15 typedecl: PIDENT IDENT EQ '[' STRING . ']'
+
+    ']'  shift, and go to state 132
+
+
+State 122
+
+   18 typedecl: PIDENT IDENT EQ '[' ']' .
+
+    $default  reduce using rule 18 (typedecl)
+
+
+State 123
+
+   19 typedecl: PIDENT IDENT EQ '[' vpkgformula . ']'
+
+    ']'  shift, and go to state 133
+
+
+State 124
+
+   21 enums: enums ',' . IDENT
+
+    IDENT  shift, and go to state 134
+
+
+State 125
+
+   16 typedecl: PIDENT IDENT '[' enums ']' .
+   17         | PIDENT IDENT '[' enums ']' . EQ '[' IDENT ']'
+
+    EQ  shift, and go to state 135
+
+    $default  reduce using rule 16 (typedecl)
+
+
+State 126
+
+   84 avpkgformula: avpkgformula ',' . vpkgor
+
+    IDENT  shift, and go to state 32
+
+    vpkgor  go to state 136
+    veqpkg  go to state 33
+    vpkg    go to state 85
+
+
+State 127
+
+   86 vpkgor: vpkgor '|' . vpkg
+
+    IDENT  shift, and go to state 32
+
+    veqpkg  go to state 33
+    vpkg    go to state 137
+
+
+State 128
+
+   98 veqpkglist: veqpkglist ',' . veqpkg
+
+    IDENT  shift, and go to state 87
+
+    veqpkg  go to state 138
+
+
+State 129
+
+   12 typedecl: PIDENT IDENT EQ '[' TRUE ']' .
+
+    $default  reduce using rule 12 (typedecl)
+
+
+State 130
+
+   13 typedecl: PIDENT IDENT EQ '[' FALSE ']' .
+
+    $default  reduce using rule 13 (typedecl)
+
+
+State 131
+
+   14 typedecl: PIDENT IDENT EQ '[' INTEGER ']' .
+
+    $default  reduce using rule 14 (typedecl)
+
+
+State 132
+
+   15 typedecl: PIDENT IDENT EQ '[' STRING ']' .
+
+    $default  reduce using rule 15 (typedecl)
+
+
+State 133
+
+   19 typedecl: PIDENT IDENT EQ '[' vpkgformula ']' .
+
+    $default  reduce using rule 19 (typedecl)
+
+
+State 134
+
+   21 enums: enums ',' IDENT .
+
+    $default  reduce using rule 21 (enums)
+
+
+State 135
+
+   17 typedecl: PIDENT IDENT '[' enums ']' EQ . '[' IDENT ']'
+
+    '['  shift, and go to state 139
+
+
+State 136
+
+   84 avpkgformula: avpkgformula ',' vpkgor .
+   86 vpkgor: vpkgor . '|' vpkg
+
+    '|'  shift, and go to state 127
+
+    $default  reduce using rule 84 (avpkgformula)
+
+
+State 137
+
+   86 vpkgor: vpkgor '|' vpkg .
+
+    $default  reduce using rule 86 (vpkgor)
+
+
+State 138
+
+   98 veqpkglist: veqpkglist ',' veqpkg .
+
+    $default  reduce using rule 98 (veqpkglist)
+
+
+State 139
+
+   17 typedecl: PIDENT IDENT '[' enums ']' EQ '[' . IDENT ']'
+
+    IDENT  shift, and go to state 140
+
+
+State 140
+
+   17 typedecl: PIDENT IDENT '[' enums ']' EQ '[' IDENT . ']'
+
+    ']'  shift, and go to state 141
+
+
+State 141
+
+   17 typedecl: PIDENT IDENT '[' enums ']' EQ '[' IDENT ']' .
+
+    $default  reduce using rule 17 (typedecl)
