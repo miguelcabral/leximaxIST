@@ -21,8 +21,13 @@ p cnf 3 3
 
 - enumerate models, use `wget http://sat.inesc-id.pt/~mikolas/sw/pienum/pienum && chmod u+w pienum`
 
-- Compile statically mccs (with lpsolve ILP solver): `make clean && make mccs-static`
+- Compile statically mccs (with lpsolve ILP solver):
+1. Compile lpsolve solver: 
+    1. Go to directory `mccs-1.1/lp_solve_5.5/lp_solve` and run `sh ccc`
+    1. Go to directory `mccs-1.1/lp_solve_5.5/lpsolve55` and run `sh ccc`
+1. You will need to put the libraries in a place where the linker will find them: `cp mccs-1.1/lp_solve_5.5/lpsolve55/bin/ux64/liblpsolve55.* /usr/lib`
+1. Finally compile mccs with `make clean && make mccs-static`
 
 - Use mccs with trendy criterium (without the recommends property): `./mccs -v1 -i input.cudf -leximax[-removed,-notuptodate,-new] &> mccs-trendy.txt`
 
-- Use packup with trendy criterium (without the recommends property): `./packup -t --max-sat --leximax --external-solver 'rc2.py -vv' input.cudf &> packup-trendy.txt`
+- Use packup with trendy criterium (possibly without the recommends property): `./packup -t --max-sat --leximax --external-solver 'rc2.py -vv' input.cudf &> packup-trendy.txt`

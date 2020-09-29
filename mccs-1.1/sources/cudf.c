@@ -14,6 +14,7 @@
 #include <cudf_reductions.h>
 #include <sys/stat.h>
 #include <errno.h>
+#include <rusage.hh>
 
 // underlying solver declaration
 // allows using solvers withour having to include the whole solver classes
@@ -671,10 +672,12 @@ int main(int argc, char *argv[]) {
     unalignedc->check_property(the_problem);
     unalignedc->initialize(problem, solver);
   }
-
+    printf("# solving \n");
+    double st = RUSAGE::read_cpu_time();
   // generate the constraints, solve the problem and print out the solutions
   if ((problem->all_packages->size() > 0) && (generate_constraints(problem, *solver, *combiner) == 0) && (! nosolve) && (solver->solve())) {
-
+    double et = RUSAGE::read_cpu_time();
+    printf("# solving time:%f--%fs\n", et, st);
     solver->init_solutions();
 
     double obj = solver->objective_value();
