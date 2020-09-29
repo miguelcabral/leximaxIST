@@ -1,5 +1,0 @@
-# solving 
-# solving time:0.00145--0.001408s
-# sol printing (0.001478)
-no solution
-# sol printed
