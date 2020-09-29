@@ -1,0 +1,1 @@
+ERROR: cannot open file legacy.cudf as input file.

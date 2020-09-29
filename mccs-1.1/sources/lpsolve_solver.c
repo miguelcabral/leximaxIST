@@ -82,7 +82,7 @@ int lpsolve_solver::solve() {
 		   PRESOLVE_REDUCEMIP | PRESOLVE_REDUCEGCD | PRESOLVE_PROBEFIX | PRESOLVE_PROBEREDUCE, get_presolveloops(lp));
       status = lpsolve(lp);
       CUDFcoefficient objval = objective_value();
-      if (verbosity > 0) printf(">>> Objective %d value : "CUDFflags"\n", k, objval);
+      if (verbosity > 0) printf("# Objective %d value : "CUDFflags"\n", k, objval);
       if (k + 1 < nb_objectives) {	
 	// Build the objective function
 	if (! set_obj_fnex(lps, objectives[k+1]->nb_coeffs, objectives[k+1]->coefficients, objectives[k+1]->sindex)) {
