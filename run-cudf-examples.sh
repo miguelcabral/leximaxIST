@@ -11,9 +11,9 @@ grep '#' "results/m_$(basename "$f")_tmp.out" > "results/m_$(basename "$f").out"
 rm "results/m_$(basename "$f")_tmp.out";) \
 &
 (nohup \
-echo "################### PACKUP ####################" >> "results/p_$(basename "$f")_tmp.out"; \
+echo "################### PACKUP ####################" > "results/p_$(basename "$f")_tmp.out"; \
 # run packup on cudf-file, get the # lines and put append them to cudf-file.out
-./old_packup/packup -t --max-sat --leximax --external-solver 'rc2.py -vv' "$f" \
+./old_packup/packup -t --max-sat --leximax --external-solver '~/thesis/default-solver/RC2/bin/rc2.py -vv' "$f" \
 2>> "results/p_$(basename "$f")_tmp.out" >> "results/p_$(basename "$f")_tmp.out"; \
 grep '#' "results/p_$(basename "$f")_tmp.out" > "results/p_$(basename "$f").out"; \
 rm "results/p_$(basename "$f")_tmp.out";) \
