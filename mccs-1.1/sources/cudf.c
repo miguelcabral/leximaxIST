@@ -744,6 +744,8 @@ int main(int argc, char *argv[]) {
     //if (verbosity > 0) printf(">>>> Objective value = %f.\n", obj);
   } else {
     if (verbosity > 0) fprintf(stdout, "================================================================\n");
+    double et = RUSAGE::read_cpu_time();
+    printf("# solving time:%f--%fs\n", et, st);
     fprintf(stdout, "No solution found.\n");
     fprintf(output_file, "FAIL\n");
     fprintf(output_file, "No solution found.\n");
