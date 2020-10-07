@@ -128,7 +128,7 @@ string convert(T val)
 
 //#define report(x) 
 
-#define read_cputime() RUSAGE::read_cpu_time()
+#define read_cputime() RUSAGE::read_cpu_time_self()
 
 #define prt_std_cputime(x,y) \
   std::cout<<x<<y<<"CPU Time: "<<read_cputime()<<endl

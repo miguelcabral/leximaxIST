@@ -36,7 +36,8 @@
 #include <iostream>
 
 namespace RUSAGE {
-  static inline double read_cpu_time();
+  static inline double read_cpu_time_self();
+  static inline double read_cpu_time_children();
   static inline long read_mem_stats(int fields);
   static inline double read_mem_used();
   static inline void print_cpu_time(const char* msg, ostream& outs=std::cout);
@@ -44,9 +45,15 @@ namespace RUSAGE {
 }
 
 
-static inline double RUSAGE::read_cpu_time()
+static inline double RUSAGE::read_cpu_time_self()
 {
   struct rusage ru; getrusage(RUSAGE_SELF, &ru);
+  return (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000;
+}
+
+static inline double RUSAGE::read_cpu_time_children()
+{
+  struct rusage ru; getrusage(RUSAGE_CHILDREN, &ru);
   return (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000;
 }
 
@@ -73,7 +80,7 @@ static inline double RUSAGE::read_mem_used()
 
 static inline void RUSAGE::print_cpu_time(const char* msg, ostream& outs)
 {
-  outs << msg << ": "<< RUSAGE::read_cpu_time() << endl;
+  outs << msg << ": "<< RUSAGE::read_cpu_time_self() << endl;
 }
 
 static inline void RUSAGE::print_mem_used(const char* msg, ostream& outs)

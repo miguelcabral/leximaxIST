@@ -1402,10 +1402,14 @@ bool Encoder::solution() {
         return false;
     }
     cerr << "# solving " << endl;
-    double st = RUSAGE::read_cpu_time();
     const bool has_solution = solver.solve();
-    double et = RUSAGE::read_cpu_time();
-    cerr << "# solving time:" << et << "--" << st << "s" << endl;
+    double parent_time = RUSAGE::read_cpu_time_self();
+    double children_time (RUSAGE::read_cpu_time_children());
+    double total_time (parent_time + children_time);
+    cerr << "# solving time:\n";
+    cerr << "#\t time to read cudf instance and do the encodings: " << parent_time << "s\n";
+    cerr << "#\t time spent by the MaxSAT or PBO solver: " << children_time << "s\n";
+    cerr << "#\t total time: " << total_time << "s" << endl;
     print_solution();
     return has_solution;
 }
@@ -1414,7 +1418,7 @@ void Encoder::print_solution() {
     if (printing_started_or_finished) return;
     printing_started_or_finished = true;
     ostream& solution_file((psolution_file==NULL) ? cout : *psolution_file);
-    cerr << "# sol printing (" << RUSAGE::read_cpu_time() << ")" << endl;
+    cerr << "# sol printing (" << RUSAGE::read_cpu_time_self() << ")" << endl;
     const bool has_solution = solver.has_solution();
     if (has_solution) {
         solution_file << "# beginning of solution from packup" << endl;
