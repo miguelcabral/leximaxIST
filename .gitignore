@@ -1,4 +1,2 @@
 *.o
-cudf-examples
 examples/*
-results/*
