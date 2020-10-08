@@ -1418,7 +1418,7 @@ void Encoder::print_solution() {
     if (printing_started_or_finished) return;
     printing_started_or_finished = true;
     ostream& solution_file((psolution_file==NULL) ? cout : *psolution_file);
-    cerr << "# sol printing (" << RUSAGE::read_cpu_time_self() << ")" << endl;
+    cerr << "# sol printing" << endl;
     const bool has_solution = solver.has_solution();
     if (has_solution) {
         solution_file << "# beginning of solution from packup" << endl;
