@@ -17,16 +17,12 @@ else
 	CCFLAGS+=-O3
 endif
 
-.PHONY: all info clean
-
-all: info
-
-info: libleximax.a
-	$(info DBG Mode : $(DBG))
+.PHONY: clean
 
 libleximax.a : $(COBJS)
 	@echo Archiving: $(COBJS)
 	ar -rcs libleximax.a $(COBJS)
+	rm -f *.o
 
 $(COBJS1): %.o: %.cc
 	@echo Compiling: $@

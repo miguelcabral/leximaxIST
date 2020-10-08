@@ -19,6 +19,7 @@ Leximax_encoder::Leximax_encoder(Options &options) :
     m_multiplication_string(options.m_multiplication_string),
     m_optimum(options.m_num_objectives, 0),
     m_solution(),
+    m_sorting_net_size(0),
     // verification:
     m_pienum_file_name()        
 {

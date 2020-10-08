@@ -31,3 +31,5 @@ p cnf 3 3
 - Use mccs with trendy criterium (without the recommends property): `./mccs -v1 -i input.cudf -leximax[-removed,-notuptodate,-new] &> mccs-trendy.txt`
 
 - Use packup with trendy criterium (possibly without the recommends property): `./packup -t --max-sat --leximax --external-solver 'rc2.py -vv' input.cudf &> packup-trendy.txt`
+
+- Get Mancoosi benchmarks: wget -q -r -l 1 -nd http://data.mancoosi.org/misc2011/problems/dudf-random

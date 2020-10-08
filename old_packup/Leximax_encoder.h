@@ -37,6 +37,7 @@ private:
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
     std::vector<LINT> m_solution;
+    size_t m_sorting_net_size;
     
 public:    
 
@@ -50,6 +51,8 @@ public:
     void solve();
     
     bool get_sat() { return m_sat; }
+    
+    size_t get_sorting_net_size() { return m_sorting_net_size; }
     
     std::vector<LINT>& get_solution() { return m_solution; }
     

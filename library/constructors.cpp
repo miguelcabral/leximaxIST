@@ -28,7 +28,8 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_debug(false),
     m_multiplication_string("*"),
     m_optimum(objective_functions.size(), 0),
-    m_solution()
+    m_solution(),
+    m_sorting_net_size(0)
 {
     for (std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count

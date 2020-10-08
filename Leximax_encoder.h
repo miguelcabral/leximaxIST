@@ -40,6 +40,7 @@ private:
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
     std::vector<LINT> m_solution;
+    size_t m_sorting_net_size; // number of comparators
     // verification:
     std::string m_pienum_file_name;
     
