@@ -1407,8 +1407,8 @@ bool Encoder::solution() {
     double children_time (RUSAGE::read_cpu_time_children());
     double total_time (parent_time + children_time);
     cerr << "# solving time:\n";
-    cerr << "#\t time to read cudf instance and do the encodings: " << parent_time << "s\n";
-    cerr << "#\t time spent by the MaxSAT or PBO solver: " << children_time << "s\n";
+    cerr << "#\t parent process: " << parent_time << "s\n";
+    cerr << "#\t child processes: " << children_time << "s\n";
     cerr << "#\t total time: " << total_time << "s" << endl;
     print_solution();
     return has_solution;
