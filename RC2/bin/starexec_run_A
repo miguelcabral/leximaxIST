@@ -1,3 +1,0 @@
-#!/bin/bash
-
-./rc2.py -c a $1
