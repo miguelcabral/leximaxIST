@@ -1,4 +1,2 @@
 *.o
 examples/*
-or-tools/*
-mccs-1.1/objs/*
