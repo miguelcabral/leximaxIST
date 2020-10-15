@@ -2,6 +2,11 @@
 PATHRC2="~/thesis/default-solver/RC2/bin/rc2.py -vv" # change this if necessary 
 for f in cudf-examples/*.cudf
 do
+    if ! [ -f "$FILE" ]; then
+        
+    else 
+        echo "$FILE does not exist."
+    fi
     TMPFILE=results/p_$(basename $f)_tmp.out
     RESFILE=results/p_$(basename $f).out
     echo "################### PACKUP ####################" > $TMPFILE
