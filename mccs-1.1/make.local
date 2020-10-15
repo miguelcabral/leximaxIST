@@ -28,7 +28,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
-USELPSOLVE=1
+#USELPSOLVE=1
 
 
 ifeq ($(USELPSOLVE),1)
@@ -51,19 +51,19 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-#USECPLEX=1
+USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)
 
 # Path to the CPLEX main dir
-CPXDIR=/usr/local/ilog_academic/cplex_studio_12.2
+CPXDIR=/home/mcabral/solvers/CPLEX_Studio1210
 
 # path to cplex include directory
 CPXINC=$(CPXDIR)/cplex/include/
 
 # path to cplex library
-CPXLIB=$(CPXDIR)/cplex/lib/x86-64_sles10_4.1/static_pic
+CPXLIB=$(CPXDIR)/cplex/lib/x86-64_linux/static_pic
 
 # cplex ld flags
 CPXLD=-L$(CPXLIB) -lcplex -lm -lpthread
