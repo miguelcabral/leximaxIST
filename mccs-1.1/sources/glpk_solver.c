@@ -72,12 +72,12 @@ int glpk_solver::solve() {
     glp_cpx_basis(lp);
   
     if (status == 0) status = glp_intopt(lp, &mip_params);
-
-    if (k + 1 < nb_objectives) {
-      // Get objective value
-      CUDFcoefficient objval = objective_value();
-
-      if (verbosity > 0) printf(">>> Objective %d value : "CUDFflags"\n", k, objval);
+    
+    // Get objective value
+    CUDFcoefficient objval = objective_value();
+    if (verbosity > 0) printf("# Objective %d value : "CUDFflags"\n", k, objval);
+    
+    if (k + 1 < nb_objectives) {     
 
       // Reset objective i coefficients
       for (int i = 1; i < objectives[k]->nb_coeffs + 1; i++) 

@@ -1,9 +1,29 @@
-f=$1 # input cudf file
-PATHRC2="~/thesis/default-solver/RC2/bin/rc2.py -vv" # change this if necessary
-TMPFILE=results/p_$(basename $f)_tmp.out
-RESFILE=results/p_$(basename $f).out
-echo "################### PACKUP ####################" > $TMPFILE
-# run packup on f, get the # lines and put them on p_f.out in /results directory
-timeout -s SIGKILL 20m ./old_packup/packup -t --max-sat --leximax --external-solver \
-"$PATHRC2" $f >> $TMPFILE 2>> $TMPFILE
-grep '#' $TMPFILE > $RESFILE
+# BENCHMARK is provided by the input: misc-live, misc2010, misc2011, misc2012, ...
+BENCHMARK=$1
+# CRITERION is the user criterion for optimisation:
+CRITERION=$2
+# SOLVERCMD is the solver command
+SOLVERCMD=$3
+# SOLVERNAME is the name of the solver
+SOLVERNAME=$4
+# MAXSAT is a string that tells the solver whether to solve MaxSAT or PBO
+MAXSAT=$5
+# INSTANCE is the input cudf instance
+INSTANCE=$6
+# SOLUTION contains the solution of the problem; this can be checked using the solution checker
+SOLUTION=/home/mcabral/data/tmp/$BENCHMARK/p_$SOLVERNAME_$(basename $INSTANCE).sol
+if ! [ -f "$SOLUTION" ]; then
+    touch $SOLUTION
+    # INFO contains the time measured by packup and the objective vector
+    INFO=/home/mcabral/data/tmp/$BENCHMARK/p_$SOLVERNAME_$(basename $INSTANCE).info
+    # STATS contains the measurements taken by runsolver during the execution
+    STATS=/home/mcabral/data/tmp/$BENCHMARK/p_$SOLVERNAME_$(basename $INSTANCE).stats
+    # run packup
+    if [ "$MAXSAT" = "max-sat" ]; then
+        ./home/mcabral/runsolver -V 4000 -C 1200 -d 10 -w $STATS ./home/mcabral/thesis/old_packup/packup \
+-u "$CRITERION" --max-sat --leximax --external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
+    else
+        ./home/mcabral/runsolver -V 4000 -C 1200 -d 10 -w $STATS ./home/mcabral/thesis/old_packup/packup \
+-u "$CRITERION" --leximax --external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
+    fi
+fi

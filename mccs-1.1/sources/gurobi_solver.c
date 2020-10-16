@@ -135,11 +135,13 @@ int gurobi_solver::solve() {
 	  if (nexti_nb_coeffs > 0) break;
 	}
 
+	if (verbosity > 0) printf("# Objective value %d = %f\n", previ, objective_value());
+	
 	if (nexti_nb_coeffs > 0) { // there is one more objective to solve
 	  // Set objective constraint value to objval
 	  double objval = objective_value();
 	  
-	  if (verbosity > 0) printf(">>>> Objective value %d = %f\n", previ, objval);
+	  
 
 	  if (GRBaddconstr(model, objectives[previ]->nb_coeffs, objectives[previ]->sindex, objectives[previ]->coefficients, GRB_EQUAL, objval, NULL)) {
 	    fprintf(stderr, "gurobi_solver: end_objective: cannot add %d objective as constraint.\n", i); 

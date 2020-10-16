@@ -184,6 +184,9 @@ int cplex_solver::solve() {
 	  if (nexti_nb_coeffs > 0) break;
 	}
 
+    if (verbosity > 0)
+	    printf("# Objective value %d = %f\n", previ, objective_value());
+    
 	if (nexti_nb_coeffs > 0) { // there is one more objective to solve
 	  // Set objective constraint value to objval
 	  int index[1];
@@ -191,9 +194,6 @@ int cplex_solver::solve() {
 	  
 	  index[0] = previ;
 	  values[0] = objective_value(); 
-	  
-	  if (verbosity > 0)
-	    printf(">>>> Objective value %d = %f\n", previ, values[0]);
 
 	  {
 	    int status, begin[2];
