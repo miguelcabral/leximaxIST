@@ -20,10 +20,12 @@ if ! [ -f "$SOLUTION" ]; then
     STATS=/home/mcabral/data/tmp/$BENCHMARK/p_$SOLVERNAME_$(basename $INSTANCE).stats
     # run packup
     if [ "$MAXSAT" = "max-sat" ]; then
-        ./home/mcabral/runsolver -V 4000 -C 1200 -d 10 -w $STATS ./home/mcabral/thesis/old_packup/packup \
--u "$CRITERION" --max-sat --leximax --external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
+        ./home/mcabral/runsolver/src/runsolver -V 4000 -C 1200 -d 10 -w $STATS \
+./home/mcabral/thesis/old_packup/packup -u "$CRITERION" --max-sat --leximax \
+--external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
     else
-        ./home/mcabral/runsolver -V 4000 -C 1200 -d 10 -w $STATS ./home/mcabral/thesis/old_packup/packup \
--u "$CRITERION" --leximax --external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
+        ./home/mcabral/runsolver/src/runsolver -V 4000 -C 1200 -d 10 -w $STATS \
+./home/mcabral/thesis/old_packup/packup -u "$CRITERION" --leximax \
+--external-solver "$SOLVER" $INSTANCE $SOLUTION 2> $INFO
     fi
 fi

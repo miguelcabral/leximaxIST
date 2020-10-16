@@ -15,7 +15,6 @@ if ! [ -f "$SOLUTION" ]; then
     # STATS contains the measurements taken by runsolver during the execution
     STATS=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).stats
     # run mccs
-    ./home/mcabral/runsolver -V 4000 -C 1200 -d 10 -w $STATS ./home/mcabral/thesis/mccs-1.1/mccs \
--v1 -i $INSTANCE -o $SOLUTION -leximax[$CRITERION] 2> $INFO
+    ./home/mcabral/runsolver/src/runsolver -V 4000 -C 1200 -d 10 -w $STATS \
+./home/mcabral/thesis/mccs-1.1/mccs -v1 -i $INSTANCE -o $SOLUTION -leximax[$CRITERION] 2> $INFO
 fi
-
