@@ -89,10 +89,10 @@ GUROBIDIR=/home/mcabral/solvers/mccs/gurobi903/linux64
 GUROBIINC=$(GUROBIDIR)/include/ 
 
 # path to gurobi library
-GUROBILIB=$(GUROBIDIR)/lib/
+GUROBILIB=$(GUROBIDIR)/src/build/
 
 # gurobi ld flags
-GUROBILD=-L$(GUROBILIB) -lgurobi_g++5.2 -lpthread -lm -Wl,-rpath,$(GUROBILIB)
+GUROBILD=-L$(GUROBILIB) -lgurobi_c++ -lpthread -lm -Wl,-rpath,$(GUROBILIB)
 
 endif
 
