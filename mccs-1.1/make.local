@@ -83,7 +83,7 @@ endif
 ifeq ($(USEGUROBI),1)
 
 # Path to the main GUROBI dir
-GUROBIDIR=/usr/local/gurobi/gurobi451/linux64
+GUROBIDIR=/home/mcabral/solvers/mccs/gurobi903/linux64
 
 # path to gurobi include directory
 GUROBIINC=$(GUROBIDIR)/include/ 
@@ -92,7 +92,7 @@ GUROBIINC=$(GUROBIDIR)/include/
 GUROBILIB=$(GUROBIDIR)/lib/
 
 # gurobi ld flags
-GUROBILD=-L$(GUROBILIB) -lgurobi45 -lpthread -lm -Wl,-rpath,$(GUROBILIB)
+GUROBILD=-L$(GUROBILIB) -lgurobi_c++ -lpthread -lm -Wl,-rpath,$(GUROBILIB)
 
 endif
 
