@@ -21,11 +21,11 @@ if ! [ -f "$SOLUTION" ]; then
     # run packup
     if [ "$MAXSAT" = "max-sat" ]; then
         /home/mcabral/runsolver/src/runsolver --vsize-limit 4000 -C 1200 -d 10 -w $STATS \
-/home/mcabral/thesis/old_packup/packup -u "$CRITERION" --max-sat --leximax \
---external-solver "$SOLVERCMD" $INSTANCE $SOLUTION 2> $INFO
+(/home/mcabral/thesis/old_packup/packup -u "$CRITERION" --max-sat --leximax \
+--external-solver "$SOLVERCMD" $INSTANCE $SOLUTION 2> $INFO)
     else
         /home/mcabral/runsolver/src/runsolver --vsize-limit 4000 -C 1200 -d 10 -w $STATS \
-/home/mcabral/thesis/old_packup/packup -u "$CRITERION" --leximax \
---external-solver "$SOLVERCMD" $INSTANCE $SOLUTION 2> $INFO
+(/home/mcabral/thesis/old_packup/packup -u "$CRITERION" --leximax \
+--external-solver "$SOLVERCMD" $INSTANCE $SOLUTION 2> $INFO)
     fi
 fi
