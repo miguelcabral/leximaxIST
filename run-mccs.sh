@@ -10,11 +10,9 @@ INSTANCE=$4
 SOLUTION=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).sol
 if ! [ -f "$SOLUTION" ]; then
     touch $SOLUTION
-    # INFO contains the time measured by packup and the objective vector
-    INFO=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).info
     # STATS contains the measurements taken by runsolver during the execution
     STATS=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).stats
     # run mccs
-    /home/mcabral/runsolver/src/runsolver -V 4000 -C 1200 -d 10 -w $STATS \
-/home/mcabral/thesis/mccs-1.1/mccs -v1 -i $INSTANCE -o $SOLUTION -leximax[$CRITERION] 2> $INFO
+    /home/mcabral/runsolver/src/runsolver -V 4000 -C 1200 -d 10 -w $STATS -o $SOLUTION \
+/home/mcabral/thesis/mccs-1.1/mccs -v1 -i $INSTANCE -leximax[$CRITERION]
 fi
