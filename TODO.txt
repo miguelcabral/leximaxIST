@@ -8,4 +8,6 @@ Test with CUDF examples.
 Collect results.
 Finish thesis.
 
+Stuff: handle signals: must remove temporary files created by leximax library
+
 Improvements: Incremental MaxSAT? Encoding of comparators - should we put the equivalence? Or implication suffices? Dealing with time restrictions - approximation tecniques? In each iteration we have guarantee of minimising the first maxima.
