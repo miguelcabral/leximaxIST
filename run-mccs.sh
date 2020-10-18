@@ -7,11 +7,11 @@ SOLVERNAME=$3
 # INSTANCE is the input cudf instance
 INSTANCE=$4
 # SOLUTION contains the solution of the problem; this can be checked using the solution checker
-SOLUTION=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).sol
+SOLUTION=/home/mcabral/data/tmp/$BENCHMARK/m_"$SOLVERNAME"_$(basename $INSTANCE).sol
 if ! [ -f "$SOLUTION" ]; then
     touch $SOLUTION
     # STATS contains the measurements taken by runsolver during the execution
-    STATS=/home/mcabral/data/tmp/$BENCHMARK/m_$SOLVERNAME_$(basename $INSTANCE).stats
+    STATS=/home/mcabral/data/tmp/$BENCHMARK/m_"$SOLVERNAME"_$(basename $INSTANCE).stats
     # run mccs
     /home/mcabral/runsolver/src/runsolver --vsize-limit 4000 -C 1200 -d 10 -w $STATS -o $SOLUTION \
 /home/mcabral/thesis/mccs-1.1/mccs -v1 -i $INSTANCE -leximax[$CRITERION]
