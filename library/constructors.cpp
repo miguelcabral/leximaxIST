@@ -1,6 +1,8 @@
 #include "Leximax_encoder.h"
-#include <time.h>
 #include <sstream>
+#include <sys/types.h>
+#include <unistd.h>
+
 
 void Leximax_encoder::update_id_count(std::vector<LINT> &clause)
 {
@@ -62,6 +64,6 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     }
     // name for temporary files
     stringstream strstr;
-    strstr << time(NULL);
+    strstr << getpid();
     m_input_name = strstr.str();
 }
