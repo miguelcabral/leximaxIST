@@ -90,9 +90,9 @@ void Leximax_encoder::write_pbconstraint(BasicClause *cl, ostream& output) {
 void Leximax_encoder::write_atmost_pb(int i, ostream &output)
 {
     for (LINT var : m_relax_vars) {
-        output << "+1" << m_multiplication_string << "x" << var << " ";
+        output << "-1" << m_multiplication_string << "x" << var << " ";
     }
-    output << " <= " << i << ";\n";
+    output << " >= " << -i << ";\n";
 }
 
 void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
