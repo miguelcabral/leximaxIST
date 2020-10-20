@@ -31,6 +31,15 @@ LIBS+=-lz
 
 .PHONY: build all objs
 
+ifdef PROF
+CFLAGS+=-fprofile-arcs -ftest-coverage
+CFLAGS+=-pg
+CFLAGS+=-g
+LNFLAGS+=-fprofile-arcs
+LNFLAGS+=-pg
+LNFLAGS+=-g
+endif
+
 all: $(XTRGT)
 
 $(XTRGT): objs 
