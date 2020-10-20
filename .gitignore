@@ -1,2 +1,5 @@
 *.o
 examples/*
+*.gcda
+*.gcno
+gmon.out
