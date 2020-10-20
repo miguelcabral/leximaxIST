@@ -43,12 +43,19 @@ else
   CPXLD =
 endif
 
+$(info GUROBILD : $(GUROBILD))
+
+$(info USEGUROBI : $(USEGUROBI))
 ifeq ($(USEGUROBI),1)
   OBJS += $(OBJDIR)/gurobi_solver.o
   CCC += -DUSEGUROBI
 else
   GUROBILD =
 endif
+# gurobi build:
+# miguel: eu retirei a opcao -lfl antes de -L.
+mccs-gurobi:  $(OBJS) libccudf.a
+	$(CCC) -o mccs $(OBJS) -L. -lccudf $(GUROBILD)
 
 # to make mccs solver
 mccs:  $(OBJS) libccudf.a
@@ -70,10 +77,10 @@ mccs-light:  $(OBJS) libccudf.so
 mccs-static: $(OBJS) libccudf.a
 	$(CCC) -o mccs -static $(OBJS) -lfl -L. -lccudf \
 		$(CPXLD) \
+		$(GUROBILD) \
 		$(LPSOLVELD) \
 		$(GLPKLD) \
 		-ldl
-
 
 #----------------------------------------------------------------------------------
 

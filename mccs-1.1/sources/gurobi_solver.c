@@ -124,6 +124,8 @@ int gurobi_solver::solve() {
     if (status) { exit(-1); }
 
     if (mipstat == GRB_OPTIMAL) {
+      double obj_value = objective_value();
+      if (verbosity > 0) printf("# Objective value %d = %f\n", i, obj_value);
       if (i < nb_objectives - 1) {
 	// Get next non empty objective
 	// (must be done here to avoid conflicting method calls
@@ -135,8 +137,6 @@ int gurobi_solver::solve() {
 	  if (nexti_nb_coeffs > 0) break;
 	}
 
-	if (verbosity > 0) printf("# Objective value %d = %f\n", previ, objective_value());
-	
 	if (nexti_nb_coeffs > 0) { // there is one more objective to solve
 	  // Set objective constraint value to objval
 	  double objval = objective_value();

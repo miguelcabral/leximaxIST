@@ -4,6 +4,6 @@
 # first parameter = CUDF problem
 # second parameter = solution file
 
-mccs -i $1 -o $2 -lexagregate[-removed,-changed]
+./mccs -i $1 -o $2 -lexagregate[-removed,-changed]
 
 
