@@ -212,6 +212,7 @@ int lp_solver::solve() {
 
     // If we are here with a status = -1, then we were enable to read the solution (or the infeasability)
     if (status == -1) {
+        printf("# --------------------------- command[0] = %s\n",command[0]);
       fprintf(stderr, "ERROR: Cannot read solution from lp solver.\n");
       exit(-1);
     }
