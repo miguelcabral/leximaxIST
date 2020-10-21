@@ -118,10 +118,11 @@ int lp_solver::solve() {
     }
     
     status = -1;
-    while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
-      printf("# --------------------------- command[0] = %c\n",command[0]);
+    fgets(command, 1000, fsol);
+    if (command != NULL) {
       switch (command[0]) {
       case 'S': // scip ?
+        while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
           printf("No sitio certo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	if (strncmp(command, "primal solution:", 16) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL)  // read ===========
@@ -159,8 +160,10 @@ int lp_solver::solve() {
 	    exit(-1);
 	  }
 	}
+        }
 	break;
       case 'C':  // COIN or CPLEX ?
+          while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
 	if ((strncmp(command, "Coin:Infeasible - objective value", 33) == 0) ||
 	    (strncmp(command, "CPLEX> MIP - Integer infeasible.", 32) == 0))
 	  status = 0;
@@ -210,7 +213,8 @@ int lp_solver::solve() {
 	  }
 	}
 	break;
-      }
+          }
+    }
     }
 
     // If we are here with a status = -1, then we were enable to read the solution (or the infeasability)
