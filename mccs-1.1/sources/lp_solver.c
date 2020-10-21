@@ -116,11 +116,11 @@ int lp_solver::solve() {
       fprintf(stderr, "Cannot open solution file \"%s\".\n", lpoutfilename);
       exit(-1);
     }
-      
+    
     status = -1;
     while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
       switch (command[0]) {
-      case 's': // scip ?
+      case 'S': // scip ?
 	if (strncmp(command, "primal solution:", 16) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL)  // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
@@ -212,7 +212,7 @@ int lp_solver::solve() {
 
     // If we are here with a status = -1, then we were enable to read the solution (or the infeasability)
     if (status == -1) {
-        printf("# --------------------------- command[0] = %s\n",command[0]);
+        printf("# --------------------------- command[0] = %c\n",command[0]);
       fprintf(stderr, "ERROR: Cannot read solution from lp solver.\n");
       exit(-1);
     }
