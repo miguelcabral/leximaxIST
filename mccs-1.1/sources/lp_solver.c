@@ -118,7 +118,8 @@ int lp_solver::solve() {
     }
     
     status = -1;
-    while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
+    while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
+      printf("# --------------------------- command[0] = %c\n",command[0]);
       switch (command[0]) {
       case 'S': // scip ?
 	if (strncmp(command, "primal solution:", 16) == 0) {
@@ -209,10 +210,10 @@ int lp_solver::solve() {
 	}
 	break;
       }
+    }
 
     // If we are here with a status = -1, then we were enable to read the solution (or the infeasability)
     if (status == -1) {
-        printf("# --------------------------- command[0] = %c\n",command[0]);
       fprintf(stderr, "ERROR: Cannot read solution from lp solver.\n");
       exit(-1);
     }
