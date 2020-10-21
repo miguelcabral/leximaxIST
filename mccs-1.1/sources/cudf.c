@@ -551,11 +551,11 @@ int main(int argc, char *argv[]) {
 	nosolve = true;
       } else if (strcmp(argv[i], "-lp") == 0) {
 	if (++i < argc) {
-	  struct stat sts;
+	  /*struct stat sts;
 	  if (stat(argv[i], &sts) == -1 && errno == ENOENT) {
 	    fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver> and %s does not exist.\n", argv[i]);
 	    exit(-1);
-	  } else
+	  } else*/
 	    solver = new_lp_solver(argv[i]);
 	} else {
 	  fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver>\n");
