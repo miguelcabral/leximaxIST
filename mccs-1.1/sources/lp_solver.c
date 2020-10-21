@@ -122,6 +122,7 @@ int lp_solver::solve() {
       printf("# --------------------------- command[0] = %c\n",command[0]);
       switch (command[0]) {
       case 'S': // scip ?
+          printf("No sitio certo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
 	if (strncmp(command, "primal solution:", 16) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL)  // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
