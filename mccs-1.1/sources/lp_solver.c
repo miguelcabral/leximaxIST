@@ -120,7 +120,7 @@ int lp_solver::solve() {
     status = -1;
     while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
       switch (command[0]) {
-      case 'p': // scip ?
+      case 's': // scip ?
 	if (strncmp(command, "primal solution:", 16) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL)  // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
