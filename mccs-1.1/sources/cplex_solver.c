@@ -173,6 +173,10 @@ int cplex_solver::solve() {
   
     // Get solution status
     if ((mipstat = CPXgetstat(env, lp)) == CPXMIP_OPTIMAL) {
+    if (verbosity > 0) {
+        double obj_val = objective_value();
+	printf("# Objective value %d = %f\n", i, obj_val);
+    }
       if (i < nb_objectives - 1) {
 	// Get next non empty objective
 	// (must be done here to avoid conflicting method calls
@@ -184,11 +188,6 @@ int cplex_solver::solve() {
 	  if (nexti_nb_coeffs > 0) break;
 	}
 
-    if (verbosity > 0) {
-        double obj_val = objective_value();
-	    printf("# Objective value %d = %f\n", previ, obj_val);
-    }
-    
 	if (nexti_nb_coeffs > 0) { // there is one more objective to solve
 	  // Set objective constraint value to objval
 	  int index[1];
