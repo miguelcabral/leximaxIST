@@ -34,7 +34,8 @@ typedef vector<PackageVersions> VersionsList;
 typedef vector<PackageVersions>  PackageVersionsList;
 typedef vector<PackageVersionsList*> PackageVersionsCNF;
 typedef vector<PackageVersion> PackageVersionList;
-typedef unordered_map<const char*, string, strhash, streq > Str2Str;
+typedef unordered_map<string, string> Str2Str;
+/*typedef unordered_map<const char*, string, strhash, streq > Str2Str;*/
 typedef unordered_map<PackageVersion, Variable, hash_package_version, eq_package_version> PackageVersionMap;
 typedef unordered_map<Variable,PackageVersion> VariableToPackageVersion;
 typedef vector<Version> VersionVector;
