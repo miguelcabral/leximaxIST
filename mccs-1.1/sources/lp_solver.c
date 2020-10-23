@@ -122,10 +122,11 @@ int lp_solver::solve() {
     if (command != NULL) {
       switch (command[0]) {
       case 'S': // scip ?
-        while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
           printf("No sitio certo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
+        while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
+            printf("%s\n",*command);
 	if (strncmp(command, "primal solution:", 16) == 0) {
-	  if (fgets(command, 1000, fsol) != NULL)  // read ===========
+	  if (fgets(command, 1000, fsol) != NULL) // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
 	      if (fgets(command, 1000, fsol) != NULL) { // read objective value or no solution
 		if (strncmp(command, "objective value:", 16) == 0) {
