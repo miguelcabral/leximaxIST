@@ -1,0 +1,7 @@
+/home/mcabral/data/benchmarks/mancoosi/misc-live/problems/rand986.sarge-etch.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc-live/problems/rand815.sarge.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc2011/978532fa-c730-11df-b070-00163e3d3b7c.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc2012/install/rand308.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc2010/huge1.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc2011/rand59.cudf
+/home/mcabral/data/benchmarks/mancoosi/misc2011/rand475.cudf

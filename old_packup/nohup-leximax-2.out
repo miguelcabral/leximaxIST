@@ -1,0 +1,18 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# solving 
+# Number of comparators of sorting network: 193666
+# Optimum sorted objective vector: 0 0 
+# solving time:
+#	 parent process: 97.9655s
+#	 child processes: 125.806s
+#	 total time: 223.771s
+# sol printing
+no solution
+FAIL
+no solution (UNSAT)
+# sol printed

@@ -1,0 +1,3639 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# solving 
+Vacuously SAT cl: -1128 1128 
+
+Vacuously SAT cl: -34 34 
+
+Vacuously SAT cl: -361 361 
+
+Vacuously SAT cl: -501 501 
+
+Vacuously SAT cl: -12 12 
+
+# Number of comparators of sorting network: 33826
+# Optimum sorted objective vector: 117 0 
+# solving time:
+#	 parent process: 2.6495s
+#	 child processes: 2.33957s
+#	 total time: 4.98907s
+# sol printing
+# beginning of solution from packup
+package: ipchains
+version: 1
+installed: true
+
+package: kdeartwork-misc
+version: 1
+installed: true
+
+package: kdeartwork
+version: 2
+installed: true
+
+package: dhcp-client
+version: 2
+installed: true
+
+package: libvorbis-ocaml-dev
+version: 1
+installed: true
+
+package: secpolicy
+version: 1
+installed: true
+
+package: vimpart
+version: 1
+installed: true
+
+package: ksig
+version: 1
+installed: true
+
+package: kicker-applets
+version: 1
+installed: true
+
+package: man-db
+version: 5
+installed: true
+
+package: kdeaddons
+version: 2
+installed: true
+
+package: libpt-plugins-oss
+version: 1
+installed: true
+
+package: gnomemeeting
+version: 2
+installed: true
+
+package: esound
+version: 3
+installed: true
+
+package: xmms
+version: 9
+installed: true
+
+package: libarts1-mpeglib
+version: 1
+installed: true
+
+package: juk
+version: 2
+installed: true
+
+package: manpages
+version: 5
+installed: true
+
+package: bsdmainutils
+version: 4
+installed: true
+
+package: fam
+version: 1
+installed: true
+
+package: xlibmesa-dri
+version: 1
+installed: true
+
+package: gksu
+version: 7
+installed: true
+
+package: menu
+version: 13
+installed: true
+
+package: apt-utils
+version: 3
+installed: true
+
+package: gcalctool
+version: 3
+installed: true
+
+package: kaddressbook-plugins
+version: 1
+installed: true
+
+package: python2.3-gtk2
+version: 5
+installed: true
+
+package: python-gtk2
+version: 13
+installed: true
+
+package: logrotate
+version: 5
+installed: true
+
+package: libgsf-1-dev
+version: 3
+installed: true
+
+package: ksysv
+version: 1
+installed: true
+
+package: kaudiocreator
+version: 1
+installed: true
+
+package: gnome-media
+version: 2
+installed: true
+
+package: libopenh323-1.15.2
+version: 2
+installed: true
+
+package: kdeartwork-theme-window
+version: 1
+installed: true
+
+package: kcmlinuz
+version: 1
+installed: true
+
+package: libmlgtk-ocaml
+version: 1
+installed: true
+
+package: libmlgtk-ocaml-dev
+version: 1
+installed: true
+
+package: gtk2-engines-mist
+version: 2
+installed: true
+
+package: noatun-plugins
+version: 1
+installed: true
+
+package: gtk2-engines-redmond95
+version: 3
+installed: true
+
+package: gnome-themes
+version: 5
+installed: true
+
+package: ktouch
+version: 1
+installed: true
+
+package: kpercentage
+version: 1
+installed: true
+
+package: kmessedwords
+version: 1
+installed: true
+
+package: kig
+version: 1
+installed: true
+
+package: keduca
+version: 1
+installed: true
+
+package: kdeedu-data
+version: 1
+installed: true
+
+package: kalzium
+version: 1
+installed: true
+
+package: abiword-common
+version: 2
+installed: true
+
+package: libboost-python1.32.0
+version: 1
+installed: true
+
+package: groff-base
+version: 3
+installed: true
+
+package: kmix
+version: 1
+installed: true
+
+package: kdeadmin
+version: 2
+installed: true
+
+package: rhythmbox
+version: 2
+installed: true
+
+package: libarts1-audiofile
+version: 1
+installed: true
+
+package: cpio
+version: 3
+installed: true
+
+package: libmusicbrainz4
+version: 2
+installed: true
+
+package: kdeadmin-kfile-plugins
+version: 1
+installed: true
+
+package: gnumeric-common
+version: 1
+installed: true
+
+package: libocamlgraph-ocaml-dev
+version: 1
+installed: true
+
+package: file-roller
+version: 2
+installed: true
+
+package: ksnake
+version: 1
+installed: true
+
+package: ksmiletris
+version: 1
+installed: true
+
+package: ksame
+version: 1
+installed: true
+
+package: kreversi
+version: 1
+installed: true
+
+package: kpoker
+version: 1
+installed: true
+
+package: kpat
+version: 1
+installed: true
+
+package: kolf
+version: 1
+installed: true
+
+package: klines
+version: 1
+installed: true
+
+package: kbounce
+version: 1
+installed: true
+
+package: kdegames
+version: 2
+installed: true
+
+package: gnome-system-tools
+version: 2
+installed: true
+
+package: kate-plugins
+version: 1
+installed: true
+
+package: libgtop2-2
+version: 1
+installed: true
+
+package: artsbuilder
+version: 4
+installed: true
+
+package: libgtk1.2-dev
+version: 5
+installed: true
+
+package: xfonts-base
+version: 7
+installed: true
+
+package: gnome-games-data
+version: 2
+installed: true
+
+package: tasksel
+version: 3
+installed: true
+
+package: krec
+version: 1
+installed: true
+
+package: libsamplerate0
+version: 1
+installed: true
+
+package: akode
+version: 1
+installed: true
+
+package: kgoldrunner
+version: 1
+installed: true
+
+package: klatin
+version: 1
+installed: true
+
+package: ksync
+version: 1
+installed: true
+
+package: libkpimexchange1
+version: 2
+installed: true
+
+package: korganizer
+version: 5
+installed: true
+
+package: kpackage
+version: 2
+installed: true
+
+package: kmailcvt
+version: 1
+installed: true
+
+package: pinentry-qt
+version: 1
+installed: true
+
+package: kdepim-wizards
+version: 1
+installed: true
+
+package: kdepim-kio-plugins
+version: 1
+installed: true
+
+package: kdepim-kfile-plugins
+version: 1
+installed: true
+
+package: kdepim
+version: 2
+installed: true
+
+package: ksirc
+version: 1
+installed: true
+
+package: kppp
+version: 1
+installed: true
+
+package: kpf
+version: 1
+installed: true
+
+package: libgadu3
+version: 2
+installed: true
+
+package: knewsticker
+version: 1
+installed: true
+
+package: kdict
+version: 1
+installed: true
+
+package: librss1
+version: 1
+installed: true
+
+package: bluefish
+version: 1
+installed: true
+
+package: gnome-about
+version: 2
+installed: true
+
+package: console-tools
+version: 6
+installed: true
+
+package: console-common
+version: 2
+installed: true
+
+package: base-config
+version: 3
+installed: true
+
+package: kscreensaver
+version: 3
+installed: true
+
+package: libksieve0
+version: 2
+installed: true
+
+package: libkpimidentities1
+version: 2
+installed: true
+
+package: kmail
+version: 3
+installed: true
+
+package: libtag1
+version: 3
+installed: true
+
+package: kandy
+version: 1
+installed: true
+
+package: kitchensync
+version: 1
+installed: true
+
+package: kfouleggs
+version: 1
+installed: true
+
+package: apt
+version: 9
+installed: true
+
+package: myspell-en-us
+version: 1
+installed: true
+
+package: libopenct1
+version: 2
+installed: true
+
+package: libgtkhtml2-0
+version: 4
+installed: true
+
+package: xfonts-75dpi
+version: 3
+installed: true
+
+package: kdemultimedia-kappfinder-data
+version: 1
+installed: true
+
+package: at
+version: 1
+installed: true
+
+package: cron
+version: 8
+installed: true
+
+package: exim4-base
+version: 4
+installed: true
+
+package: mailx
+version: 1
+installed: true
+
+package: libnet1
+version: 3
+installed: true
+
+package: aptitude
+version: 2
+installed: true
+
+package: tcptraceroute
+version: 1
+installed: true
+
+package: gnome-cups-manager
+version: 2
+installed: true
+
+package: liblwres1
+version: 1
+installed: true
+
+package: dnsutils
+version: 3
+installed: true
+
+package: libgsf-gnome-1
+version: 2
+installed: true
+
+package: kworldclock
+version: 2
+installed: true
+
+package: kdewallpapers
+version: 2
+installed: true
+
+package: fifteenapplet
+version: 1
+installed: true
+
+package: psmisc
+version: 1
+installed: true
+
+package: kwin4
+version: 1
+installed: true
+
+package: tidy
+version: 3
+installed: true
+
+package: quanta-data
+version: 1
+installed: true
+
+package: nano
+version: 1
+installed: true
+
+package: gettext
+version: 11
+installed: true
+
+package: kfilereplace
+version: 1
+installed: true
+
+package: quanta
+version: 5
+installed: true
+
+package: gettext-base
+version: 4
+installed: true
+
+package: libcroco3-dev
+version: 1
+installed: true
+
+package: gtk2-engines-lighthouseblue
+version: 2
+installed: true
+
+package: korn
+version: 1
+installed: true
+
+package: kimagemapeditor
+version: 1
+installed: true
+
+package: knode
+version: 2
+installed: true
+
+package: kaddressbook
+version: 2
+installed: true
+
+package: kshisen
+version: 1
+installed: true
+
+package: gstreamer0.8-audiofile
+version: 1
+installed: true
+
+package: desktop-base
+version: 2
+installed: true
+
+package: mime-support
+version: 4
+installed: true
+
+package: ed
+version: 1
+installed: true
+
+package: libgucharmap4
+version: 1
+installed: true
+
+package: texinfo
+version: 5
+installed: true
+
+package: tetex-base
+version: 14
+installed: true
+
+package: libarts1-xine
+version: 1
+installed: true
+
+package: libsigc++-2.0-0
+version: 2
+installed: true
+
+package: libglibmm-2.4-1
+version: 2
+installed: true
+
+package: libgtkmm-2.4-1
+version: 1
+installed: true
+
+package: kbattleship
+version: 1
+installed: true
+
+package: exim4-config
+version: 2
+installed: true
+
+package: cdrecord
+version: 6
+installed: true
+
+package: myspell-en-gb
+version: 1
+installed: true
+
+package: libmal1
+version: 1
+installed: true
+
+package: libmetacity0
+version: 2
+installed: true
+
+package: libqthreads-12
+version: 1
+installed: true
+
+package: libmimelib1a
+version: 1
+installed: true
+
+package: kdetoys
+version: 3
+installed: true
+
+package: gnome-icon-theme
+version: 6
+installed: true
+
+package: kstars
+version: 2
+installed: true
+
+package: libedata-cal5
+version: 3
+installed: true
+
+package: klinkstatus
+version: 1
+installed: true
+
+package: libedata-book1
+version: 3
+installed: true
+
+package: libpisync0
+version: 1
+installed: true
+
+package: libpisock8
+version: 1
+installed: true
+
+package: libsoup2.2-7
+version: 3
+installed: true
+
+package: xserver-xfree86
+version: 5
+installed: true
+
+package: libegroupwise6
+version: 2
+installed: true
+
+package: libdb4.1
+version: 1
+installed: true
+
+package: libedataserver3
+version: 4
+installed: true
+
+package: kalarm
+version: 2
+installed: true
+
+package: libebook8
+version: 4
+installed: true
+
+package: kdewebdev
+version: 2
+installed: true
+
+package: libcompfaceg1
+version: 1
+installed: true
+
+package: libgtkhtml3.2-11
+version: 2
+installed: true
+
+package: gtkhtml3.2
+version: 2
+installed: true
+
+package: dirmngr
+version: 1
+installed: true
+
+package: amor
+version: 2
+installed: true
+
+package: libgconf2-dev
+version: 5
+installed: true
+
+package: noatun
+version: 2
+installed: true
+
+package: libbonobo2-dev
+version: 4
+installed: true
+
+package: libidl-dev
+version: 1
+installed: true
+
+package: pppconfig
+version: 2
+installed: true
+
+package: libgnome-pilot2
+version: 2
+installed: true
+
+package: vim
+version: 8
+installed: true
+
+package: libxklavier8
+version: 1
+installed: true
+
+package: vim-gtk
+version: 2
+installed: true
+
+package: libpth2
+version: 1
+installed: true
+
+package: libsigc++-1.2-5c102
+version: 1
+installed: true
+
+package: gnupg-agent
+version: 1
+installed: true
+
+package: wget
+version: 2
+installed: true
+
+package: gimp
+version: 7
+installed: true
+
+package: klettres-data
+version: 1
+installed: true
+
+package: kodo
+version: 2
+installed: true
+
+package: ktimer
+version: 1
+installed: true
+
+package: libsnmp-base
+version: 2
+installed: true
+
+package: libsnmp5
+version: 2
+installed: true
+
+package: ksim
+version: 1
+installed: true
+
+package: klaptopdaemon
+version: 1
+installed: true
+
+package: khexedit
+version: 1
+installed: true
+
+package: kgpg
+version: 1
+installed: true
+
+package: kfloppy
+version: 1
+installed: true
+
+package: libsysfs1
+version: 1
+installed: true
+
+package: kdessh
+version: 1
+installed: true
+
+package: kdelirc
+version: 1
+installed: true
+
+package: libaspell-dev
+version: 1
+installed: true
+
+package: dbus-glib-1
+version: 4
+installed: true
+
+package: kdat
+version: 1
+installed: true
+
+package: evolution
+version: 5
+installed: true
+
+package: gstreamer0.8-mad
+version: 1
+installed: true
+
+package: gnome-nettool
+version: 1
+installed: true
+
+package: liboil0.2
+version: 1
+installed: true
+
+package: gstreamer0.8-misc
+version: 2
+installed: true
+
+package: gstreamer0.8-gnomevfs
+version: 1
+installed: true
+
+package: liblircclient0
+version: 2
+installed: true
+
+package: totem
+version: 2
+installed: true
+
+package: libgal2.2-1
+version: 2
+installed: true
+
+package: libgal2.2-common
+version: 2
+installed: true
+
+package: libnews-nntpclient-perl
+version: 1
+installed: true
+
+package: bzip2
+version: 3
+installed: true
+
+package: kverbos
+version: 1
+installed: true
+
+package: libhtml-tableextract-perl
+version: 1
+installed: true
+
+package: libfinance-quote-perl
+version: 1
+installed: true
+
+package: libgconf2-4
+version: 8
+installed: true
+
+package: libenchant1
+version: 1
+installed: true
+
+package: finger
+version: 1
+installed: true
+
+package: portmap
+version: 1
+installed: true
+
+package: gsfonts
+version: 4
+installed: true
+
+package: menu-xdg
+version: 1
+installed: true
+
+package: qt3-dev-tools
+version: 1
+installed: true
+
+package: klipper
+version: 1
+installed: true
+
+package: binutils
+version: 7
+installed: true
+
+package: xlibs-data
+version: 1
+installed: true
+
+package: ksvg
+version: 1
+installed: true
+
+package: libgstreamer-gconf0.8-0
+version: 2
+installed: true
+
+package: xserver-common
+version: 4
+installed: true
+
+package: libaudiofile-dev
+version: 1
+installed: true
+
+package: debconf-i18n
+version: 1
+installed: true
+
+package: libglade2-0
+version: 7
+installed: true
+
+package: libxmu-dev
+version: 2
+installed: true
+
+package: libsm-dev
+version: 2
+installed: true
+
+package: libbonoboui2-0
+version: 6
+installed: true
+
+package: konquest
+version: 1
+installed: true
+
+package: xlibs-static-dev
+version: 2
+installed: true
+
+package: libtext-charwidth-perl
+version: 1
+installed: true
+
+package: libxi-dev
+version: 1
+installed: true
+
+package: kpilot
+version: 1
+installed: true
+
+package: libx11-dev
+version: 4
+installed: true
+
+package: libncurses5-dev
+version: 1
+installed: true
+
+package: katomic
+version: 1
+installed: true
+
+package: libglut3
+version: 2
+installed: true
+
+package: kweather
+version: 2
+installed: true
+
+package: liblablgl-ocaml
+version: 2
+installed: true
+
+package: liblzo1
+version: 3
+installed: true
+
+package: kanjidic
+version: 2
+installed: true
+
+package: libgpgme11
+version: 4
+installed: true
+
+package: libxt-dev
+version: 4
+installed: true
+
+package: libtasn1-2-dev
+version: 1
+installed: true
+
+package: libhtml-tree-perl
+version: 5
+installed: true
+
+package: libgsf-1
+version: 2
+installed: true
+
+package: libhtml-tagset-perl
+version: 3
+installed: true
+
+package: libhtml-parser-perl
+version: 7
+installed: true
+
+package: kbackgammon
+version: 1
+installed: true
+
+package: kopete
+version: 1
+installed: true
+
+package: autoconf
+version: 7
+installed: true
+
+package: liburi-perl
+version: 6
+installed: true
+
+package: libart-2.0-dev
+version: 1
+installed: true
+
+package: kuser
+version: 1
+installed: true
+
+package: kblackbox
+version: 1
+installed: true
+
+package: libgcc1
+version: 20
+installed: true
+
+package: zlib1g-dev
+version: 3
+installed: true
+
+package: libfreetype6-dev
+version: 4
+installed: true
+
+package: khelpcenter
+version: 1
+installed: true
+
+package: libgnomecanvas2-0
+version: 5
+installed: true
+
+package: kcachegrind
+version: 2
+installed: true
+
+package: python
+version: 14
+installed: true
+
+package: libgnomevfs2-0
+version: 5
+installed: true
+
+package: bc
+version: 1
+installed: true
+
+package: libopenexr2
+version: 3
+installed: true
+
+package: libxrender-dev
+version: 1
+installed: true
+
+package: libtasn1-2
+version: 4
+installed: true
+
+package: kruler
+version: 1
+installed: true
+
+package: libopencdk8
+version: 2
+installed: true
+
+package: libcupsys2-gnutls10
+version: 3
+installed: true
+
+package: libgle3
+version: 1
+installed: true
+
+package: libaspell15
+version: 5
+installed: true
+
+package: libpaper1
+version: 2
+installed: true
+
+package: kdevelop3-data
+version: 2
+installed: true
+
+package: kjumpingcube
+version: 1
+installed: true
+
+package: libvorbisenc2
+version: 4
+installed: true
+
+package: ocaml-nox
+version: 2
+installed: true
+
+package: liblcms1
+version: 2
+installed: true
+
+package: libmng1
+version: 2
+installed: true
+
+package: libpt-1.8.3
+version: 1
+installed: true
+
+package: libjack0.80.0-0
+version: 4
+installed: true
+
+package: kdesdk-scripts
+version: 1
+installed: true
+
+package: ksirtet
+version: 2
+installed: true
+
+package: imlib11
+version: 1
+installed: true
+
+package: libbonobo2-common
+version: 2
+installed: true
+
+package: x-window-system-core
+version: 1
+installed: true
+
+package: kdelibs4
+version: 20
+installed: true
+
+package: kcontrol
+version: 5
+installed: true
+
+package: libpt-plugins-v4l2
+version: 1
+installed: true
+
+package: libsensors3
+version: 8
+installed: true
+
+package: render-dev
+version: 1
+installed: true
+
+package: gconf2
+version: 7
+installed: true
+
+package: grep
+version: 6
+installed: true
+
+package: libgnutls11
+version: 3
+installed: true
+
+package: libstartup-notification0
+version: 3
+installed: true
+
+package: m4
+version: 2
+installed: true
+
+package: kturtle
+version: 1
+installed: true
+
+package: libvte-common
+version: 1
+installed: true
+
+package: gconf-editor
+version: 2
+installed: true
+
+package: netpbm
+version: 4
+installed: true
+
+package: dcoprss
+version: 1
+installed: true
+
+package: libtext-iconv-perl
+version: 2
+installed: true
+
+package: libgnome-keyring-dev
+version: 3
+installed: true
+
+package: e2fslibs
+version: 1
+installed: true
+
+package: gretl-common
+version: 1
+installed: true
+
+package: ppp
+version: 14
+installed: true
+
+package: usbutils
+version: 1
+installed: true
+
+package: libpcap0.7
+version: 1
+installed: true
+
+package: libguile-ltdl-1
+version: 1
+installed: true
+
+package: liborbit2
+version: 3
+installed: true
+
+package: libgretl1
+version: 2
+installed: true
+
+package: psutils
+version: 2
+installed: true
+
+package: exim4
+version: 1
+installed: true
+
+package: libaudiofile0
+version: 2
+installed: true
+
+package: liblablgtk2-ocaml
+version: 2
+installed: true
+
+package: libpopt0
+version: 3
+installed: true
+
+package: file
+version: 6
+installed: true
+
+package: libnspr4
+version: 4
+installed: true
+
+package: python2.2-sqlrelay
+version: 1
+installed: true
+
+package: libaudio-dev
+version: 1
+installed: true
+
+package: login
+version: 2
+installed: true
+
+package: klickety
+version: 1
+installed: true
+
+package: freeglut3
+version: 1
+installed: true
+
+package: konsolekalendar
+version: 1
+installed: true
+
+package: gnome-desktop-data
+version: 4
+installed: true
+
+package: libhal0
+version: 2
+installed: true
+
+package: mawk
+version: 2
+installed: true
+
+package: libvte4
+version: 4
+installed: true
+
+package: libgtk2.0-common
+version: 3
+installed: true
+
+package: knewsticker-scripts
+version: 1
+installed: true
+
+package: frozen-bubble
+version: 2
+installed: true
+
+package: kmahjongg
+version: 1
+installed: true
+
+package: lskat
+version: 1
+installed: true
+
+package: kdelibs-data
+version: 4
+installed: true
+
+package: base-files
+version: 6
+installed: true
+
+package: kdeartwork-theme-icon
+version: 1
+installed: true
+
+package: gnumeric
+version: 6
+installed: true
+
+package: libmad0-dev
+version: 1
+installed: true
+
+package: libqt3c102-mt
+version: 8
+installed: true
+
+package: kenolaba
+version: 1
+installed: true
+
+package: libmyspell3
+version: 1
+installed: true
+
+package: bsdutils
+version: 8
+installed: true
+
+package: pkg-config
+version: 5
+installed: true
+
+package: libxcursor1
+version: 3
+installed: true
+
+package: xlibmesa-gl
+version: 1
+installed: true
+
+package: libkscan1
+version: 1
+installed: true
+
+package: libfam0c102
+version: 1
+installed: true
+
+package: hicolor-icon-theme
+version: 1
+installed: true
+
+package: libxmuu1
+version: 1
+installed: true
+
+package: kdebase-bin
+version: 2
+installed: true
+
+package: libg2c0
+version: 5
+installed: true
+
+package: junior-puzzle
+version: 1
+installed: true
+
+package: kmines
+version: 1
+installed: true
+
+package: libgstreamer0.8-0
+version: 4
+installed: true
+
+package: libwnck-common
+version: 1
+installed: true
+
+package: kcharselect
+version: 1
+installed: true
+
+package: libartsc0
+version: 6
+installed: true
+
+package: libsm6
+version: 1
+installed: true
+
+package: libgnomeprintui2.2-common
+version: 1
+installed: true
+
+package: libarts1
+version: 4
+installed: true
+
+package: debianutils
+version: 20
+installed: true
+
+package: libpam0g
+version: 5
+installed: true
+
+package: liblockfile1
+version: 2
+installed: true
+
+package: kvoctrain
+version: 1
+installed: true
+
+package: ocaml
+version: 4
+installed: true
+
+package: tcpd
+version: 1
+installed: true
+
+package: tetex-bin
+version: 20
+installed: true
+
+package: libpango1.0-0
+version: 8
+installed: true
+
+package: ksnapshot
+version: 1
+installed: true
+
+package: liblocale-gettext-perl
+version: 2
+installed: true
+
+package: gs-common
+version: 2
+installed: true
+
+package: libxv1
+version: 1
+installed: true
+
+package: ksysguard
+version: 1
+installed: true
+
+package: kde-core
+version: 1
+installed: true
+
+package: gcc-3.3-base
+version: 2
+installed: true
+
+package: libgda2-3
+version: 1
+installed: true
+
+package: libxrandr-dev
+version: 2
+installed: true
+
+package: libsdl-ttf2.0-0
+version: 1
+installed: true
+
+package: kicker
+version: 2
+installed: true
+
+package: cpp
+version: 3
+installed: true
+
+package: libkdeedu1
+version: 2
+installed: true
+
+package: kteatime
+version: 2
+installed: true
+
+package: liborbit2-dev
+version: 6
+installed: true
+
+package: libgtk1.2-common
+version: 1
+installed: true
+
+package: libxft2
+version: 2
+installed: true
+
+package: edict
+version: 1
+installed: true
+
+package: kedit
+version: 1
+installed: true
+
+package: passwd
+version: 8
+installed: true
+
+package: libacl1
+version: 3
+installed: true
+
+package: libscrollkeeper0
+version: 3
+installed: true
+
+package: coreutils
+version: 11
+installed: true
+
+package: libpopt-dev
+version: 3
+installed: true
+
+package: kregexpeditor
+version: 1
+installed: true
+
+package: libuuid1
+version: 2
+installed: true
+
+package: ktnef
+version: 2
+installed: true
+
+package: inkscape
+version: 1
+installed: true
+
+package: libmodplug0
+version: 2
+installed: true
+
+package: libgtk2.0-bin
+version: 2
+installed: true
+
+package: libt1-5
+version: 2
+installed: true
+
+package: exim4-daemon-light
+version: 3
+installed: true
+
+package: libgtk2.0-0
+version: 12
+installed: true
+
+package: kiten
+version: 1
+installed: true
+
+package: fontconfig
+version: 3
+installed: true
+
+package: libxaw7
+version: 2
+installed: true
+
+package: kcoloredit
+version: 1
+installed: true
+
+package: less
+version: 1
+installed: true
+
+package: libgdbm3
+version: 1
+installed: true
+
+package: kdepasswd
+version: 1
+installed: true
+
+package: libid3tag0
+version: 3
+installed: true
+
+package: libgnome-desktop-2
+version: 2
+installed: true
+
+package: dpkg
+version: 22
+installed: true
+
+package: libgksuui1.0-0
+version: 1
+installed: true
+
+package: libglib2.0-0
+version: 10
+installed: true
+
+package: dia-libs
+version: 1
+installed: true
+
+package: libpng12-0
+version: 5
+installed: true
+
+package: librsvg2-2
+version: 3
+installed: true
+
+package: gpdf
+version: 2
+installed: true
+
+package: libice6
+version: 1
+installed: true
+
+package: libdb4.2++
+version: 1
+installed: true
+
+package: libdb1-compat
+version: 1
+installed: true
+
+package: xbase-clients
+version: 7
+installed: true
+
+package: e2fsprogs
+version: 4
+installed: true
+
+package: fortunes-min
+version: 1
+installed: true
+
+package: mpeglib
+version: 2
+installed: true
+
+package: libkpathsea3
+version: 5
+installed: true
+
+package: totem-xine
+version: 1
+installed: true
+
+package: libexpat1
+version: 3
+installed: true
+
+package: xfree86-common
+version: 4
+installed: true
+
+package: libpng12-dev
+version: 2
+installed: true
+
+package: libx11-6
+version: 1
+installed: true
+
+package: librudiments0c102
+version: 2
+installed: true
+
+package: perl
+version: 49
+installed: true
+
+package: libhal-storage0
+version: 1
+installed: true
+
+package: mozilla-browser
+version: 16
+installed: true
+
+package: libmagic1
+version: 1
+installed: true
+
+package: libgksu1.2-0
+version: 1
+installed: true
+
+package: kaboodle
+version: 1
+installed: true
+
+package: sysv-rc
+version: 2
+installed: true
+
+package: libjpeg62
+version: 1
+installed: true
+
+package: libgtk1.2
+version: 3
+installed: true
+
+package: procps
+version: 2
+installed: true
+
+package: libsmbclient
+version: 3
+installed: true
+
+package: kdf
+version: 1
+installed: true
+
+package: libxrender1
+version: 2
+installed: true
+
+package: libpam-runtime
+version: 3
+installed: true
+
+package: kmilo
+version: 1
+installed: true
+
+package: libatk1.0-0
+version: 8
+installed: true
+
+package: libpanel-applet2-0
+version: 7
+installed: true
+
+package: sfftw-dev
+version: 1
+installed: true
+
+package: libbonobo2-0
+version: 9
+installed: true
+
+package: libdps1
+version: 2
+installed: true
+
+package: gstreamer0.8-flac
+version: 1
+installed: true
+
+package: libtidy0
+version: 1
+installed: true
+
+package: libnewt0.51
+version: 1
+installed: true
+
+package: libxml2-dev
+version: 9
+installed: true
+
+package: bash
+version: 13
+installed: true
+
+package: libdb4.2
+version: 1
+installed: true
+
+package: sed
+version: 12
+installed: true
+
+package: sgml-base
+version: 5
+installed: true
+
+package: klettres
+version: 2
+installed: true
+
+package: kcalc
+version: 1
+installed: true
+
+package: libxrandr2
+version: 1
+installed: true
+
+package: libxv-dev
+version: 1
+installed: true
+
+package: kdegames-card-data
+version: 1
+installed: true
+
+package: zlib1g
+version: 5
+installed: true
+
+package: kmplot
+version: 1
+installed: true
+
+package: gtk2-engines-crux
+version: 3
+installed: true
+
+package: libxtrap6
+version: 1
+installed: true
+
+package: xfonts-scalable
+version: 2
+installed: true
+
+package: kfind
+version: 1
+installed: true
+
+package: knotes
+version: 3
+installed: true
+
+package: libkcddb1
+version: 2
+installed: true
+
+package: ktuberling
+version: 1
+installed: true
+
+package: abiword-gnome
+version: 3
+installed: true
+
+package: libsdl-image1.2
+version: 4
+installed: true
+
+package: python2.2
+version: 3
+installed: true
+
+package: libncurses5
+version: 6
+installed: true
+
+package: hostname
+version: 2
+installed: true
+
+package: libcroco3
+version: 2
+installed: true
+
+package: libfontconfig1
+version: 3
+installed: true
+
+package: libsmpeg0
+version: 2
+installed: true
+
+package: libc6
+version: 20
+installed: true
+
+package: kdeartwork-style
+version: 2
+installed: true
+
+package: libartsc0-dev
+version: 1
+installed: true
+
+package: nms-textcounter
+version: 1
+installed: true
+
+package: kwordquiz
+version: 1
+installed: true
+
+package: frozen-bubble-data
+version: 2
+installed: true
+
+package: librecode0
+version: 2
+installed: true
+
+package: kooka
+version: 1
+installed: true
+
+package: kdeutils
+version: 2
+installed: true
+
+package: nvi
+version: 1
+installed: true
+
+package: libogg0
+version: 4
+installed: true
+
+package: gdm
+version: 2
+installed: true
+
+package: debconf
+version: 42
+installed: true
+
+package: libgtkgl2.0-1
+version: 1
+installed: true
+
+package: xfonts-100dpi
+version: 3
+installed: true
+
+package: mcl-doc
+version: 1
+installed: true
+
+package: aalib1
+version: 3
+installed: true
+
+package: libxml2-utils
+version: 1
+installed: true
+
+package: cpp-3.3
+version: 3
+installed: true
+
+package: libnautilus2-2
+version: 3
+installed: true
+
+package: libgstreamer-plugins0.8-0
+version: 2
+installed: true
+
+package: ttf-opensymbol
+version: 1
+installed: true
+
+package: ocaml-base
+version: 2
+installed: true
+
+package: atlas3-base
+version: 1
+installed: true
+
+package: libkrb53
+version: 4
+installed: true
+
+package: slang1a-utf8
+version: 3
+installed: true
+
+package: libneon23
+version: 2
+installed: true
+
+package: libconsole
+version: 1
+installed: true
+
+package: xjig
+version: 1
+installed: true
+
+package: kxsldbg
+version: 2
+installed: true
+
+package: libgail17
+version: 3
+installed: true
+
+package: tcl8.4-dev
+version: 3
+installed: true
+
+package: libexif10
+version: 1
+installed: true
+
+package: ktron
+version: 1
+installed: true
+
+package: util-linux
+version: 7
+installed: true
+
+package: libstdc++2.10-glibc2.2
+version: 4
+installed: true
+
+package: dbus-1
+version: 5
+installed: true
+
+package: libreadline4
+version: 5
+installed: true
+
+package: libkcal2a
+version: 2
+installed: true
+
+package: kompare
+version: 2
+installed: true
+
+package: libnetpbm10
+version: 1
+installed: true
+
+package: xlibmesa-glu
+version: 1
+installed: true
+
+package: tar
+version: 9
+installed: true
+
+package: libgail-common
+version: 3
+installed: true
+
+package: kiconedit
+version: 1
+installed: true
+
+package: libssl0.9.7
+version: 1
+installed: true
+
+package: libksba8
+version: 1
+installed: true
+
+package: libxml2
+version: 16
+installed: true
+
+package: codebreaker
+version: 1
+installed: true
+
+package: dselect
+version: 1
+installed: true
+
+package: kscreensaver-xsavers
+version: 1
+installed: true
+
+package: libtimedate-perl
+version: 1
+installed: true
+
+package: libbz2-1.0
+version: 1
+installed: true
+
+package: sysvinit
+version: 12
+installed: true
+
+package: python2.3
+version: 6
+installed: true
+
+package: libvorbisfile3
+version: 6
+installed: true
+
+package: libsdl-perl
+version: 3
+installed: true
+
+package: kappfinder
+version: 1
+installed: true
+
+package: ucf
+version: 12
+installed: true
+
+package: libsdl-console
+version: 2
+installed: true
+
+package: libtiff4
+version: 1
+installed: true
+
+package: libkleopatra0a
+version: 1
+installed: true
+
+package: pppoeconf
+version: 2
+installed: true
+
+package: libxi6
+version: 1
+installed: true
+
+package: libgimp2.0
+version: 3
+installed: true
+
+package: libglib1.2
+version: 4
+installed: true
+
+package: libgpmg1
+version: 2
+installed: true
+
+package: libsvga1
+version: 1
+installed: true
+
+package: libsdl1.2debian-oss
+version: 1
+installed: true
+
+package: sfftw2
+version: 1
+installed: true
+
+package: libblkid1
+version: 3
+installed: true
+
+package: slang1
+version: 6
+installed: true
+
+package: libasound2
+version: 10
+installed: true
+
+package: libxcursor-dev
+version: 1
+installed: true
+
+package: libvorbis-dev
+version: 1
+installed: true
+
+package: libesd0-dev
+version: 2
+installed: true
+
+package: esound-common
+version: 2
+installed: true
+
+package: libvorbis-ocaml
+version: 1
+installed: true
+
+package: libaudio2
+version: 1
+installed: true
+
+package: libgnome2-0
+version: 7
+installed: true
+
+package: libxt6
+version: 1
+installed: true
+
+package: kmid
+version: 1
+installed: true
+
+package: libstdc++5
+version: 15
+installed: true
+
+package: libfontconfig1-dev
+version: 3
+installed: true
+
+package: libattr1
+version: 3
+installed: true
+
+package: gnupg2
+version: 2
+installed: true
+
+package: libxpm4
+version: 1
+installed: true
+
+package: gstreamer0.8-plugin-apps
+version: 1
+installed: true
+
+package: mount
+version: 4
+installed: true
+
+package: xlibs
+version: 8
+installed: true
+
+package: libgnomecupsui1.0-1
+version: 2
+installed: true
+
+package: powermgmt-base
+version: 1
+installed: true
+
+package: kdelibs-bin
+version: 1
+installed: true
+
+package: libopensc1
+version: 3
+installed: true
+
+package: libselinux1
+version: 2
+installed: true
+
+package: libiw27
+version: 2
+installed: true
+
+package: gnome-games
+version: 3
+installed: true
+
+package: libsdl-mixer1.2
+version: 5
+installed: true
+
+package: kdenetwork-filesharing
+version: 1
+installed: true
+
+package: kdemultimedia
+version: 2
+installed: true
+
+package: libvorbis0a
+version: 6
+installed: true
+
+package: libsdl-net1.2
+version: 1
+installed: true
+
+package: libice-dev
+version: 2
+installed: true
+
+package: pciutils
+version: 6
+installed: true
+
+package: fb-music-high
+version: 1
+installed: true
+
+package: libgpg-error0
+version: 4
+installed: true
+
+package: libsdl1.2debian
+version: 7
+installed: true
+
+package: libnautilus-burn0
+version: 2
+installed: true
+
+package: lmemory
+version: 1
+installed: true
+
+package: base-passwd
+version: 5
+installed: true
+
+package: kbabel
+version: 3
+installed: true
+
+package: tk8.4
+version: 5
+installed: true
+
+package: kdeedu
+version: 2
+installed: true
+
+package: libecal6
+version: 3
+installed: true
+
+package: libidn11
+version: 3
+installed: true
+
+package: librio500-dev
+version: 1
+installed: true
+
+package: libssl-dev
+version: 4
+installed: true
+
+package: libesd0
+version: 3
+installed: true
+
+package: libldap2
+version: 2
+installed: true
+
+package: libsasl2
+version: 5
+installed: true
+
+package: gnome-mime-data
+version: 1
+installed: true
+
+package: kmoon
+version: 2
+installed: true
+
+package: xscreensaver-gl
+version: 1
+installed: true
+
+package: libpcre3
+version: 3
+installed: true
+
+package: shared-mime-info
+version: 2
+installed: true
+
+package: libxtst6
+version: 1
+installed: true
+
+package: desktop-file-utils
+version: 2
+installed: true
+
+package: ncurses-bin
+version: 1
+installed: true
+
+package: kuickshow
+version: 1
+installed: true
+
+package: libgnome2-common
+version: 2
+installed: true
+
+package: sane-utils
+version: 1
+installed: true
+
+package: ktip
+version: 1
+installed: true
+
+package: libbonoboui2-common
+version: 3
+installed: true
+
+package: libxft1
+version: 1
+installed: true
+
+package: libgnomeui-0
+version: 6
+installed: true
+
+package: libgnome-keyring0
+version: 3
+installed: true
+
+package: gnome-keyring
+version: 1
+installed: true
+
+package: eyesapplet
+version: 1
+installed: true
+
+package: kasteroids
+version: 1
+installed: true
+
+package: libkdegames1
+version: 2
+installed: true
+
+package: libreadline5
+version: 1
+installed: true
+
+package: kontact
+version: 3
+installed: true
+
+package: libogg-dev
+version: 1
+installed: true
+
+package: gstreamer0.8-vorbis
+version: 1
+installed: true
+
+package: linux-kernel-headers
+version: 2
+installed: true
+
+package: libpcsclite1
+version: 4
+installed: true
+
+package: libwww0
+version: 2
+installed: true
+
+package: ksokoban
+version: 1
+installed: true
+
+package: libc6-dev
+version: 7
+installed: true
+
+package: libeel2-data
+version: 1
+installed: true
+
+package: enscript
+version: 1
+installed: true
+
+package: libio-stringy-perl
+version: 5
+installed: true
+
+package: librsvg2-common
+version: 4
+installed: true
+
+package: kcron
+version: 1
+installed: true
+
+package: kbruch
+version: 1
+installed: true
+
+package: atlantikdesigner
+version: 1
+installed: true
+
+package: kde-amusements
+version: 1
+installed: true
+
+package: kwalletmanager
+version: 1
+installed: true
+
+package: gnupg
+version: 7
+installed: true
+
+package: libusb-0.1-4
+version: 7
+installed: true
+
+package: makedev
+version: 15
+installed: true
+
+package: netbase
+version: 20
+installed: true
+
+package: gpgsm
+version: 1
+installed: true
+
+package: console-data
+version: 7
+installed: true
+
+package: adduser
+version: 14
+installed: true
+
+package: ifupdown
+version: 9
+installed: true
+
+package: sysklogd
+version: 3
+installed: true
+
+package: ncurses-base
+version: 2
+installed: true
+
+package: gimp-data
+version: 3
+installed: true
+
+package: libwnck4
+version: 2
+installed: true
+
+package: klogd
+version: 1
+installed: true
+
+package: libgnomeui-common
+version: 1
+installed: true
+
+package: libgimpprint1
+version: 3
+installed: true
+
+package: kleopatra
+version: 1
+installed: true
+
+package: libkdepim1
+version: 2
+installed: true
+
+package: telnet
+version: 2
+installed: true
+
+package: kjots
+version: 1
+installed: true
+
+package: gs
+version: 7
+installed: true
+
+package: gtk2-engines-thinice
+version: 3
+installed: true
+
+package: libxslt1.1
+version: 5
+installed: true
+
+package: netkit-inetd
+version: 1
+installed: true
+
+package: libcomerr2
+version: 3
+installed: true
+
+package: konq-plugins
+version: 1
+installed: true
+
+package: vino
+version: 2
+installed: true
+
+package: libsdl-gfx1.2
+version: 1
+installed: true
+
+package: libkdenetwork2
+version: 3
+installed: true
+
+package: iputils-ping
+version: 2
+installed: true
+
+package: gzip
+version: 6
+installed: true
+
+package: libxine1
+version: 4
+installed: true
+
+package: libspeex1
+version: 1
+installed: true
+
+package: libtheora0
+version: 1
+installed: true
+
+package: libjpeg-progs
+version: 1
+installed: true
+
+package: libxext6
+version: 1
+installed: true
+
+package: bind9-host
+version: 1
+installed: true
+
+package: libbz2-dev
+version: 1
+installed: true
+
+package: libdns16
+version: 1
+installed: true
+
+package: libisc7
+version: 1
+installed: true
+
+package: findutils
+version: 3
+installed: true
+
+package: khangman
+version: 1
+installed: true
+
+package: whiptail
+version: 2
+installed: true
+
+package: libieee1284-3
+version: 1
+installed: true
+
+package: kwin
+version: 3
+installed: true
+
+package: libsane
+version: 5
+installed: true
+
+package: libtext-wrapi18n-perl
+version: 1
+installed: true
+
+package: libgphoto2-2
+version: 5
+installed: true
+
+package: kdeprint
+version: 1
+installed: true
+
+package: libopenobex-1.0-0
+version: 2
+installed: true
+
+package: libgphoto2-port0
+version: 5
+installed: true
+
+package: ksysguardd
+version: 1
+installed: true
+
+package: libsvn0
+version: 4
+installed: true
+
+package: libmng-dev
+version: 3
+installed: true
+
+package: initscripts
+version: 4
+installed: true
+
+package: libjpeg62-dev
+version: 2
+installed: true
+
+package: libnss3
+version: 3
+installed: true
+
+package: perl-modules
+version: 10
+installed: true
+
+package: libqt3-headers
+version: 3
+installed: true
+
+package: libart-2.0-2
+version: 3
+installed: true
+
+package: libxft-dev
+version: 3
+installed: true
+
+package: mozilla-psm
+version: 5
+installed: true
+
+package: libexpat1-dev
+version: 2
+installed: true
+
+package: libpango1.0-dev
+version: 4
+installed: true
+
+package: libglib2.0-dev
+version: 7
+installed: true
+
+package: libshout3
+version: 1
+installed: true
+
+package: libss2
+version: 2
+installed: true
+
+package: libgc1
+version: 1
+installed: true
+
+package: libgtkspell0
+version: 2
+installed: true
+
+package: fortune-mod
+version: 5
+installed: true
+
+package: poxml
+version: 1
+installed: true
+
+package: kviewshell
+version: 1
+installed: true
+
+package: kdevelop3-plugins
+version: 1
+installed: true
+
+package: pmount
+version: 3
+installed: true
+
+package: libapm1
+version: 3
+installed: true
+
+package: libstlport4.6
+version: 1
+installed: true
+
+package: scowl
+version: 1
+installed: true
+
+package: kolourpaint
+version: 1
+installed: true
+
+package: ktux
+version: 1
+installed: true
+
+package: libjasper-1.701-1
+version: 2
+installed: true
+
+package: konqueror
+version: 7
+installed: true
+
+package: evolution-data-server
+version: 3
+installed: true
+
+package: libeel2-2
+version: 3
+installed: true
+
+package: libgcrypt11
+version: 1
+installed: true
+
+package: libgnomecups1.0-1
+version: 2
+installed: true
+
+package: libgnomeprint2.2-data
+version: 1
+installed: true
+
+package: sqlrelay
+version: 1
+installed: true
+
+package: libgnomeprintui2.2-0
+version: 4
+installed: true
+
+package: ssh-askpass-fullscreen
+version: 1
+installed: true
+
+package: kpdf
+version: 1
+installed: true
+
+package: libmad0
+version: 3
+installed: true
+
+package: libgtksourceview1.0-0
+version: 4
+installed: true
+
+package: libkonq4
+version: 2
+installed: true
+
+package: libgtksourceview-common
+version: 1
+installed: true
+
+package: imlib-base
+version: 3
+installed: true
+
+package: libfribidi0
+version: 2
+installed: true
+
+package: kscd
+version: 1
+installed: true
+
+package: liboggflac1
+version: 1
+installed: true
+
+package: ocaml-base-nox
+version: 1
+installed: true
+
+package: libgnomecanvas2-common
+version: 1
+installed: true
+
+package: perl-base
+version: 16
+installed: true
+
+package: libidn11-dev
+version: 1
+installed: true
+
+package: gstreamer0.8-oss
+version: 1
+installed: true
+
+package: kdebase
+version: 6
+installed: true
+
+package: karm
+version: 1
+installed: true
+
+package: libwww-perl
+version: 14
+installed: true
+
+package: arts
+version: 1
+installed: true
+
+package: xutils
+version: 6
+installed: true
+
+package: kate
+version: 4
+installed: true
+
+package: libglib1.2-dev
+version: 2
+installed: true
+
+package: ark
+version: 1
+installed: true
+
+package: gdb
+version: 3
+installed: true
+
+package: libraw1394-5
+version: 1
+installed: true
+
+package: kdemultimedia-kfile-plugins
+version: 1
+installed: true
+
+package: kdebase-data
+version: 1
+installed: true
+
+package: ttf-bitstream-vera
+version: 1
+installed: true
+
+package: libtunepimp-bin
+version: 1
+installed: true
+
+package: kdebase-kio-plugins
+version: 2
+installed: true
+
+package: poster
+version: 1
+installed: true
+
+package: kdesktop
+version: 1
+installed: true
+
+package: x-dev
+version: 2
+installed: true
+
+package: kmenuedit
+version: 1
+installed: true
+
+package: iptables
+version: 6
+installed: true
+
+package: libdb3
+version: 7
+installed: true
+
+package: liblcms1-dev
+version: 1
+installed: true
+
+package: konqueror-nsplugins
+version: 1
+installed: true
+
+package: konsole
+version: 2
+installed: true
+
+package: kpager
+version: 1
+installed: true
+
+package: libidl0
+version: 1
+installed: true
+
+package: libfreetype6
+version: 5
+installed: true
+
+package: ksmserver
+version: 1
+installed: true
+
+package: ksplash
+version: 1
+installed: true
+
+package: kdelibs
+version: 1
+installed: true
+
+package: vim-common
+version: 2
+installed: true
+
+package: gnome-themes-extras
+version: 1
+installed: true
+
+package: cervisia
+version: 2
+installed: true
+
+package: libcvsservice0
+version: 2
+installed: true
+
+package: libgmp3
+version: 3
+installed: true
+
+package: cvs
+version: 2
+installed: true
+
+package: libaffix2
+version: 2
+installed: true
+
+package: kbugbuster
+version: 2
+installed: true
+
+package: kdesdk-kfile-plugins
+version: 1
+installed: true
+
+package: kdesdk-misc
+version: 1
+installed: true
+
+package: diff
+version: 5
+installed: true
+
+package: kmtrace
+version: 1
+installed: true
+
+package: libcap1
+version: 1
+installed: true
+
+package: libgnomevfs2-common
+version: 3
+installed: true
+
+package: libasound2-dev
+version: 2
+installed: true
+
+package: kspaceduel
+version: 1
+installed: true
+
+package: libjack0.80.0-dev
+version: 1
+installed: true
+
+package: libxext-dev
+version: 2
+installed: true
+
+package: libopencdk8-dev
+version: 1
+installed: true
+
+package: libfam-dev
+version: 1
+installed: true
+
+package: tk8.4-dev
+version: 3
+installed: true
+
+package: autotools-dev
+version: 3
+installed: true
+
+package: dosfstools
+version: 1
+installed: true
+
+package: libpcre3-dev
+version: 3
+installed: true
+
+package: libungif4g
+version: 3
+installed: true
+
+package: kuiviewer
+version: 1
+installed: true
+
+package: python2.3-numeric
+version: 1
+installed: true
+
+package: xscreensaver
+version: 3
+installed: true
+
+package: libpam-modules
+version: 5
+installed: true
+
+package: umbrello
+version: 1
+installed: true
+
+package: qt3-designer
+version: 1
+installed: true
+
+package: kdbg
+version: 1
+installed: true
+
+package: sudo
+version: 1
+installed: true
+
+package: kdevelop3
+version: 2
+installed: true
+
+package: metacity
+version: 3
+installed: true
+
+package: automake1.4
+version: 1
+installed: true
+
+package: libapr0
+version: 4
+installed: true
+
+package: kapptemplate
+version: 1
+installed: true
+
+package: libneon24
+version: 2
+installed: true
+
+package: ocaml-interp
+version: 1
+installed: true
+
+package: kprof
+version: 1
+installed: true
+
+package: libperl5.8
+version: 5
+installed: true
+
+package: libwrap0
+version: 3
+installed: true
+
+package: hotplug
+version: 5
+installed: true
+
+package: modutils
+version: 10
+installed: true
+
+package: libwmf0.2-7
+version: 3
+installed: true
+
+package: gretl
+version: 2
+installed: true
+
+package: libmagick6
+version: 1
+installed: true
+
+package: libcurl3
+version: 6
+installed: true
+
+package: libtiff-tools
+version: 4
+installed: true
+
+package: fdutils
+version: 1
+installed: true
+
+package: dia-common
+version: 2
+installed: true
+
+package: libgda2-common
+version: 1
+installed: true
+
+package: libpango1.0-common
+version: 1
+installed: true
+
+package: gtk2-engines-smooth
+version: 3
+installed: true
+
+package: libtunepimp2
+version: 2
+installed: true
+
+package: gtk2-engines-spherecrystal
+version: 1
+installed: true
+
+package: defoma
+version: 8
+installed: true
+
+package: gtk2-engines-pixbuf
+version: 3
+installed: true
+
+package: gtk2-engines-industrial
+version: 3
+installed: true
+
+package: libtextwrap1
+version: 2
+installed: true
+
+package: libkgantt0
+version: 2
+installed: true
+
+package: kommander
+version: 2
+installed: true
+
+package: ssh
+version: 6
+installed: true
+
+package: openoffice.org-l10n-en
+version: 3
+installed: true
+
+package: kfax
+version: 1
+installed: true
+
+package: kstars-data
+version: 1
+installed: true
+
+package: eog
+version: 2
+installed: true
+
+package: kdeaddons-kfile-plugins
+version: 1
+installed: true
+
+package: kpersonalizer
+version: 1
+installed: true
+
+package: tcl8.4
+version: 4
+installed: true
+
+package: atlantik
+version: 2
+installed: true
+
+package: libgnomeprint2.2-0
+version: 5
+installed: true
+
+package: kget
+version: 1
+installed: true
+
+package: gtans
+version: 1
+installed: true
+
+package: dictionaries-common
+version: 8
+installed: true
+
+package: gstreamer0.8-tools
+version: 1
+installed: true
+
+package: kwifimanager
+version: 1
+installed: true
+
+package: guile-1.6-libs
+version: 1
+installed: true
+
+package: openjade
+version: 1
+installed: true
+
+package: libosp4
+version: 2
+installed: true
+
+package: libostyle1
+version: 1
+installed: true
+
+package: kdemultimedia-kio-plugins
+version: 1
+installed: true
+
+package: libcdparanoia0
+version: 1
+installed: true
+
+package: libflac6
+version: 1
+installed: true
+
+package: libxmu6
+version: 1
+installed: true
+
+package: kdegraphics
+version: 2
+installed: true
+
+package: kamera
+version: 1
+installed: true
+
+package: libgsm1
+version: 5
+installed: true
+
+package: kdegraphics-kfile-plugins
+version: 1
+installed: true
+
+package: kdvi
+version: 1
+installed: true
+
+package: kgamma
+version: 1
+installed: true
+
+package: kghostview
+version: 2
+installed: true
+
+package: dia-gnome
+version: 1
+installed: true
+
+package: libmime-perl
+version: 10
+installed: true
+
+package: gs-gpl
+version: 5
+installed: true
+
+package: info
+version: 2
+installed: true
+
+package: net-tools
+version: 1
+installed: true
+
+package: kmrml
+version: 1
+installed: true
+
+package: kpovmodeler
+version: 1
+installed: true
+
+package: libxp6
+version: 1
+installed: true
+
+package: kview
+version: 2
+installed: true
+
+package: imagemagick
+version: 6
+installed: true
+
+package: libmailtools-perl
+version: 5
+installed: true
+
+package: libconvert-binhex-perl
+version: 1
+installed: true
+
+# end of solution from packup
+# sol printed

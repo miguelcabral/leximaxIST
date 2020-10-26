@@ -1,0 +1,2148 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# solving 
+# external command finished with exit value 0
+# solving time:
+#	 parent process: 0.71682s
+#	 child processes: 4.55599s
+#	 total time: 5.27281s
+# sol printing
+# beginning of solution from packup
+package: libvorbis-ocaml-dev
+version: 1
+installed: true
+
+package: libvorbis-ocaml
+version: 1
+installed: true
+
+package: kdeartwork-misc
+version: 1
+installed: true
+
+package: kdewallpapers
+version: 2
+installed: true
+
+package: libcroco3-dev
+version: 1
+installed: true
+
+package: libmlgtk-ocaml-dev
+version: 1
+installed: true
+
+package: tasksel
+version: 3
+installed: true
+
+package: base-config
+version: 3
+installed: true
+
+package: libpt-plugins-v4l2
+version: 1
+installed: true
+
+package: openoffice.org-l10n-en
+version: 3
+installed: true
+
+package: libgle3
+version: 1
+installed: true
+
+package: libgtk1.2-dev
+version: 5
+installed: true
+
+package: ttf-opensymbol
+version: 1
+installed: true
+
+package: libgadu3
+version: 2
+installed: true
+
+package: ed
+version: 1
+installed: true
+
+package: tetex-base
+version: 15
+installed: true
+
+package: libio-stringy-perl
+version: 5
+installed: true
+
+package: libmime-perl
+version: 11
+installed: true
+
+package: knewsticker-scripts
+version: 1
+installed: true
+
+package: console-common
+version: 2
+installed: true
+
+package: gnupg2
+version: 2
+installed: true
+
+package: nano
+version: 1
+installed: true
+
+package: libstlport4.6
+version: 1
+installed: true
+
+package: libwww0
+version: 2
+installed: true
+
+package: libksba8
+version: 1
+installed: true
+
+package: dirmngr
+version: 1
+installed: true
+
+package: liblircclient0
+version: 2
+installed: true
+
+package: fortunes-min
+version: 1
+installed: true
+
+package: libtunepimp2
+version: 2
+installed: true
+
+package: libtunepimp-bin
+version: 1
+installed: true
+
+package: libfinance-quote-perl
+version: 1
+installed: true
+
+package: dia-libs
+version: 1
+installed: true
+
+package: kanjidic
+version: 2
+installed: true
+
+package: quanta-data
+version: 1
+installed: true
+
+package: fdutils
+version: 1
+installed: true
+
+package: sane-utils
+version: 1
+installed: true
+
+package: libsane
+version: 5
+installed: true
+
+package: libieee1284-3
+version: 1
+installed: true
+
+package: libsigc++-1.2-5c102
+version: 1
+installed: true
+
+package: aptitude
+version: 2
+installed: true
+
+package: libtiff-tools
+version: 4
+installed: true
+
+package: libsigc++-2.0-0
+version: 2
+installed: true
+
+package: libdb4.2++
+version: 1
+installed: true
+
+package: gimp-data
+version: 3
+installed: true
+
+package: libpt-1.8.3
+version: 1
+installed: true
+
+package: libopenh323-1.15.2
+version: 2
+installed: true
+
+package: xfonts-scalable
+version: 2
+installed: true
+
+package: libatk1.0-dev
+version: 3
+installed: true
+
+package: libidl-dev
+version: 1
+installed: true
+
+package: liborbit2-dev
+version: 7
+installed: true
+
+package: libgda2-common
+version: 1
+installed: true
+
+package: libtidy0
+version: 1
+installed: true
+
+package: kdeartwork-theme-icon
+version: 1
+installed: true
+
+package: ocaml-nox
+version: 2
+installed: true
+
+package: libocamlgraph-ocaml-dev
+version: 1
+installed: true
+
+package: ocaml
+version: 4
+installed: true
+
+package: libglut3
+version: 2
+installed: true
+
+package: freeglut3
+version: 1
+installed: true
+
+package: ocaml-base-nox
+version: 1
+installed: true
+
+package: liblablgl-ocaml-dev
+version: 2
+installed: true
+
+package: kdeedu-data
+version: 1
+installed: true
+
+package: xserver-common
+version: 4
+installed: true
+
+package: libneon23
+version: 2
+installed: true
+
+package: libneon24
+version: 2
+installed: true
+
+package: less
+version: 1
+installed: true
+
+package: dosfstools
+version: 1
+installed: true
+
+package: libbz2-dev
+version: 1
+installed: true
+
+package: libpcre3-dev
+version: 3
+installed: true
+
+package: libfam-dev
+version: 1
+installed: true
+
+package: libjack0.80.0-dev
+version: 1
+installed: true
+
+package: libqt3-headers
+version: 3
+installed: true
+
+package: xserver-xfree86
+version: 5
+installed: true
+
+package: g++-2.95
+version: 2
+installed: true
+
+package: libstdc++2.10-dev
+version: 4
+installed: true
+
+package: xlibmesa-glu-dev
+version: 1
+installed: true
+
+package: libpopt-dev
+version: 3
+installed: true
+
+package: ocaml-interp
+version: 1
+installed: true
+
+package: libopencdk8-dev
+version: 1
+installed: true
+
+package: libgpg-error-dev
+version: 1
+installed: true
+
+package: libgcrypt11-dev
+version: 2
+installed: true
+
+package: libcupsys2-dev
+version: 2
+installed: true
+
+package: libpng12-dev
+version: 2
+installed: true
+
+package: liblcms1-dev
+version: 1
+installed: true
+
+package: libmng-dev
+version: 3
+installed: true
+
+package: libsm-dev
+version: 2
+installed: true
+
+package: libidn11-dev
+version: 1
+installed: true
+
+package: libxrender-dev
+version: 2
+installed: true
+
+package: libxrandr-dev
+version: 2
+installed: true
+
+package: libfreetype6-dev
+version: 5
+installed: true
+
+package: libxv-dev
+version: 1
+installed: true
+
+package: xlibs-static-dev
+version: 2
+installed: true
+
+package: libxi-dev
+version: 1
+installed: true
+
+package: libx11-dev
+version: 4
+installed: true
+
+package: libmad0-dev
+version: 1
+installed: true
+
+package: libaudiofile-dev
+version: 1
+installed: true
+
+package: libglib2.0-dev
+version: 9
+installed: true
+
+package: libart-2.0-dev
+version: 3
+installed: true
+
+package: autotools-dev
+version: 3
+installed: true
+
+package: kapptemplate
+version: 1
+installed: true
+
+package: info
+version: 2
+installed: true
+
+package: cvs
+version: 2
+installed: true
+
+package: libsensors3
+version: 8
+installed: true
+
+package: ksysguardd
+version: 1
+installed: true
+
+package: iptables
+version: 7
+installed: true
+
+package: console-data
+version: 7
+installed: true
+
+package: libglibmm-2.4-1
+version: 2
+installed: true
+
+package: liblwres1
+version: 1
+installed: true
+
+package: esound
+version: 3
+installed: true
+
+package: libjpeg-progs
+version: 2
+installed: true
+
+package: tcl8.4-dev
+version: 3
+installed: true
+
+package: xmms
+version: 11
+installed: true
+
+package: base-passwd
+version: 5
+installed: true
+
+package: libenchant1
+version: 1
+installed: true
+
+package: libvorbis0a
+version: 6
+installed: true
+
+package: libvorbisfile3
+version: 6
+installed: true
+
+package: libxpm4
+version: 1
+installed: true
+
+package: automake1.4
+version: 1
+installed: true
+
+package: libuuid1
+version: 2
+installed: true
+
+package: hal
+version: 3
+installed: true
+
+package: python
+version: 15
+installed: true
+
+package: libgnomecanvas2-common
+version: 1
+installed: true
+
+package: perl-base
+version: 16
+installed: true
+
+package: liboggflac1
+version: 1
+installed: true
+
+package: libsvga1
+version: 1
+installed: true
+
+package: ssh
+version: 6
+installed: true
+
+package: gcc-2.95
+version: 4
+installed: true
+
+package: e2fsprogs
+version: 6
+installed: true
+
+package: libpam0g
+version: 5
+installed: true
+
+package: kdelibs-data
+version: 5
+installed: true
+
+package: libmlgtk-ocaml
+version: 1
+installed: true
+
+package: libbz2-1.0
+version: 1
+installed: true
+
+package: libglib2.0-0
+version: 11
+installed: true
+
+package: xfonts-75dpi
+version: 3
+installed: true
+
+package: libncurses5-dev
+version: 1
+installed: true
+
+package: liblockfile1
+version: 3
+installed: true
+
+package: libcdparanoia0
+version: 1
+installed: true
+
+package: libapr0
+version: 4
+installed: true
+
+package: makedev
+version: 15
+installed: true
+
+package: klettres-data
+version: 1
+installed: true
+
+package: liborbit2
+version: 3
+installed: true
+
+package: openjade
+version: 1
+installed: true
+
+package: libxml2-dev
+version: 12
+installed: true
+
+package: libpcap0.7
+version: 1
+installed: true
+
+package: libc6-dev
+version: 7
+installed: true
+
+package: libeel2-data
+version: 1
+installed: true
+
+package: exim4-config
+version: 2
+installed: true
+
+package: cdrecord
+version: 6
+installed: true
+
+package: libaudiofile0
+version: 2
+installed: true
+
+package: libkpathsea3
+version: 5
+installed: true
+
+package: logrotate
+version: 5
+installed: true
+
+package: libsnmp-base
+version: 2
+installed: true
+
+package: libguile-ltdl-1
+version: 1
+installed: true
+
+package: libartsc0-dev
+version: 2
+installed: true
+
+package: man-db
+version: 5
+installed: true
+
+package: libxslt1.1
+version: 5
+installed: true
+
+package: xlibmesa-dri
+version: 1
+installed: true
+
+package: libcupsys2-gnutls10
+version: 3
+installed: true
+
+package: libgnomecups1.0-1
+version: 2
+installed: true
+
+package: libgcrypt11
+version: 1
+installed: true
+
+package: libtextwrap1
+version: 2
+installed: true
+
+package: m4
+version: 2
+installed: true
+
+package: libstartup-notification0
+version: 3
+installed: true
+
+package: docbook-xml
+version: 8
+installed: true
+
+package: libbonobo2-0
+version: 9
+installed: true
+
+package: scrollkeeper
+version: 9
+installed: true
+
+package: cpp
+version: 3
+installed: true
+
+package: libreadline5
+version: 1
+installed: true
+
+package: libbonoboui2-common
+version: 3
+installed: true
+
+package: libpcsclite1
+version: 4
+installed: true
+
+package: libgimpprint1
+version: 3
+installed: true
+
+package: libgnomeui-common
+version: 1
+installed: true
+
+package: sgml-data
+version: 5
+installed: true
+
+package: dictionaries-common
+version: 10
+installed: true
+
+package: mount
+version: 5
+installed: true
+
+package: gstreamer0.8-audiofile
+version: 1
+installed: true
+
+package: libtag1
+version: 3
+installed: true
+
+package: gstreamer0.8-mad
+version: 1
+installed: true
+
+package: libsmbclient
+version: 3
+installed: true
+
+package: desktop-file-utils
+version: 2
+installed: true
+
+package: libxtst6
+version: 1
+installed: true
+
+package: libpcre3
+version: 3
+installed: true
+
+package: gnome-mime-data
+version: 1
+installed: true
+
+package: sysvinit
+version: 12
+installed: true
+
+package: belocs-locales-data
+version: 2
+installed: true
+
+package: gedit-common
+version: 4
+installed: true
+
+package: libfam0c102
+version: 1
+installed: true
+
+package: adduser
+version: 16
+installed: true
+
+package: gstreamer0.8-plugin-apps
+version: 1
+installed: true
+
+package: libnews-nntpclient-perl
+version: 1
+installed: true
+
+package: dselect
+version: 1
+installed: true
+
+package: hotplug
+version: 5
+installed: true
+
+package: python2.3-twisted
+version: 4
+installed: true
+
+package: libgnutls11
+version: 3
+installed: true
+
+package: libkrb53
+version: 4
+installed: true
+
+package: libsnmp5
+version: 2
+installed: true
+
+package: slang1a-utf8
+version: 3
+installed: true
+
+package: libjpeg62
+version: 1
+installed: true
+
+package: tidy
+version: 3
+installed: true
+
+package: bsdutils
+version: 8
+installed: true
+
+package: libmyspell3
+version: 1
+installed: true
+
+package: modutils
+version: 10
+installed: true
+
+package: pciutils
+version: 6
+installed: true
+
+package: guile-1.6-libs
+version: 1
+installed: true
+
+package: libxp6
+version: 1
+installed: true
+
+package: libxi6
+version: 1
+installed: true
+
+package: libgpmg1
+version: 2
+installed: true
+
+package: libglib1.2
+version: 4
+installed: true
+
+package: portmap
+version: 1
+installed: true
+
+package: libcap1
+version: 1
+installed: true
+
+package: libxml2
+version: 16
+installed: true
+
+package: libice6
+version: 1
+installed: true
+
+package: grep
+version: 7
+installed: true
+
+package: binutils
+version: 7
+installed: true
+
+package: libbonobo2-common
+version: 2
+installed: true
+
+package: libhal-storage0
+version: 1
+installed: true
+
+package: xlibs-data
+version: 1
+installed: true
+
+package: imlib-base
+version: 3
+installed: true
+
+package: dbus-1
+version: 5
+installed: true
+
+package: libfreetype6
+version: 6
+installed: true
+
+package: libmad0
+version: 3
+installed: true
+
+package: ncurses-bin
+version: 1
+installed: true
+
+package: libwrap0
+version: 3
+installed: true
+
+package: libgcc1
+version: 20
+installed: true
+
+package: libmal1
+version: 1
+installed: true
+
+package: libesd0
+version: 4
+installed: true
+
+package: libxcursor1
+version: 3
+installed: true
+
+package: tcpd
+version: 1
+installed: true
+
+package: libpng12-0
+version: 5
+installed: true
+
+package: libdb1-compat
+version: 1
+installed: true
+
+package: myspell-en-us
+version: 1
+installed: true
+
+package: libwnck-common
+version: 1
+installed: true
+
+package: tetex-bin
+version: 21
+installed: true
+
+package: libcurl3
+version: 6
+installed: true
+
+package: libxrandr2
+version: 1
+installed: true
+
+package: sgml-base
+version: 6
+installed: true
+
+package: libxaw7
+version: 2
+installed: true
+
+package: python-crypto
+version: 1
+installed: true
+
+package: file
+version: 6
+installed: true
+
+package: util-linux
+version: 7
+installed: true
+
+package: tk8.4-dev
+version: 3
+installed: true
+
+package: libxine1
+version: 4
+installed: true
+
+package: libscrollkeeper0
+version: 3
+installed: true
+
+package: libssl0.9.7
+version: 1
+installed: true
+
+package: libselinux1
+version: 2
+installed: true
+
+package: e2fslibs
+version: 1
+installed: true
+
+package: libnss3
+version: 3
+installed: true
+
+package: perl-modules
+version: 10
+installed: true
+
+package: libattr1
+version: 3
+installed: true
+
+package: libopencdk8
+version: 2
+installed: true
+
+package: liblablgl-ocaml
+version: 2
+installed: true
+
+package: apt-utils
+version: 3
+installed: true
+
+package: liburi-perl
+version: 6
+installed: true
+
+package: dhcp-client
+version: 2
+installed: true
+
+package: libmagic1
+version: 1
+installed: true
+
+package: libc6
+version: 21
+installed: true
+
+package: imms
+version: 1
+installed: true
+
+package: libgpg-error0
+version: 4
+installed: true
+
+package: libtext-wrapi18n-perl
+version: 1
+installed: true
+
+package: libgphoto2-2
+version: 5
+installed: true
+
+package: libperl5.8
+version: 5
+installed: true
+
+package: libstdc++5
+version: 15
+installed: true
+
+package: kdegames-card-data
+version: 1
+installed: true
+
+package: libasound2
+version: 10
+installed: true
+
+package: debconf
+version: 43
+installed: true
+
+package: libconsole
+version: 1
+installed: true
+
+package: libogg0
+version: 4
+installed: true
+
+package: libungif4g
+version: 3
+installed: true
+
+package: libusb-0.1-4
+version: 7
+installed: true
+
+package: libacl1
+version: 3
+installed: true
+
+package: libt1-5
+version: 2
+installed: true
+
+package: libsm6
+version: 1
+installed: true
+
+package: debianutils
+version: 21
+installed: true
+
+package: perl
+version: 50
+installed: true
+
+package: libxmu-dev
+version: 2
+installed: true
+
+package: xlibmesa-gl
+version: 1
+installed: true
+
+package: apt-howto-it
+version: 2
+installed: true
+
+package: libpam-runtime
+version: 3
+installed: true
+
+package: libxrender1
+version: 2
+installed: true
+
+package: fortune-mod
+version: 5
+installed: true
+
+package: debconf-i18n
+version: 1
+installed: true
+
+package: libopenct1
+version: 2
+installed: true
+
+package: libsdl1.2debian
+version: 7
+installed: true
+
+package: apt-howto-common
+version: 2
+installed: true
+
+package: procps
+version: 3
+installed: true
+
+package: libpaper1
+version: 2
+installed: true
+
+package: linux-kernel-headers
+version: 2
+installed: true
+
+package: libblkid1
+version: 3
+installed: true
+
+package: xml-core
+version: 2
+installed: true
+
+package: lg-issue65
+version: 1
+installed: true
+
+package: python2.3-crypto
+version: 2
+installed: true
+
+package: libconvert-binhex-perl
+version: 2
+installed: true
+
+package: bzip2
+version: 3
+installed: true
+
+package: liblzo1
+version: 3
+installed: true
+
+package: libxmuu1
+version: 1
+installed: true
+
+package: libgtk2.0-common
+version: 4
+installed: true
+
+package: python-bibtex
+version: 1
+installed: true
+
+package: libldap2
+version: 2
+installed: true
+
+package: login
+version: 2
+installed: true
+
+package: libtiff4
+version: 1
+installed: true
+
+package: libtimedate-perl
+version: 2
+installed: true
+
+package: libfribidi0
+version: 2
+installed: true
+
+package: coreutils
+version: 12
+installed: true
+
+package: libncurses5
+version: 6
+installed: true
+
+package: libsasl2
+version: 5
+installed: true
+
+package: libss2
+version: 2
+installed: true
+
+package: psmisc
+version: 1
+installed: true
+
+package: sysv-rc
+version: 2
+installed: true
+
+package: gnome-icon-theme
+version: 7
+installed: true
+
+package: libgtk1.2
+version: 3
+installed: true
+
+package: mawk
+version: 2
+installed: true
+
+package: libpam-modules
+version: 5
+installed: true
+
+package: libdb4.2
+version: 1
+installed: true
+
+package: libxtrap6
+version: 1
+installed: true
+
+package: sed
+version: 12
+installed: true
+
+package: libesd0-dev
+version: 3
+installed: true
+
+package: libgtk1.2-common
+version: 1
+installed: true
+
+package: libhtml-tableextract-perl
+version: 1
+installed: true
+
+package: libsqlite3-0
+version: 4
+installed: true
+
+package: libxklavier8
+version: 1
+installed: true
+
+package: xfree86-common
+version: 4
+installed: true
+
+package: libexpat1
+version: 3
+installed: true
+
+package: gnupg-agent
+version: 1
+installed: true
+
+package: esound-common
+version: 2
+installed: true
+
+package: wget
+version: 2
+installed: true
+
+package: libtasn1-2
+version: 4
+installed: true
+
+package: gcc-3.3-base
+version: 2
+installed: true
+
+package: xlibmesa-glu
+version: 1
+installed: true
+
+package: klogd
+version: 1
+installed: true
+
+package: libatk1.0-0
+version: 8
+installed: true
+
+package: netpbm
+version: 5
+installed: true
+
+package: libsvn0
+version: 4
+installed: true
+
+package: xfonts-base
+version: 7
+installed: true
+
+package: libopenexr2
+version: 3
+installed: true
+
+package: libgsf-1-dev
+version: 3
+installed: true
+
+package: libvorbisenc2
+version: 4
+installed: true
+
+package: python2.3
+version: 6
+installed: true
+
+package: libice-dev
+version: 2
+installed: true
+
+package: zlib1g-dev
+version: 5
+installed: true
+
+package: zlib1g
+version: 5
+installed: true
+
+package: libvorbis-dev
+version: 2
+installed: true
+
+package: myspell-en-gb
+version: 1
+installed: true
+
+package: kdebase-data
+version: 1
+installed: true
+
+package: dpkg
+version: 24
+installed: true
+
+package: mime-support
+version: 4
+installed: true
+
+package: libreadline4
+version: 5
+installed: true
+
+package: autoconf
+version: 7
+installed: true
+
+package: libgsf-1
+version: 2
+installed: true
+
+package: libhtml-tree-perl
+version: 5
+installed: true
+
+package: imagemagick
+version: 8
+installed: true
+
+package: libhtml-parser-perl
+version: 9
+installed: true
+
+package: libvte-common
+version: 1
+installed: true
+
+package: libcomerr2
+version: 3
+installed: true
+
+package: bsdmainutils
+version: 4
+installed: true
+
+package: slang1
+version: 6
+installed: true
+
+package: initscripts
+version: 4
+installed: true
+
+package: libdb3
+version: 8
+installed: true
+
+package: libx11-6
+version: 1
+installed: true
+
+package: gstreamer0.8-flac
+version: 1
+installed: true
+
+package: aalib1
+version: 3
+installed: true
+
+package: libgstreamer-plugins0.8-0
+version: 2
+installed: true
+
+package: libogg-dev
+version: 2
+installed: true
+
+package: libsoup2.2-7
+version: 3
+installed: true
+
+package: libpopt0
+version: 3
+installed: true
+
+package: libgda2-3
+version: 1
+installed: true
+
+package: base-files
+version: 6
+installed: true
+
+package: liblocale-gettext-perl
+version: 2
+installed: true
+
+package: imlib11
+version: 1
+installed: true
+
+package: libart-2.0-2
+version: 3
+installed: true
+
+package: libiw27
+version: 2
+installed: true
+
+package: hostname
+version: 2
+installed: true
+
+package: libnewt0.51
+version: 1
+installed: true
+
+package: libboost-python1.32.0
+version: 1
+installed: true
+
+package: passwd
+version: 8
+installed: true
+
+package: libgpgme11
+version: 4
+installed: true
+
+package: libpisock8
+version: 1
+installed: true
+
+package: belocs-locales-bin
+version: 1
+installed: true
+
+package: libaspell15
+version: 5
+installed: true
+
+package: libxml2-utils
+version: 1
+installed: true
+
+package: libopensc1
+version: 3
+installed: true
+
+package: cpio
+version: 3
+installed: true
+
+package: libhtml-tagset-perl
+version: 3
+installed: true
+
+package: tar
+version: 9
+installed: true
+
+package: libnetpbm10
+version: 1
+installed: true
+
+package: ipchains
+version: 1
+installed: true
+
+package: libgdbm3
+version: 1
+installed: true
+
+package: libexpat1-dev
+version: 2
+installed: true
+
+package: gnumeric-common
+version: 2
+installed: true
+
+package: liblcms1
+version: 3
+installed: true
+
+package: libnspr4
+version: 4
+installed: true
+
+package: libxcursor-dev
+version: 1
+installed: true
+
+package: libgc1
+version: 1
+installed: true
+
+package: libapm1
+version: 3
+installed: true
+
+package: python2.3-twisted-conch
+version: 1
+installed: true
+
+package: libgnomeprint2.2-data
+version: 1
+installed: true
+
+package: xfonts-100dpi
+version: 3
+installed: true
+
+package: tcl8.4
+version: 4
+installed: true
+
+package: libartsc0
+version: 6
+installed: true
+
+package: libaudio2
+version: 1
+installed: true
+
+package: libspeex1
+version: 1
+installed: true
+
+package: libasound2-dev
+version: 3
+installed: true
+
+package: libjasper-1.701-1
+version: 2
+installed: true
+
+package: libxmu6
+version: 2
+installed: true
+
+package: menu-xdg
+version: 1
+installed: true
+
+package: menu
+version: 13
+installed: true
+
+package: libdps1
+version: 2
+installed: true
+
+package: edict
+version: 1
+installed: true
+
+package: libjack0.80.0-0
+version: 4
+installed: true
+
+package: libflac6
+version: 1
+installed: true
+
+package: vim
+version: 8
+installed: true
+
+package: powermgmt-base
+version: 1
+installed: true
+
+package: ncurses-base
+version: 2
+installed: true
+
+package: gpgsm
+version: 1
+installed: true
+
+package: libexif10
+version: 1
+installed: true
+
+package: libid3tag0
+version: 3
+installed: true
+
+package: libomnithread3
+version: 3
+installed: true
+
+package: python2.3-numeric
+version: 1
+installed: true
+
+package: apt
+version: 9
+installed: true
+
+package: gnome-desktop-data
+version: 4
+installed: true
+
+package: libhal0
+version: 2
+installed: true
+
+package: texinfo
+version: 5
+installed: true
+
+package: libstdc++2.10-glibc2.2
+version: 4
+installed: true
+
+package: lg-base
+version: 3
+installed: true
+
+package: libdb4.1
+version: 1
+installed: true
+
+package: libgnome-pilot2
+version: 2
+installed: true
+
+package: libgnomeprintui2.2-common
+version: 1
+installed: true
+
+package: fftw3
+version: 1
+installed: true
+
+package: libpisync0
+version: 1
+installed: true
+
+package: libxt-dev
+version: 5
+installed: true
+
+package: sysklogd
+version: 3
+installed: true
+
+package: libtext-charwidth-perl
+version: 1
+installed: true
+
+package: kdesdk-scripts
+version: 1
+installed: true
+
+package: libxext-dev
+version: 2
+installed: true
+
+package: libmagick6
+version: 1
+installed: true
+
+package: gnome-doc-tools
+version: 1
+installed: true
+
+package: libxt6
+version: 1
+installed: true
+
+package: iputils-ping
+version: 2
+installed: true
+
+package: libosp4
+version: 2
+installed: true
+
+package: libostyle1
+version: 1
+installed: true
+
+package: findutils
+version: 3
+installed: true
+
+package: librecode0
+version: 2
+installed: true
+
+package: libgstreamer0.8-0
+version: 4
+installed: true
+
+package: desktop-base
+version: 2
+installed: true
+
+package: libaspell-dev
+version: 1
+installed: true
+
+package: ocaml-base
+version: 2
+installed: true
+
+package: udev
+version: 5
+installed: true
+
+package: finger
+version: 1
+installed: true
+
+package: sudo
+version: 1
+installed: true
+
+package: gdb
+version: 4
+installed: true
+
+package: libraw1394-5
+version: 1
+installed: true
+
+package: dbus-glib-1
+version: 4
+installed: true
+
+package: libgphoto2-port0
+version: 5
+installed: true
+
+package: libgtop2-2
+version: 1
+installed: true
+
+package: libmailtools-perl
+version: 7
+installed: true
+
+package: libmng1
+version: 2
+installed: true
+
+package: liboil0.2
+version: 1
+installed: true
+
+package: libtasn1-2-dev
+version: 1
+installed: true
+
+package: libshout3
+version: 1
+installed: true
+
+package: libtheora0
+version: 1
+installed: true
+
+package: gstreamer0.8-tools
+version: 1
+installed: true
+
+package: console-tools
+version: 6
+installed: true
+
+package: pkg-config
+version: 6
+installed: true
+
+package: xlibmesa-gl-dev
+version: 1
+installed: true
+
+package: libwww-perl
+version: 15
+installed: true
+
+package: libsdl1.2debian-oss
+version: 1
+installed: true
+
+package: gstreamer0.8-oss
+version: 1
+installed: true
+
+package: cpp-2.95
+version: 2
+installed: true
+
+package: libgsm1
+version: 5
+installed: true
+
+package: bc
+version: 1
+installed: true
+
+package: libcompfaceg1
+version: 1
+installed: true
+
+package: libgtksourceview-common
+version: 2
+installed: true
+
+package: gnupg
+version: 10
+installed: true
+
+package: nautilus-data
+version: 1
+installed: true
+
+package: mkisofs
+version: 5
+installed: true
+
+package: kstars-data
+version: 1
+installed: true
+
+package: libgmp3
+version: 4
+installed: true
+
+package: x-dev
+version: 2
+installed: true
+
+package: fam
+version: 1
+installed: true
+
+package: gnome2-user-guide
+version: 2
+installed: true
+
+package: tcptraceroute
+version: 1
+installed: true
+
+package: netkit-inetd
+version: 1
+installed: true
+
+package: xutils
+version: 6
+installed: true
+
+package: bash
+version: 13
+installed: true
+
+package: hicolor-icon-theme
+version: 2
+installed: true
+
+package: libtext-iconv-perl
+version: 2
+installed: true
+
+package: ucf
+version: 13
+installed: true
+
+package: python2.2
+version: 3
+installed: true
+
+package: libcroco3
+version: 2
+installed: true
+
+package: vim-common
+version: 2
+installed: true
+
+package: libmusicbrainz4
+version: 2
+installed: true
+
+package: docbook-dsssl
+version: 2
+installed: true
+
+package: libxv1
+version: 1
+installed: true
+
+package: libbonobo2-dev
+version: 5
+installed: true
+
+package: shared-mime-info
+version: 3
+installed: true
+
+package: tk8.4
+version: 5
+installed: true
+
+package: gzip
+version: 6
+installed: true
+
+package: python-twisted
+version: 5
+installed: true
+
+package: enscript
+version: 1
+installed: true
+
+package: libgnutls11-dev
+version: 1
+installed: true
+
+package: libmimelib1a
+version: 1
+installed: true
+
+package: psutils
+version: 2
+installed: true
+
+package: manpages
+version: 5
+installed: true
+
+package: libsamplerate0
+version: 1
+installed: true
+
+package: render-dev
+version: 1
+installed: true
+
+package: gettext
+version: 13
+installed: true
+
+package: gettext-base
+version: 4
+installed: true
+
+package: diff
+version: 5
+installed: true
+
+package: libjpeg62-dev
+version: 2
+installed: true
+
+package: libxext6
+version: 1
+installed: true
+
+package: libpth2
+version: 1
+installed: true
+
+package: cron
+version: 8
+installed: true
+
+package: libisc7
+version: 1
+installed: true
+
+package: libglib1.2-dev
+version: 2
+installed: true
+
+package: libqthreads-12
+version: 1
+installed: true
+
+package: groff-base
+version: 3
+installed: true
+
+package: libidl0
+version: 1
+installed: true
+
+package: libomniorb4
+version: 3
+installed: true
+
+package: libdb4.1-dev
+version: 1
+installed: true
+
+package: libdb4.1++-dev
+version: 1
+installed: true
+
+package: libdb4.1++
+version: 1
+installed: true
+
+package: python2.2-omniorb2
+version: 1
+installed: true
+
+package: libaudio-dev
+version: 1
+installed: true
+
+package: python-twisted-conch
+version: 1
+installed: true
+
+package: python2.3-twisted-bin
+version: 1
+installed: true
+
+package: db2latex-xsl-doc
+version: 1
+installed: true
+
+package: libapt-pkg-perl
+version: 3
+installed: true
+
+package: libmodplug0
+version: 2
+installed: true
+
+package: libnet1
+version: 3
+installed: true
+
+package: usbutils
+version: 1
+installed: true
+
+package: cpp-3.3
+version: 3
+installed: true
+
+package: poster
+version: 1
+installed: true
+
+package: libidn11
+version: 3
+installed: true
+
+package: gnome-games-data
+version: 2
+installed: true
+
+package: libssl-dev
+version: 5
+installed: true
+
+# end of solution from packup
+# sol printed

@@ -1,0 +1,5921 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# solving 
+# Number of comparators of sorting network: 42947
+# Optimum sorted objective vector: 109 10 
+# solving time:
+#	 parent process: 4.53913s
+#	 child processes: 3.25625s
+#	 total time: 7.79538s
+# sol printing
+# beginning of solution from packup
+package: liblzo2-dev
+version: 8673
+installed: true
+
+package: psfontmgr
+version: 2979
+installed: true
+
+package: cvs-buildpackage
+version: 11825
+installed: true
+
+package: vim-tiny
+version: 14456
+installed: true
+
+package: manpages-dev
+version: 10789
+installed: true
+
+package: libxapian15
+version: 4956
+installed: true
+
+package: libegl1-mesa-drivers
+version: 12149
+installed: true
+
+package: rake
+version: 2330
+installed: true
+
+package: apt-file
+version: 8750
+installed: true
+
+package: netcat
+version: 6882
+installed: true
+
+package: less
+version: 12591
+installed: true
+
+package: texlive-latex-extra-doc
+version: 12656
+installed: true
+
+package: localization-config
+version: 6459
+installed: true
+
+package: libledit-ocaml-dev
+version: 8373
+installed: true
+
+package: texlive-lang-spanish
+version: 12653
+installed: true
+
+package: doc-base
+version: 2822
+installed: true
+
+package: python-xappy
+version: 1431
+installed: true
+
+package: python-parsedatetime
+version: 2330
+installed: true
+
+package: traceroute
+version: 13730
+installed: true
+
+package: dh-ocaml
+version: 2590
+installed: true
+
+package: nano
+version: 8444
+installed: true
+
+package: libpod-coverage-perl
+version: 3326
+installed: true
+
+package: esound-clients
+version: 917
+installed: true
+
+package: bc
+version: 6445
+installed: true
+
+package: headache
+version: 5695
+installed: true
+
+package: libnet-openid-consumer-perl
+version: 5670
+installed: true
+
+package: vbetool
+version: 5025
+installed: true
+
+package: metche
+version: 13463
+installed: true
+
+package: patchutils
+version: 1037
+installed: true
+
+package: diff
+version: 13928
+installed: true
+
+package: wdiff
+version: 1821
+installed: true
+
+package: hal-info
+version: 13002
+installed: true
+
+package: liblwpx-paranoidagent-perl
+version: 6461
+installed: true
+
+package: texlive-science-doc
+version: 12656
+installed: true
+
+package: libocamlnet-ocaml-doc
+version: 8472
+installed: true
+
+package: liblzo2-2
+version: 8673
+installed: true
+
+package: libauthen-dechpwd-perl
+version: 8838
+installed: true
+
+package: at
+version: 10214
+installed: true
+
+package: libalgorithm-merge-perl
+version: 2159
+installed: true
+
+package: menhir
+version: 12962
+installed: true
+
+package: python-tk
+version: 9104
+installed: true
+
+package: lynx
+version: 9209
+installed: true
+
+package: libbind9-50
+version: 14182
+installed: true
+
+package: ntfsprogs
+version: 7818
+installed: true
+
+package: trang
+version: 13000
+installed: true
+
+package: libbenchmark-ocaml-dev
+version: 2414
+installed: true
+
+package: libjson-wheel-ocaml-dev
+version: 4844
+installed: true
+
+package: libjson-static-camlp4-dev
+version: 2643
+installed: true
+
+package: apt-xapian-index
+version: 3567
+installed: true
+
+package: libfont-afm-perl
+version: 7135
+installed: true
+
+package: libhtml-format-perl
+version: 8838
+installed: true
+
+package: libexcalibur-logkit-java
+version: 7766
+installed: true
+
+package: cowdancer
+version: 3749
+installed: true
+
+package: cowbuilder
+version: 3749
+installed: true
+
+package: debian-builder
+version: 6591
+installed: true
+
+package: libauthen-sasl-perl
+version: 9926
+installed: true
+
+package: python-werkzeug
+version: 1803
+installed: true
+
+package: php-pear
+version: 11625
+installed: true
+
+package: rubygems
+version: 6373
+installed: true
+
+package: libqt4-test
+version: 14621
+installed: true
+
+package: openssh-blacklist-extra
+version: 1266
+installed: true
+
+package: telnet
+version: 3236
+installed: true
+
+package: w3m
+version: 1554
+installed: true
+
+package: manpages
+version: 10789
+installed: true
+
+package: texlive-math-extra
+version: 12656
+installed: true
+
+package: libcgi-formbuilder-perl
+version: 10513
+installed: true
+
+package: rnv
+version: 6579
+installed: true
+
+package: libgd-gd2-noxpm-perl
+version: 13909
+installed: true
+
+package: python-psycopg2
+version: 8373
+installed: true
+
+package: libdaemon0
+version: 3109
+installed: true
+
+package: avahi-daemon
+version: 1932
+installed: true
+
+package: portmap
+version: 11922
+installed: true
+
+package: groovy
+version: 6575
+installed: true
+
+package: libio-compress-base-perl
+version: 9776
+installed: true
+
+package: liblwres50
+version: 14182
+installed: true
+
+package: mancoosi-contest
+version: 1009
+installed: true
+
+package: libevent-1.4-2
+version: 6107
+installed: true
+
+package: libminisat-ocaml
+version: 939
+installed: true
+
+package: bip
+version: 2328
+installed: true
+
+package: libarchive1
+version: 9191
+installed: true
+
+package: cmake
+version: 9196
+installed: true
+
+package: xutils-dev
+version: 14169
+installed: true
+
+package: ssh
+version: 14123
+installed: true
+
+package: libcurl4-gnutls-dev
+version: 12161
+installed: true
+
+package: python-sqlobject
+version: 3025
+installed: true
+
+package: libocsigen-ocaml-doc
+version: 5793
+installed: true
+
+package: libconfig-inifiles-perl
+version: 9828
+installed: true
+
+package: libminisat-ocaml-dev
+version: 939
+installed: true
+
+package: libavahi-core6
+version: 1929
+installed: true
+
+package: mktemp
+version: 12243
+installed: true
+
+package: build-essential
+version: 12372
+installed: true
+
+package: libgl1-mesa-dri
+version: 12149
+installed: true
+
+package: python-moinmoin
+version: 6804
+installed: true
+
+package: libuuid-perl
+version: 683
+installed: true
+
+package: libcryptokit-ocaml-dev
+version: 5692
+installed: true
+
+package: python-subversion
+version: 6438
+installed: true
+
+package: libxstr-ocaml-dev
+version: 767
+installed: true
+
+package: python-wxversion
+version: 9213
+installed: true
+
+package: xbitmaps
+version: 5128
+installed: true
+
+package: quilt
+version: 3624
+installed: true
+
+package: libhal-storage1
+version: 1650
+installed: true
+
+package: liburi-fetch-perl
+version: 2156
+installed: true
+
+package: libcrypt-blowfish-perl
+version: 9360
+installed: true
+
+package: liblog4cxx10
+version: 2811
+installed: true
+
+package: pdfjam
+version: 8839
+installed: true
+
+package: libboost-iostreams1.40.0
+version: 7317
+installed: true
+
+package: xdelta
+version: 5188
+installed: true
+
+package: pristine-tar
+version: 6979
+installed: true
+
+package: libbuddy-ocaml-dev
+version: 391
+installed: true
+
+package: python-genshi
+version: 1687
+installed: true
+
+package: libio-compress-zlib-perl
+version: 9776
+installed: true
+
+package: texlive-publishers
+version: 12656
+installed: true
+
+package: logcheck-database
+version: 5874
+installed: true
+
+package: python-twisted-core
+version: 12339
+installed: true
+
+package: vrfy
+version: 12780
+installed: true
+
+package: libqt4-sql
+version: 14621
+installed: true
+
+package: libqt4-script
+version: 14621
+installed: true
+
+package: libpxp-ocaml-dev
+version: 5454
+installed: true
+
+package: tk8.5
+version: 12250
+installed: true
+
+package: wwwconfig-common
+version: 782
+installed: true
+
+package: libbz2-ocaml-dev
+version: 1754
+installed: true
+
+package: libbeecrypt7
+version: 11092
+installed: true
+
+package: vim-common
+version: 14456
+installed: true
+
+package: libbz2-dev
+version: 4832
+installed: true
+
+package: libboost1.40-dev
+version: 7317
+installed: true
+
+package: gettext-base
+version: 3267
+installed: true
+
+package: libparse-debcontrol-perl
+version: 8839
+installed: true
+
+package: libcache-perl
+version: 8675
+installed: true
+
+package: libgmp3-dev
+version: 14448
+installed: true
+
+package: createrepo
+version: 1382
+installed: true
+
+package: schroot
+version: 6123
+installed: true
+
+package: libcalendar-ocaml-dev
+version: 8154
+installed: true
+
+package: python-dns
+version: 8624
+installed: true
+
+package: help2man
+version: 7310
+installed: true
+
+package: sudo
+version: 6559
+installed: true
+
+package: debootstrap
+version: 4978
+installed: true
+
+package: udev
+version: 12550
+installed: true
+
+package: python-zope.interface
+version: 10527
+installed: true
+
+package: gpgv
+version: 6096
+installed: true
+
+package: libreadonly-xs-perl
+version: 5902
+installed: true
+
+package: libclass-errorhandler-perl
+version: 395
+installed: true
+
+package: deborphan
+version: 6586
+installed: true
+
+package: libocamlnet-ocaml
+version: 8473
+installed: true
+
+package: libjpeg8
+version: 12181
+installed: true
+
+package: libboost-regex1.46.0
+version: 7358
+installed: true
+
+package: libpolkit-gobject-1-0
+version: 4071
+installed: true
+
+package: python2.5-minimal
+version: 8907
+installed: true
+
+package: python2.5
+version: 8907
+installed: true
+
+package: libcrypt-passwdmd5-perl
+version: 5687
+installed: true
+
+package: libboost-iostreams1.42.0
+version: 7335
+installed: true
+
+package: libnet-dns-perl
+version: 3777
+installed: true
+
+package: libjansi-java
+version: 5897
+installed: true
+
+package: libglu1-mesa
+version: 12149
+installed: true
+
+package: libboost-program-options1.40-dev
+version: 7317
+installed: true
+
+package: uuid-runtime
+version: 9505
+installed: true
+
+package: xauth
+version: 13418
+installed: true
+
+package: zlib1g-dev
+version: 13495
+installed: true
+
+package: libneon27-gnutls
+version: 3461
+installed: true
+
+package: python-cheetah
+version: 8762
+installed: true
+
+package: libglib2.0-data
+version: 9690
+installed: true
+
+package: libglib2.0-dev
+version: 9690
+installed: true
+
+package: libasm3-java
+version: 10240
+installed: true
+
+package: perl-doc
+version: 11795
+installed: true
+
+package: x11proto-composite-dev
+version: 13193
+installed: true
+
+package: camlp5
+version: 11973
+installed: true
+
+package: liblwres60
+version: 14184
+installed: true
+
+package: ocaml-ulex08
+version: 2170
+installed: true
+
+package: cpp-4.5
+version: 11251
+installed: true
+
+package: clisp
+version: 13915
+installed: true
+
+package: libxmlgraphics-commons-java
+version: 6146
+installed: true
+
+package: mc
+version: 14487
+installed: true
+
+package: libpcre3-dev
+version: 12257
+installed: true
+
+package: dosfstools
+version: 10091
+installed: true
+
+package: libxau-dev
+version: 13419
+installed: true
+
+package: lib32gomp1
+version: 11251
+installed: true
+
+package: libdevmapper1.02.1
+version: 14339
+installed: true
+
+package: poppler-data
+version: 1320
+installed: true
+
+package: libdigest-hmac-perl
+version: 5383
+installed: true
+
+package: libgraph-perl
+version: 13351
+installed: true
+
+package: libisccfg62
+version: 14184
+installed: true
+
+package: libdns69
+version: 14184
+installed: true
+
+package: libboost-system1.46.0
+version: 7358
+installed: true
+
+package: libjcode-pm-perl
+version: 8938
+installed: true
+
+package: bind9-host
+version: 14184
+installed: true
+
+package: texlive-latex-recommended-doc
+version: 12657
+installed: true
+
+package: libjpeg62-dev
+version: 11901
+installed: true
+
+package: libxext6
+version: 14324
+installed: true
+
+package: libpq-dev
+version: 12290
+installed: true
+
+package: liblist-moreutils-perl
+version: 3394
+installed: true
+
+package: perl-tk
+version: 14220
+installed: true
+
+package: gnupg
+version: 6096
+installed: true
+
+package: libflac8
+version: 5455
+installed: true
+
+package: debian-policy
+version: 10684
+installed: true
+
+package: libtdb1
+version: 5596
+installed: true
+
+package: rarian-compat
+version: 2241
+installed: true
+
+package: libreadline5
+version: 11571
+installed: true
+
+package: libgraphviz-perl
+version: 8673
+installed: true
+
+package: libpam-krb5
+version: 11175
+installed: true
+
+package: libcore-ocaml
+version: 1749
+installed: true
+
+package: libxalan2-java-gcj
+version: 9107
+installed: true
+
+package: libopenssl-ruby1.8
+version: 6711
+installed: true
+
+package: libmaven-resources-plugin-java
+version: 8544
+installed: true
+
+package: libexpat1-dev
+version: 7855
+installed: true
+
+package: libstax-java
+version: 5404
+installed: true
+
+package: rpm-common
+version: 11335
+installed: true
+
+package: python-formencode
+version: 5489
+installed: true
+
+package: iproute
+version: 13095
+installed: true
+
+package: libio-pty-perl
+version: 13633
+installed: true
+
+package: libipc-run-perl
+version: 3923
+installed: true
+
+package: moreutils
+version: 3596
+installed: true
+
+package: cdbs
+version: 1408
+installed: true
+
+package: libx11-data
+version: 14350
+installed: true
+
+package: libhtml-parser-perl
+version: 10848
+installed: true
+
+package: libwww-perl
+version: 11884
+installed: true
+
+package: perl-modules
+version: 11795
+installed: true
+
+package: ocaml-compiler-libs
+version: 10721
+installed: true
+
+package: libdata-float-perl
+version: 2915
+installed: true
+
+package: postgresql-client
+version: 12290
+installed: true
+
+package: dbus
+version: 6059
+installed: true
+
+package: libisccc50
+version: 14182
+installed: true
+
+package: libbdd-dev
+version: 8684
+installed: true
+
+package: libbsd0
+version: 725
+installed: true
+
+package: libapt-pkg-perl
+version: 643
+installed: true
+
+package: libxml-twig-perl
+version: 14032
+installed: true
+
+package: load-dirs-common
+version: 5238
+installed: true
+
+package: libedit2
+version: 9340
+installed: true
+
+package: openssh-client
+version: 14123
+installed: true
+
+package: libexpat-ocaml-dev
+version: 2498
+installed: true
+
+package: libidl-dev
+version: 2368
+installed: true
+
+package: libbz2-1.0
+version: 4832
+installed: true
+
+package: gcc-doc-base
+version: 11212
+installed: true
+
+package: libplexus-velocity-java
+version: 5231
+installed: true
+
+package: libservlet2.5-java
+version: 11937
+installed: true
+
+package: libcommons-io-java
+version: 5903
+installed: true
+
+package: libapr1
+version: 6016
+installed: true
+
+package: libmaven-archiver-java
+version: 8675
+installed: true
+
+package: libdoxia-sitetools-java
+version: 5165
+installed: true
+
+package: libltdl-dev
+version: 8453
+installed: true
+
+package: rhino
+version: 6483
+installed: true
+
+package: xpdf
+version: 10250
+installed: true
+
+package: libspreadsheet-writeexcel-perl
+version: 9791
+installed: true
+
+package: xfonts-encodings
+version: 13414
+installed: true
+
+package: python2.5-dev
+version: 8907
+installed: true
+
+package: python-pam
+version: 1299
+installed: true
+
+package: sgml-base
+version: 7213
+installed: true
+
+package: iso-codes
+version: 10784
+installed: true
+
+package: install-info
+version: 11385
+installed: true
+
+package: libcommons-validator-java
+version: 13522
+installed: true
+
+package: libnetpbm10
+version: 14463
+installed: true
+
+package: libusb-0.1-4
+version: 14257
+installed: true
+
+package: python-paramiko
+version: 6566
+installed: true
+
+package: libmaven-compiler-plugin-java
+version: 7877
+installed: true
+
+package: python-pydot
+version: 4740
+installed: true
+
+package: libmaven-filtering-java
+version: 4490
+installed: true
+
+package: libavalon-framework-java
+version: 11086
+installed: true
+
+package: libmaven-clean-plugin-java
+version: 8542
+installed: true
+
+package: libsaxon-java
+version: 14142
+installed: true
+
+package: maven-repo-helper
+version: 6209
+installed: true
+
+package: debtree
+version: 4840
+installed: true
+
+package: libmagic1
+version: 11631
+installed: true
+
+package: libcarp-clan-perl
+version: 11997
+installed: true
+
+package: python-central
+version: 1915
+installed: true
+
+package: cvs
+version: 13662
+installed: true
+
+package: librpmbuild1
+version: 11335
+installed: true
+
+package: libxdelta2
+version: 5188
+installed: true
+
+package: libpcap0.8
+version: 5130
+installed: true
+
+package: gcc-4.4-base
+version: 11218
+installed: true
+
+package: tcpdump
+version: 11023
+installed: true
+
+package: liburi-perl
+version: 7415
+installed: true
+
+package: libkadm5clnt-mit8
+version: 6768
+installed: true
+
+package: python-webpy
+version: 13324
+installed: true
+
+package: ed
+version: 5903
+installed: true
+
+package: libxpm4
+version: 14008
+installed: true
+
+package: libregexp-assemble-perl
+version: 3508
+installed: true
+
+package: libplexus-compiler-api-java
+version: 6240
+installed: true
+
+package: libice-dev
+version: 14298
+installed: true
+
+package: libxmu6
+version: 14307
+installed: true
+
+package: libwbclient0
+version: 14436
+installed: true
+
+package: libopenjpeg2
+version: 5713
+installed: true
+
+package: texlive-base
+version: 12657
+installed: true
+
+package: fuse-utils
+version: 9194
+installed: true
+
+package: cudf-tools
+version: 1673
+installed: true
+
+package: texlive-fonts-recommended
+version: 12657
+installed: true
+
+package: mysql-common
+version: 11563
+installed: true
+
+package: python-support
+version: 4909
+installed: true
+
+package: texlive-doc-base
+version: 12652
+installed: true
+
+package: libnet-ldap-perl
+version: 13367
+installed: true
+
+package: python-gobject
+version: 9584
+installed: true
+
+package: libganymed-ssh2-java
+version: 12574
+installed: true
+
+package: libnetbeans-cvsclient-java
+version: 12005
+installed: true
+
+package: libisc62
+version: 14184
+installed: true
+
+package: libnspr4-0d
+version: 11348
+installed: true
+
+package: lynx-cur
+version: 9209
+installed: true
+
+package: librpmbuild0
+version: 11315
+installed: true
+
+package: libtask-weaken-perl
+version: 5666
+installed: true
+
+package: xindy-rules
+version: 8673
+installed: true
+
+package: libplexus-interactivity-api-java
+version: 4615
+installed: true
+
+package: libaccess-bridge-java
+version: 7214
+installed: true
+
+package: libxrandr2
+version: 14347
+installed: true
+
+package: junit
+version: 10659
+installed: true
+
+package: liblwt-ocaml-doc
+version: 8147
+installed: true
+
+package: libxcomposite1
+version: 13196
+installed: true
+
+package: libxcb-dri2-0
+version: 6463
+installed: true
+
+package: libpoppler5
+version: 3024
+installed: true
+
+package: liblockfile-simple-perl
+version: 4198
+installed: true
+
+package: libdatrie1
+version: 819
+installed: true
+
+package: libcairo-script-interpreter2
+version: 6899
+installed: true
+
+package: tcl8.4
+version: 12241
+installed: true
+
+package: file
+version: 11631
+installed: true
+
+package: docbook-xsl-doc-html
+version: 7482
+installed: true
+
+package: libvorbisenc2
+version: 5768
+installed: true
+
+package: latexdiff
+version: 1422
+installed: true
+
+package: defoma
+version: 2979
+installed: true
+
+package: libtasn1-3-dev
+version: 9227
+installed: true
+
+package: libpango1.0-common
+version: 7233
+installed: true
+
+package: libpango1.0-0
+version: 7233
+installed: true
+
+package: libplexus-digest-java
+version: 5025
+installed: true
+
+package: libpam-gnome-keyring
+version: 9746
+installed: true
+
+package: libcore-ocaml-dev
+version: 1749
+installed: true
+
+package: python-wadllib
+version: 5425
+installed: true
+
+package: libxcb-shm0
+version: 6463
+installed: true
+
+package: qt4-qmake
+version: 14630
+installed: true
+
+package: time
+version: 6481
+installed: true
+
+package: gitk
+version: 13628
+installed: true
+
+package: libxcb-xfixes0
+version: 6463
+installed: true
+
+package: docbook2x
+version: 2343
+installed: true
+
+package: libxcb-shape0
+version: 6463
+installed: true
+
+package: tasksel-data
+version: 9875
+installed: true
+
+package: libx11-xcb1
+version: 14350
+installed: true
+
+package: sysv-rc
+version: 9874
+installed: true
+
+package: libudev0
+version: 12550
+installed: true
+
+package: libextlib-ocaml
+version: 6216
+installed: true
+
+package: libtalloc2
+version: 7925
+installed: true
+
+package: libfreezethaw-perl
+version: 4321
+installed: true
+
+package: libck-connector0
+version: 1320
+installed: true
+
+package: libxxf86vm1
+version: 13446
+installed: true
+
+package: libgl1-mesa-glx
+version: 12149
+installed: true
+
+package: texlive-latex-recommended
+version: 12657
+installed: true
+
+package: libdrm2
+version: 8828
+installed: true
+
+package: librpmio0
+version: 11315
+installed: true
+
+package: libhtml-tree-perl
+version: 11000
+installed: true
+
+package: libegl1-mesa
+version: 12149
+installed: true
+
+package: libutempter0
+version: 5211
+installed: true
+
+package: libmpeg3-1
+version: 6250
+installed: true
+
+package: texlive-humanities-doc
+version: 12656
+installed: true
+
+package: libatk1.0-0
+version: 7263
+installed: true
+
+package: liblwt-ssl-ocaml-dev
+version: 8148
+installed: true
+
+package: libts-0.0-0
+version: 4534
+installed: true
+
+package: desktop-file-utils
+version: 3145
+installed: true
+
+package: libcdt4
+version: 9663
+installed: true
+
+package: libvorbis0a
+version: 5768
+installed: true
+
+package: ldap-utils
+version: 8830
+installed: true
+
+package: texlive-pstricks
+version: 12656
+installed: true
+
+package: libcroco3
+version: 1803
+installed: true
+
+package: libjetty-java
+version: 11957
+installed: true
+
+package: libfontconfig1
+version: 9164
+installed: true
+
+package: apt-listchanges
+version: 9859
+installed: true
+
+package: libcairo2
+version: 6899
+installed: true
+
+package: libdb5.1
+version: 11556
+installed: true
+
+package: libpulse0
+version: 2728
+installed: true
+
+package: libxcursor1
+version: 13458
+installed: true
+
+package: libcryptgps-ocaml-dev
+version: 764
+installed: true
+
+package: libmaven-scm-java
+version: 5670
+installed: true
+
+package: texlive-humanities
+version: 12656
+installed: true
+
+package: libplexus-component-api-java
+version: 4627
+installed: true
+
+package: libyaml-0-2
+version: 533
+installed: true
+
+package: bsh
+version: 7789
+installed: true
+
+package: whiptail
+version: 3684
+installed: true
+
+package: ca-certificates-java
+version: 13028
+installed: true
+
+package: libmaven-doxia-tools-java
+version: 5343
+installed: true
+
+package: libplexus-cipher-java
+version: 6152
+installed: true
+
+package: liblua5.1-0
+version: 11547
+installed: true
+
+package: libplexus-archiver-java
+version: 4469
+installed: true
+
+package: debsums
+version: 8037
+installed: true
+
+package: maven2
+version: 8378
+installed: true
+
+package: texlive-binaries
+version: 12655
+installed: true
+
+package: libclassworlds-java
+version: 5081
+installed: true
+
+package: libmodello-java
+version: 5025
+installed: true
+
+package: libplexus-i18n-java
+version: 4622
+installed: true
+
+package: libxbean-java
+version: 10490
+installed: true
+
+package: gcc-4.4
+version: 11218
+installed: true
+
+package: markdown
+version: 4708
+installed: true
+
+package: python-elementtree
+version: 5564
+installed: true
+
+package: libaprutil1
+version: 5865
+installed: true
+
+package: libncurses5
+version: 11720
+installed: true
+
+package: libjaxp1.3-java
+version: 5828
+installed: true
+
+package: libpathplan4
+version: 9663
+installed: true
+
+package: libgnuinet-java
+version: 5136
+installed: true
+
+package: libplexus-utils-java
+version: 13591
+installed: true
+
+package: libgoogle-collections-java
+version: 4522
+installed: true
+
+package: libaudiofile0
+version: 843
+installed: true
+
+package: libplexus-containers-java
+version: 4483
+installed: true
+
+package: ca-certificates
+version: 12982
+installed: true
+
+package: texlive-lang-german
+version: 12653
+installed: true
+
+package: shared-mime-info
+version: 3927
+installed: true
+
+package: libpcre3
+version: 12257
+installed: true
+
+package: debconf-i18n
+version: 6296
+installed: true
+
+package: libnet-libidn-perl
+version: 3054
+installed: true
+
+package: openssl
+version: 2657
+installed: true
+
+package: console-common
+version: 2130
+installed: true
+
+package: latex-make
+version: 8269
+installed: true
+
+package: devscripts
+version: 9322
+installed: true
+
+package: fontconfig
+version: 9164
+installed: true
+
+package: ftp
+version: 3234
+installed: true
+
+package: rsyslog
+version: 11717
+installed: true
+
+package: libperl5.10
+version: 11795
+installed: true
+
+package: bash
+version: 11003
+installed: true
+
+package: libavahi-common-data
+version: 1932
+installed: true
+
+package: libpam-runtime
+version: 5168
+installed: true
+
+package: libpam-ck-connector
+version: 1320
+installed: true
+
+package: libk5crypto3
+version: 6768
+installed: true
+
+package: libcloog-ppl0
+version: 3174
+installed: true
+
+package: libncursesw5
+version: 11720
+installed: true
+
+package: libunistring0
+version: 2540
+installed: true
+
+package: ruby
+version: 11232
+installed: true
+
+package: jhead
+version: 13919
+installed: true
+
+package: krb5-config
+version: 8311
+installed: true
+
+package: gcc-4.3-base
+version: 11163
+installed: true
+
+package: libcommons-jxpath-java
+version: 5676
+installed: true
+
+package: libcommons-lang-java
+version: 8678
+installed: true
+
+package: libnewt0.52
+version: 3684
+installed: true
+
+package: xterm
+version: 12579
+installed: true
+
+package: liblcms1
+version: 7119
+installed: true
+
+package: libpng12-0
+version: 5650
+installed: true
+
+package: gettext
+version: 3267
+installed: true
+
+package: icedtea-6-jre-cacao
+version: 11912
+installed: true
+
+package: libfontenc1
+version: 13441
+installed: true
+
+package: libqt3-mt
+version: 14484
+installed: true
+
+package: default-jre-headless
+version: 13594
+installed: true
+
+package: liblockdev1
+version: 4773
+installed: true
+
+package: libmng1
+version: 4903
+installed: true
+
+package: libplexus-compiler-javac-java
+version: 6241
+installed: true
+
+package: tex-common
+version: 9148
+installed: true
+
+package: libgpgme11
+version: 5408
+installed: true
+
+package: libdirectfb-1.2-9
+version: 5611
+installed: true
+
+package: adduser
+version: 10875
+installed: true
+
+package: console-data
+version: 14374
+installed: true
+
+package: poppler-utils
+version: 3024
+installed: true
+
+package: libc-dev-bin
+version: 9354
+installed: true
+
+package: libhtml-template-perl
+version: 9228
+installed: true
+
+package: libgnomevfs2-extra
+version: 13896
+installed: true
+
+package: mount
+version: 9505
+installed: true
+
+package: netbase
+version: 11433
+installed: true
+
+package: initscripts
+version: 9874
+installed: true
+
+package: libqdox-java
+version: 6921
+installed: true
+
+package: luatex
+version: 3727
+installed: true
+
+package: python-lazr.restfulclient
+version: 2954
+installed: true
+
+package: libsasl2-2
+version: 8285
+installed: true
+
+package: libtrang-java
+version: 13000
+installed: true
+
+package: libgcj-common
+version: 14096
+installed: true
+
+package: postgresql-common
+version: 12529
+installed: true
+
+package: libplexus-ant-factory-java
+version: 4464
+installed: true
+
+package: libtasn1-3
+version: 9227
+installed: true
+
+package: texlive-latex-base
+version: 12657
+installed: true
+
+package: testng
+version: 11799
+installed: true
+
+package: libgcrypt11
+version: 6063
+installed: true
+
+package: tcl
+version: 12247
+installed: true
+
+package: libgraph4
+version: 9663
+installed: true
+
+package: libisccfg50
+version: 14182
+installed: true
+
+package: passwd
+version: 14067
+installed: true
+
+package: edos-distcheck
+version: 6018
+installed: true
+
+package: x11-common
+version: 14170
+installed: true
+
+package: python2.6-dev
+version: 9017
+installed: true
+
+package: locate
+version: 11194
+installed: true
+
+package: libmaven-plugin-tools-java
+version: 8839
+installed: true
+
+package: tmpreaper
+version: 6435
+installed: true
+
+package: libmaven-install-plugin-java
+version: 8538
+installed: true
+
+package: libxaw7
+version: 14301
+installed: true
+
+package: mini-dinstall
+version: 1931
+installed: true
+
+package: python-pycurl
+version: 12157
+installed: true
+
+package: libplexus-classworlds-java
+version: 6195
+installed: true
+
+package: libgomp1
+version: 11251
+installed: true
+
+package: libltdl7
+version: 8453
+installed: true
+
+package: libncurses5-dev
+version: 11720
+installed: true
+
+package: libhamcrest-java
+version: 5041
+installed: true
+
+package: blt
+version: 8702
+installed: true
+
+package: binutils
+version: 9578
+installed: true
+
+package: libsqlite3-dev
+version: 10633
+installed: true
+
+package: groff-base
+version: 7161
+installed: true
+
+package: libbit-vector-perl
+version: 12089
+installed: true
+
+package: libbackport-util-concurrent-java
+version: 10125
+installed: true
+
+package: texlive-metapost-doc
+version: 12657
+installed: true
+
+package: openssh-server
+version: 14123
+installed: true
+
+package: hdparm
+version: 12317
+installed: true
+
+package: ocaml-nox
+version: 10721
+installed: true
+
+package: libssl0.9.8
+version: 2657
+installed: true
+
+package: ntfs-3g
+version: 14230
+installed: true
+
+package: findutils
+version: 11194
+installed: true
+
+package: bsdutils
+version: 13881
+installed: true
+
+package: libexpat-ocaml
+version: 2498
+installed: true
+
+package: libgdbm3
+version: 6669
+installed: true
+
+package: libextlib-ocaml-dev
+version: 6216
+installed: true
+
+package: odbcinst
+version: 8502
+installed: true
+
+package: libqdbm14
+version: 6739
+installed: true
+
+package: liborbit2-dev
+version: 13872
+installed: true
+
+package: ocaml-base-nox
+version: 10721
+installed: true
+
+package: perl-base
+version: 11795
+installed: true
+
+package: libcgi-session-perl
+version: 11427
+installed: true
+
+package: edos-debcheck
+version: 4541
+installed: true
+
+package: libnss3-1d
+version: 10737
+installed: true
+
+package: ocaml-ulex
+version: 5025
+installed: true
+
+package: libruby1.8
+version: 6717
+installed: true
+
+package: libaudio2
+version: 6796
+installed: true
+
+package: libplexus-io-java
+version: 4467
+installed: true
+
+package: sgml-data
+version: 7923
+installed: true
+
+package: libdb4.7
+version: 11324
+installed: true
+
+package: xfonts-utils
+version: 14167
+installed: true
+
+package: libcurl-ocaml-dev
+version: 1549
+installed: true
+
+package: radeontool
+version: 6353
+installed: true
+
+package: gsfonts-x11
+version: 3343
+installed: true
+
+package: equivs
+version: 7953
+installed: true
+
+package: libocamlnet-ocaml-dev
+version: 8473
+installed: true
+
+package: bsd-mailx
+version: 12203
+installed: true
+
+package: libboost-program-options1.46.0
+version: 7358
+installed: true
+
+package: libmaven-file-management-java
+version: 5452
+installed: true
+
+package: gcj-4.4-base
+version: 11218
+installed: true
+
+package: libsvn1
+version: 6438
+installed: true
+
+package: libcommons-beanutils-java
+version: 6668
+installed: true
+
+package: texlive-latex3
+version: 12656
+installed: true
+
+package: libexpat1
+version: 7855
+installed: true
+
+package: libgc1c2
+version: 14152
+installed: true
+
+package: libsqlite3-ocaml
+version: 6265
+installed: true
+
+package: libpcre-ocaml
+version: 11974
+installed: true
+
+package: libtext-tabulardisplay-perl
+version: 7173
+installed: true
+
+package: libldap2-dev
+version: 8830
+installed: true
+
+package: python-lazr.uri
+version: 4747
+installed: true
+
+package: vim-latexsuite
+version: 13107
+installed: true
+
+package: libqt4-network
+version: 14621
+installed: true
+
+package: librpm1
+version: 11335
+installed: true
+
+package: logrotate
+version: 10637
+installed: true
+
+package: libcudf-dev
+version: 1673
+installed: true
+
+package: openssh-blacklist
+version: 1266
+installed: true
+
+package: gcc-4.5-base
+version: 11251
+installed: true
+
+package: unixodbc-dev
+version: 8502
+installed: true
+
+package: libcrypt-dh-perl
+version: 1695
+installed: true
+
+package: openjdk-6-jre-lib
+version: 11912
+installed: true
+
+package: libice6
+version: 14298
+installed: true
+
+package: python-minimal
+version: 9015
+installed: true
+
+package: tipa
+version: 14346
+installed: true
+
+package: libmath-bigint-gmp-perl
+version: 7284
+installed: true
+
+package: php5-suhosin
+version: 2752
+installed: true
+
+package: debconf
+version: 6296
+installed: true
+
+package: e2fslibs
+version: 7329
+installed: true
+
+package: man-db
+version: 8922
+installed: true
+
+package: libsm6
+version: 14323
+installed: true
+
+package: libsepol1-dev
+version: 8032
+installed: true
+
+package: libplexus-build-api-java
+version: 130
+installed: true
+
+package: ocaml-source
+version: 10721
+installed: true
+
+package: libslang2
+version: 8396
+installed: true
+
+package: graphviz
+version: 9663
+installed: true
+
+package: texinfo
+version: 11385
+installed: true
+
+package: libplot2c2
+version: 8940
+installed: true
+
+package: python-crypto
+version: 8115
+installed: true
+
+package: rssh
+version: 8608
+installed: true
+
+package: libgeoip1
+version: 6072
+installed: true
+
+package: librpm-dev
+version: 11335
+installed: true
+
+package: cmap-adobe-japan1
+version: 32
+installed: true
+
+package: gcc-multilib
+version: 14605
+installed: true
+
+package: libmaven-site-plugin-java
+version: 8070
+installed: true
+
+package: libservlet2.4-java
+version: 11521
+installed: true
+
+package: libselinux1
+version: 8051
+installed: true
+
+package: cpp
+version: 14605
+installed: true
+
+package: libtext-charwidth-perl
+version: 1198
+installed: true
+
+package: libpam-modules
+version: 5168
+installed: true
+
+package: python2.6-minimal
+version: 9017
+installed: true
+
+package: docbook-xsl
+version: 7484
+installed: true
+
+package: libmpc2
+version: 2413
+installed: true
+
+package: libantlr-java-gcj
+version: 9127
+installed: true
+
+package: libtext-wrapi18n-perl
+version: 1703
+installed: true
+
+package: libjsr305-java
+version: 389
+installed: true
+
+package: libdoxia-java
+version: 5165
+installed: true
+
+package: tailor
+version: 2755
+installed: true
+
+package: libcrypt-rijndael-perl
+version: 6592
+installed: true
+
+package: sysvinit-utils
+version: 9874
+installed: true
+
+package: python-reportbug
+version: 11476
+installed: true
+
+package: libtype-conv-camlp4-dev
+version: 6519
+installed: true
+
+package: libsepol1
+version: 8032
+installed: true
+
+package: libppl-c4
+version: 2955
+installed: true
+
+package: login
+version: 14067
+installed: true
+
+package: python-matplotlib-data
+version: 4088
+installed: true
+
+package: zip
+version: 9978
+installed: true
+
+package: libxml2
+version: 9130
+installed: true
+
+package: libatk1.0-data
+version: 7263
+installed: true
+
+package: postgresql-client-8.4
+version: 12236
+installed: true
+
+package: libsurefire-java
+version: 8768
+installed: true
+
+package: libmpfr4
+version: 10023
+installed: true
+
+package: libgvpr1
+version: 9663
+installed: true
+
+package: libfontconfig1-dev
+version: 9164
+installed: true
+
+package: velocity
+version: 6376
+installed: true
+
+package: texlive-lang-italian
+version: 12653
+installed: true
+
+package: texlive
+version: 12657
+installed: true
+
+package: darcs
+version: 8779
+installed: true
+
+package: libxml-libxml-perl
+version: 7464
+installed: true
+
+package: xz-utils
+version: 11493
+installed: true
+
+package: libgmp3c2
+version: 14448
+installed: true
+
+package: libxml-parser-perl
+version: 9786
+installed: true
+
+package: sysvinit
+version: 9874
+installed: true
+
+package: libgcj10
+version: 11218
+installed: true
+
+package: libpixman-1-dev
+version: 3337
+installed: true
+
+package: ruby1.8
+version: 6717
+installed: true
+
+package: libcommons-digester-java
+version: 6647
+installed: true
+
+package: libattr1
+version: 13805
+installed: true
+
+package: libxml-light-ocaml-dev
+version: 8325
+installed: true
+
+package: git-core
+version: 13628
+installed: true
+
+package: libicu42
+version: 11093
+installed: true
+
+package: insserv
+version: 7023
+installed: true
+
+package: linux-libc-dev
+version: 9068
+installed: true
+
+package: apt-utils
+version: 2361
+installed: true
+
+package: libc6
+version: 9354
+installed: true
+
+package: libgvc5
+version: 9663
+installed: true
+
+package: liblockfile1
+version: 6598
+installed: true
+
+package: libacl1
+version: 8514
+installed: true
+
+package: libocamlodbc-ocaml-dev
+version: 9455
+installed: true
+
+package: lacheck
+version: 7212
+installed: true
+
+package: libkrb5-3
+version: 6768
+installed: true
+
+package: libkdb5-5
+version: 6768
+installed: true
+
+package: topgit
+version: 2158
+installed: true
+
+package: libconvert-asn1-perl
+version: 3344
+installed: true
+
+package: libcommons-cli-java
+version: 5343
+installed: true
+
+package: gcc
+version: 14605
+installed: true
+
+package: libbonobo2-common
+version: 9631
+installed: true
+
+package: libhawtjni-runtime-java
+version: 4510
+installed: true
+
+package: libbonobo2-0
+version: 9631
+installed: true
+
+package: mime-support
+version: 10830
+installed: true
+
+package: dpkg
+version: 7068
+installed: true
+
+package: strace
+version: 11260
+installed: true
+
+package: ocaml-interp
+version: 10721
+installed: true
+
+package: liblwt-ocaml-dev
+version: 8148
+installed: true
+
+package: libfreetype6
+version: 8777
+installed: true
+
+package: libidl0
+version: 2368
+installed: true
+
+package: libasm2-java
+version: 8411
+installed: true
+
+package: libc-bin
+version: 9354
+installed: true
+
+package: libgd2-noxpm
+version: 8028
+installed: true
+
+package: zlib1g
+version: 13495
+installed: true
+
+package: librpmio1
+version: 11335
+installed: true
+
+package: tzdata-java
+version: 12702
+installed: true
+
+package: libv4l-0
+version: 2280
+installed: true
+
+package: debian-keyring
+version: 12710
+installed: true
+
+package: aspell-en
+version: 11919
+installed: true
+
+package: libslf4j-java
+version: 6353
+installed: true
+
+package: lib32bz2-1.0
+version: 4832
+installed: true
+
+package: libpcre-ocaml-dev
+version: 11974
+installed: true
+
+package: libkdecore5
+version: 14598
+installed: true
+
+package: libcalendar-ocaml
+version: 8154
+installed: true
+
+package: reportbug
+version: 11476
+installed: true
+
+package: libobject-realize-later-perl
+version: 3254
+installed: true
+
+package: libjmock-java
+version: 4703
+installed: true
+
+package: liblablgtk2-ocaml-doc
+version: 9444
+installed: true
+
+package: libqtcore4
+version: 14621
+installed: true
+
+package: libboost-filesystem1.40.0
+version: 7317
+installed: true
+
+package: squid3-common
+version: 10211
+installed: true
+
+package: libmysql-ocaml-dev
+version: 4808
+installed: true
+
+package: libplexus-interpolation-java
+version: 6922
+installed: true
+
+package: libkeyutils1
+version: 5906
+installed: true
+
+package: cpio
+version: 9329
+installed: true
+
+package: python-foolscap
+version: 1773
+installed: true
+
+package: x11proto-input-dev
+version: 7848
+installed: true
+
+package: fakechroot
+version: 9429
+installed: true
+
+package: unison
+version: 9773
+installed: true
+
+package: libdbi-perl
+version: 7645
+installed: true
+
+package: xml-core
+version: 3056
+installed: true
+
+package: libdirectfb-extra
+version: 5611
+installed: true
+
+package: libdb4.8
+version: 11352
+installed: true
+
+package: diffutils
+version: 13928
+installed: true
+
+package: libpng12-dev
+version: 5650
+installed: true
+
+package: libkrb5support0
+version: 6768
+installed: true
+
+package: ssl-cert
+version: 4978
+installed: true
+
+package: libxau6
+version: 13419
+installed: true
+
+package: libxp6
+version: 13400
+installed: true
+
+package: libgnutls-dev
+version: 9307
+installed: true
+
+package: gcj-jre-headless
+version: 14599
+installed: true
+
+package: libthai0
+version: 620
+installed: true
+
+package: liblocale-gettext-perl
+version: 6161
+installed: true
+
+package: base-files
+version: 11940
+installed: true
+
+package: libcomerr2
+version: 7329
+installed: true
+
+package: libxdmcp6
+version: 13441
+installed: true
+
+package: libjaxp1.3-java-gcj
+version: 5828
+installed: true
+
+package: libcups2
+version: 6062
+installed: true
+
+package: libcurl3
+version: 12161
+installed: true
+
+package: dhcp3-common
+version: 11035
+installed: true
+
+package: preview-latex-style
+version: 12379
+installed: true
+
+package: libjansi-native-java
+version: 4513
+installed: true
+
+package: libfindlib-ocaml
+version: 5566
+installed: true
+
+package: cpp-4.3
+version: 11163
+installed: true
+
+package: libblkid1
+version: 9505
+installed: true
+
+package: libcommons-httpclient-java
+version: 10131
+installed: true
+
+package: libplexus-bsh-factory-java
+version: 4468
+installed: true
+
+package: libaudiofile-dev
+version: 843
+installed: true
+
+package: liborbit2
+version: 13872
+installed: true
+
+package: libsigsegv2
+version: 9228
+installed: true
+
+package: libdebian-installer4
+version: 3838
+installed: true
+
+package: libpipeline1
+version: 5404
+installed: true
+
+package: liblzma2
+version: 11493
+installed: true
+
+package: apt-show-versions
+version: 3216
+installed: true
+
+package: libxml-namespacesupport-perl
+version: 6756
+installed: true
+
+package: libmaven-shared-io-java
+version: 5029
+installed: true
+
+package: vim-runtime
+version: 14456
+installed: true
+
+package: libelfg0
+version: 2362
+installed: true
+
+package: x11proto-fixes-dev
+version: 14108
+installed: true
+
+package: dialog
+version: 5079
+installed: true
+
+package: libsmbclient
+version: 14436
+installed: true
+
+package: gcc-4.5
+version: 11251
+installed: true
+
+package: libgpm2
+version: 7153
+installed: true
+
+package: libjline-java
+version: 2768
+installed: true
+
+package: libgcj-bc
+version: 11215
+installed: true
+
+package: libpwl5
+version: 2955
+installed: true
+
+package: libboost-graph1.40.0
+version: 7317
+installed: true
+
+package: libdigest-sha1-perl
+version: 9405
+installed: true
+
+package: libsysfs-dev
+version: 8131
+installed: true
+
+package: latex-beamer
+version: 10698
+installed: true
+
+package: libc6-i386
+version: 9354
+installed: true
+
+package: libnet-ip-perl
+version: 7201
+installed: true
+
+package: libc6-dev
+version: 9354
+installed: true
+
+package: ncurses-bin
+version: 11720
+installed: true
+
+package: python-serial
+version: 8839
+installed: true
+
+package: librarian0
+version: 2241
+installed: true
+
+package: libcommons-logging-java
+version: 5142
+installed: true
+
+package: libfs6
+version: 14295
+installed: true
+
+package: libisccc60
+version: 14184
+installed: true
+
+package: libfont-freetype-perl
+version: 939
+installed: true
+
+package: texlive-generic-extra
+version: 12656
+installed: true
+
+package: libogg0
+version: 5396
+installed: true
+
+package: libxcb-render-util0
+version: 1099
+installed: true
+
+package: lib32ncurses5
+version: 11720
+installed: true
+
+package: x-ttcidfont-conf
+version: 12477
+installed: true
+
+package: libgif4
+version: 11059
+installed: true
+
+package: liblog4j1.2-java-gcj
+version: 5633
+installed: true
+
+package: python-bzrlib
+version: 8577
+installed: true
+
+package: libbuddy-ocaml
+version: 391
+installed: true
+
+package: libxdot4
+version: 9663
+installed: true
+
+package: ncurses-base
+version: 11720
+installed: true
+
+package: ocaml-findlib
+version: 5566
+installed: true
+
+package: libcgraph5
+version: 9663
+installed: true
+
+package: python
+version: 9015
+installed: true
+
+package: libtool
+version: 8453
+installed: true
+
+package: libsys-hostname-long-perl
+version: 5901
+installed: true
+
+package: libmysqlclient16
+version: 11563
+installed: true
+
+package: libtext-ocaml-dev
+version: 1190
+installed: true
+
+package: unixodbc
+version: 8502
+installed: true
+
+package: libspreadsheet-parseexcel-perl
+version: 4325
+installed: true
+
+package: libcap2
+version: 13887
+installed: true
+
+package: libhal1
+version: 1650
+installed: true
+
+package: gsfonts
+version: 14177
+installed: true
+
+package: libntfs-3g75
+version: 14230
+installed: true
+
+package: libldap-2.4-2
+version: 8830
+installed: true
+
+package: x11proto-core-dev
+version: 12081
+installed: true
+
+package: odbcinst1debian2
+version: 8502
+installed: true
+
+package: gcc-4.1
+version: 11042
+installed: true
+
+package: libxss1
+version: 13475
+installed: true
+
+package: openjdk-6-jre-headless
+version: 11912
+installed: true
+
+package: libhtml-tagset-perl
+version: 10769
+installed: true
+
+package: libnet-ssleay-perl
+version: 7284
+installed: true
+
+package: sensible-utils
+version: 152
+installed: true
+
+package: x11proto-xf86vidmode-dev
+version: 8577
+installed: true
+
+package: texlive-common
+version: 12657
+installed: true
+
+package: libqt4-sql-mysql
+version: 14621
+installed: true
+
+package: libxcb-render0
+version: 6463
+installed: true
+
+package: swig
+version: 5889
+installed: true
+
+package: liblqr-1-0
+version: 1268
+installed: true
+
+package: python-debian
+version: 632
+installed: true
+
+package: libfam0
+version: 9097
+installed: true
+
+package: libdrm-nouveau1a
+version: 8828
+installed: true
+
+package: libgcrypt11-dev
+version: 6063
+installed: true
+
+package: perl
+version: 11795
+installed: true
+
+package: tzdata
+version: 12702
+installed: true
+
+package: syslog-summary
+version: 7010
+installed: true
+
+package: bzrtools
+version: 8577
+installed: true
+
+package: libtimedate-perl
+version: 7672
+installed: true
+
+package: libmath-bigint-perl
+version: 7661
+installed: true
+
+package: debianutils
+version: 10472
+installed: true
+
+package: lib32asound2
+version: 4968
+installed: true
+
+package: libossp-uuid16
+version: 6373
+installed: true
+
+package: libcompress-raw-bzip2-perl
+version: 9776
+installed: true
+
+package: cl-asdf
+version: 14412
+installed: true
+
+package: ia32-libs
+version: 13117
+installed: true
+
+package: libasyncns0
+version: 2156
+installed: true
+
+package: libffi5
+version: 10093
+installed: true
+
+package: libelf1
+version: 4181
+installed: true
+
+package: vim-addon-manager
+version: 1308
+installed: true
+
+package: libgmpxx4ldbl
+version: 14448
+installed: true
+
+package: liblwt-ocaml
+version: 8148
+installed: true
+
+package: libdebian-installer-extra4
+version: 3838
+installed: true
+
+package: libnethttpd-ocaml-dev
+version: 8473
+installed: true
+
+package: libbind9-60
+version: 14184
+installed: true
+
+package: tk
+version: 12247
+installed: true
+
+package: libsoap-lite-perl
+version: 4243
+installed: true
+
+package: libxstream-java
+version: 5759
+installed: true
+
+package: dctrl-tools
+version: 9512
+installed: true
+
+package: emacs22-common
+version: 12442
+installed: true
+
+package: libxml-writer-perl
+version: 4235
+installed: true
+
+package: libpam-ldap
+version: 12555
+installed: true
+
+package: libxres1
+version: 14296
+installed: true
+
+package: xtrans-dev
+version: 5559
+installed: true
+
+package: texlive-generic-recommended
+version: 12657
+installed: true
+
+package: libvoikko1
+version: 10121
+installed: true
+
+package: libglib2.0-0
+version: 9690
+installed: true
+
+package: lzma
+version: 11431
+installed: true
+
+package: libgcc1
+version: 14100
+installed: true
+
+package: libwrap0
+version: 12140
+installed: true
+
+package: x11proto-kb-dev
+version: 4824
+installed: true
+
+package: libfile-copy-recursive-perl
+version: 3541
+installed: true
+
+package: libreadonly-perl
+version: 5670
+installed: true
+
+package: libkpathsea5
+version: 12655
+installed: true
+
+package: libparams-classify-perl
+version: 3057
+installed: true
+
+package: texlive-bibtex-extra
+version: 12656
+installed: true
+
+package: sun-java6-jre
+version: 12047
+installed: true
+
+package: python-apt
+version: 2144
+installed: true
+
+package: sed
+version: 11095
+installed: true
+
+package: libthai-data
+version: 620
+installed: true
+
+package: libbin-prot-camlp4-dev
+version: 5641
+installed: true
+
+package: ucf
+version: 10786
+installed: true
+
+package: python-pygments
+version: 5934
+installed: true
+
+package: base-passwd
+version: 10550
+installed: true
+
+package: python-flup
+version: 4740
+installed: true
+
+package: squid-langpack
+version: 13106
+installed: true
+
+package: heroes-data
+version: 6156
+installed: true
+
+package: libssl-dev
+version: 2657
+installed: true
+
+package: libcommons-configuration-java
+version: 6311
+installed: true
+
+package: libdjvulibre-text
+version: 10554
+installed: true
+
+package: libdbd-mysql-perl
+version: 11390
+installed: true
+
+package: libcommons-collections3-java
+version: 10285
+installed: true
+
+package: vim
+version: 14456
+installed: true
+
+package: make
+version: 10859
+installed: true
+
+package: libio-multiplex-perl
+version: 6944
+installed: true
+
+package: libasound2
+version: 4968
+installed: true
+
+package: krb5-multidev
+version: 6768
+installed: true
+
+package: mime-construct
+version: 6920
+installed: true
+
+package: libexiv2-6
+version: 3281
+installed: true
+
+package: libparse-debianchangelog-perl
+version: 5131
+installed: true
+
+package: ttf-dejavu-extra
+version: 9776
+installed: true
+
+package: python-storm
+version: 3142
+installed: true
+
+package: locales-all
+version: 9354
+installed: true
+
+package: libmaven-reporting-impl-java
+version: 7922
+installed: true
+
+package: libtext-ocaml
+version: 1190
+installed: true
+
+package: libcapture-tiny-perl
+version: 2783
+installed: true
+
+package: libwerken.xpath-java
+version: 2561
+installed: true
+
+package: libavahi-common3
+version: 1932
+installed: true
+
+package: libmaven-jar-plugin-java
+version: 8318
+installed: true
+
+package: lib32stdc++6
+version: 11251
+installed: true
+
+package: libappconfig-perl
+version: 7409
+installed: true
+
+package: cron
+version: 10002
+installed: true
+
+package: lib32z1
+version: 13495
+installed: true
+
+package: libipc-signal-perl
+version: 4532
+installed: true
+
+package: postgresql-8.3
+version: 12223
+installed: true
+
+package: libselinux1-dev
+version: 8051
+installed: true
+
+package: libss2
+version: 7329
+installed: true
+
+package: libpq5
+version: 12290
+installed: true
+
+package: libgfortran3
+version: 11251
+installed: true
+
+package: libgnutls26
+version: 9307
+installed: true
+
+package: libpciaccess0
+version: 3011
+installed: true
+
+package: libjpeg62
+version: 11901
+installed: true
+
+package: libdbus-1-3
+version: 6059
+installed: true
+
+package: git-man
+version: 13628
+installed: true
+
+package: grep
+version: 8987
+installed: true
+
+package: e2fsprogs
+version: 7329
+installed: true
+
+package: python-pkg-resources
+version: 1912
+installed: true
+
+package: libwagon-java
+version: 4621
+installed: true
+
+package: gzip
+version: 5871
+installed: true
+
+package: tk8.4
+version: 12241
+installed: true
+
+package: tar
+version: 7202
+installed: true
+
+package: denyhosts
+version: 8945
+installed: true
+
+package: libpam-chroot
+version: 2418
+installed: true
+
+package: libxalan2-java
+version: 9107
+installed: true
+
+package: libxml-xpathengine-perl
+version: 2989
+installed: true
+
+package: dash
+version: 1589
+installed: true
+
+package: libsigsegv0
+version: 8841
+installed: true
+
+package: libfcgi0ldbl
+version: 8724
+installed: true
+
+package: libpixman-1-0
+version: 3337
+installed: true
+
+package: patch
+version: 8971
+installed: true
+
+package: mawk
+version: 5799
+installed: true
+
+package: kde-l10n-si
+version: 14596
+installed: true
+
+package: texlive-publishers-doc
+version: 12656
+installed: true
+
+package: postgresql-client-common
+version: 12529
+installed: true
+
+package: libqt4-dbus
+version: 14621
+installed: true
+
+package: php5-mysql
+version: 11625
+installed: true
+
+package: libqt4-xml
+version: 14621
+installed: true
+
+package: libregexp-java
+version: 6156
+installed: true
+
+package: libpolkit-agent-1-0
+version: 4071
+installed: true
+
+package: libssh2-1
+version: 5559
+installed: true
+
+package: lesstif2-dbg
+version: 13356
+installed: true
+
+package: libyaml-syck-perl
+version: 7085
+installed: true
+
+package: gcj-4.4-jre-headless
+version: 11218
+installed: true
+
+package: fontconfig-config
+version: 9164
+installed: true
+
+package: ttf-dejavu-core
+version: 9776
+installed: true
+
+package: python-apt-common
+version: 2144
+installed: true
+
+package: procps
+version: 13978
+installed: true
+
+package: libyaml-tiny-perl
+version: 7369
+installed: true
+
+package: lib32gcc1
+version: 14100
+installed: true
+
+package: libpython2.6
+version: 9017
+installed: true
+
+package: libclass-makemethods-perl
+version: 5031
+installed: true
+
+package: libxfont1
+version: 13553
+installed: true
+
+package: libpam0g
+version: 5168
+installed: true
+
+package: libxerces2-java
+version: 9250
+installed: true
+
+package: libunicode-map-perl
+version: 4149
+installed: true
+
+package: vim-nox
+version: 14456
+installed: true
+
+package: ant-optional
+version: 6630
+installed: true
+
+package: libmail-sendmail-perl
+version: 3844
+installed: true
+
+package: libio-stringy-perl
+version: 9907
+installed: true
+
+package: debian-archive-keyring
+version: 12688
+installed: true
+
+package: logtail
+version: 5874
+installed: true
+
+package: libdpkg-perl
+version: 7068
+installed: true
+
+package: libavahi-client3
+version: 1932
+installed: true
+
+package: junit4
+version: 11340
+installed: true
+
+package: libpth20
+version: 7950
+installed: true
+
+package: bzip2
+version: 4832
+installed: true
+
+package: libreadline6
+version: 11943
+installed: true
+
+package: libalgorithm-diff-perl
+version: 7130
+installed: true
+
+package: emacsen-common
+version: 6126
+installed: true
+
+package: logcheck
+version: 5874
+installed: true
+
+package: lsb-release
+version: 10254
+installed: true
+
+package: libppl9
+version: 2955
+installed: true
+
+package: libxdamage1
+version: 13449
+installed: true
+
+package: libgmp10
+version: 14450
+installed: true
+
+package: libterm-size-perl
+version: 684
+installed: true
+
+package: libreact-ocaml
+version: 2512
+installed: true
+
+package: libxt6
+version: 13446
+installed: true
+
+package: python-libxml2
+version: 9130
+installed: true
+
+package: libxft2
+version: 8353
+installed: true
+
+package: update-inetd
+version: 11420
+installed: true
+
+package: libjson-xs-perl
+version: 9920
+installed: true
+
+package: usbutils
+version: 13373
+installed: true
+
+package: libnet1
+version: 5197
+installed: true
+
+package: x11proto-xext-dev
+version: 12092
+installed: true
+
+package: docbook-xml
+version: 11237
+installed: true
+
+package: libdate-manip-perl
+version: 12046
+installed: true
+
+package: m4
+version: 6109
+installed: true
+
+package: libodbcinstq1c2
+version: 8502
+installed: true
+
+package: libstartup-notification0
+version: 2783
+installed: true
+
+package: libole-storage-lite-perl
+version: 3278
+installed: true
+
+package: libproc-waitstat-perl
+version: 4528
+installed: true
+
+package: python-twisted-bin
+version: 12339
+installed: true
+
+package: libdrm-intel1
+version: 8828
+installed: true
+
+package: liberror-perl
+version: 3217
+installed: true
+
+package: xpdf-common
+version: 10246
+installed: true
+
+package: libnet-snmp-perl
+version: 11575
+installed: true
+
+package: libgnome-keyring-dev
+version: 9762
+installed: true
+
+package: libtie-ixhash-perl
+version: 7157
+installed: true
+
+package: libgnome-keyring0
+version: 9762
+installed: true
+
+package: libopts25
+version: 14128
+installed: true
+
+package: libtokyocabinet8
+version: 6137
+installed: true
+
+package: wget
+version: 6946
+installed: true
+
+package: common-lisp-controller
+version: 12141
+installed: true
+
+package: lmodern
+version: 8738
+installed: true
+
+package: python-sqlite
+version: 4709
+installed: true
+
+package: realpath
+version: 7050
+installed: true
+
+package: libsub-name-perl
+version: 1417
+installed: true
+
+package: xorg-sgml-doctools
+version: 13593
+installed: true
+
+package: libplexus-container-default-java
+version: 4619
+installed: true
+
+package: libjpeg-progs
+version: 12181
+installed: true
+
+package: libjson-perl
+version: 9817
+installed: true
+
+package: libgirepository1.0-0
+version: 1906
+installed: true
+
+package: libplexus-compiler-manager-java
+version: 6241
+installed: true
+
+package: transfig
+version: 13977
+installed: true
+
+package: libcairo-gobject2
+version: 6899
+installed: true
+
+package: python-django
+version: 5543
+installed: true
+
+package: makedev
+version: 8596
+installed: true
+
+package: apache2-utils
+version: 8504
+installed: true
+
+package: libxrender1
+version: 13286
+installed: true
+
+package: nscd
+version: 9354
+installed: true
+
+package: libijs-0.35
+version: 3517
+installed: true
+
+package: libmaven-dependency-tree-java
+version: 5341
+installed: true
+
+package: libnss-ldap
+version: 12578
+installed: true
+
+package: libjbig2dec0
+version: 2915
+installed: true
+
+package: libxmuu1
+version: 14307
+installed: true
+
+package: dmsetup
+version: 14339
+installed: true
+
+package: libpaper1
+version: 5296
+installed: true
+
+package: g++-4.4
+version: 11218
+installed: true
+
+package: gs-common
+version: 12291
+installed: true
+
+package: libmaven-shade-plugin-java
+version: 5452
+installed: true
+
+package: liboro-java
+version: 7961
+installed: true
+
+package: texlive-latex-base-doc
+version: 12657
+installed: true
+
+package: libreadline-dev
+version: 11943
+installed: true
+
+package: libreadline6-dev
+version: 11943
+installed: true
+
+package: libdb5.1-dev
+version: 11556
+installed: true
+
+package: python-magic
+version: 11631
+installed: true
+
+package: libio-string-perl
+version: 6596
+installed: true
+
+package: fastjar
+version: 14275
+installed: true
+
+package: libjtidy-java
+version: 12067
+installed: true
+
+package: psmisc
+version: 12444
+installed: true
+
+package: libmldbm-perl
+version: 8673
+installed: true
+
+package: gnuplot-nox
+version: 11186
+installed: true
+
+package: libbonobo2-dev
+version: 9631
+installed: true
+
+package: libhtml-scrubber-perl
+version: 2165
+installed: true
+
+package: libwxbase2.8-0
+version: 9214
+installed: true
+
+package: libcommons-collections-java
+version: 8158
+installed: true
+
+package: curl
+version: 12161
+installed: true
+
+package: libboost-test1.40-dev
+version: 7317
+installed: true
+
+package: libboost-test1.40.0
+version: 7317
+installed: true
+
+package: libpthread-stubs0-dev
+version: 943
+installed: true
+
+package: libstdc++6-4.4-dev
+version: 11218
+installed: true
+
+package: libonig2
+version: 11752
+installed: true
+
+package: libgeronimo-jms-1.1-spec-java
+version: 5022
+installed: true
+
+package: cpp-4.4
+version: 11218
+installed: true
+
+package: libounit-ocaml-dev
+version: 5095
+installed: true
+
+package: java-common
+version: 3551
+installed: true
+
+package: libstdc++6-4.5-dev
+version: 11251
+installed: true
+
+package: python-chardet
+version: 7848
+installed: true
+
+package: python-dev
+version: 9015
+installed: true
+
+package: g++-4.5
+version: 11251
+installed: true
+
+package: apt
+version: 2361
+installed: true
+
+package: libstdc++6-4.3-dev
+version: 11163
+installed: true
+
+package: libreact-ocaml-dev
+version: 2512
+installed: true
+
+package: g++-4.3
+version: 11163
+installed: true
+
+package: gcc-4.3
+version: 11163
+installed: true
+
+package: ikiwiki
+version: 10893
+installed: true
+
+package: libsigc++-2.0-0c2a
+version: 8434
+installed: true
+
+package: libgpg-error0
+version: 6870
+installed: true
+
+package: python-httplib2
+version: 1752
+installed: true
+
+package: libfuse2
+version: 9194
+installed: true
+
+package: python-oauth
+version: 4695
+installed: true
+
+package: python-simplejson
+version: 8195
+installed: true
+
+package: iputils-ping
+version: 14491
+installed: true
+
+package: xaw3dg
+version: 6184
+installed: true
+
+package: mysql-client
+version: 11563
+installed: true
+
+package: libdns53
+version: 14182
+installed: true
+
+package: libdigest-md4-perl
+version: 6299
+installed: true
+
+package: libisc50
+version: 14182
+installed: true
+
+package: libheap-perl
+version: 3847
+installed: true
+
+package: ttf-liberation
+version: 6351
+installed: true
+
+package: x11proto-xinerama-dev
+version: 5449
+installed: true
+
+package: libsasl2-modules-gssapi-mit
+version: 8285
+installed: true
+
+package: screen
+version: 10962
+installed: true
+
+package: libtext-iconv-perl
+version: 6463
+installed: true
+
+package: hicolor-icon-theme
+version: 2987
+installed: true
+
+package: libxcb-atom1
+version: 1099
+installed: true
+
+package: gconf2
+version: 9688
+installed: true
+
+package: libsvn-perl
+version: 6438
+installed: true
+
+package: libgconf2-4
+version: 9688
+installed: true
+
+package: libparams-util-perl
+version: 4513
+installed: true
+
+package: x11-utils
+version: 12133
+installed: true
+
+package: libxfixes3
+version: 14051
+installed: true
+
+package: gconf2-common
+version: 9688
+installed: true
+
+package: libdbus-glib-1-2
+version: 3956
+installed: true
+
+package: sat4j
+version: 8405
+installed: true
+
+package: dbus-x11
+version: 6059
+installed: true
+
+package: libgsf-1-common
+version: 7043
+installed: true
+
+package: libkdb5-4
+version: 6674
+installed: true
+
+package: python2.4-minimal
+version: 8795
+installed: true
+
+package: xutils
+version: 14170
+installed: true
+
+package: spass
+version: 10607
+installed: true
+
+package: netcat-traditional
+version: 6882
+installed: true
+
+package: libgs9-common
+version: 12291
+installed: true
+
+package: xfsprogs
+version: 10190
+installed: true
+
+package: libalgorithm-diff-xs-perl
+version: 1185
+installed: true
+
+package: x11proto-render-dev
+version: 14268
+installed: true
+
+package: libdose2-ocaml
+version: 6013
+installed: true
+
+package: libbz2-ocaml
+version: 1754
+installed: true
+
+package: coreutils
+version: 12243
+installed: true
+
+package: libzip-ocaml
+version: 5912
+installed: true
+
+package: libxcb-aux0
+version: 1099
+installed: true
+
+package: libboost-system1.40.0
+version: 7317
+installed: true
+
+package: libenchant1c2a
+version: 6337
+installed: true
+
+package: gcc-4.1-base
+version: 11042
+installed: true
+
+package: libtemplate-perl
+version: 9587
+installed: true
+
+package: cpp-4.1
+version: 11042
+installed: true
+
+package: dvidvi
+version: 4538
+installed: true
+
+package: x11proto-damage-dev
+version: 13475
+installed: true
+
+package: libterm-readline-gnu-perl
+version: 7135
+installed: true
+
+package: debhelper
+version: 12200
+installed: true
+
+package: html2text
+version: 5781
+installed: true
+
+package: po-debconf
+version: 4942
+installed: true
+
+package: bsdmainutils
+version: 12213
+installed: true
+
+package: libmaven-enforcer-plugin-java
+version: 4479
+installed: true
+
+package: sun-java6-bin
+version: 12047
+installed: true
+
+package: tsconf
+version: 4534
+installed: true
+
+package: python-argparse
+version: 5022
+installed: true
+
+package: vim-scripts
+version: 12992
+installed: true
+
+package: libneon27-gnutls-dev
+version: 3461
+installed: true
+
+package: libept1
+version: 4797
+installed: true
+
+package: libxapian22
+version: 5528
+installed: true
+
+package: libboost-serialization1.40-dev
+version: 7317
+installed: true
+
+package: libboost-serialization1.40.0
+version: 7317
+installed: true
+
+package: hlins
+version: 3550
+installed: true
+
+package: python-tz
+version: 12670
+installed: true
+
+package: python-openssl
+version: 2783
+installed: true
+
+package: info
+version: 11385
+installed: true
+
+package: libuuid1
+version: 9505
+installed: true
+
+package: libfcgi-ruby1.8
+version: 2340
+installed: true
+
+package: libkadm5srv-mit7
+version: 6674
+installed: true
+
+package: libgssrpc4
+version: 6768
+installed: true
+
+package: libsqlite0
+version: 9219
+installed: true
+
+package: exuberant-ctags
+version: 14125
+installed: true
+
+package: texlive-fonts-recommended-doc
+version: 12657
+installed: true
+
+package: lesstif2
+version: 13356
+installed: true
+
+package: libboost-program-options1.40.0
+version: 7317
+installed: true
+
+package: libplrpc-perl
+version: 4301
+installed: true
+
+package: libssl-ocaml-dev
+version: 1320
+installed: true
+
+package: kwalify
+version: 2025
+installed: true
+
+package: unp
+version: 7755
+installed: true
+
+package: libssl-ocaml
+version: 1320
+installed: true
+
+package: libsqlite3-0
+version: 10633
+installed: true
+
+package: g++
+version: 14605
+installed: true
+
+package: g++-4.5-multilib
+version: 11251
+installed: true
+
+package: lsb-base
+version: 10254
+installed: true
+
+package: gcc-4.5-multilib
+version: 11251
+installed: true
+
+package: libc6-dev-i386
+version: 9354
+installed: true
+
+package: libxml-sax-expat-perl
+version: 3552
+installed: true
+
+package: net-tools
+version: 7420
+installed: true
+
+package: libxml-sax-perl
+version: 4021
+installed: true
+
+package: opensp
+version: 6232
+installed: true
+
+package: talk
+version: 3230
+installed: true
+
+package: jocaml-base
+version: 10724
+installed: true
+
+package: libpthread-stubs0
+version: 943
+installed: true
+
+package: libosp5
+version: 6232
+installed: true
+
+package: libxinerama1
+version: 14310
+installed: true
+
+package: xsltproc
+version: 5301
+installed: true
+
+package: isc-dhcp-common
+version: 11035
+installed: true
+
+package: libxslt1.1
+version: 5301
+installed: true
+
+package: openbsd-inetd
+version: 4418
+installed: true
+
+package: libpostgresql-ocaml
+version: 7021
+installed: true
+
+package: fop
+version: 13357
+installed: true
+
+package: libntfs10
+version: 7818
+installed: true
+
+package: libvorbisfile3
+version: 5768
+installed: true
+
+package: feynmf
+version: 6601
+installed: true
+
+package: texlive-font-utils
+version: 12656
+installed: true
+
+package: acl
+version: 8514
+installed: true
+
+package: python-sqlitecachec
+version: 5166
+installed: true
+
+package: libsqlite0-dev
+version: 9219
+installed: true
+
+package: camlp4
+version: 10721
+installed: true
+
+package: ruby1.8-dev
+version: 6717
+installed: true
+
+package: libdrm-radeon1
+version: 8828
+installed: true
+
+package: edos-rpmcheck
+version: 4541
+installed: true
+
+package: gawk
+version: 13964
+installed: true
+
+package: libfile-which-perl
+version: 6592
+installed: true
+
+package: dput
+version: 2610
+installed: true
+
+package: libcrypt-unixcrypt-xs-perl
+version: 2157
+installed: true
+
+package: gcc-4.3-doc
+version: 11160
+installed: true
+
+package: texlive-lang-french
+version: 12653
+installed: true
+
+package: libxml-commons-resolver1.1-java
+version: 5348
+installed: true
+
+package: libnet-daemon-perl
+version: 3616
+installed: true
+
+package: ocamlduce
+version: 10723
+installed: true
+
+package: ocamlduce-base
+version: 10723
+installed: true
+
+package: libcryptokit-ocaml
+version: 5692
+installed: true
+
+package: libgnomevfs2-common
+version: 13896
+installed: true
+
+package: python-lxml
+version: 8533
+installed: true
+
+package: gnome-mime-data
+version: 9517
+installed: true
+
+package: libpolkit-backend-1-0
+version: 4071
+installed: true
+
+package: rsync
+version: 10085
+installed: true
+
+package: libgssapi-krb5-2
+version: 6768
+installed: true
+
+package: git-annex
+version: 3395
+installed: true
+
+package: ocamldsort
+version: 3129
+installed: true
+
+package: lintian
+version: 8764
+installed: true
+
+package: diffstat
+version: 7398
+installed: true
+
+package: libcanberra0
+version: 3381
+installed: true
+
+package: gnupg-curl
+version: 6096
+installed: true
+
+package: libxcb-event1
+version: 1099
+installed: true
+
+package: rpm
+version: 11335
+installed: true
+
+package: php5-cli
+version: 11625
+installed: true
+
+package: git
+version: 13628
+installed: true
+
+package: libserf-0-0
+version: 1010
+installed: true
+
+package: php5-common
+version: 11625
+installed: true
+
+package: texlive-pictures
+version: 12657
+installed: true
+
+package: libicu44
+version: 11195
+installed: true
+
+package: python-yaml
+version: 10678
+installed: true
+
+package: libkrb5-dev
+version: 6768
+installed: true
+
+package: policykit-1
+version: 4071
+installed: true
+
+package: consolekit
+version: 1320
+installed: true
+
+package: texlive-latex-extra
+version: 12656
+installed: true
+
+package: libcommons-codec-java
+version: 5901
+installed: true
+
+package: krb5-user
+version: 6768
+installed: true
+
+package: x11proto-dri2-dev
+version: 8534
+installed: true
+
+package: libkadm5clnt-mit7
+version: 6674
+installed: true
+
+package: libio-compress-perl
+version: 9776
+installed: true
+
+package: libkadm5srv-mit8
+version: 6768
+installed: true
+
+package: libnfsidmap2
+version: 3381
+installed: true
+
+package: uuid
+version: 6373
+installed: true
+
+package: libexiv2-9
+version: 3298
+installed: true
+
+package: sqlfairy
+version: 4361
+installed: true
+
+package: libgnomecanvas2-common
+version: 9730
+installed: true
+
+package: tetex-frogg
+version: 1193
+installed: true
+
+package: libclass-base-perl
+version: 951
+installed: true
+
+package: kbd
+version: 7059
+installed: true
+
+package: libclass-data-inheritable-perl
+version: 2156
+installed: true
+
+package: libclass-inspector-perl
+version: 7200
+installed: true
+
+package: libmailtools-perl
+version: 9076
+installed: true
+
+package: libxpp3-java
+version: 5201
+installed: true
+
+package: libfile-spec-perl
+version: 10887
+installed: true
+
+package: libidn11-dev
+version: 7135
+installed: true
+
+package: x11proto-randr-dev
+version: 5768
+installed: true
+
+package: libfields-camlp4-dev
+version: 466
+installed: true
+
+package: libres-ocaml-dev
+version: 10268
+installed: true
+
+package: libjsch-java
+version: 654
+installed: true
+
+package: libsexplib-camlp4-dev
+version: 11118
+installed: true
+
+package: libpostgresql-ocaml-dev
+version: 7021
+installed: true
+
+package: comerr-dev
+version: 8105
+installed: true
+
+package: libart-2.0-dev
+version: 8666
+installed: true
+
+package: liblog4j1.2-java
+version: 5633
+installed: true
+
+package: libart-2.0-2
+version: 8666
+installed: true
+
+package: libgnutlsxx26
+version: 9307
+installed: true
+
+package: ocaml-tools
+version: 12974
+installed: true
+
+package: libgnomevfs2-0
+version: 13896
+installed: true
+
+package: emacs22-bin-common
+version: 12442
+installed: true
+
+package: ifupdown
+version: 1891
+installed: true
+
+package: dmidecode
+version: 9226
+installed: true
+
+package: libfindlib-ocaml-dev
+version: 5566
+installed: true
+
+package: darcs-buildpackage
+version: 1642
+installed: true
+
+package: libblas3gf
+version: 5354
+installed: true
+
+package: pm-utils
+version: 5990
+installed: true
+
+package: libcurl3-gnutls
+version: 12161
+installed: true
+
+package: darcs-load-dirs
+version: 5238
+installed: true
+
+package: eject
+version: 8230
+installed: true
+
+package: libglib2.0-bin
+version: 9690
+installed: true
+
+package: python-stats
+version: 1704
+installed: true
+
+package: libxml-commons-external-java
+version: 5829
+installed: true
+
+package: libkms1
+version: 8828
+installed: true
+
+package: javascript-common
+version: 12177
+installed: true
+
+package: libpulse-mainloop-glib0
+version: 2728
+installed: true
+
+package: libsasl2-modules
+version: 8285
+installed: true
+
+package: lsof
+version: 11452
+installed: true
+
+package: xindy
+version: 8673
+installed: true
+
+package: libffcall1
+version: 6884
+installed: true
+
+package: libtext-recordparser-perl
+version: 6193
+installed: true
+
+package: libaspell15
+version: 3735
+installed: true
+
+package: debconf-utils
+version: 6296
+installed: true
+
+package: libhunspell-1.2-0
+version: 5626
+installed: true
+
+package: python-numpy
+version: 13550
+installed: true
+
+package: texlive-pictures-doc
+version: 12657
+installed: true
+
+package: pkg-config
+version: 3398
+installed: true
+
+package: liblapack3gf
+version: 10367
+installed: true
+
+package: gcj-4.4-jre-lib
+version: 11218
+installed: true
+
+package: libfile-sharedir-perl
+version: 4512
+installed: true
+
+package: libio-socket-ssl-perl
+version: 7307
+installed: true
+
+package: python-twisted-web
+version: 12339
+installed: true
+
+package: global
+version: 11710
+installed: true
+
+package: bsh-gcj
+version: 7789
+installed: true
+
+package: postgresql-8.4-debversion
+version: 4799
+installed: true
+
+package: postgresql-8.4
+version: 12236
+installed: true
+
+package: libgnumail-java
+version: 5172
+installed: true
+
+package: libgnujaf-java
+version: 5139
+installed: true
+
+package: libconvert-binhex-perl
+version: 7589
+installed: true
+
+package: pgf
+version: 7759
+installed: true
+
+package: libxtst6
+version: 14323
+installed: true
+
+package: latex-xcolor
+version: 9324
+installed: true
+
+package: libjdom1-java
+version: 5152
+installed: true
+
+package: libx11-6
+version: 14350
+installed: true
+
+package: subversion-tools
+version: 6438
+installed: true
+
+package: python-all
+version: 9015
+installed: true
+
+package: nfs-common
+version: 13485
+installed: true
+
+package: libocamlgraph-ocaml-dev
+version: 6153
+installed: true
+
+package: subversion
+version: 6438
+installed: true
+
+package: librpcsecgss3
+version: 3279
+installed: true
+
+package: libpci3
+version: 13963
+installed: true
+
+package: squid3-dbg
+version: 10211
+installed: true
+
+package: autotools-dev
+version: 13008
+installed: true
+
+package: expect
+version: 11838
+installed: true
+
+package: lib32v4l-0
+version: 2280
+installed: true
+
+package: libdrm-dev
+version: 8828
+installed: true
+
+package: x11proto-gl-dev
+version: 6100
+installed: true
+
+package: libatk1.0-dev
+version: 7263
+installed: true
+
+package: libenchant-dev
+version: 6337
+installed: true
+
+package: texlive-extra-utils
+version: 12656
+installed: true
+
+package: libdata-entropy-perl
+version: 1687
+installed: true
+
+package: libdevel-symdump-perl
+version: 9155
+installed: true
+
+package: ocaml-base
+version: 10721
+installed: true
+
+package: python-egenix-mxtools
+version: 10183
+installed: true
+
+package: exiv2
+version: 3298
+installed: true
+
+package: g++-multilib
+version: 14605
+installed: true
+
+package: python-pexpect
+version: 8534
+installed: true
+
+package: ocaml-native-compilers
+version: 10721
+installed: true
+
+package: postgresql-client-8.3
+version: 12223
+installed: true
+
+package: libavahi-client-dev
+version: 1932
+installed: true
+
+package: libavahi-common-dev
+version: 1932
+installed: true
+
+package: libnekohtml-java
+version: 6846
+installed: true
+
+package: libdbus-1-dev
+version: 6059
+installed: true
+
+package: libsm-dev
+version: 14323
+installed: true
+
+package: libscalar-string-perl
+version: 391
+installed: true
+
+package: libfile-libmagic-perl
+version: 4017
+installed: true
+
+package: libxml-xpath-perl
+version: 6987
+installed: true
+
+package: powermgmt-base
+version: 7253
+installed: true
+
+package: dpatch
+version: 8022
+installed: true
+
+package: module-init-tools
+version: 10727
+installed: true
+
+package: python-pyparsing
+version: 6229
+installed: true
+
+package: libxml-simple-perl
+version: 9513
+installed: true
+
+package: libpopt-dev
+version: 7071
+installed: true
+
+package: vim-gui-common
+version: 14456
+installed: true
+
+package: sqlite3
+version: 10633
+installed: true
+
+package: orbit2
+version: 13872
+installed: true
+
+package: dh-make
+version: 3709
+installed: true
+
+package: python-all-dev
+version: 9015
+installed: true
+
+package: libxxf86dga1
+version: 14315
+installed: true
+
+package: python-rpm
+version: 11335
+installed: true
+
+package: debmirror
+version: 13834
+installed: true
+
+package: libplexus-sec-dispatcher-java
+version: 5756
+installed: true
+
+package: rpm2cpio
+version: 11335
+installed: true
+
+package: ntpdate
+version: 14080
+installed: true
+
+package: git-buildpackage
+version: 1657
+installed: true
+
+package: arping
+version: 9227
+installed: true
+
+package: python-dateutil
+version: 5986
+installed: true
+
+package: ledit
+version: 8373
+installed: true
+
+package: libdjvulibre21
+version: 10554
+installed: true
+
+package: ntp
+version: 14080
+installed: true
+
+package: librpm0
+version: 11315
+installed: true
+
+package: ant
+version: 6630
+installed: true
+
+package: libusb-1.0-0
+version: 14300
+installed: true
+
+package: libcompress-zlib-perl
+version: 9776
+installed: true
+
+package: libjs-jquery
+version: 6210
+installed: true
+
+package: libboost-regex1.40.0
+version: 7317
+installed: true
+
+package: postfix
+version: 9173
+installed: true
+
+package: libxml2-dev
+version: 9130
+installed: true
+
+package: x11-xfs-utils
+version: 12133
+installed: true
+
+package: aptitude
+version: 1825
+installed: true
+
+package: automake
+version: 13660
+installed: true
+
+package: x11-session-utils
+version: 12133
+installed: true
+
+package: libsndfile1
+version: 4966
+installed: true
+
+package: svn-buildpackage
+version: 2278
+installed: true
+
+package: libnfnetlink0
+version: 4644
+installed: true
+
+package: minisat2
+version: 13755
+installed: true
+
+package: geoip-database
+version: 13118
+installed: true
+
+package: libopenexr6
+version: 6360
+installed: true
+
+package: libwnck-common
+version: 9749
+installed: true
+
+package: munin-node
+version: 6056
+installed: true
+
+package: ttf-lyx
+version: 7812
+installed: true
+
+package: libgsf-1-114
+version: 7043
+installed: true
+
+package: hostname
+version: 10556
+installed: true
+
+package: libilmbase6
+version: 4697
+installed: true
+
+package: libtest-pod-perl
+version: 7342
+installed: true
+
+package: libxmlrpc-light-ocaml-dev
+version: 1780
+installed: true
+
+package: libboost-graph1.40-dev
+version: 7317
+installed: true
+
+package: debtags
+version: 6580
+installed: true
+
+package: libxi6
+version: 14349
+installed: true
+
+package: libcurl-ocaml
+version: 1549
+installed: true
+
+package: libbsf-java
+version: 13795
+installed: true
+
+package: dc
+version: 6445
+installed: true
+
+package: libcudf-ocaml-dev
+version: 1673
+installed: true
+
+package: x11-xserver-utils
+version: 12133
+installed: true
+
+package: libsysfs2
+version: 8131
+installed: true
+
+package: antlr
+version: 9127
+installed: true
+
+package: libantlr-java
+version: 9127
+installed: true
+
+package: util-linux
+version: 9505
+installed: true
+
+package: python-pyicu
+version: 5022
+installed: true
+
+package: libuser-identity-perl
+version: 3973
+installed: true
+
+package: libcrypt-ssleay-perl
+version: 3705
+installed: true
+
+package: libdata-integer-perl
+version: 1185
+installed: true
+
+package: python-xapian
+version: 5528
+installed: true
+
+package: libdate-calc-perl
+version: 11916
+installed: true
+
+package: libgdbm-dev
+version: 6669
+installed: true
+
+package: openssl-blacklist
+version: 1422
+installed: true
+
+package: liblog-agent-perl
+version: 4215
+installed: true
+
+package: libcompress-raw-zlib-perl
+version: 9776
+installed: true
+
+package: tcpd
+version: 12140
+installed: true
+
+package: fakeroot
+version: 7029
+installed: true
+
+package: libavahi-glib-dev
+version: 1932
+installed: true
+
+package: libavahi-glib1
+version: 1932
+installed: true
+
+package: libfile-remove-perl
+version: 7369
+installed: true
+
+package: libmaven2-core-java
+version: 8377
+installed: true
+
+package: libgnomevfs2-dev
+version: 13896
+installed: true
+
+package: rubygems1.8
+version: 6373
+installed: true
+
+package: tcl8.5
+version: 12250
+installed: true
+
+package: libgconf2-dev
+version: 9688
+installed: true
+
+package: libgpg-error-dev
+version: 6870
+installed: true
+
+package: libmpeg3-dev
+version: 6250
+installed: true
+
+package: libavahi-core7
+version: 1932
+installed: true
+
+package: git-svn
+version: 13628
+installed: true
+
+package: libterm-readkey-perl
+version: 9717
+installed: true
+
+package: libitext1-java
+version: 5903
+installed: true
+
+package: libxcb1
+version: 6463
+installed: true
+
+package: python2.4
+version: 8795
+installed: true
+
+package: libgp11-0
+version: 9746
+installed: true
+
+package: groff
+version: 7161
+installed: true
+
+package: menu
+version: 8289
+installed: true
+
+package: libesd0-dev
+version: 917
+installed: true
+
+package: libesd0
+version: 917
+installed: true
+
+package: esound-common
+version: 917
+installed: true
+
+package: python-configobj
+version: 11318
+installed: true
+
+package: pbuilder
+version: 4191
+installed: true
+
+package: cdebootstrap
+version: 1605
+installed: true
+
+package: libt1-5
+version: 11539
+installed: true
+
+package: libclass-accessor-perl
+version: 3504
+installed: true
+
+package: libnet-cidr-perl
+version: 3107
+installed: true
+
+package: libmodule-runtime-perl
+version: 1951
+installed: true
+
+package: tasksel
+version: 9875
+installed: true
+
+package: libcwidget3
+version: 1651
+installed: true
+
+package: libmpfr1ldbl
+version: 8754
+installed: true
+
+package: libcommon-sense-perl
+version: 10421
+installed: true
+
+package: libmime-types-perl
+version: 7242
+installed: true
+
+package: libnss-mdns
+version: 2789
+installed: true
+
+package: camlp4-extra
+version: 10721
+installed: true
+
+package: libxerces2-java-gcj
+version: 9250
+installed: true
+
+package: libfreetype6-dev
+version: 8777
+installed: true
+
+package: readline-common
+version: 11943
+installed: true
+
+package: monotone
+version: 3622
+installed: true
+
+package: cmake-data
+version: 9196
+installed: true
+
+package: libmudflap0
+version: 11251
+installed: true
+
+package: libgssglue1
+version: 671
+installed: true
+
+package: python-cairo
+version: 6720
+installed: true
+
+package: autoconf
+version: 9845
+installed: true
+
+package: dselect
+version: 7068
+installed: true
+
+package: dpkg-dev
+version: 7068
+installed: true
+
+package: libcrypt-mysql-perl
+version: 1193
+installed: true
+
+package: lockfile-progs
+version: 625
+installed: true
+
+package: libboost-filesystem1.46.0
+version: 7358
+installed: true
+
+package: libstdc++6
+version: 11251
+installed: true
+
+package: schroot-common
+version: 6123
+installed: true
+
+package: libjasper1
+version: 7655
+installed: true
+
+package: libparse-recdescent-perl
+version: 7726
+installed: true
+
+package: etckeeper
+version: 3686
+installed: true
+
+package: libpopt0
+version: 7071
+installed: true
+
+package: texpower
+version: 689
+installed: true
+
+package: chrpath
+version: 3060
+installed: true
+
+package: libxv1
+version: 14297
+installed: true
+
+package: tcsh
+version: 12041
+installed: true
+
+package: libossp-uuid15
+version: 6211
+installed: true
+
+package: libsqlite3-ocaml-dev
+version: 6265
+installed: true
+
+package: mtools
+version: 10988
+installed: true
+
+package: libdigest-perl
+version: 7071
+installed: true
+
+package: lib32ncurses5-dev
+version: 11720
+installed: true
+
+package: liba52-0.7.4
+version: 2064
+installed: true
+
+package: libnet-server-perl
+version: 4069
+installed: true
+
+package: pciutils
+version: 13963
+installed: true
+
+package: bison
+version: 13801
+installed: true
+
+package: libzip-ocaml-dev
+version: 5912
+installed: true
+
+package: ttf-dejavu
+version: 9776
+installed: true
+
+package: libeggdbus-1-0
+version: 1687
+installed: true
+
+package: jarwrapper
+version: 3485
+installed: true
+
+package: psutils
+version: 7092
+installed: true
+
+package: libcommons-net2-java
+version: 7761
+installed: true
+
+package: libapt-pkg-dev
+version: 2361
+installed: true
+
+package: munin-common
+version: 6056
+installed: true
+
+package: aspell
+version: 3735
+installed: true
+
+package: texlive-science
+version: 12656
+installed: true
+
+package: dictionaries-common
+version: 6903
+installed: true
+
+package: python2.6
+version: 9017
+installed: true
+
+package: libdb-dev
+version: 11528
+installed: true
+
+package: python-clientform
+version: 881
+installed: true
+
+package: python-egenix-mxdatetime
+version: 10183
+installed: true
+
+package: dnsutils
+version: 14184
+installed: true
+
+package: libsql-translator-perl
+version: 4361
+installed: true
+
+package: libossp-uuid-perl
+version: 6373
+installed: true
+
+package: libfcgi-perl
+version: 3803
+installed: true
+
+package: binfmt-support
+version: 7891
+installed: true
+
+package: libpcrecpp0
+version: 12257
+installed: true
+
+package: libmime-tools-perl
+version: 11869
+installed: true
+
+package: libgtk2.0-common
+version: 9630
+installed: true
+
+package: libx86-1
+version: 5072
+installed: true
+
+package: libpaper-utils
+version: 5296
+installed: true
+
+package: intltool-debian
+version: 3519
+installed: true
+
+package: libcrypt-des-perl
+version: 8840
+installed: true
+
+package: postgresql-client-9.0
+version: 12290
+installed: true
+
+package: libmockobjects-java
+version: 2418
+installed: true
+
+package: libmysqlclient-dev
+version: 11563
+installed: true
+
+package: libbotan-1.8.2
+version: 6726
+installed: true
+
+package: unzip
+version: 11918
+installed: true
+
+package: libconfig-file-perl
+version: 7379
+installed: true
+
+package: libidn11
+version: 7135
+installed: true
+
+package: libfile-nfslock-perl
+version: 7136
+installed: true
+
+package: tagcoll
+version: 7988
+installed: true
+
+package: libxml2-utils
+version: 9130
+installed: true
+
+package: libntfs-3g54
+version: 14228
+installed: true
+
+package: mutt
+version: 6290
+installed: true
+
+package: bash-completion
+version: 13508
+installed: true
+
+package: mysql-client-5.1
+version: 11563
+installed: true
+
+package: pbzip2
+version: 5128
+installed: true
+
+package: libbeecrypt-dev
+version: 11092
+installed: true
+
+package: libbdd0c2
+version: 8684
+installed: true
+
+package: hunspell-en-us
+version: 12914
+installed: true
+
+package: bonnie++
+version: 7526
+installed: true
+
+package: libdb4.5
+version: 11262
+installed: true
+
+package: libqt4-assistant
+version: 14621
+installed: true
+
+package: libcore-ocaml-doc
+version: 1748
+installed: true
+
+package: squid3
+version: 10211
+installed: true
+
+package: texlive-luatex
+version: 12657
+installed: true
+
+package: python-mechanize
+version: 607
+installed: true
+
+package: libmail-box-perl
+version: 9894
+installed: true
+
+package: texlive-metapost
+version: 12657
+installed: true
+
+package: libxmlrpc-core-c3
+version: 7082
+installed: true
+
+package: scrollkeeper
+version: 2241
+installed: true
+
+package: texlive-pstricks-doc
+version: 12656
+installed: true
+
+package: libgstreamer0.10-0
+version: 2906
+installed: true
+
+package: ipython
+version: 2823
+installed: true
+
+package: libbatik-java
+version: 6471
+installed: true
+
+package: java-wrappers
+version: 632
+installed: true
+
+package: libmysql-ocaml
+version: 4808
+installed: true
+
+package: ivy
+version: 8351
+installed: true
+
+package: iptables
+version: 6091
+installed: true
+
+package: bzr
+version: 8577
+installed: true
+
+package: aspell-fr
+version: 3654
+installed: true
+
+# end of solution from packup
+# sol printed

@@ -1,0 +1,4 @@
+-new,-changed
+?
+-notuptodate,-removed
+...

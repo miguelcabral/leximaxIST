@@ -1,0 +1,18 @@
+# authors: Mikolas Janota, Joao Marques-Silva
+# contributors: Ines Lynce, Vasco Manquinho
+# email mikolas@sat.inesc-id.pt
+# (C) 2011 Mikolas Janota
+# release: 0.6 distribution date: 2011-06-05 change set: e09be74b0d54
+# Released under the GPL license.
+# solving 
+Killed
+# external command finished with exit value 35072
+# solving time:
+#	 parent process: 0.536366s
+#	 child processes: 198.598s
+#	 total time: 199.134s
+# sol printing
+no solution
+FAIL
+no solution (UNSAT)
+# sol printed
