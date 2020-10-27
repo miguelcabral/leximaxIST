@@ -24,7 +24,7 @@ void Leximax_encoder::encode_sorted()
                 std::cerr << "---------------- Sorting Network " << i << " ----------------\n";
             }
             encode_network(elems_to_sort, objective, sorting_network);
-            // sorted_vec variables are the outputs of sorting_network;
+            // sorted_vec variables are the outputs of sorting_network
             if (num_terms == 1) { // in this case the sorting network is empty
                 std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
                 sorted_vec->at(0) = objective->at(0);
@@ -296,6 +296,17 @@ void Leximax_encoder::componentwise_OR(int i)
 
 void Leximax_encoder::generate_soft_clauses(int i)
 {
+    std::vector<LINT> lits;
+    // if m_num_objectives is 1 then this is a single objective problem
+    if (m_num_objectives == 1) {
+        std::vector<LINT> *objective = m_objectives[0];
+	for (size_t j (0); j < objective->size(); ++j) {
+	    lits.push_back(objective->at(j));
+            m_soft_clauses.create_clause(lits);
+            lits.clear();
+	}
+	return;
+    }
     // find size of largest objective function
     size_t largest = largest_obj();
     LINT first_soft = m_id_count + 1;
@@ -305,7 +316,6 @@ void Leximax_encoder::generate_soft_clauses(int i)
         for (size_t j = 0; j < largest; ++j)
             std::cerr << first_soft + j << '\n';
     }
-    std::vector<LINT> lits;
     for (size_t j = 0; j < largest; ++j) {
         lits.push_back(-(first_soft + j));
         m_soft_clauses.create_clause(lits);
@@ -326,6 +336,19 @@ size_t Leximax_encoder::get_obj_value(std::vector<LINT> &model)
 
 void Leximax_encoder::solve()
 {
+    // if there is only one objective function then it is a simple single objective problem
+    if (m_num_objectives == 1) {
+        generate_soft_clauses(0);
+        // call solver 
+        if (m_pbo)
+            solve_pbo(0); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
+        else
+            solve_maxsat(0);
+        // read model returned by the solver
+	m_sat = !(m_solution.empty());
+        m_optimum[0] = get_obj_value(m_solution);
+	return;
+    }
     // encode sorted vectors with sorting network
     encode_sorted();
     // iteratively call (MaxSAT or PBO) solver       
@@ -344,12 +367,6 @@ void Leximax_encoder::solve()
             solve_pbo(i); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
         else
             solve_maxsat(i);
-        /*
-        if (retv != 0) {
-            open_wbo returns 7680 , wtf???
-            std::cerr << "Something went wrong with the solver\n";
-            exit(retv);
-        }*/
         // read model returned by the solver and fix value of current maximum
         if (m_solution.empty()){
             m_sat = false;
