@@ -44,13 +44,16 @@ class ClauseHash {
 public:
   ULINT operator()(BasicClause* clref) const {  // see below new hash functions
     //return clref->clhash(); // -> Very slow; unable to undertand why
-    ULINT hashv = 0;
-    for (auto l : *clref)
-        hashv ^= l;
+    size_t rv = 7;
+    for (LINT l : *clref) rv = rv * 31 + l;
+    return rv;
+    /* ULINT hashv = 0; */
+    /* for (auto l : *clref) */
+        /* hashv ^= l; */
     /* for(Literator pos = clref->begin(); pos != clref->end(); ++pos) { */
     /*   hashv ^= (*pos>0) ? *pos : -*pos; */
     /* }  cout << "Hash value: " << hashv << endl; cout.flush(); */
-    return hashv;
+    /* return hashv; */
   }
 };
  
