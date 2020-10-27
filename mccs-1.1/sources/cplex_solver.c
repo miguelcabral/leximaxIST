@@ -9,7 +9,7 @@
 #include <cplex_solver.h>
 #include <math.h>
 
-#define OUTPUT_MODEL 1
+#define OUTPUT_MODEL 0
 #define USEXNAME 0
 
 // solver creation 
@@ -227,11 +227,11 @@ int cplex_solver::solve() {
 	  }
 	  
 	  // Output model to file (when requested)
-	  if (OUTPUT_MODEL) {
+	  /*if (OUTPUT_MODEL) {
 	    char buffer[1024];
 	    sprintf(buffer, "cplexpbs%d.lp", i);
 	    CPXwriteprob (env, lp, buffer, NULL);
-	  }
+	  }*/
 	} else
 	  return 1;
       } else
@@ -413,6 +413,6 @@ int cplex_solver::add_constraint_eq(CUDFcoefficient bound) {
 
 // ends up constraint declaration
 int cplex_solver::end_add_constraints(void) { 
-  if (OUTPUT_MODEL) CPXwriteprob (env, lp, "cplexpbs.lp", NULL); 
+  //if (OUTPUT_MODEL) CPXwriteprob (env, lp, "cplexpbs.lp", NULL); 
   return 0; 
 }

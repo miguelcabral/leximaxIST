@@ -9,7 +9,7 @@
 #include <gurobi_solver.h>
 #include <math.h>
 
-#define OUTPUT_MODEL 1
+#define OUTPUT_MODEL 0
 
 // solver creation 
 abstract_solver *new_gurobi_solver() { return new gurobi_solver(); }
