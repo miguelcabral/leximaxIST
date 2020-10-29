@@ -123,14 +123,13 @@ int lp_solver::solve() {
       switch (command[0]) {
       case 'S': // scip ?
         while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
-	if (strncmp(command, "primal solution:", 16) == 0) {
+	if (strncmp(command, "primal solution", 15) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL) // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
 	      if (fgets(command, 1000, fsol) != NULL) { // read objective value or no solution
 		if (strncmp(command, "objective value:", 16) == 0) {
 		  status = 1;
 		  if (sscanf(command+16, "%d", &iobjval) > 0) objval = objvals[iobj] = iobjval;
-		  
 		  
 		  // Reading scip solution
 		  if (iobj + 1 == nb_objectives) { // read solutions

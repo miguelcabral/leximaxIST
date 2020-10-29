@@ -1,2 +1,2 @@
 #!/bin/sh
-../scip/scip-2.0.1.linux.x86_64.gnu.opt.spx -f $1
+/home/mcabral/solvers/mccs/scipoptsuite-7.0.1/scip/bin/scip-7.0.1.linux.x86_64.gnu.opt.spx2.none -f $1
