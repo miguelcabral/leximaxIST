@@ -120,11 +120,9 @@ int lp_solver::solve() {
     status = -1;
     fgets(command, 1000, fsol);
     if (command != NULL) {
-	    std::cout << "#################################### command[0] = " << command[0] << std::endl;
       switch (command[0]) {
       case 'S': // scip ?
         while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
-            printf("%s\n",*command);
 	if (strncmp(command, "primal solution:", 16) == 0) {
 	  if (fgets(command, 1000, fsol) != NULL) // read ===========
 	    if (fgets(command, 1000, fsol) != NULL)  // read empty line
@@ -132,6 +130,7 @@ int lp_solver::solve() {
 		if (strncmp(command, "objective value:", 16) == 0) {
 		  status = 1;
 		  if (sscanf(command+16, "%d", &iobjval) > 0) objval = objvals[iobj] = iobjval;
+		  
 		  
 		  // Reading scip solution
 		  if (iobj + 1 == nb_objectives) { // read solutions
@@ -164,14 +163,12 @@ int lp_solver::solve() {
         }
 	break;
       case 'W':  // COIN or CPLEX ?
-	std::cout << "aqui!" << std::endl;
           while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
 	if ((strncmp(command, "Coin:Infeasible - objective value", 33) == 0) ||
 	    (strncmp(command, "CPLEX> MIP - Integer infeasible.", 32) == 0)){
 		status = 0;
 	}
 	else if (strncmp(command, "Coin:Optimal - objective value", 30) == 0) {
-	  std::cout << "aqui2!!!" << std::endl;
 	  status = 1;
 	  if (sscanf(command+30, "%d", &iobjval) > 0) objval = objvals[iobj] = iobjval;
 	  
@@ -199,6 +196,10 @@ int lp_solver::solve() {
       fprintf(stderr, "ERROR: Cannot read solution from lp solver.\n");
       exit(-1);
     }
+
+        double obj_val = objective_value();
+	printf("# Objective value %d = %f\n", iobj, obj_val);
+
   } // end for objectives
 
   if (CLEAN_FILES) {
