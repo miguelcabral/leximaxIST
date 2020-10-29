@@ -120,9 +120,9 @@ int lp_solver::solve() {
     status = -1;
     fgets(command, 1000, fsol);
     if (command != NULL) {
+	    std::cout << "#################################### command[0] = " << command[0] << std::endl;
       switch (command[0]) {
       case 'S': // scip ?
-          printf("No sitio certo!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n");
         while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
             printf("%s\n",*command);
 	if (strncmp(command, "primal solution:", 16) == 0) {
@@ -163,20 +163,21 @@ int lp_solver::solve() {
 	}
         }
 	break;
-      case 'C':  // COIN or CPLEX ?
+      case 'W':  // COIN or CPLEX ?
+	std::cout << "aqui!" << std::endl;
           while ((status == -1) && (! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)) {
 	if ((strncmp(command, "Coin:Infeasible - objective value", 33) == 0) ||
-	    (strncmp(command, "CPLEX> MIP - Integer infeasible.", 32) == 0))
-	  status = 0;
+	    (strncmp(command, "CPLEX> MIP - Integer infeasible.", 32) == 0)){
+		status = 0;
+	}
 	else if (strncmp(command, "Coin:Optimal - objective value", 30) == 0) {
+	  std::cout << "aqui2!!!" << std::endl;
 	  status = 1;
 	  if (sscanf(command+30, "%d", &iobjval) > 0) objval = objvals[iobj] = iobjval;
 	  
 	  // Reading COIN solution
 	  if (iobj + 1 == nb_objectives) { // read solutions
-	    
 	    for (int i = 0; i < nb_packages; i++) solution[i] = 0; // Set solution values to 0
-	    
 	    while ((! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
 	      if ((command[0] == ' ') && (command[8] == 'x')) {
 		if (sscanf(command+9, "%d", &rank) > 0) 
@@ -187,32 +188,8 @@ int lp_solver::solve() {
 	      } else // end of solution reached
 		break;
 	  }
-	} else if (strncmp(command, "CPLEX> MIP - Integer optimal solution:  Objective = ", 52) == 0) {
-	  status = 1;
-	  if (sscanf(command+52, "%d", &iobjval) > 0) objval = objvals[iobj] = iobjval;
-
-	  // Reading CPLEX solution
-	  if (iobj + 1 == nb_objectives) { // read solutions
-	    
-	    for (int i = 0; i < nb_packages; i++) solution[i] = 0; // Set solution values to 0
-	    
-	    if (fgets(command, 1000, fsol) != NULL) { //  Forget two next lines
-	      if (fgets(command, 1000, fsol) != NULL) {
-		while ((! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
-		  if (command[0] == 'x') {
-		    if (sscanf(command+1, "%d", &rank) > 0) solution[rank] = 1;
-		  } else // end of solution reached
-		    break;
-	      } else {
-		fprintf(stderr, "mccs: error while reading solution file.\n");
-		exit(-1);
-	      }
-	    } else {
-	      fprintf(stderr, "mccs: error while reading solution file.\n");
-	      exit(-1);
-	    }
+	}/* else if (strncmp(command, "CPLEX> MIP - Integer optimal solution:  Objective = ", 52) == 0) {*/
 	  }
-	}
 	break;
           }
     }
