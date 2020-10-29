@@ -193,7 +193,6 @@ int lp_solver::solve() {
 	break;
           }
     }
-    }
 
     // If we are here with a status = -1, then we were enable to read the solution (or the infeasability)
     if (status == -1) {
