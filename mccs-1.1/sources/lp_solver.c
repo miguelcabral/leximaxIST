@@ -137,12 +137,13 @@ int lp_solver::solve() {
 		    
 		    for (int i = 0; i < nb_packages; i++) solution[i] = 0; // Set solution values to 0
 		    
-		    while ((! feof(fsol)) && (fgets(command, 1000, fsol) != NULL))
+		    while ((! feof(fsol)) && (fgets(command, 1000, fsol) != NULL)){
 		      if (command[0] == 'x') {
 			if (sscanf(command+1, "%d", &rank) > 0) 
 			  solution[rank] = 1;
 		      } else // end of solution reached
 			break;
+            }
 		  }
 		} else if (strncmp(command, "no solution available", 21) == 0) {
 		  status = 0;
