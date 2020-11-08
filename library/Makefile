@@ -17,6 +17,10 @@ else
 	CCFLAGS+=-O3
 endif
 
+ifdef PROF
+	CCFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
+endif
+
 .PHONY: clean
 
 libleximax.a : $(COBJS)

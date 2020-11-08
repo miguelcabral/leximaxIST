@@ -13,15 +13,16 @@ COBJS      = $(CSRCS:.cc=.o)
 LIBD = -L .
 LIBS = -lleximax
 CXX?=g++
-CFLAGS+=-DEXTERNAL_SOLVER
-CFLAGS+=-DNDEBUG -DNCHECK
-CFLAGS+=-O3
+CFLAGS += -DEXTERNAL_SOLVER
+CFLAGS += -DNDEBUG -DNCHECK
+CFLAGS += -O3
 CFLAGS += -std=c++17
-CFLAGS += -Wall -Wextra -Wno-deprecated-register -Wno-parentheses 
+#CFLAGS += -Wno-deprecated-register
+CFLAGS += -Wall -Wextra -Wno-parentheses 
 CFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DDISTDATE='"$(DISTDATE)"'
 CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
 # CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
-LIBS+=-lz
+LIBS +=-lz
 #LNFLAGS+=-static
 
 # comment out if arbitrary precision not needed
@@ -32,10 +33,12 @@ LIBS+=-lz
 .PHONY: build all objs
 
 ifdef PROF
-CFLAGS+=-fprofile-arcs -ftest-coverage
+CFLAGS+=-ftest-coverage
+CFLAGS+=-fprofile-arcs
 CFLAGS+=-pg
 CFLAGS+=-g
 LNFLAGS+=-fprofile-arcs
+LNFLAGS+=-ftest-coverage
 LNFLAGS+=-pg
 LNFLAGS+=-g
 endif
@@ -54,7 +57,7 @@ depend:
 ## Build rule
 %.o:	%.cc *.hh
 	@echo Compiling: $@
-	@$(CXX)  -I. $(CFLAGS) -c -o $@ $<
+	$(CXX)  -I. $(CFLAGS) -c -o $@ $<
 
 ##  This  needs bison and ragel, comment in if parsing changes
 #Lexer.cc: p.tab.cc  l.rl Lexer.hh
