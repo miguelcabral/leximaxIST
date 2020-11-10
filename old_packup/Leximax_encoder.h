@@ -6,9 +6,13 @@
 #include <vector> // std::vector
 #include <utility> // std::pair
 #include <forward_list> // std::forward_list
-#include "clause.h"
+#include "basic_clause.hh"
+#include "basic_clset.hh"
 #include "basic_types.h"
-#include "globals.hh"
+#include "clause_utils.hh"
+#include "cl_registry.hh"
+#include "cl_globals.hh"
+#include "cl_types.hh"
 
 typedef std::vector<std::pair<LINT, LINT>*> SNET;
 
@@ -17,8 +21,8 @@ class Leximax_encoder {
 private:
 
     size_t m_id_count;
-    std::vector<Clause*> m_constraints;
-    std::vector<Clause*> m_soft_clauses;
+    BasicClauseSet m_constraints;
+    BasicClauseSet m_soft_clauses;
     std::vector<std::vector<LINT>*> m_objectives;
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
@@ -66,17 +70,7 @@ private:
     
     // constructors.cpp
     
-    void add_soft_clause(const std::vector<LINT> &lits);
-    
-    void add_hard_clause(const std::vector<LINT> &lits);
-    
     void update_id_count(std::vector<LINT> &clause);
-    
-    // destructor.cpp
-    
-    void clear_soft_clauses();
-    
-    void clear_hard_clauses();
     
     // sorting_net.cpp
     
@@ -116,7 +110,7 @@ private:
     
     void write_atmost_pb(int i, ostream &output);
     
-    void write_pbconstraint(Clause *cl, ostream& output);
+    void write_pbconstraint(BasicClause *cl, ostream& output);
     
     void write_sum_equals_pb(int i, ostream &output);
     

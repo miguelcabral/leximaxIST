@@ -1,7 +1,7 @@
 -include makeenv
 
 CCFLAGS=-Wall -Wextra -std=c++17 -pedantic
-CSRCS1 = $(wildcard *.cc)
+#CSRCS1 = $(wildcard *.cc)
 CSRCS2 = $(wildcard *.cpp)
 COBJS1 = $(CSRCS1:.cc=.o)
 COBJS2 = $(CSRCS2:.cpp=.o)

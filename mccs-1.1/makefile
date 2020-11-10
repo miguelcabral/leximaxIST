@@ -82,6 +82,14 @@ mccs-static: $(OBJS) libccudf.a
 		$(GLPKLD) \
 		-ldl
 
+mccs-test: $(OBJS) libccudf.a
+	$(CCC) -o mccs-test -static $(OBJS) -lfl -L. -lccudf \
+		$(CPXLD) \
+		$(GUROBILD) \
+		$(LPSOLVELD) \
+		$(GLPKLD) \
+		-ldl
+
 #----------------------------------------------------------------------------------
 
 $(OBJDIR)/cudf.o: $(SRCDIR)/cudf.c $(SRCLIB)/cudf.h
