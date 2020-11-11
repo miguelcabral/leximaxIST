@@ -8,10 +8,11 @@ RAGEL?=ragel
 BISON?=bison
 CCC?=g++
 XTRGT = packup
-CSRCS      = $(wildcard *.cc) 
-COBJS      = $(CSRCS:.cc=.o)
-LIBD = -L .
-LIBS = -lleximax
+CSRCS = $(wildcard *.cc) 
+COBJS = $(CSRCS:.cc=.o)
+LIBD = 
+LIBS =
+INCD = 
 CXX?=g++
 CFLAGS += -DEXTERNAL_SOLVER
 CFLAGS += -DNDEBUG -DNCHECK
@@ -24,6 +25,12 @@ CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
 # CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
 LIBS +=-lz
 #LNFLAGS+=-static
+
+# change LEXIMAXDIR to the root directory of the leximax library
+LEXIMAXDIR = ~/thesis/no-clause-set
+INCD += $(LEXIMAXDIR)/include
+LIBD += $(LEXIMAXDIR)/lib
+LIBS += -lleximax
 
 # comment out if arbitrary precision not needed
 # LIBS+=-lgmpxx -lgmp
@@ -47,7 +54,7 @@ all: $(XTRGT)
 
 $(XTRGT): objs 
 	@echo Linking: $@
-	@$(CXX) $(COBJS) $(LNFLAGS) $(LIBD) $(LIBS) -o $@ 
+	@$(CXX) $(COBJS) $(LNFLAGS) -L $(LIBD) $(LIBS) -o $@ 
 
 objs: Lexer.o p.tab.o $(COBJS) 
 
@@ -57,7 +64,7 @@ depend:
 ## Build rule
 %.o:	%.cc *.hh
 	@echo Compiling: $@
-	$(CXX)  -I. $(CFLAGS) -c -o $@ $<
+	$(CXX) -I $(INCD) $(CFLAGS) -c -o $@ $<
 
 ##  This  needs bison and ragel, comment in if parsing changes
 #Lexer.cc: p.tab.cc  l.rl Lexer.hh

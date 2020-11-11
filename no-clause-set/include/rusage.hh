@@ -40,8 +40,8 @@ namespace RUSAGE {
   static inline double read_cpu_time_children();
   static inline long read_mem_stats(int fields);
   static inline double read_mem_used();
-  static inline void print_cpu_time(const char* msg, ostream& outs=std::cout);
-  static inline void print_mem_used(const char* msg, ostream& outs=std::cout);
+  static inline void print_cpu_time(const char* msg, std::ostream& outs=std::cout);
+  static inline void print_mem_used(const char* msg, std::ostream& outs=std::cout);
 }
 
 
@@ -78,12 +78,12 @@ static inline double RUSAGE::read_mem_used()
   return ((long)read_mem_stats(0) * (long)getpagesize() * 1.0) / __1MBYTE__;
 }
 
-static inline void RUSAGE::print_cpu_time(const char* msg, ostream& outs)
+static inline void RUSAGE::print_cpu_time(const char* msg, std::ostream& outs)
 {
   outs << msg << ": "<< RUSAGE::read_cpu_time_self() << endl;
 }
 
-static inline void RUSAGE::print_mem_used(const char* msg, ostream& outs)
+static inline void RUSAGE::print_mem_used(const char* msg, std::ostream& outs)
 {
   outs << msg << ": " << RUSAGE::read_mem_used() << endl;
 }

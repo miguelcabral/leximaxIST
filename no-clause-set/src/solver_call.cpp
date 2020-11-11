@@ -6,15 +6,13 @@
 #include <zlib.h>
 #include <fmtutils.hh>
 
-using namespace std;
-
 int Leximax_encoder::call_solver(std::string &file_name)
 {
-    stringstream scommand;
-    const string output_filename = file_name + ".out";
+    std::stringstream scommand;
+    const std::string output_filename = file_name + ".out";
     scommand << m_solver_command << " ";
     scommand << file_name << " > " << output_filename << " 2> solver_error.txt";
-    const string command = scommand.str();
+    const std::string command = scommand.str();
     const int retv = system (command.c_str());
     //std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
     gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -51,7 +49,7 @@ int Leximax_encoder::call_solver(std::string &file_name)
     return retv;
 }
 
-void write_clauses(ostream &output, std::vector<Clause*> &clauses, size_t weight)
+void write_clauses(std::ostream &output, std::vector<Clause*> &clauses, size_t weight)
 {
     for (Clause *cl : clauses) {
         output << weight << " ";
@@ -64,8 +62,8 @@ void write_clauses(ostream &output, std::vector<Clause*> &clauses, size_t weight
 int Leximax_encoder::solve_maxsat(int i)
 {
     std::string input_name (m_input_name);
-    input_name += "_" + to_string(i) + ".wcnf";
-    ofstream output(input_name.c_str());
+    input_name += "_" + std::to_string(i) + ".wcnf";
+    std::ofstream output(input_name.c_str());
     // prepare input for the solver
     size_t weight = m_soft_clauses.size() + 1;
     output << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
@@ -78,7 +76,7 @@ int Leximax_encoder::solve_maxsat(int i)
     return call_solver(input_name);
 }
 
-void Leximax_encoder::write_pbconstraint(Clause *cl, ostream& output) {
+void Leximax_encoder::write_pbconstraint(Clause *cl, std::ostream &output) {
     LINT num_negatives(0);
     for (LINT literal : *cl) {
         bool sign = literal > 0;
@@ -89,7 +87,7 @@ void Leximax_encoder::write_pbconstraint(Clause *cl, ostream& output) {
     output << " >= " << 1 - num_negatives << ";\n";
 }
 
-void Leximax_encoder::write_atmost_pb(int i, ostream &output)
+void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
 {
     for (LINT var : m_relax_vars) {
         output << "-1" << m_multiplication_string << "x" << var << " ";
@@ -97,7 +95,7 @@ void Leximax_encoder::write_atmost_pb(int i, ostream &output)
     output << " >= " << -i << ";\n";
 }
 
-void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
+void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
 {
     for (LINT var : m_relax_vars) {
         output << "+1" << m_multiplication_string << "x" << var << " ";
@@ -108,8 +106,8 @@ void Leximax_encoder::write_sum_equals_pb(int i, ostream &output)
 int Leximax_encoder::solve_pbo(int i)
 {
     std::string input_name (m_input_name);
-    input_name += "_" + to_string(i) + ".opb";
-    ofstream output(input_name.c_str());
+    input_name += "_" + std::to_string(i) + ".opb";
+    std::ofstream output(input_name.c_str());
     // prepare input for the solver
     output << "* #variable= " << m_id_count << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function

@@ -27,7 +27,7 @@
 #include <iostream>
 #include "ExternalWrapper.hh"
 #include "fmtutils.hh"
-#include "Leximax_encoder.h"
+#include <Leximax_encoder.h>
 using std::sort;
 
 ExternalWrapper::ExternalWrapper(IDManager& id_manager)

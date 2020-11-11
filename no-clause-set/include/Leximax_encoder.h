@@ -110,11 +110,11 @@ private:
     
     int solve_maxsat(int i);
     
-    void write_atmost_pb(int i, ostream &output);
+    void write_atmost_pb(int i, std::ostream &output);
     
-    void write_pbconstraint(Clause *cl, ostream& output);
+    void write_pbconstraint(Clause *cl, std::ostream& output);
     
-    void write_sum_equals_pb(int i, ostream &output);
+    void write_sum_equals_pb(int i, std::ostream &output);
     
     int solve_pbo(int i);
     

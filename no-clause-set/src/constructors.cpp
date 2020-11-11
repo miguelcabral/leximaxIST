@@ -74,7 +74,7 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
         ++i;
     }
     // name for temporary files
-    stringstream strstr;
+    std::stringstream strstr;
     strstr << getpid();
     m_input_name = strstr.str();
 }
