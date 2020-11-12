@@ -25,6 +25,7 @@
 #include "SolutionReader.hh"
 #include "SolverWrapperTypes.hh"
 #include "Options.hh"
+#include <Leximax_encoder.h>
 using std::ifstream;
 
 static const char* dist_date = ""DISTDATE"";
@@ -56,11 +57,26 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
     return true;
 }
 
-#ifndef EXTERNAL_SOLVER
+#ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
-  cerr << "# received external signal " << signum << "("  << (RUSAGE::read_cpu_time()) << ")" << endl;
+  cerr << "# received external signal " << signum << '\n';
+  Leximax_encoder *leximax_enc (parser.get_encoder.get_solver_wrapper().get_leximax_enc());
+  if (leximax_enc != nullptr) {
+      leximax_enc->terminate();
+      parser.get_encoder.get_solver_wrapper().set_model(leximax_enc->get_solution());
+      print_leximax_info();
+  }
+  parser.get_encoder().print_time();
   parser.get_encoder().print_solution();
-  cerr << "Terminating ..." << endl;
+  cerr << "Terminating ..." << '\n';
+  exit(0);
+}
+#else
+static void SIG_handler(int signum) {
+  cerr << "# received external signal " << signum << '\n';
+  parser.get_encoder().print_time();
+  parser.get_encoder().print_solution();
+  cerr << "Terminating ..." << '\n';
   exit(0);
 }
 #endif /* !EXTERNAL_SOLVER */
@@ -103,7 +119,7 @@ int main(int argc, char** argv) {
     print_header();
     
     /* set up signals */
-#ifdef EXTERNAL_SOLVER
+/*#ifdef EXTERNAL_SOLVER
     // assuming external solver received as well
     struct sigaction new_act1;
     new_act1.sa_handler = SIG_IGN;
@@ -113,15 +129,15 @@ int main(int argc, char** argv) {
     sigaction(SIGUSR1, &new_act2, 0);
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
-    sigaction(SIGUSR2, &new_act3, 0);
-#else
+    sigaction(SIGUSR2, &new_act3, 0);*/
+//#else
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
     signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
     //signal(SIGALRM,SIG_handler);
     //alarm(290);  // Specify alarm interrupt given timeout
-#endif
+//#endif
 
     /* parse options */
     Options options;

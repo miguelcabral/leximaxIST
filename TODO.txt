@@ -11,3 +11,5 @@ Finish thesis.
 Stuff: handle signals: must remove temporary files created by leximax library; try to use leximax library in mccs?
 
 Improvements: Incremental MaxSAT? Encoding of comparators - should we put the equivalence? Or implication suffices? Dealing with time restrictions - approximation tecniques? In each iteration we have guarantee of minimising the first maxima.
+-> Add feature: Convert encoding format to ILP format (.lp file) and call ILP solvers instead of MaxSAT or PBO solvers.
+It might work more efficiently.

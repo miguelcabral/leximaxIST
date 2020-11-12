@@ -1390,6 +1390,17 @@ void Encoder::request_to_clause (CONSTANT PackageVersions& pvs,LiteralVector& li
    }
 }
 
+void Encoder::print_time()
+{
+    double parent_time (RUSAGE::read_cpu_time_self());
+    double children_time (RUSAGE::read_cpu_time_children());
+    double total_time (parent_time + children_time);
+    std::cerr << "# solving time:\n";
+    std::cerr << "#\t parent process: " << parent_time << "s\n";
+    std::cerr << "#\t child processes: " << children_time << "s\n";
+    std::cerr << "#\t total time: " << total_time << "s\n";
+}
+
 bool Encoder::solution() {
     CNF_OUT(cout << "p wcnf " << id_manager.top_id() << " " << solver.get_clause_count() << " " << (solver.get_soft_clauses_weight() + 1) << endl;)
     if (!should_solve) {
@@ -1403,13 +1414,7 @@ bool Encoder::solution() {
     }
     cerr << "# solving " << endl;
     const bool has_solution = solver.solve();
-    double parent_time = RUSAGE::read_cpu_time_self();
-    double children_time (RUSAGE::read_cpu_time_children());
-    double total_time (parent_time + children_time);
-    cerr << "# solving time:\n";
-    cerr << "#\t parent process: " << parent_time << "s\n";
-    cerr << "#\t child processes: " << children_time << "s\n";
-    cerr << "#\t total time: " << total_time << "s" << endl;
+    print_time();
     print_solution();
     return has_solution;
 }

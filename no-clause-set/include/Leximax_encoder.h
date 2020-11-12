@@ -33,8 +33,16 @@ private:
     
 public:    
 
-    // constraints is a set of hard clauses;
-    // objective_functions is a collection of objective functions, each one being a vector of soft clauses;
+    /* a clause is a disjunction of literals;
+     * a literal is a variable or a negation of a variable;
+     * each variable is represented as a positive integer (LINT);
+     * LINT is the largest integer type of your machine (see leximax_types.h);
+     * a clause is represented as a vector of literals (integers)
+     * constraints is a collection of clauses;
+     * each entry of constraints contains a clause, stored as a vector;
+     * each entry of the clause vector is a literal of that clause.
+     * objective_functions is a collection of objective functions;
+     * each objective function is a vector of soft clauses;*/
     // each objective function is the sum of its falsified soft clauses.
     Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
     
@@ -46,6 +54,9 @@ public:
     
     size_t get_sorting_net_size() { return m_sorting_net_size; }
     
+    /* if the problem is satisfiable, then m_solution is a satisfying assignment;
+     * each entry i of m_solution is +i if variable i is true and -i otherwise;
+     * if the problem is not satisfiable, m_solution is empty.*/
     std::vector<LINT>& get_solution() { return m_solution; }
     
     std::vector<LINT>& get_optimum() { return m_optimum; }
@@ -57,6 +68,8 @@ public:
     void set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
     
     void set_multiplication_string(std::string &str) { m_multiplication_string = str; }
+    
+    void terminate();
     
 private:
     

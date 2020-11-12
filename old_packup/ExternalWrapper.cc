@@ -22,12 +22,13 @@
  * Copyright (C) 2011, Mikolas Janota
  */
 
+
 #include <algorithm>
 #include <zlib.h>
 #include <iostream>
 #include "ExternalWrapper.hh"
 #include "fmtutils.hh"
-#include <Leximax_encoder.h>
+
 using std::sort;
 
 ExternalWrapper::ExternalWrapper(IDManager& id_manager)
@@ -39,6 +40,7 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
 ,leximax(false)
+,leximax_enc(nullptr)
 ,iterative(true)
 {}
 
@@ -396,6 +398,17 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      }
  }
 
+ void ExternalWrapper::print_leximax_info() {
+     assert(leximax_enc != nullptr);
+     size_t sorting_net_size (leximax_enc->get_sorting_net_size());
+     std::cerr << "# Number of comparators of sorting network: " << sorting_net_size << '\n';
+     std::vector<LINT> optimum(leximax_enc->get_optimum());
+     std::cerr << "# Sorted objective vector: ";
+     for (LINT o : optimum)
+         std::cerr << o << ' ';
+     std::cerr << '\n';
+ }
+ 
  bool ExternalWrapper::solve_leximax() {
      // create constraints and objective functions as vectors of vectors...
      std::vector<std::vector<LINT>> input_constraints(hard_clauses.size());
@@ -429,23 +442,17 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     Leximax_encoder l_enc(input_constraints, obj_functions);
+     leximax_enc = new Leximax_encoder(input_constraints, obj_functions);
      // set external solver and parameters of Leximax_encoder
-     l_enc.set_solver_command(solver_command);
-     l_enc.set_multiplication_string(multiplication_string);
-     l_enc.set_leave_temporary_files(leave_temporary_files);
-     l_enc.set_pbo(iterative);
+     leximax_enc->set_solver_command(solver_command);
+     leximax_enc->set_multiplication_string(multiplication_string);
+     leximax_enc->set_leave_temporary_files(leave_temporary_files);
+     leximax_enc->set_pbo(iterative);
      // solve and put solution in model member variable
-     l_enc.solve();
-     model = l_enc.get_solution();
-     size_t sorting_net_size (l_enc.get_sorting_net_size());
-     std::cout << "# Number of comparators of sorting network: " << sorting_net_size << std::endl;
-     std::vector<LINT> optimum(l_enc.get_optimum());
-     std::cout << "# Optimum sorted objective vector: ";
-     for (LINT o : optimum)
-         std::cout << o << ' ';
-     std::cout << std::endl;
+     leximax_enc->solve();
+     model = leximax_enc->get_solution();
+     print_leximax_info();
      // return satisfiable or not?
-     return l_enc.get_sat();
+     return leximax_enc->get_sat();
  }
  

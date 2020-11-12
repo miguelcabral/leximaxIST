@@ -60,7 +60,8 @@ public:
     void encode();
     bool solution();
     void print_solution();
-    SolverWrapper<ClausePointer>& get_solver_wrapper();
+    void print_time();
+    SolverWrapper<ClausePointer>& get_solver_wrapper() {return solver;}
 
     UINT unit_count;
     UINT cut_off;

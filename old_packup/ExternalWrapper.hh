@@ -29,6 +29,7 @@
 #include "id_manager.hh"
 #include "basic_clset.hh"
 #include "SolverWrapperBase.hh"
+#include <Leximax_encoder.h>
 
 class ExternalWrapper : public SolverWrapperBase<BasicClause*> {
 public:
@@ -42,6 +43,8 @@ public:
     bool solve_leximax();
 
     virtual IntVector& get_model()          { return model; }
+    virtual void set_model(IntVector &my_model) { model = my_model; }
+    
     virtual XLINT      get_min_unsat_cost() {return min_cost;}
 
     virtual bool register_weight(XLINT weight) {
@@ -54,6 +57,8 @@ public:
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
     inline void set_leximax(bool value=true);
+    void print_leximax_info();
+    Leximax_encoder* get_leximax_enc() {return leximax_enc;}
 
     void _output_clause (/*const*/ LiteralVector& literals);
     void _output_unary_clause(LINT l);
@@ -87,6 +92,7 @@ private:
     string temporary_directory;
     bool   leave_temporary_files;
     bool   leximax;
+    Leximax_encoder *leximax_enc;
     bool   iterative;
 
     vector< vector<LINT> > constraints;
