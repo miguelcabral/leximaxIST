@@ -21,10 +21,11 @@ private:
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
     std::forward_list<LINT> m_relax_vars;
     std::string m_solver_command;
+    std::string m_solver_format;
+    std::string m_lp_solver;
     std::string m_input_name;
     bool m_leave_temporary_files;
     bool m_sat;
-    bool m_pbo;
     bool m_debug;
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
@@ -50,24 +51,26 @@ public:
     
     void solve();
     
-    bool get_sat() { return m_sat; }
+    bool get_sat();
     
-    size_t get_sorting_net_size() { return m_sorting_net_size; }
+    size_t get_sorting_net_size();
     
     /* if the problem is satisfiable, then m_solution is a satisfying assignment;
      * each entry i of m_solution is +i if variable i is true and -i otherwise;
      * if the problem is not satisfiable, m_solution is empty.*/
-    std::vector<LINT>& get_solution() { return m_solution; }
+    std::vector<LINT>& get_solution();
     
-    std::vector<LINT>& get_optimum() { return m_optimum; }
+    std::vector<LINT>& get_optimum();
     
-    void set_solver_command(std::string &command) { m_solver_command = command; }
+    void set_solver_command(std::string &command);
     
-    void set_pbo(bool val) { m_pbo = val; }
+    void set_solver_format(std::string &format);
     
-    void set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
+    void set_lp_solver(std::string &lp_solver);
     
-    void set_multiplication_string(std::string &str) { m_multiplication_string = str; }
+    void set_leave_temporary_files(bool val);
+    
+    void set_multiplication_string(std::string &str);
     
     void terminate();
     
@@ -132,6 +135,12 @@ private:
     int solve_pbo(int i);
     
     int call_solver(std::string &file_name);
+    
+    void read_solver_output(std::string &output_filename);
+    
+    void external_solve(int i);
+    
+    int solve_lp(int i);
 
 };
     

@@ -34,10 +34,11 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_sorted_relax_vecs(objective_functions.size(), nullptr),
     m_relax_vars(),
     m_solver_command("rc2.py -vv"),
+    m_solver_format("wcnf"),
+    m_lp_solver("cplex")
     m_input_name(),
     m_leave_temporary_files(false),
     m_sat(true),
-    m_pbo(false),
     m_debug(false),
     m_multiplication_string("*"),
     m_optimum(objective_functions.size(), 0),

@@ -333,20 +333,31 @@ size_t Leximax_encoder::get_obj_value(std::vector<LINT> &model)
     return optimum;
 }
 
+bool Leximax_encoder::check_solver_format()
+{
+    std::string &s (m_solver_format);
+    if (s != "wcnf" && s != "opb" && s != "lp") {
+        std::cerr << "The external solver format entered: '" << m_solver_format << "' is not valid\n";
+        std::cerr << "Valid external solver formats: 'wcnf' 'opb' 'lp'" << std::endl;
+        return false;
+    }
+    else
+        return true;
+}
+
 void Leximax_encoder::solve()
 {
+    if (!check_solver_format())
+        return;
     // if there is only one objective function then it is a simple single objective problem
     if (m_num_objectives == 1) {
         generate_soft_clauses(0);
         // call solver 
-        if (m_pbo)
-            solve_pbo(0); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
-        else
-            solve_maxsat(0);
+        external_solve(0);
         // read model returned by the solver
-	m_sat = !(m_solution.empty());
+        m_sat = !(m_solution.empty());
         m_optimum[0] = get_obj_value(m_solution);
-	return;
+        return;
     }
     // encode sorted vectors with sorting network
     encode_sorted();
@@ -361,11 +372,8 @@ void Leximax_encoder::solve()
         // encode the componentwise OR between sorted_relax vectors except in the last iteration
         if (i != m_num_objectives - 1)
             componentwise_OR(i);
-        // call solver 
-        if (m_pbo)
-            solve_pbo(i); // tmp_model[k] is k if k is true under tmp_model, and -k otherwise.
-        else
-            solve_maxsat(i);
+        // call solver
+        external_solve(i);
         // read model returned by the solver and fix value of current maximum
         if (m_solution.empty()){
             m_sat = false;
