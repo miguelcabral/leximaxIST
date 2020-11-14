@@ -23,7 +23,9 @@ private:
     std::string m_solver_command;
     std::string m_solver_format;
     std::string m_lp_solver;
+    std::string m_valid_lp_solvers[];
     std::string m_input_name;
+    pid_t m_child_pid;
     bool m_leave_temporary_files;
     bool m_sat;
     bool m_debug;
@@ -72,7 +74,7 @@ public:
     
     void set_multiplication_string(std::string &str);
     
-    void terminate();
+    void terminate(int signum);
     
 private:
     
@@ -141,6 +143,10 @@ private:
     void external_solve(int i);
     
     int solve_lp(int i);
+    
+    // error.cpp
+    
+    void print_error_msg(std::string &msg);
 
 };
     

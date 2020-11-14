@@ -37,6 +37,7 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_solver_format("wcnf"),
     m_lp_solver("cplex")
     m_input_name(),
+    m_child_pid(-1),
     m_leave_temporary_files(false),
     m_sat(true),
     m_debug(false),

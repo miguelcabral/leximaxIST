@@ -5,10 +5,49 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include <fmtutils.hh>
+#include <errno.h>
+#include <sys/wait.h>
+
+void Leximax_encoder::read_cplex_output(std::string &output_filename)
+{
+    gzFile of = gzopen(output_filename.c_str(), "rb");
+    assert(of!=NULL);
+    StreamBuffer r(of);
+    bool sat = false;
+    m_solution.resize(static_cast<size_t>(m_id_count + 1), 0);
+    // set all variables to false, because we only get the variables that are true
+    for (size_t v (1); v < m_id_count + 1; ++v)
+        m_solution[v] = -v;
+    while (*r != EOF) {
+        if (*r != 'C') {// ignore all the other lines
+            skipLine(r);
+        } else {
+            // check if the line is 'CPLEX> Incumbent solution'
+            std::string line;
+            for (int i (0); i < 25 && (*r != '\n') && (*r != EOF) && (*r != '\r'); ++i) {
+                line.push_back(*r);
+                ++r;
+            }
+            if (line == "CPLEX> Incumbent solution") {
+                sat=true;
+                while (*r != EOF) {
+                    if (*r != 'x')
+                        skipLine(r);
+                    else {
+                        ++r;
+                        const LINT l = parseInt(r);
+                        assert(m_solution.size()>(size_t)l);
+                        m_solution[l] = l;
+                    }
+                }
+            }
+        }
+    }
+    if (!sat) m_solution.clear();    
+}
 
 void Leximax_encoder::read_solver_output(std::string &output_filename)
 {
-    // TODO: switch statement : if maxsat or pbo like below, else write the code for lp
     if (m_solver_format == "wcnf" || m_solver_format == "opb") {
         gzFile of = gzopen(output_filename.c_str(), "rb");
         assert(of!=NULL);
@@ -57,9 +96,6 @@ void Leximax_encoder::read_solver_output(std::string &output_filename)
             case "lpsolve":
                 read_lpsolve_output(output_filename);
                 break;
-            default:
-                std::cerr << "The lp solver name entered: '" << m_lp_solver << "' is not valid\n";
-                std::cerr << "Valid lp solvers: 'cplex' 'gurobi' 'glpk' 'scip' 'cbc' 'lpsolve'" << std::endl;
         }
     }
 }
@@ -71,17 +107,46 @@ int Leximax_encoder::call_solver(std::string &file_name)
     std::stringstream scommand;
     const std::string output_filename = file_name + ".out";
     scommand << m_solver_command << " ";
-    scommand << file_name << " > " << output_filename << " 2> solver_error.txt";
+    if (m_solver_format == "lp" && m_lp_solver == "cplex") {
+        scommand << "-c \"read " << file_name << "\" \"optimize\" \"display solution variables -\" \"quit\"";
+    }
+    else
+        scommand << file_name;
+    //scommand << " > " << output_filename << " 2> solver_error.txt";
     const std::string command = scommand.str();
-    const int retv = system (command.c_str());
-    //std::cerr << "# " <<  "external command finished with exit value " << retv << '\n';
+    pid_t pid (fork());
+    if (pid == -1) {
+        print_error_msg("Can't fork process: " + strerror(errno));
+        return -1;
+    }
+    if (pid == 0) {
+        // child process - run external solver
+        // redirect std output to output_filename and std error to solver_error.txt
+        
+        // convert command to vector of strings (split by whitespace)
+        
+        // execute execl
+        execl();
+    }
+    // parent process - store child pid for signal handling
+    m_child_pid = pid;
+    // waitpid for child process
+    int pid_status;
+    if (waitpid(pid, &pid_status, 0) == -1) {
+        print_error_msg("Error waiting for child process: " + strerror(errno));
+        return -1;
+    }
+    if (WEXITSTATUS(pid_status)) {
+        print_error_msg("The external solver finished with non-zero error status");
+        return -1;
+    }    
     read_solver_output(output_filename);
     if (!m_leave_temporary_files) {
         remove(file_name.c_str());
         remove(output_filename.c_str());
         remove("solver_error.txt");
     }
-    return retv;
+    return 0;
 }
 
 void write_clauses(std::ostream &output, std::vector<Clause*> &clauses, size_t weight)
@@ -221,7 +286,11 @@ void Leximax_encoder:: solve_lp(int i)
         write_sum_equals_lp(1, output); // in the last iteration print =1 cardinality constraint
     else if (i != 0)
         write_atmost_lp(i, output); // in other iterations print at most i constraint  
-    // TODO: print all variables after Binaries
+    // print all variables after Binaries
+    output << "Binaries\n";
+    for (size_t j (1); j <= m_id_count; ++j)
+        output << "x" << j << '\n';
+    output << "End";
     output.close();
     // call the solver
     return call_solver(input_name);
