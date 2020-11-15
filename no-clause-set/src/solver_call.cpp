@@ -1,6 +1,7 @@
 #include <Leximax_encoder.h>
 #include <assert.h>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <stdlib.h>
 #include <zlib.h>
@@ -8,7 +9,7 @@
 #include <errno.h>
 #include <sys/wait.h>
 
-void Leximax_encoder::read_cplex_output(std::string &output_filename)
+void Leximax_encoder::read_cplex_output(const std::string &output_filename)
 {
     gzFile of = gzopen(output_filename.c_str(), "rb");
     assert(of!=NULL);
@@ -46,7 +47,7 @@ void Leximax_encoder::read_cplex_output(std::string &output_filename)
     if (!sat) m_solution.clear();    
 }
 
-void Leximax_encoder::read_solver_output(std::string &output_filename)
+void Leximax_encoder::read_solver_output(const std::string &output_filename)
 {
     if (m_solver_format == "wcnf" || m_solver_format == "opb") {
         gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -100,33 +101,70 @@ void Leximax_encoder::read_solver_output(std::string &output_filename)
     }
 }
 
-int Leximax_encoder::call_solver(std::string &file_name)
+void split_solver_command(const std::string &command, std::vector<std::string> &command_split)
 {
-    // TODO: change this to fork and exec and waitpid; Store the child pid -> member variable
-    // , to send signal to the child in function terminate
+    // TODO
+    size_t pos (0);
+    while (true) {
+        // skip whitespace until next piece of text
+        while (command[pos] == ' ' && pos < command.length())
+            pos++;
+        if (pos == command.length())
+            break;
+        // pos is where the piece of text starts
+        std::vector<char> quote_stack;
+        size_t found (command.find_first_of(" \"\'", pos));
+        if ()
+        command_split.push_back(command.substr(pos, found));
+        command_split.push_back(command.substr(pos, found));
+        pos = found;
+        while (command[pos] == ' ' && pos < command.length())
+            pos++;
+        if (pos == command.length())
+            // break ciclo
+        bool inside_single_quote (false);
+        bool inside_double_quote (false);
+    }
+    
+}
+
+int Leximax_encoder::call_solver(const std::string &input_filename)
+{
     std::stringstream scommand;
-    const std::string output_filename = file_name + ".out";
+    const std::string output_filename = input_filename + ".out";
+    const std::string error_filename = input_filename + ".err";
     scommand << m_solver_command << " ";
     if (m_solver_format == "lp" && m_lp_solver == "cplex") {
-        scommand << "-c \"read " << file_name << "\" \"optimize\" \"display solution variables -\" \"quit\"";
+        scommand << "-c \"read " << input_filename << "\" \"optimize\" \"display solution variables -\" \"quit\"";
     }
     else
-        scommand << file_name;
-    //scommand << " > " << output_filename << " 2> solver_error.txt";
+        scommand << input_filename;
     const std::string command = scommand.str();
     pid_t pid (fork());
     if (pid == -1) {
         print_error_msg("Can't fork process: " + strerror(errno));
         return -1;
     }
-    if (pid == 0) {
-        // child process - run external solver
-        // redirect std output to output_filename and std error to solver_error.txt
-        
+    if (pid == 0) { // child process
+        // open output_filename and error_filename
+        std::ofstream output_stream(output_filename);
+        std::ofstream error_stream(error_filename);
+        // redirect std output to output_filename and std error to error_filename
+        std::cout.readbf(output_stream.readbf());
+        std::cerr.readbf(error_stream.readbf());
         // convert command to vector of strings (split by whitespace)
-        
-        // execute execl
-        execl();
+        std::vector<std::string> command_split;
+        split_solver_command(command, command_split);
+        // convert to array for execv function
+        char* *args (new char* [command_split.size()]);
+        for (int i (0); i < command_split.size() - 1; ++i)
+            args[i] = command_split[i + 1].c_str();
+        args[command_split.size() - 1] = nullptr;
+        // call solver
+        if (execv(command_split[0], args) == -1) {
+            print_error_msg("Something went wrong with the external solver: " + strerror(errno));
+            return -1;
+        }
     }
     // parent process - store child pid for signal handling
     m_child_pid = pid;
@@ -142,9 +180,9 @@ int Leximax_encoder::call_solver(std::string &file_name)
     }    
     read_solver_output(output_filename);
     if (!m_leave_temporary_files) {
-        remove(file_name.c_str());
+        remove(input_filename.c_str());
         remove(output_filename.c_str());
-        remove("solver_error.txt");
+        remove(error_filename.c_str());
     }
     return 0;
 }

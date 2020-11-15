@@ -136,9 +136,9 @@ private:
     
     int solve_pbo(int i);
     
-    int call_solver(std::string &file_name);
+    int call_solver(const std::string &input_filename);
     
-    void read_solver_output(std::string &output_filename);
+    void read_solver_output(const std::string &output_filename);
     
     void external_solve(int i);
     
