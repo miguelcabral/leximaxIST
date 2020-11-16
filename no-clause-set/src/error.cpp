@@ -7,6 +7,7 @@ void Leximax_encoder::print_error_msg(std::string &msg)
 
 void Leximax_encoder::terminate(int signum)
 {
+    // TODO
     // send signal to child process external solver (if one exists) with the kill function
     // wait a few seconds for the external solver to return the best solution so far
     // read solution

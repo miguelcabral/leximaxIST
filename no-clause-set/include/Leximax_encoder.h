@@ -23,7 +23,7 @@ private:
     std::string m_solver_command;
     std::string m_solver_format;
     std::string m_lp_solver;
-    std::string m_valid_lp_solvers[];
+    std::string m_valid_lp_solvers[6];
     std::string m_input_name;
     pid_t m_child_pid;
     bool m_leave_temporary_files;
@@ -51,7 +51,8 @@ public:
     
     ~Leximax_encoder();
     
-    void solve();
+    // returns 0 if all want well, -1 otherwise
+    int solve();
     
     bool get_sat();
     
@@ -130,19 +131,39 @@ private:
     
     void write_atmost_pb(int i, std::ostream &output);
     
-    void write_pbconstraint(Clause *cl, std::ostream& output);
+    void write_pbconstraint(Clause *cl, std::ostream &output);
     
     void write_sum_equals_pb(int i, std::ostream &output);
     
     int solve_pbo(int i);
     
+    int split_solver_command(const std::string &command, std::vector<std::string> &command_split);
+    
     int call_solver(const std::string &input_filename);
     
     void read_solver_output(const std::string &output_filename);
     
-    void external_solve(int i);
+    int external_solve(int i);
     
     int solve_lp(int i);
+    
+    void write_atmost_lp(int i, std::ostream &output);
+    
+    void write_lpconstraint(Clause *cl, std::ostream &output);
+    
+    void write_sum_equals_lp(int i, std::ostream &output);
+    
+    void read_cplex_output(const std::string &output_filename);
+    
+    void read_gurobi_output(const std::string &output_filename);
+    
+    void read_glpk_output(const std::string &output_filename);
+    
+    void read_lpsolve_output(const std::string &output_filename);
+    
+    void read_scip_output(const std::string &output_filename);
+    
+    void read_cbc_output(const std::string &output_filename);
     
     // error.cpp
     

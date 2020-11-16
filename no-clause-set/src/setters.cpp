@@ -20,7 +20,7 @@ void Leximax_encoder::set_lp_solver(std::string &lp_solver)
     if (!found) {
         std::string msg = "The lp solver name entered: '" + lp_solver + "' is not valid\n";
         msg += "Valid lp solvers: ";
-        for (std::string &valid_lp_solver m_valid_lp_solvers)
+        for (std::string &valid_lp_solver : m_valid_lp_solvers)
             msg += valid_lp_solver + ' ';
         print_error_msg(msg);
     }

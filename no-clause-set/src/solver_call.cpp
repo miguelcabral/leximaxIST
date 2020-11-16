@@ -8,6 +8,32 @@
 #include <fmtutils.hh>
 #include <errno.h>
 #include <sys/wait.h>
+#include <cstring> // for strerror()
+
+void Leximax_encoder::read_gurobi_output(const std::string &output_filename)
+{
+    // TODO
+}
+
+void Leximax_encoder::read_glpk_output(const std::string &output_filename)
+{
+    // TODO
+}
+
+void Leximax_encoder::read_lpsolve_output(const std::string &output_filename)
+{
+    // TODO
+}
+
+void Leximax_encoder::read_scip_output(const std::string &output_filename)
+{
+    // TODO
+}
+
+void Leximax_encoder::read_cbc_output(const std::string &output_filename)
+{
+    // TODO
+}
 
 void Leximax_encoder::read_cplex_output(const std::string &output_filename)
 {
@@ -78,54 +104,67 @@ void Leximax_encoder::read_solver_output(const std::string &output_filename)
         if (!sat) m_solution.clear();
     }
     else if (m_solver_format == "lp") {
-        switch (m_lp_solver) {
-            case "cplex":
-                read_cplex_output(output_filename);
-                break;
-            case "gurobi":
-                read_gurobi_output(output_filename);
-                break;
-            case "glpk":
-                read_glpk_output(output_filename);
-                break;
-            case "scip":
-                read_scip_output(output_filename);
-                break;
-            case "cbc":
-                read_cbc_output(output_filename);
-                break;
-            case "lpsolve":
-                read_lpsolve_output(output_filename);
-                break;
-        }
+        if (m_lp_solver == "cplex")
+            read_cplex_output(output_filename);
+        else if (m_lp_solver == "gurobi")
+            read_gurobi_output(output_filename);
+        else if (m_lp_solver == "glpk")
+            read_glpk_output(output_filename);
+        else if (m_lp_solver == "scip")
+            read_scip_output(output_filename);
+        else if (m_lp_solver == "cbc")
+            read_cbc_output(output_filename);
+        else if (m_lp_solver == "lpsolve")
+            read_lpsolve_output(output_filename);
     }
 }
 
-void split_solver_command(const std::string &command, std::vector<std::string> &command_split)
+int Leximax_encoder::split_solver_command(const std::string &command, std::vector<std::string> &command_split)
 {
-    // TODO
     size_t pos (0);
-    while (true) {
+    while (pos < command.length()) {
         // skip whitespace until next piece of text
         while (command[pos] == ' ' && pos < command.length())
             pos++;
         if (pos == command.length())
             break;
         // pos is where the piece of text starts
-        std::vector<char> quote_stack;
         size_t found (command.find_first_of(" \"\'", pos));
-        if ()
-        command_split.push_back(command.substr(pos, found));
-        command_split.push_back(command.substr(pos, found));
+        while (found != std::string::npos && command[found] != ' ') {
+            char quote (command[found]);
+            size_t quote_pos (found);
+            found++;
+            while (command[found] != quote && found < command.length())
+                found++;
+            if (command[found] != quote) {
+                std::string msg ("Can not parse external solver command - missing closing quotation mark\n");
+                msg += command + "\n";
+                for (int i (0); i < quote_pos; ++i) {
+                    msg += " ";
+                }
+                msg += "^";
+                print_error_msg(msg);
+                return -1;
+            }
+            else
+                found++;
+            found = command.find_first_of(" \"\'", found));
+        }
+        // I just found the end of the piece of text
+        command_split.push_back(command.substr(pos, found - pos));
         pos = found;
-        while (command[pos] == ' ' && pos < command.length())
-            pos++;
-        if (pos == command.length())
-            // break ciclo
-        bool inside_single_quote (false);
-        bool inside_double_quote (false);
     }
-    
+    if (command_split.empty()) {
+        print_error_msg("Empty external solver command");
+        return -1;
+    }
+    // copy the path of the solver to the first position
+    command_split.insert(command_split.begin(), command_split[0]);
+    std::cout << "command_split: ";
+    for (std::string &s : command_split)
+        std::cout << s << ", ";
+    std::cout << std::endl;
+    return 0;
 }
 
 int Leximax_encoder::call_solver(const std::string &input_filename)
@@ -134,8 +173,11 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     const std::string output_filename = input_filename + ".out";
     const std::string error_filename = input_filename + ".err";
     scommand << m_solver_command << " ";
-    if (m_solver_format == "lp" && m_lp_solver == "cplex") {
-        scommand << "-c \"read " << input_filename << "\" \"optimize\" \"display solution variables -\" \"quit\"";
+    if (m_solver_format == "lp") {
+        if (m_lp_solver == "cplex")
+            scommand << "-c \"read " << input_filename << "\" \"optimize\" \"display solution variables -\"";
+        if (m_lp_solver == "cbc")
+            scommand << input_filename << " solve solution $";
     }
     else
         scommand << input_filename;
@@ -254,12 +296,39 @@ void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
     output << " >= " << -i << ";\n";
 }
 
+void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
+{
+    bool first_iteration (true);
+    for (LINT var : m_relax_vars) {
+        if (first_iteration) {
+            output << 'x' << var;
+            first_iteration = false;
+        }
+        else
+            output << " + " << 'x' << var;
+    output << " >= " << -i << '\n';
+}
+
 void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
 {
     for (LINT var : m_relax_vars) {
         output << "+1" << m_multiplication_string << "x" << var << " ";
     }
     output << " = " << i << ";\n";
+}
+
+void Leximax_encoder::write_sum_equals_lp(int i, std::ostream &output)
+{
+    bool first_iteration (true);
+    for (LINT var : m_relax_vars) {
+        if (first_iteration) {
+            output << 'x' << var;
+            first_iteration = false;
+        }
+        else
+            output << " + " << 'x' << var;
+    }
+    output << " = " << i << '\n';
 }
 
 int Leximax_encoder::solve_pbo(int i)
@@ -290,7 +359,7 @@ int Leximax_encoder::solve_pbo(int i)
     return call_solver(input_name);
 }
 
-void Leximax_encoder:: solve_lp(int i)
+int Leximax_encoder:: solve_lp(int i)
 {
     std::string input_name (m_input_name);
     input_name += "_" + std::to_string(i) + ".lp";
@@ -334,17 +403,19 @@ void Leximax_encoder:: solve_lp(int i)
     return call_solver(input_name);
 }
 
-void Leximax_encoder::external_solve(int i)
+int Leximax_encoder::external_solve(int i)
 {
     switch(m_solver_format) {
         case "wcnf":
-            solve_maxsat(i);
-            break;
+            return solve_maxsat(i);
         case "opb":
-            solve_pbo(i);
-            break;
+            return solve_pbo(i);
         case "lp":
-            solve_lp(i);
-            break;
+            return solve_lp(i);
+        default
+            std::string msg ("The external solver format entered: '" + m_solver_format + "' is not valid\n");
+            msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
+            print_error_msg(msg);
+            return -1;
     }
 }
