@@ -62,7 +62,7 @@ static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n';
   Leximax_encoder *leximax_enc (parser.get_encoder.get_solver_wrapper().get_leximax_enc());
   if (leximax_enc != nullptr) {
-      leximax_enc->terminate();
+      leximax_enc->terminate(signum);
       parser.get_encoder.get_solver_wrapper().set_model(leximax_enc->get_solution());
       print_leximax_info();
   }
