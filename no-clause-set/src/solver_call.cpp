@@ -8,6 +8,7 @@
 #include <fmtutils.hh>
 #include <errno.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #include <cstring> // for strerror()
 
 void Leximax_encoder::read_gurobi_output(const std::string &output_filename)
@@ -148,18 +149,16 @@ int Leximax_encoder::split_solver_command(const std::string &command, std::vecto
             }
             else
                 found++;
-            found = command.find_first_of(" \"\'", found));
+            found = command.find_first_of(" \"\'", found);
         }
         // I just found the end of the piece of text
-        command_split.push_back(command.substr(pos, found - pos));
+        command_split.push_back(command.substr(pos, found - pos)/*.c_str()*/);
         pos = found;
     }
     if (command_split.empty()) {
         print_error_msg("Empty external solver command");
         return -1;
     }
-    // copy the path of the solver to the first position
-    command_split.insert(command_split.begin(), command_split[0]);
     std::cout << "command_split: ";
     for (std::string &s : command_split)
         std::cout << s << ", ";
@@ -169,22 +168,21 @@ int Leximax_encoder::split_solver_command(const std::string &command, std::vecto
 
 int Leximax_encoder::call_solver(const std::string &input_filename)
 {
-    std::stringstream scommand;
     const std::string output_filename = input_filename + ".out";
     const std::string error_filename = input_filename + ".err";
-    scommand << m_solver_command << " ";
-    if (m_solver_format == "lp") {
+    std::string command (m_solver_command + " ");
+    if (m_solver_format == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
         if (m_lp_solver == "cplex")
-            scommand << "-c \"read " << input_filename << "\" \"optimize\" \"display solution variables -\"";
+            command += "-c \"read " + input_filename + "\" \"optimize\" \"display solution variables -\"";
         if (m_lp_solver == "cbc")
-            scommand << input_filename << " solve solution $";
+            command += input_filename + " solve solution $";
     }
     else
-        scommand << input_filename;
-    const std::string command = scommand.str();
+        command += input_filename;
     pid_t pid (fork());
     if (pid == -1) {
-        print_error_msg("Can't fork process: " + strerror(errno));
+        std::string errmsg (strerror(errno));
+        print_error_msg("Can't fork process: " + errmsg);
         return -1;
     }
     if (pid == 0) { // child process
@@ -192,19 +190,22 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
         std::ofstream output_stream(output_filename);
         std::ofstream error_stream(error_filename);
         // redirect std output to output_filename and std error to error_filename
-        std::cout.readbf(output_stream.readbf());
-        std::cerr.readbf(error_stream.readbf());
+        std::cout.rdbuf(output_stream.rdbuf());
+        std::cerr.rdbuf(error_stream.rdbuf());
         // convert command to vector of strings (split by whitespace)
         std::vector<std::string> command_split;
-        split_solver_command(command, command_split);
+        if (split_solver_command(command, command_split) == -1)
+            return -1;
         // convert to array for execv function
-        char* *args (new char* [command_split.size()]);
-        for (int i (0); i < command_split.size() - 1; ++i)
-            args[i] = command_split[i + 1].c_str();
-        args[command_split.size() - 1] = nullptr;
+        char **args (new char*[command_split.size()]);
+        for (size_t i (0); i < command_split.size(); ++i) {
+            size_t length (command_split[i].copy(args[i], command_split[i].size()));
+            args[i][length] = '\0';
+        }
         // call solver
-        if (execv(command_split[0], args) == -1) {
-            print_error_msg("Something went wrong with the external solver: " + strerror(errno));
+        if (execv(args[0], args) == -1) {
+            std::string errmsg (strerror(errno));
+            print_error_msg("Something went wrong with the external solver: " + errmsg);
             return -1;
         }
     }
@@ -213,7 +214,8 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     // waitpid for child process
     int pid_status;
     if (waitpid(pid, &pid_status, 0) == -1) {
-        print_error_msg("Error waiting for child process: " + strerror(errno));
+        std::string errmsg (strerror(errno));
+        print_error_msg("Error waiting for child process: " + errmsg);
         return -1;
     }
     if (WEXITSTATUS(pid_status)) {
@@ -226,6 +228,8 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
         remove(output_filename.c_str());
         remove(error_filename.c_str());
     }
+    // set to zero, i.e. no external solver is currently running
+    m_child_pid = 0;
     return 0;
 }
 
@@ -306,7 +310,8 @@ void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
         }
         else
             output << " + " << 'x' << var;
-    output << " >= " << -i << '\n';
+    }
+    output << " <= " << i << '\n';
 }
 
 void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
@@ -337,7 +342,11 @@ int Leximax_encoder::solve_pbo(int i)
     input_name += "_" + std::to_string(i) + ".opb";
     std::ofstream output(input_name.c_str());
     // prepare input for the solver
-    output << "* #variable= " << m_id_count << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
+    output << "* #variable= " << m_id_count;
+    if (i == 0)
+        output << " #constraint= " << m_constraints.size() << '\n';
+    else
+        output << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function
         output << "min:";
         for (Clause *cl : m_soft_clauses) {
@@ -366,11 +375,11 @@ int Leximax_encoder:: solve_lp(int i)
     std::ofstream output(input_name.c_str());
     // prepare input for the solver
     output << "Minimize\n";
-    output << " obj: "
+    output << " obj: ";
     if (m_soft_clauses.size() > 0) {// print minimization function
         size_t nb_vars_in_line (0);
         for (size_t j (0); j < m_soft_clauses.size(); ++j) {
-            Clause *cl (m_soft_clauses[j])
+            Clause *cl (m_soft_clauses[j]);
             LINT soft_var = -(*(cl->begin())); // cl is unitary clause
             if (j == 0)
                 output << 'x' << soft_var;
@@ -405,17 +414,16 @@ int Leximax_encoder:: solve_lp(int i)
 
 int Leximax_encoder::external_solve(int i)
 {
-    switch(m_solver_format) {
-        case "wcnf":
-            return solve_maxsat(i);
-        case "opb":
-            return solve_pbo(i);
-        case "lp":
-            return solve_lp(i);
-        default
-            std::string msg ("The external solver format entered: '" + m_solver_format + "' is not valid\n");
-            msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
-            print_error_msg(msg);
-            return -1;
+    if(m_solver_format == "wcnf")
+        return solve_maxsat(i);
+    else if(m_solver_format == "opb")
+        return solve_pbo(i);
+    else if(m_solver_format == "lp")
+        return solve_lp(i);
+    else {
+        std::string msg ("The external solver format entered: '" + m_solver_format + "' is not valid\n");
+        msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
+        print_error_msg(msg);
+        return -1;
     }
 }

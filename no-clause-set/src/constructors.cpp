@@ -38,11 +38,11 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_lp_solver("cplex"),
     m_valid_lp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"},
     m_input_name(),
-    m_child_pid(-1),
+    m_child_pid(0),
     m_leave_temporary_files(false),
     m_sat(true),
     m_debug(false),
-    m_multiplication_string("*"),
+    m_multiplication_string(" "),
     m_optimum(objective_functions.size(), 0),
     m_solution(),
     m_sorting_net_size(0)

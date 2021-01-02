@@ -8,6 +8,15 @@ void Leximax_encoder::clear_soft_clauses()
     m_soft_clauses.clear();
 }
 
+void Leximax_encoder::clear_sorted_relax()
+{
+    // in first iteration (of the algorithm) nullptr is ignored by delete
+    for (size_t i (0); i < m_sorted_relax_vecs.size(); ++i) {
+        delete m_sorted_relax_vecs[i];
+        m_sorted_relax_vecs[i] = nullptr;
+    }
+}
+
 // free clauses in m_constraints and clear vector
 void Leximax_encoder::clear_hard_clauses()
 {
@@ -26,8 +35,7 @@ Leximax_encoder::~Leximax_encoder()
     for (std::vector<LINT> *sorted_vec : m_sorted_vecs)
         delete sorted_vec;
     // free m_sorted_relax_vecs
-    for (std::vector<LINT> *sorted_relax_vec : m_sorted_relax_vecs)
-        delete sorted_relax_vec;
+    clear_sorted_relax();
     clear_hard_clauses();
     clear_soft_clauses();
 }

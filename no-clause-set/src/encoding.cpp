@@ -120,6 +120,8 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 
 void Leximax_encoder::encode_relaxation(int i)
 {
+    // free dynamic memory m_sorted_relax_vecs of previous iteration (i-1) 
+    clear_sorted_relax();
     LINT first_relax_var = m_id_count + 1;
     m_relax_vars.clear(); // clear from previous iteration
     for (int j = 0; j < m_num_objectives; ++j)
@@ -184,7 +186,7 @@ void Leximax_encoder::encode_relaxation(int i)
         // at most i constraint 
         if (m_debug)
             std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
-        if (!m_pbo)
+        if(m_solver_format == "wcnf")
             at_most(m_relax_vars, i);
         // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
     }
@@ -221,7 +223,7 @@ void Leximax_encoder::encode_relaxation(int i)
             }
             ++k;
         }
-        if (!m_pbo) { // when solving with pbo, this constraint is written before calling the solver
+        if(m_solver_format == "wcnf") { // when solving with pbo or lp, this constraint is written before calling the solver
             // at most 1 constraint
             if (m_debug)
                 std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
@@ -299,12 +301,12 @@ void Leximax_encoder::generate_soft_clauses(int i)
     // if m_num_objectives is 1 then this is a single objective problem
     if (m_num_objectives == 1) {
         std::vector<LINT> *objective = m_objectives[0];
-	for (size_t j (0); j < objective->size(); ++j) {
-	    lits.push_back(objective->at(j));
-        add_soft_clause(lits);
-        lits.clear();
-	}
-	return;
+        for (size_t j (0); j < objective->size(); ++j) {
+            lits.push_back(-(objective->at(j)));
+            add_soft_clause(lits);
+            lits.clear();
+        }
+            return;
     }
     // find size of largest objective function
     size_t largest = largest_obj();
@@ -342,6 +344,7 @@ int Leximax_encoder::solve()
         int retv = external_solve(0);
         // read model returned by the solver
         m_sat = !(m_solution.empty());
+        // TODO: change optimum to objective vector!!
         m_optimum[0] = get_obj_value(m_solution);
         return retv;
     }
@@ -367,7 +370,8 @@ int Leximax_encoder::solve()
             break;
         }
         m_sat = true;
-        if (i != m_num_objectives - 1) { // in the last iteration we just print the solution
+        // fix value of current maximum; in the end of last iteration there is no need for this
+        if (i != m_num_objectives - 1) {
             for (Clause *cl : m_soft_clauses) {
                 LINT soft_var = -(*(cl->begin()));
                 std::vector<LINT> lits (1, m_solution[soft_var]);

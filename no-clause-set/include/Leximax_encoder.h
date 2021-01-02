@@ -63,6 +63,7 @@ public:
      * if the problem is not satisfiable, m_solution is empty.*/
     std::vector<LINT>& get_solution();
     
+    // TODO: change m_optimum to objective vector; calculate it in the last iteration by checking the values of each obj var
     std::vector<LINT>& get_optimum();
     
     void set_solver_command(std::string &command);
@@ -90,6 +91,8 @@ private:
     // destructor.cpp
     
     void clear_soft_clauses();
+    
+    void clear_sorted_relax();
     
     void clear_hard_clauses();
     
@@ -167,7 +170,7 @@ private:
     
     // error.cpp
     
-    void print_error_msg(std::string &msg);
+    void print_error_msg(const std::string &msg);
 
 };
     
