@@ -66,15 +66,15 @@ public:
     // TODO: change m_optimum to objective vector; calculate it in the last iteration by checking the values of each obj var
     std::vector<LINT>& get_optimum();
     
-    void set_solver_command(std::string &command);
+    void set_solver_command(const std::string &command);
     
-    void set_solver_format(std::string &format);
+    void set_solver_format(const std::string &format);
     
-    void set_lp_solver(std::string &lp_solver);
+    void set_lp_solver(const std::string &lp_solver);
     
     void set_leave_temporary_files(bool val);
     
-    void set_multiplication_string(std::string &str);
+    void set_multiplication_string(const std::string &str);
     
     void terminate(int signum);
     

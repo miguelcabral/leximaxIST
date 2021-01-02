@@ -59,13 +59,12 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
 
 #ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
-  cerr << "# received external signal " << signum << '\n';
-  ExternalWrapper &extwrap (parser.get_encoder().get_solver_wrapper()); 
-  Leximax_encoder *leximax_enc (extwrap.get_leximax_enc());
+  cerr << "# received external signal " << signum << '\n'; 
+  Leximax_encoder *leximax_enc (solver.get_leximax_enc());
   if (leximax_enc != nullptr) {
       leximax_enc->terminate(signum);
-      extwrap.set_model(leximax_enc->get_solution());
-      extwrap.print_leximax_info();
+      solver.set_model(leximax_enc->get_solution());
+      solver.print_leximax_info();
   }
   parser.get_encoder().print_time();
   parser.get_encoder().print_solution();
