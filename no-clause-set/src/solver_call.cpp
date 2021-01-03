@@ -159,10 +159,6 @@ int Leximax_encoder::split_solver_command(const std::string &command, std::vecto
         print_error_msg("Empty external solver command");
         return -1;
     }
-    std::cout << "command_split: ";
-    for (std::string &s : command_split)
-        std::cout << s << ", ";
-    std::cout << std::endl;
     return 0;
 }
 
@@ -196,14 +192,27 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
         std::vector<std::string> command_split;
         if (split_solver_command(command, command_split) == -1)
             return -1;
+        command_split.clear();
+        command_split.push_back("grep");
+        command_split.push_back("'packup'");
+        command_split.push_back("/home/miguelcabral/thesis/old_packup/Makefile");
         // convert to array for execv function
-        char **args (new char*[command_split.size()]);
+        std::vector<char*> args(command_split.size() + 1, new char[30]{}); // memory leak - no problems because child process dies afterward?
+        //char **args (new char*[command_split.size()]);
         for (size_t i (0); i < command_split.size(); ++i) {
             size_t length (command_split[i].copy(args[i], command_split[i].size()));
             args[i][length] = '\0';
+            std::cerr << "i="<< i << std::endl;
+            std::cerr << args[i] << std::endl;
         }
+        args[command_split.size()] = nullptr;
+            /*std::cout << "command_split: ";
+    for (std::string &s : command_split)
+        std::cout << s << ", ";
+    std::cout << std::endl;*/
         // call solver
-        if (execv(args[0], args) == -1) {
+        std::string ola ("/bin/grep");
+        if (execv(/*args[0]*/ola.c_str(), args.data()) == -1) {
             std::string errmsg (strerror(errno));
             print_error_msg("Something went wrong with the external solver: " + errmsg);
             return -1;
@@ -219,7 +228,8 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
         return -1;
     }
     if (WEXITSTATUS(pid_status)) {
-        print_error_msg("The external solver finished with non-zero error status");
+        std::string errmsg (strerror(errno));
+        print_error_msg("The external solver finished with non-zero error status: " + errmsg);
         return -1;
     }    
     read_solver_output(output_filename);

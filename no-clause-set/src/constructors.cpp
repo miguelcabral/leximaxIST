@@ -1,6 +1,5 @@
 #include <Leximax_encoder.h>
 #include <sstream>
-#include <sys/types.h>
 #include <unistd.h>
 
 void Leximax_encoder::add_hard_clause(const std::vector<LINT> &lits)

@@ -7,6 +7,7 @@
 #include <utility> // std::pair
 #include <forward_list> // std::forward_list
 #include <leximax_types.h>
+#include <sys/types.h>
 
 class Leximax_encoder {
 
