@@ -20,7 +20,8 @@ private:
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
-    std::forward_list<LINT> m_relax_vars;
+    std::vector<std::vector<std::vector<LINT>*>>  m_sorted_relax_collection;
+    std::vector<std::forward_list<LINT>> m_all_relax_vars; // relax_vars of each iteration
     std::string m_solver_command;
     std::string m_solver_format;
     std::string m_lp_solver;
@@ -33,7 +34,7 @@ private:
     std::string m_multiplication_string;
     std::vector<LINT> m_optimum;
     std::vector<LINT> m_solution;
-    size_t m_sorting_net_size;
+    size_t m_sorting_net_size; // size of largest sorting network
     
 public:    
 
@@ -49,7 +50,7 @@ public:
      * each objective function is a vector of soft clauses;*/
     // each objective function is the sum of its falsified soft clauses.
     Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
-    
+    // TODO: change the constructor's parameters to const, and add checks if constraints and/or obj functions is empty
     ~Leximax_encoder();
     
     // returns 0 if all want well, -1 otherwise
@@ -119,7 +120,7 @@ private:
     
     void generate_soft_clauses(int i);
     
-    size_t get_obj_value(std::vector<LINT> &model);
+    LINT get_obj_value(std::vector<LINT> &model);
     
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     

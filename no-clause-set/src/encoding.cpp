@@ -22,7 +22,16 @@ void Leximax_encoder::encode_sorted()
                 }
                 std::cerr << "---------------- Sorting Network " << i << " ----------------\n";
             }
+            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
+            size_t old_snet_size (m_sorting_net_size);
+            //std::cerr << "old: " << old_snet_size << std::endl;
+            m_sorting_net_size = 0;
+            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
             encode_network(elems_to_sort, objective, sorting_network);
+            if (old_snet_size > m_sorting_net_size)
+                m_sorting_net_size = old_snet_size; // in the end m_sorting_net_size is the size of the largest sorting network
+            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
+            //std::cerr << "old: " << old_snet_size << std::endl;
             // sorted_vec variables are the outputs of sorting_network
             if (num_terms == 1) { // in this case the sorting network is empty
                 std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
@@ -121,12 +130,14 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 void Leximax_encoder::encode_relaxation(int i)
 {
     // free dynamic memory m_sorted_relax_vecs of previous iteration (i-1) 
-    clear_sorted_relax();
+    //clear_sorted_relax();
     LINT first_relax_var = m_id_count + 1;
-    m_relax_vars.clear(); // clear from previous iteration
+    //m_relax_vars.clear(); // clear from previous iteration
+    std::forward_list<LINT> relax_vars;
     for (int j = 0; j < m_num_objectives; ++j)
-        m_relax_vars.push_front(first_relax_var + j);
+        relax_vars.push_front(first_relax_var + j);
     m_id_count += m_num_objectives; // create the remaining relaxation vars
+    m_all_relax_vars.push_back(relax_vars);
     if (m_debug) {
         std::cerr << "------------ Relaxation variables of iteration " << i << " ------------\n";
         for (int j = 0; j < m_num_objectives; ++j)
@@ -187,14 +198,14 @@ void Leximax_encoder::encode_relaxation(int i)
         if (m_debug)
             std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
         if(m_solver_format == "wcnf")
-            at_most(m_relax_vars, i);
-        // at least i constraint -> should I put this one? -> experiment later to check if program runs faster
+            at_most(relax_vars, i);
+        // at least i constraint -> should I put this one?
     }
     else { // last iteration
         // choose exactly one obj function to minimise
         int k = 0;
         std::vector<LINT> lits;
-        for (LINT relax_var : m_relax_vars) {
+        for (LINT relax_var : relax_vars) {
             std::vector<LINT> *objective = m_objectives[k];
             size_t j = 0;
             for (Clause *cl : m_soft_clauses) {
@@ -227,14 +238,15 @@ void Leximax_encoder::encode_relaxation(int i)
             // at most 1 constraint
             if (m_debug)
                 std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
-            at_most(m_relax_vars, 1);
+            at_most(relax_vars, 1);
             // at least 1 constraint
             lits.clear();
-            for (LINT relax_var : m_relax_vars)
+            for (LINT relax_var : relax_vars)
                 lits.push_back(relax_var);
             add_hard_clause(lits);
         }
     }
+    m_sorted_relax_collection.push_back(m_sorted_relax_vecs);
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -289,7 +301,7 @@ void Leximax_encoder::componentwise_OR(int i)
             lits.clear();
         }
         ++k;        
-        // soft variable implies disjunction -> Should I put this one? -> experiment later on
+        // soft variable implies disjunction -> Should I put this one?
         /*disjunction.push_back(soft_lit);
         add_hard_clause(disjunction);*/
     }
@@ -324,9 +336,9 @@ void Leximax_encoder::generate_soft_clauses(int i)
     }
 }
 
-size_t Leximax_encoder::get_obj_value(std::vector<LINT> &model)
+LINT Leximax_encoder::get_obj_value(std::vector<LINT> &model)
 {
-    size_t optimum = 0;
+    LINT optimum = 0;
     for (Clause *cl : m_soft_clauses) {
         LINT var = -(*(cl->begin()));
         if (model[var] > 0)
@@ -337,6 +349,8 @@ size_t Leximax_encoder::get_obj_value(std::vector<LINT> &model)
 
 int Leximax_encoder::solve()
 {
+    // DEBUGING!!
+    std::vector<std::vector<LINT>> true_ys;
     // if there is only one objective function then it is a simple single objective problem
     if (m_num_objectives == 1) {
         generate_soft_clauses(0);
@@ -378,8 +392,88 @@ int Leximax_encoder::solve()
                 add_hard_clause(lits);
             }
         }
+        std::vector<LINT> current_true_ys;
+        for (Clause *cl : m_soft_clauses) {
+            LINT soft_var = -(*(cl->begin()));
+            if (m_solution[soft_var] > 0)
+                current_true_ys.push_back(soft_var);
+        }
+        true_ys.push_back(current_true_ys);
         // store i-th maximum
         m_optimum[i] = get_obj_value(m_solution);
+        
+    }
+    // DEBUGING!!!
+    if (!m_solution.empty()){
+        // compare m_optimum with objective vector and print true sorted vector variables
+        std::cerr << "Y vector: ";
+        for (LINT v : m_optimum)
+            std::cerr << v << ' ';
+        std::cerr << std::endl;
+        std::vector<std::vector<LINT>> true_input;
+        for (std::vector<LINT> *obj : m_objectives) {
+            std::vector<LINT> true_obj_vars;
+            for (LINT var : *obj) {
+                if (m_solution[var] > 0)
+                    true_obj_vars.push_back(var);
+            }
+            true_input.push_back(true_obj_vars);
+        }
+        std::vector<LINT> obj_vector (m_num_objectives, 0);
+        std::cerr << "Input vector: ";
+        for (const std::vector<LINT> &true_obj_vars : true_input)
+            std::cerr << true_obj_vars.size() << ' ';
+        std::cerr << std::endl;      
+        std::cerr << "Y true variables:" << std::endl;
+        int j (0);
+        for (const std::vector<LINT> &true_vars : true_ys) {
+            std::cerr << "Maximum " << j << ": ";
+            for (LINT var : true_vars)
+                std::cerr << var << ' ';
+            std::cerr << std::endl;
+            ++j;
+        }
+        std::cerr << "Input true variables:" << std::endl;
+        j = 0;
+        for (const std::vector<LINT> &true_vars : true_input) {
+            std::cerr << "Function " << j << ": ";
+            for (LINT var : true_vars)
+                std::cerr << var << ' ';
+            std::cerr << std::endl;
+            ++j;
+        }
+        std::cerr << "Sorted vecs true variables:" << std::endl;
+        j = 0;
+        for (std::vector<LINT> *sorted_vec : m_sorted_vecs) {
+            std::cerr << "Sorted vec " << j << ": ";
+            for (LINT var : *sorted_vec) {
+                if (m_solution[var] > 0)
+                    std::cerr << var << ' ';
+            }
+            std::cerr << std::endl;
+            ++j;
+        }
+        
+        j = 1;
+        for (std::vector<std::vector<LINT>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+            std::cerr << "Sorted Relax Vecs true variables of iteration " << j << ":" << std::endl;
+            int k (0);
+            for (std::vector<LINT> *sorted_relax : sorted_relax_vecs) {
+                if (sorted_relax != nullptr) {
+                    std::cerr << "Sorted Relax vec " << k << ": ";
+                    for (LINT var : *sorted_relax) {
+                        if (m_solution[var] > 0)
+                            std::cerr << var << ' ';
+                    }
+                    std::cerr << std::endl;
+                    ++k;
+                }
+            }
+            ++j;
+        }
+
+        /*for (LINT var : m_relax_vars)
+            std::cerr << "Relax variable " << j << ": " << var << std::endl;*/
     }
     return 0;
 }

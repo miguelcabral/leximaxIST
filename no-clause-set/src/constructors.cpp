@@ -31,7 +31,7 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_num_objectives(objective_functions.size()),
     m_sorted_vecs(objective_functions.size(), nullptr),
     m_sorted_relax_vecs(objective_functions.size(), nullptr),
-    m_relax_vars(),
+    m_all_relax_vars(),
     m_solver_command("rc2.py -vv"),
     m_solver_format("wcnf"),
     m_lp_solver("cplex"),
@@ -40,12 +40,13 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_child_pid(0),
     m_leave_temporary_files(false),
     m_sat(true),
-    m_debug(false),
+    m_debug(true),
     m_multiplication_string(" "),
     m_optimum(objective_functions.size(), 0),
     m_solution(),
     m_sorting_net_size(0)
 {  
+    //std::cerr << "snet_size (constructor): " << m_sorting_net_size << std::endl;
     for (std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count
         update_id_count(hard_clause);

@@ -175,7 +175,7 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     }
     else
         command += input_filename;
-    pid_t pid (fork());
+    /*pid_t pid (fork());
     if (pid == -1) {
         std::string errmsg (strerror(errno));
         print_error_msg("Can't fork process: " + errmsg);
@@ -206,13 +206,13 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
             std::cerr << args[i] << std::endl;
         }
         args[command_split.size()] = nullptr;
-            /*std::cout << "command_split: ";
+            std::cout << "command_split: ";
     for (std::string &s : command_split)
         std::cout << s << ", ";
-    std::cout << std::endl;*/
+    std::cout << std::endl;
         // call solver
         std::string ola ("/bin/grep");
-        if (execv(/*args[0]*/ola.c_str(), args.data()) == -1) {
+        if (execv(args[0]ola.c_str(), args.data()) == -1) {
             std::string errmsg (strerror(errno));
             print_error_msg("Something went wrong with the external solver: " + errmsg);
             return -1;
@@ -231,7 +231,10 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
         std::string errmsg (strerror(errno));
         print_error_msg("The external solver finished with non-zero error status: " + errmsg);
         return -1;
-    }    
+    }  */
+    command += " > " + output_filename;
+    command += " 2> " + error_filename;
+    system(command.c_str());
     read_solver_output(output_filename);
     if (!m_leave_temporary_files) {
         remove(input_filename.c_str());
@@ -304,7 +307,9 @@ void Leximax_encoder::write_lpconstraint(Clause *cl, std::ostream &output) {
 
 void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
 {
-    for (LINT var : m_relax_vars) {
+    // i = 1 means position 0, i = 2, means position 1, etc
+    const std::forward_list<LINT> &relax_vars (m_all_relax_vars[i-1]);
+    for (LINT var : relax_vars) {
         output << "-1" << m_multiplication_string << "x" << var << " ";
     }
     output << " >= " << -i << ";\n";
@@ -313,20 +318,21 @@ void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
 void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
 {
     bool first_iteration (true);
-    for (LINT var : m_relax_vars) {
+    /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
         if (first_iteration) {
             output << 'x' << var;
             first_iteration = false;
         }
         else
             output << " + " << 'x' << var;
-    }
+    }*/
     output << " <= " << i << '\n';
 }
 
 void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
 {
-    for (LINT var : m_relax_vars) {
+    const std::forward_list<LINT> &relax_vars (m_all_relax_vars.back());
+    for (LINT var : relax_vars) {
         output << "+1" << m_multiplication_string << "x" << var << " ";
     }
     output << " = " << i << ";\n";
@@ -335,14 +341,14 @@ void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
 void Leximax_encoder::write_sum_equals_lp(int i, std::ostream &output)
 {
     bool first_iteration (true);
-    for (LINT var : m_relax_vars) {
+    /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
         if (first_iteration) {
             output << 'x' << var;
             first_iteration = false;
         }
         else
             output << " + " << 'x' << var;
-    }
+    }*/
     output << " = " << i << '\n';
 }
 
@@ -369,6 +375,8 @@ int Leximax_encoder::solve_pbo(int i)
     for (Clause *cl : m_constraints) {
         write_pbconstraint(cl, output);
     }
+    for (int j (1); j < m_num_objectives - 2; )
+    // Write at most 1, 2, 3, ..., until m_num_objectives - 2! (because this is not stored in the hard clauses)
     if (i == m_num_objectives - 1 && m_num_objectives != 1)
         write_sum_equals_pb(1, output); // in the last iteration print =1 cardinality constraint
     else if (i != 0)

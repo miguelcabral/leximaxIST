@@ -401,7 +401,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
  void ExternalWrapper::print_leximax_info() {
      assert(leximax_enc != nullptr);
      size_t sorting_net_size (leximax_enc->get_sorting_net_size());
-     std::cerr << "# Number of comparators of sorting network: " << sorting_net_size << '\n';
+     std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';
      if (leximax_enc->get_sat()) {
      	const std::vector<LINT> &optimum(leximax_enc->get_optimum());
      	std::cerr << "# Sorted objective vector: ";
@@ -454,6 +454,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      else
          leximax_enc->set_solver_format("wcnf");     
      // solve and put solution in model member variable
+     // TODO: change this: solve() returns 0 if all went well, and -1 otherwise. 
      leximax_enc->solve();
      model = leximax_enc->get_solution();
      print_leximax_info();
