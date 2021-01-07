@@ -403,9 +403,9 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      size_t sorting_net_size (leximax_enc->get_sorting_net_size());
      std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';
      if (leximax_enc->get_sat()) {
-     	const std::vector<LINT> &optimum(leximax_enc->get_optimum());
-     	std::cerr << "# Sorted objective vector: ";
-     	for (LINT o : optimum)
+     	const std::vector<LINT> obj_vector(leximax_enc->get_objective_vector());
+     	std::cerr << "# Objective vector: ";
+     	for (LINT o : obj_vector)
             std::cerr << o << ' ';
      	std::cerr << '\n';
      }
@@ -453,9 +453,11 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          leximax_enc->set_solver_format("opb");
      else
          leximax_enc->set_solver_format("wcnf");     
-     // solve and put solution in model member variable
-     // TODO: change this: solve() returns 0 if all went well, and -1 otherwise. 
-     leximax_enc->solve();
+     // solve() returns 0 if all went well, and -1 otherwise. 
+     if (leximax_enc->solve() == -1) {
+         model.clear();
+         return false;
+     }
      model = leximax_enc->get_solution();
      print_leximax_info();
      // return satisfiable or not?

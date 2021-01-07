@@ -20,19 +20,19 @@ private:
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
+#ifdef DEBUG
     std::vector<std::vector<std::vector<LINT>*>>  m_sorted_relax_collection;
+#endif
     std::vector<std::forward_list<LINT>> m_all_relax_vars; // relax_vars of each iteration
     std::string m_solver_command;
     std::string m_solver_format;
     std::string m_lp_solver;
     std::string m_valid_lp_solvers[6];
-    std::string m_input_name;
+    std::string m_pid;
     pid_t m_child_pid;
     bool m_leave_temporary_files;
     bool m_sat;
-    bool m_debug;
     std::string m_multiplication_string;
-    std::vector<LINT> m_optimum;
     std::vector<LINT> m_solution;
     size_t m_sorting_net_size; // size of largest sorting network
     
@@ -49,24 +49,24 @@ public:
      * objective_functions is a collection of objective functions;
      * each objective function is a vector of soft clauses;*/
     // each objective function is the sum of its falsified soft clauses.
-    Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
+    Leximax_encoder(const std::vector<std::vector<LINT>> &constraints, const std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
     // TODO: change the constructor's parameters to const, and add checks if constraints and/or obj functions is empty
     ~Leximax_encoder();
     
     // returns 0 if all want well, -1 otherwise
     int solve();
     
-    bool get_sat();
+    bool get_sat() const;
     
-    size_t get_sorting_net_size();
+    size_t get_sorting_net_size() const;
     
     /* if the problem is satisfiable, then m_solution is a satisfying assignment;
      * each entry i of m_solution is +i if variable i is true and -i otherwise;
      * if the problem is not satisfiable, m_solution is empty.*/
-    std::vector<LINT>& get_solution();
+    const std::vector<LINT>& get_solution() const;
     
-    // TODO: change m_optimum to objective vector; calculate it in the last iteration by checking the values of each obj var
-    std::vector<LINT>& get_optimum();
+    // empty if unsat
+    std::vector<LINT> get_objective_vector() const;
     
     void set_solver_command(const std::string &command);
     
@@ -88,7 +88,7 @@ private:
     
     void add_hard_clause(const std::vector<LINT> &lits);
     
-    void update_id_count(std::vector<LINT> &clause);
+    void update_id_count(const std::vector<LINT> &clause);
     
     // destructor.cpp
     
@@ -120,8 +120,6 @@ private:
     
     void generate_soft_clauses(int i);
     
-    LINT get_obj_value(std::vector<LINT> &model);
-    
     void all_subsets(std::forward_list<LINT> set, int i, std::vector<LINT> &clause_vec);
     
     void at_most(std::forward_list<LINT> &set, int i);
@@ -131,14 +129,8 @@ private:
     void componentwise_OR(int i);
     
     // solver_call.cpp
-    
+
     int solve_maxsat(int i);
-    
-    void write_atmost_pb(int i, std::ostream &output);
-    
-    void write_pbconstraint(Clause *cl, std::ostream &output);
-    
-    void write_sum_equals_pb(int i, std::ostream &output);
     
     int solve_pbo(int i);
     
@@ -152,12 +144,6 @@ private:
     
     int solve_lp(int i);
     
-    void write_atmost_lp(int i, std::ostream &output);
-    
-    void write_lpconstraint(Clause *cl, std::ostream &output);
-    
-    void write_sum_equals_lp(int i, std::ostream &output);
-    
     void read_cplex_output(const std::string &output_filename);
     
     void read_gurobi_output(const std::string &output_filename);
@@ -170,9 +156,25 @@ private:
     
     void read_cbc_output(const std::string &output_filename);
     
-    // error.cpp
+    // printing.cpp
     
     void print_error_msg(const std::string &msg);
+    
+    void print_clause(std::ostream &output, Clause * const cl);
+    
+    void write_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight);
+    
+    void write_atmost_lp(int i, std::ostream &output);
+    
+    void write_lpconstraint(Clause * const cl, std::ostream &output);
+    
+    void write_sum_equals_lp(int i, std::ostream &output);
+    
+    void write_atmost_pb(int i, std::ostream &output);
+    
+    void write_pbconstraint(Clause * const cl, std::ostream &output);
+    
+    void write_sum_equals_pb(int i, std::ostream &output);
 
 };
     

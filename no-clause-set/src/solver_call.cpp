@@ -246,19 +246,9 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     return 0;
 }
 
-void write_clauses(std::ostream &output, std::vector<Clause*> &clauses, size_t weight)
-{
-    for (Clause *cl : clauses) {
-        output << weight << " ";
-        for (LINT lit : *cl)
-            output << lit << " "; 
-        output << "0\n";
-    }
-}
-
 int Leximax_encoder::solve_maxsat(int i)
 {
-    std::string input_name (m_input_name);
+    std::string input_name (m_pid);
     input_name += "_" + std::to_string(i) + ".wcnf";
     std::ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -273,88 +263,9 @@ int Leximax_encoder::solve_maxsat(int i)
     return call_solver(input_name);
 }
 
-void Leximax_encoder::write_pbconstraint(Clause *cl, std::ostream &output) {
-    LINT num_negatives(0);
-    for (LINT literal : *cl) {
-        bool sign = literal > 0;
-        if (!sign)
-            ++num_negatives;
-        output << (sign ? "+1" : "-1") << m_multiplication_string << "x" << (sign ? literal : -literal) << " ";
-    }
-    output << " >= " << 1 - num_negatives << ";\n";
-}
-
-void Leximax_encoder::write_lpconstraint(Clause *cl, std::ostream &output) {
-    LINT num_negatives(0);
-    size_t nb_vars_in_line (0);
-    for (size_t j (0); j < cl->size(); ++j) {
-        LINT literal (cl->at(j));
-        bool sign = literal > 0;
-        if (!sign)
-            ++num_negatives;
-        if (j == 0)
-            output << 'x' << (sign ? literal : -literal);
-        else
-            output << (sign ? " + " : " - ") << 'x' << (sign ? literal : -literal);
-        nb_vars_in_line++;
-        if (nb_vars_in_line == 5) {
-            output << '\n';
-            nb_vars_in_line = 0;
-        }
-    }
-    output << " >= " << 1 - num_negatives << '\n';
-}
-
-void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
-{
-    // i = 1 means position 0, i = 2, means position 1, etc
-    const std::forward_list<LINT> &relax_vars (m_all_relax_vars[i-1]);
-    for (LINT var : relax_vars) {
-        output << "-1" << m_multiplication_string << "x" << var << " ";
-    }
-    output << " >= " << -i << ";\n";
-}
-
-void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
-{
-    bool first_iteration (true);
-    /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
-        if (first_iteration) {
-            output << 'x' << var;
-            first_iteration = false;
-        }
-        else
-            output << " + " << 'x' << var;
-    }*/
-    output << " <= " << i << '\n';
-}
-
-void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
-{
-    const std::forward_list<LINT> &relax_vars (m_all_relax_vars.back());
-    for (LINT var : relax_vars) {
-        output << "+1" << m_multiplication_string << "x" << var << " ";
-    }
-    output << " = " << i << ";\n";
-}
-
-void Leximax_encoder::write_sum_equals_lp(int i, std::ostream &output)
-{
-    bool first_iteration (true);
-    /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
-        if (first_iteration) {
-            output << 'x' << var;
-            first_iteration = false;
-        }
-        else
-            output << " + " << 'x' << var;
-    }*/
-    output << " = " << i << '\n';
-}
-
 int Leximax_encoder::solve_pbo(int i)
 {
-    std::string input_name (m_input_name);
+    std::string input_name (m_pid);
     input_name += "_" + std::to_string(i) + ".opb";
     std::ofstream output(input_name.c_str());
     // prepare input for the solver
@@ -375,12 +286,11 @@ int Leximax_encoder::solve_pbo(int i)
     for (Clause *cl : m_constraints) {
         write_pbconstraint(cl, output);
     }
-    for (int j (1); j < m_num_objectives - 2; )
-    // Write at most 1, 2, 3, ..., until m_num_objectives - 2! (because this is not stored in the hard clauses)
+    // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
+    for (int j (1); j <= ( i < m_num_objectives - 2 ? i : m_num_objectives - 2 ); ++j)
+        write_atmost_pb(j, output);
     if (i == m_num_objectives - 1 && m_num_objectives != 1)
         write_sum_equals_pb(1, output); // in the last iteration print =1 cardinality constraint
-    else if (i != 0)
-        write_atmost_pb(i, output); // in other iterations print at most i constraint  
     output.close();
     // call the solver
     return call_solver(input_name);
@@ -388,7 +298,7 @@ int Leximax_encoder::solve_pbo(int i)
 
 int Leximax_encoder:: solve_lp(int i)
 {
-    std::string input_name (m_input_name);
+    std::string input_name (m_pid);
     input_name += "_" + std::to_string(i) + ".lp";
     std::ofstream output(input_name.c_str());
     // prepare input for the solver

@@ -14,7 +14,7 @@ void Leximax_encoder::add_soft_clause(const std::vector<LINT> &lits)
     m_soft_clauses.push_back(cl);
 }
 
-void Leximax_encoder::update_id_count(std::vector<LINT> &clause)
+void Leximax_encoder::update_id_count(const std::vector<LINT> &clause)
 {
     for (LINT lit : clause) {
         LINT var( lit < 0 ? -lit : lit );
@@ -23,7 +23,7 @@ void Leximax_encoder::update_id_count(std::vector<LINT> &clause)
     }
 }
 
-Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, std::vector<std::vector<std::vector<LINT>>> &objective_functions) : 
+Leximax_encoder::Leximax_encoder(const std::vector<std::vector<LINT>> &constraints, const std::vector<std::vector<std::vector<LINT>>> &objective_functions) : 
     m_id_count(0),
     m_constraints(),
     m_soft_clauses(),
@@ -36,35 +36,32 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     m_solver_format("wcnf"),
     m_lp_solver("cplex"),
     m_valid_lp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"},
-    m_input_name(),
+    m_pid(),
     m_child_pid(0),
     m_leave_temporary_files(false),
-    m_sat(true),
-    m_debug(true),
+    m_sat(false),
     m_multiplication_string(" "),
-    m_optimum(objective_functions.size(), 0),
     m_solution(),
     m_sorting_net_size(0)
 {  
-    //std::cerr << "snet_size (constructor): " << m_sorting_net_size << std::endl;
-    for (std::vector<LINT> &hard_clause : constraints) {
+    for (const std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count
         update_id_count(hard_clause);
         // store clause
         add_hard_clause(hard_clause);
     }
     // update m_id_count if there are new variables in objective_functions
-    for (std::vector<std::vector<LINT>> &obj : objective_functions) {
-        for (std::vector<LINT> &soft_clause : obj)
+    for (const std::vector<std::vector<LINT>> &obj : objective_functions) {
+        for (const std::vector<LINT> &soft_clause : obj)
             update_id_count(soft_clause);
     }
     // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
     int i(0);
-    for (std::vector<std::vector<LINT>> &obj : objective_functions) {
+    for (const std::vector<std::vector<LINT>> &obj : objective_functions) {
         m_objectives[i] = new std::vector<LINT>(obj.size(), 0);
         std::vector<LINT> lits;
         int j(0);
-        for (std::vector<LINT> &soft_clause : obj) {
+        for (const std::vector<LINT> &soft_clause : obj) {
             LINT fresh_var(m_id_count + 1);
             m_id_count++;
             lits = soft_clause;
@@ -79,5 +76,5 @@ Leximax_encoder::Leximax_encoder(std::vector<std::vector<LINT>> &constraints, st
     // name for temporary files
     std::stringstream strstr;
     strstr << getpid();
-    m_input_name = strstr.str();
+    m_pid = strstr.str();
 }

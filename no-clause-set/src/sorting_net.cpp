@@ -46,8 +46,9 @@ void Leximax_encoder::encode_min(LINT var_out_min, LINT var_in1, LINT var_in2)
 
 void Leximax_encoder::insert_comparator(LINT el1, LINT el2, std::vector<LINT> *objective, SNET &sorting_network)
 {
-    if (m_debug)
-        std::cerr << "Inserting comparator between wires " << el1 << " and " << el2 << std::endl;
+#ifdef DEBUG
+        //std::cerr << "Inserting comparator between wires " << el1 << " and " << el2 << std::endl;
+#endif
     m_sorting_net_size++;
     // if the entry is empty, then it is the first comparator for that wire
     LINT var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1]->second;

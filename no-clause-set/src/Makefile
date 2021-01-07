@@ -1,5 +1,3 @@
--include makeenv
-
 CCFLAGS = -std=c++17
 CCFLAGS += -I ../include
 CSRCS1 = $(wildcard *.cc)
@@ -9,24 +7,17 @@ COBJS2 = $(CSRCS2:.cpp=.o)
 COBJS := $(COBJS1)
 COBJS += $(COBJS2)
 
-ifndef RELEASE
-	CCFLAGS += -Wall -Wextra -pedantic
-endif
-
-ifdef DBG
-	CCFLAGS+=-g
-	CCFLAGS+=-fsanitize=address
-	CCFLAGS+=-D_GLIBCXX_DEBUG
-else
-	CCFLAGS+=-DNDEBUG
-	CCFLAGS+=-O3
-endif
-
 ifdef PROF
 	CCFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
 endif
 
-.PHONY: clean
+.PHONY: clean release debug
+
+release : CCFLAGS += -O3 -w
+release : libleximax.a
+
+debug : CCFLAGS += -g -fsanitize=address -D_GLIBCXX_DEBUG -D DEBUG -Wall -Wextra -pedantic
+debug : libleximax.a
 
 libleximax.a : $(COBJS)
 	@echo "Archiving: libleximax.a"

@@ -11,27 +11,22 @@ void Leximax_encoder::encode_sorted()
             SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
             // elems_to_sort is represented by a pair (first element, number of elements).
             std::pair<LINT,LINT> elems_to_sort(0, num_terms);
-            if (m_debug) {
-                std::cerr << "--------------- Objective Function " << i << " --------------\n";
-                for (size_t j = 0; j < num_terms; ++j) {
-                    std::cerr << objective->at(j);
-                    if (j != num_terms - 1)
-                        std::cerr << " + ";
-                    else
-                        std::cerr << '\n';
-                }
-                std::cerr << "---------------- Sorting Network " << i << " ----------------\n";
+#ifdef DEBUG
+            std::cerr << "--------------- Objective Function " << i << " --------------\n";
+            for (size_t j = 0; j < num_terms; ++j) {
+                std::cerr << objective->at(j);
+                if (j != num_terms - 1)
+                    std::cerr << " + ";
+                else
+                    std::cerr << '\n';
             }
-            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
+            std::cerr << "-------------- Size of Sorting Network " << i << ": " << m_sorting_net_size << " --------------\n";
+#endif
             size_t old_snet_size (m_sorting_net_size);
-            //std::cerr << "old: " << old_snet_size << std::endl;
             m_sorting_net_size = 0;
-            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
             encode_network(elems_to_sort, objective, sorting_network);
             if (old_snet_size > m_sorting_net_size)
                 m_sorting_net_size = old_snet_size; // in the end m_sorting_net_size is the size of the largest sorting network
-            //std::cerr << "m_sort: " << m_sorting_net_size << std::endl;
-            //std::cerr << "old: " << old_snet_size << std::endl;
             // sorted_vec variables are the outputs of sorting_network
             if (num_terms == 1) { // in this case the sorting network is empty
                 std::vector<LINT> *sorted_vec = m_sorted_vecs[i];
@@ -46,12 +41,11 @@ void Leximax_encoder::encode_sorted()
             }
             // free memory allocated for the comparators of the sorting network
             delete_snet(sorting_network);
-            if (m_debug) {
-                std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
-                for(size_t j{0}; j < num_terms; j++) {
-                    std::cerr << "sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
-                }
-            }
+#ifdef DEBUG
+            std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
+            for(size_t j{0}; j < num_terms; j++)
+                std::cerr << "sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
+#endif
         }
     }
 }
@@ -79,13 +73,10 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
             j++;
         }
         // add clause to constraints
-        if (m_debug) {
-            std::cerr << "Combination: ";
-            for (LINT lit : clause_vec) {
-                std::cerr << lit << " ";
-            }
-            std::cerr << '\n';
-        }
+#ifdef DEBUG
+        std::cerr << "Combination: ";
+        print_clause(std::cerr, &clause_vec);
+#endif
         lits.clear();
         for (LINT lit : clause_vec)
             lits.push_back(lit);
@@ -96,13 +87,10 @@ void Leximax_encoder::all_subsets(std::forward_list<LINT> set, int i, std::vecto
         for (LINT elem : set) {
             clause_vec[size-1] = -elem;
             // add clause to constraints
-            if (m_debug) {
-                std::cerr << "Combination: ";
-                for (LINT lit : clause_vec) {
-                    std::cerr << lit << " ";
-                }
-                std::cerr << '\n';
-            }
+#ifdef DEBUG
+        std::cerr << "Combination: ";
+        print_clause(std::cerr, &clause_vec);
+#endif
             lits.clear();
             for (LINT lit : clause_vec)
                 lits.push_back(lit);
@@ -129,8 +117,10 @@ void Leximax_encoder::at_most(std::forward_list<LINT> &set, int i)
 
 void Leximax_encoder::encode_relaxation(int i)
 {
-    // free dynamic memory m_sorted_relax_vecs of previous iteration (i-1) 
-    //clear_sorted_relax();
+    // free dynamic memory in m_sorted_relax_vecs of previous iteration (i-1)
+#ifndef DEBUG
+    clear_sorted_relax();
+#endif
     LINT first_relax_var = m_id_count + 1;
     //m_relax_vars.clear(); // clear from previous iteration
     std::forward_list<LINT> relax_vars;
@@ -138,68 +128,64 @@ void Leximax_encoder::encode_relaxation(int i)
         relax_vars.push_front(first_relax_var + j);
     m_id_count += m_num_objectives; // create the remaining relaxation vars
     m_all_relax_vars.push_back(relax_vars);
-    if (m_debug) {
-        std::cerr << "------------ Relaxation variables of iteration " << i << " ------------\n";
-        for (int j = 0; j < m_num_objectives; ++j)
-            std::cerr << first_relax_var + j << '\n';
-        if (i != m_num_objectives - 1)
-            std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
-    }
+#ifdef DEBUG
+    std::cerr << "------------ Relaxation variables of iteration " << i << " ------------\n";
+    for (int j = 0; j < m_num_objectives; ++j)
+        std::cerr << first_relax_var + j << '\n';
+    if (i != m_num_objectives - 1)
+        std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
+#endif
     if (i != m_num_objectives - 1) {
         for (int j = 0; j < m_num_objectives; ++j) {
             // encode relaxation variable of the j-th objective
             std::vector<LINT> *sorted_vec = m_sorted_vecs[j];
             std::vector<LINT> *sorted_relax = new std::vector<LINT>(sorted_vec->size(), 0);
             m_sorted_relax_vecs[j] = sorted_relax;
-            if (m_debug)
-                std::cerr << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+#ifdef DEBUG
+            std::cerr << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+#endif
             for (size_t k = 0; k < sorted_relax->size(); ++k) {
                 // create sorted_relax variables
                 sorted_relax->at(k) = m_id_count + 1;
                 m_id_count++;
-                if (m_debug)
-                    std::cerr << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
                 // relax_j implies not sorted_relax_j_k
                 std::vector<LINT> lits;
                 lits.push_back(-(first_relax_var + j));
                 lits.push_back(-sorted_relax->at(k));
                 add_hard_clause(lits);
-                if (m_debug) {
-                    std::cerr << "-------------- relax_var " <<  first_relax_var + j << " implies not sorted_relax["<< k << "] ------\n";
-                    for (LINT l : lits)
-                        std::cerr << l << " ";
-                    std::cerr << "0\n";
-                    std::cerr << "------- not relax_var " <<  first_relax_var + j << " implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
-                }
+#ifdef DEBUG
+                std::cerr << "sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
+                std::cerr << "-------------- relax_var " <<  first_relax_var + j << " implies not sorted_relax["<< k << "] ------\n";
+                print_clause(std::cerr, &lits);
+                std::cerr << "------- not relax_var " <<  first_relax_var + j << " implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
+#endif
                 lits.clear();
                 // not relax_j implies sorted_relax_j_k equals sorted_j_k
                 lits.push_back(first_relax_var + j);
                 lits.push_back(-sorted_relax->at(k));
                 lits.push_back(sorted_vec->at(k));
                 add_hard_clause(lits);
-                if (m_debug) {
-                    for (LINT l : lits)
-                        std::cerr << l << " ";
-                    std::cerr << "0\n";
-                }
+#ifdef DEBUG
+                print_clause(std::cerr, &lits);
+#endif
                 lits.clear();
                 lits.push_back(first_relax_var + j);
                 lits.push_back(sorted_relax->at(k));
                 lits.push_back(-(sorted_vec->at(k)));
                 add_hard_clause(lits);
-                if (m_debug) {
-                    for (LINT l : lits)
-                        std::cerr << l << " ";
-                    std::cerr << "0\n";
-                }
+#ifdef DEBUG
+                print_clause(std::cerr, &lits);
+#endif
             }
         }
         // at most i constraint 
-        if (m_debug)
+        if(m_solver_format == "wcnf") {
+#ifdef DEBUG
             std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
-        if(m_solver_format == "wcnf")
+#endif
             at_most(relax_vars, i);
-        // at least i constraint -> should I put this one?
+            // at least i constraint -> is not necessary
+        }
     }
     else { // last iteration
         // choose exactly one obj function to minimise
@@ -212,22 +198,34 @@ void Leximax_encoder::encode_relaxation(int i)
                 LINT soft_var = -(*(cl->begin()));
                 lits.clear();
                 if (j >= objective->size()) {
-                    // m_relax_vars[k] implies neg soft_var[j]
+                    // relax_vars[k] implies neg soft_var[j]
                     lits.push_back(-relax_var);
                     lits.push_back(-soft_var);
+#ifdef DEBUG
+                    std::cerr << "relax_var " << k << " implies neg soft_var " << j << ": ";
+                    print_clause(std::cerr, &lits);
+#endif
                     add_hard_clause(lits);
                 }
                 else {
-                    // m_relax_vars[k] implies objective[j] implies soft_var[j]
+                    // relax_vars[k] implies objective[j] implies soft_var[j]
                     lits.push_back(-relax_var);
                     lits.push_back(-(objective->at(j)));
                     lits.push_back(soft_var);
+#ifdef DEBUG
+                    std::cerr << "relax_var " << k << " implies obj " << j << " implies soft_var " << j << ": ";
+                    print_clause(std::cerr, &lits);
+#endif
                     add_hard_clause(lits);
                     lits.clear();
                     // let's check: m_relax_vars[k] implies soft_var[j] implies objective[j]
                     lits.push_back(-relax_var);
                     lits.push_back(objective->at(j));
                     lits.push_back(-soft_var);
+#ifdef DEBUG
+                    std::cerr << "relax_var " << k << " implies soft_var " << j << " implies obj " << j << ": ";
+                    print_clause(std::cerr, &lits);
+#endif
                     add_hard_clause(lits);
                 }
                 ++j;
@@ -236,17 +234,24 @@ void Leximax_encoder::encode_relaxation(int i)
         }
         if(m_solver_format == "wcnf") { // when solving with pbo or lp, this constraint is written before calling the solver
             // at most 1 constraint
-            if (m_debug)
-                std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
+#ifdef DEBUG
+            std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
+#endif
             at_most(relax_vars, 1);
             // at least 1 constraint
             lits.clear();
             for (LINT relax_var : relax_vars)
                 lits.push_back(relax_var);
+#ifdef DEBUG
+            std::cerr << "---------------- At least " << 1 << " Constraint ----------------\n";
+            print_clause(std::cerr, &lits);
+#endif
             add_hard_clause(lits);
         }
     }
+#ifdef DEBUG
     m_sorted_relax_collection.push_back(m_sorted_relax_vecs);
+#endif
 }
 
 size_t Leximax_encoder::largest_obj()
@@ -261,8 +266,9 @@ size_t Leximax_encoder::largest_obj()
 
 void Leximax_encoder::componentwise_OR(int i)
 {
-    if (m_debug)
-        std::cerr << "------------ Componentwise OR ------------\n";
+#ifdef DEBUG
+    std::cerr << "------------ Componentwise OR ------------\n";
+#endif
     std::vector<std::vector<LINT>*> *sorted_vecs(nullptr);
     if (i == 0) {
         // the OR is between sorted vecs
@@ -293,15 +299,13 @@ void Leximax_encoder::componentwise_OR(int i)
             lits.push_back(-soft_lit);
             lits.push_back(-component);
             add_hard_clause(lits);
-            if (m_debug) {
-                for (LINT l : lits)
-                    std::cerr << l << " ";
-                std::cerr << "0\n";
-            }
+#ifdef DEBUG
+            print_clause(std::cerr, &lits);
+#endif
             lits.clear();
         }
         ++k;        
-        // soft variable implies disjunction -> Should I put this one?
+        // soft variable implies disjunction -> It is not necessary
         /*disjunction.push_back(soft_lit);
         add_hard_clause(disjunction);*/
     }
@@ -324,11 +328,11 @@ void Leximax_encoder::generate_soft_clauses(int i)
     size_t largest = largest_obj();
     LINT first_soft = m_id_count + 1;
     m_id_count += largest; // create the variables of the soft clauses of this iteration
-    if (m_debug) {
-        std::cerr << "------------ Soft variables of iteration " << i << " ------------\n";
-        for (size_t j = 0; j < largest; ++j)
-            std::cerr << first_soft + j << '\n';
-    }
+#ifdef DEBUG
+    std::cerr << "------------ Soft variables of iteration " << i << " ------------\n";
+    for (size_t j = 0; j < largest; ++j)
+        std::cerr << first_soft + j << '\n';
+#endif
     for (size_t j = 0; j < largest; ++j) {
         lits.push_back(-(first_soft + j));
         add_soft_clause(lits);
@@ -336,21 +340,12 @@ void Leximax_encoder::generate_soft_clauses(int i)
     }
 }
 
-LINT Leximax_encoder::get_obj_value(std::vector<LINT> &model)
-{
-    LINT optimum = 0;
-    for (Clause *cl : m_soft_clauses) {
-        LINT var = -(*(cl->begin()));
-        if (model[var] > 0)
-            optimum++;
-    }
-    return optimum;
-}
-
 int Leximax_encoder::solve()
 {
-    // DEBUGING!!
+#ifdef DEBUG
     std::vector<std::vector<LINT>> true_ys;
+    std::vector<LINT> y_vector;
+#endif
     // if there is only one objective function then it is a simple single objective problem
     if (m_num_objectives == 1) {
         generate_soft_clauses(0);
@@ -358,8 +353,6 @@ int Leximax_encoder::solve()
         int retv = external_solve(0);
         // read model returned by the solver
         m_sat = !(m_solution.empty());
-        // TODO: change optimum to objective vector!!
-        m_optimum[0] = get_obj_value(m_solution);
         return retv;
     }
     // encode sorted vectors with sorting network
@@ -368,8 +361,9 @@ int Leximax_encoder::solve()
     for (int i = 0; i < m_num_objectives; ++i) {
         clear_soft_clauses();
         generate_soft_clauses(i);
-        if (m_debug)
-            std::cerr << "------------------ ITERATION " << i << " ------------------\n";
+#ifdef DEBUG
+        std::cerr << "------------------ ITERATION " << i << " ------------------\n";
+#endif
         if (i != 0 && m_num_objectives != 1) // in the first iteration i == 0 there is no relaxation
             encode_relaxation(i);
         // encode the componentwise OR between sorted_relax vectors except in the last iteration
@@ -392,22 +386,22 @@ int Leximax_encoder::solve()
                 add_hard_clause(lits);
             }
         }
+#ifdef DEBUG
         std::vector<LINT> current_true_ys;
         for (Clause *cl : m_soft_clauses) {
             LINT soft_var = -(*(cl->begin()));
             if (m_solution[soft_var] > 0)
                 current_true_ys.push_back(soft_var);
         }
+        y_vector.push_back(current_true_ys.size());
         true_ys.push_back(current_true_ys);
-        // store i-th maximum
-        m_optimum[i] = get_obj_value(m_solution);
-        
+#endif      
     }
-    // DEBUGING!!!
+#ifdef DEBUG
     if (!m_solution.empty()){
-        // compare m_optimum with objective vector and print true sorted vector variables
+        // compare y_vector with objective vector and print true sorted vector variables
         std::cerr << "Y vector: ";
-        for (LINT v : m_optimum)
+        for (LINT v : y_vector)
             std::cerr << v << ' ';
         std::cerr << std::endl;
         std::vector<std::vector<LINT>> true_input;
@@ -453,7 +447,6 @@ int Leximax_encoder::solve()
             std::cerr << std::endl;
             ++j;
         }
-        
         j = 1;
         for (std::vector<std::vector<LINT>*> &sorted_relax_vecs : m_sorted_relax_collection) {
             std::cerr << "Sorted Relax Vecs true variables of iteration " << j << ":" << std::endl;
@@ -471,9 +464,7 @@ int Leximax_encoder::solve()
             }
             ++j;
         }
-
-        /*for (LINT var : m_relax_vars)
-            std::cerr << "Relax variable " << j << ": " << var << std::endl;*/
     }
+#endif
     return 0;
 }
