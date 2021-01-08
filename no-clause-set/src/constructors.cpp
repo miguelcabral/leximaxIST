@@ -24,6 +24,7 @@ void Leximax_encoder::update_id_count(const std::vector<LINT> &clause)
 }
 
 Leximax_encoder::Leximax_encoder(const std::vector<std::vector<LINT>> &constraints, const std::vector<std::vector<std::vector<LINT>>> &objective_functions) : 
+    m_debug(false),
     m_id_count(0),
     m_constraints(),
     m_soft_clauses(),

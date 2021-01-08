@@ -43,7 +43,7 @@ public:
     bool solve_leximax();
 
     virtual IntVector& get_model()          { return model; }
-    virtual void set_model(IntVector &my_model) { model = my_model; }
+    virtual void set_model(const IntVector &my_model) { model = my_model; }
     
     virtual XLINT      get_min_unsat_cost() {return min_cost;}
 

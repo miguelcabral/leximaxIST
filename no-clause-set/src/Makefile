@@ -1,39 +1,42 @@
-CCFLAGS = -std=c++17
-CCFLAGS += -I ../include
-CSRCS1 = $(wildcard *.cc)
-CSRCS2 = $(wildcard *.cpp)
-COBJS1 = $(CSRCS1:.cc=.o)
-COBJS2 = $(CSRCS2:.cpp=.o)
-COBJS := $(COBJS1)
-COBJS += $(COBJS2)
+CFLAGS = -std=c++17
+CFLAGS += -I ../include
+SRCS1 = $(wildcard *.cc)
+SRCS2 = $(wildcard *.cpp)
+OBJS1 = $(SRCS1:.cc=.o)
+OBJS2 = $(SRCS2:.cpp=.o)
+OBJS := $(OBJS1)
+OBJS += $(OBJS2)
 
 ifdef PROF
-	CCFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
+	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
 endif
 
 .PHONY: clean release debug
 
-release : CCFLAGS += -O3 -w
+release : CFLAGS += -O3 -w
+release : SEDSTR=s/m_debug(true)/m_debug(false)/g
 release : libleximax.a
 
-debug : CCFLAGS += -g -fsanitize=address -D_GLIBCXX_DEBUG -D DEBUG -Wall -Wextra -pedantic
+debug : CFLAGS += -g -Wall -Wextra -pedantic
+debug : SEDSTR=s/m_debug(false)/m_debug(true)/g
 debug : libleximax.a
 
-libleximax.a : $(COBJS)
+libleximax.a : $(OBJS)
 	@echo "Archiving: libleximax.a"
-	@ar -rcs ../lib/libleximax.a $(COBJS)
+	@ar -rcs ../lib/libleximax.a $(OBJS)
 	@rm -f *.o
 
-$(COBJS1): %.o: %.cc
+$(OBJS1) : %.o: %.cc
 	@echo "Compiling: $@"
-	@g++ $(CCFLAGS) -c -o $@ $<
+	@g++ $(CFLAGS) -c -o $@ $<
 
-$(COBJS2): %.o: %.cpp
+$(OBJS2) : %.o: %.cpp
 	@echo "Compiling: $@"
-	@g++ $(CCFLAGS) -c -o $@ $<
+	@sed -i '$(SEDSTR)' constructors.cpp
+	@g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
 	@rm -f ../lib/libleximax.a *.o
-	@echo "Removing: libleximax.a $(COBJS)"
+	@echo "Removing: libleximax.a $(OBJS)"
 	
 

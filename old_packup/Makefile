@@ -16,7 +16,6 @@ INCD =
 CXX?=g++
 CFLAGS += -DEXTERNAL_SOLVER
 CFLAGS += -DNDEBUG -DNCHECK
-CFLAGS += -O3
 CFLAGS += -std=c++17
 #CFLAGS += -Wno-deprecated-register
 CFLAGS += -Wall -Wextra -Wno-parentheses 
@@ -37,7 +36,7 @@ LIBS += -lleximax
 # CFLAGS+=-DGMPDEF
 # CFLAGS+=-DCONV_DBG
 
-.PHONY: build all objs
+.PHONY: build release objs debug
 
 ifdef PROF
 CFLAGS+=-ftest-coverage
@@ -50,11 +49,19 @@ LNFLAGS+=-pg
 LNFLAGS+=-g
 endif
 
-all: $(XTRGT)
+
+# Miguel: should we put LNFLAGS += -O3 as well?
+#release : LNFLAGS += -O3
+release : CFLAGS += -O3
+release : $(XTRGT)
+
+debug : LNFLAGS += -g
+debug : CFLAGS += -g
+debug : $(XTRGT)
 
 $(XTRGT): objs 
 	@echo Linking: $@
-	@$(CXX) $(COBJS) $(LNFLAGS) -L $(LIBD) $(LIBS) -o $@ 
+	$(CXX) $(COBJS) $(LNFLAGS) -L $(LIBD) $(LIBS) -o $@ 
 
 objs: Lexer.o p.tab.o $(COBJS) 
 

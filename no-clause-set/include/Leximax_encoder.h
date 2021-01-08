@@ -13,6 +13,7 @@ class Leximax_encoder {
 
 private:
 
+    bool m_debug;
     size_t m_id_count;
     std::vector<Clause*> m_constraints;
     std::vector<Clause*> m_soft_clauses;
@@ -20,9 +21,7 @@ private:
     int m_num_objectives;
     std::vector<std::vector<LINT>*> m_sorted_vecs;
     std::vector<std::vector<LINT>*> m_sorted_relax_vecs;
-#ifdef DEBUG
     std::vector<std::vector<std::vector<LINT>*>>  m_sorted_relax_collection;
-#endif
     std::vector<std::forward_list<LINT>> m_all_relax_vars; // relax_vars of each iteration
     std::string m_solver_command;
     std::string m_solver_format;
