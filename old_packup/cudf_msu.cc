@@ -130,7 +130,7 @@ int main(int argc, char** argv) {
     sigaction(SIGUSR1, &new_act2, 0);
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
-    sigaction(SIGUSR2, &new_act3, 0);*/
+    sigaction(SIGUSR2, &new_act3, 0);
 #else
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
