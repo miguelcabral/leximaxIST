@@ -119,7 +119,8 @@ int main(int argc, char** argv) {
     print_header();
     
     /* set up signals */
-/*#ifdef EXTERNAL_SOLVER
+#ifdef EXTERNAL_SOLVER
+// Miguel: in this case nothing is done
     // assuming external solver received as well
     struct sigaction new_act1;
     new_act1.sa_handler = SIG_IGN;
@@ -130,14 +131,14 @@ int main(int argc, char** argv) {
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
     sigaction(SIGUSR2, &new_act3, 0);*/
-//#else
+#else
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
     signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
     //signal(SIGALRM,SIG_handler);
     //alarm(290);  // Specify alarm interrupt given timeout
-//#endif
+#endif
 
     /* parse options */
     Options options;
