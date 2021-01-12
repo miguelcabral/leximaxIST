@@ -21,7 +21,7 @@ int lpsolve_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages
   initialize_coeffs(nb_packages + other_vars);
 
   this->all_versioned_packages = all_versioned_packages;
-  if (verbosity > 0) printf("nb vars = %d\n", nb_vars);
+  //if (verbosity > 0) printf("nb vars = %d\n", nb_vars);
 
   if ((lp = make_lp(0, nb_vars)) == NULL) {
     fprintf(stderr, "Cannot create the lpsolve solver.\n");

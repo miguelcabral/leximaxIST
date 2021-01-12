@@ -85,6 +85,7 @@ class glpk_solver: public abstract_solver, public scoeff_solver<double, 1, 1>  {
     lp = (glp_prob *)NULL;
     all_versioned_packages = (CUDFVersionedPackageList *)NULL;
     lb = ub = (CUDFcoefficient *)NULL;
+    glp_term_out(GLP_OFF);
   }
 };
 

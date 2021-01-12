@@ -28,19 +28,19 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
-#USELPSOLVE=1
+USELPSOLVE=1
 
 
 ifeq ($(USELPSOLVE),1)
 
 # Path to the LPSOLVE main dir
-LPSOLVEDIR=~/Downloads/mccs-1.1/lp_solve_5.5/lp_solve/bin/ux64/
+LPSOLVEDIR=/home/mcabral/solvers/mccs/lp_solve_5.5
 
 # Path to the LPSOLVE include files
-LPSOLVEINC= ~/Downloads/mccs-1.1/lp_solve_5.5/
+LPSOLVEINC=${LPSOLVEDIR}/ 
 
 # LPSOLVE library path and options
-LPSOLVELD=-L ~/Downloads/mccs-1.1/lp_solve_5.5/lpsolve55/bin/ux64/ -llpsolve55 -Wl,-rpath,${LPSOLVEDIR}
+LPSOLVELD=-L ${LPSOLVEDIR}/lpsolve55/bin/ux64/ -llpsolve55 -Wl,-rpath,${LPSOLVEDIR}
 
 endif
 
@@ -51,7 +51,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-USECPLEX=1
+#USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)

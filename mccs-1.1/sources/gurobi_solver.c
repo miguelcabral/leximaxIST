@@ -39,6 +39,9 @@ int gurobi_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages,
   /* Set MIP gap to zero */
   status = GRBsetdblparam(env, "MIPGap", 0.0);
 
+  // (Miguel: set number of threads to 1)
+  status = GRBsetintparam(env, "Threads", 1);
+
   /* Create Gurobi model */
   status = GRBnewmodel(env, &model, "mip1", 0, NULL, NULL, NULL, NULL, NULL);
   if (status || (model == (GRBmodel *)NULL)) {
