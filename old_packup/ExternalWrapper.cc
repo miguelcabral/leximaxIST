@@ -449,8 +449,10 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_solver_command(solver_command);
      leximax_enc->set_multiplication_string(multiplication_string);
      leximax_enc->set_leave_temporary_files(leave_temporary_files);
-     if (iterative)
+     if (iterative) {
          leximax_enc->set_solver_format("opb");
+		 leximax_enc->set_lp_solver("gurobi");
+	 }
      else
          leximax_enc->set_solver_format("wcnf");     
      // solve() returns 0 if all went well, and -1 otherwise. 
