@@ -27,8 +27,10 @@ private:
     std::string m_solver_format;
     std::string m_lp_solver;
     std::string m_valid_lp_solvers[6];
-    std::string m_pid;
+    std::string m_file_name;
+    bool m_solver_output; // is there an output file to read?
     pid_t m_child_pid;
+    double m_timeout; // timeout for signal handling in milliseconds
     bool m_leave_temporary_files;
     bool m_sat;
     std::string m_multiplication_string;
@@ -49,7 +51,7 @@ public:
      * each objective function is a vector of soft clauses;*/
     // each objective function is the sum of its falsified soft clauses.
     Leximax_encoder(const std::vector<std::vector<LINT>> &constraints, const std::vector<std::vector<std::vector<LINT>>> &objective_functions); 
-    // TODO: change the constructor's parameters to const, and add checks if constraints and/or obj functions is empty
+    // TODO: add checks if constraints and/or obj functions is empty
     ~Leximax_encoder();
     
     // returns 0 if all want well, -1 otherwise

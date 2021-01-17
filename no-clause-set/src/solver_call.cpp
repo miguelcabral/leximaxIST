@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <zlib.h>
 #include <fmtutils.hh>
-#include <errno.h>
+#include <errno.h> // for errno
 #include <sys/wait.h>
 #include <unistd.h>
 #include <cstring> // for strerror()
@@ -74,9 +74,12 @@ void Leximax_encoder::read_cplex_output(const std::string &output_filename)
     if (!sat) m_solution.clear();    
 }
 
-void Leximax_encoder::read_solver_output(const std::string &output_filename)
+void Leximax_encoder::read_solver_output(const std::string &input_filename)
+// TODO: Change this to a function that receives a std::vector<LINT> model and stores solution in that model.
+//          Why? For flexibility - I can use this function to read an approximate solution that solver outputs (when program is interrupted)
 {
     if (m_solver_format == "wcnf" || m_solver_format == "opb") {
+        std::string output_filename (input_filename + ".out");
         gzFile of = gzopen(output_filename.c_str(), "rb");
         assert(of!=NULL);
         StreamBuffer r(of);
@@ -106,17 +109,17 @@ void Leximax_encoder::read_solver_output(const std::string &output_filename)
     }
     else if (m_solver_format == "lp") {
         if (m_lp_solver == "cplex")
-            read_cplex_output(output_filename);
+            read_cplex_output(input_filename);
         else if (m_lp_solver == "gurobi")
-            read_gurobi_output(output_filename);
+            read_gurobi_output(input_filename);
         else if (m_lp_solver == "glpk")
-            read_glpk_output(output_filename);
+            read_glpk_output(input_filename);
         else if (m_lp_solver == "scip")
-            read_scip_output(output_filename);
+            read_scip_output(input_filename);
         else if (m_lp_solver == "cbc")
-            read_cbc_output(output_filename);
+            read_cbc_output(input_filename);
         else if (m_lp_solver == "lpsolve")
-            read_lpsolve_output(output_filename);
+            read_lpsolve_output(input_filename);
     }
 }
 
@@ -172,6 +175,8 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
             command += "-c \"read " + input_filename + "\" \"optimize\" \"display solution variables -\"";
         if (m_lp_solver == "cbc")
             command += input_filename + " solve solution $";
+        if (m_lp_solver == "scip")
+            command += "-f " + input_filename;
     }
     else
         command += input_filename;
@@ -235,12 +240,6 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     command += " > " + output_filename;
     command += " 2> " + error_filename;
     system(command.c_str());
-    read_solver_output(output_filename);
-    if (!m_leave_temporary_files) {
-        remove(input_filename.c_str());
-        remove(output_filename.c_str());
-        remove(error_filename.c_str());
-    }
     // set to zero, i.e. no external solver is currently running
     m_child_pid = 0;
     return 0;
@@ -263,44 +262,66 @@ int Leximax_encoder::solve_maxsat(int i)
     return call_solver(input_name);
 }
 
-int Leximax_encoder::solve_pbo(int i)
+int Leximax_encoder::write_opb_file(int i)
 {
-    std::string input_name (m_pid);
-    input_name += "_" + std::to_string(i) + ".opb";
-    std::ofstream output(input_name.c_str());
+    m_file_name += "_" + std::to_string(i) + ".opb";
+    std::ofstream out(m_file_name);
+    if (!out) {
+        print_error_msg("Could not open " + file_name + " for writing");
+        return -1;
+    }
     // prepare input for the solver
-    output << "* #variable= " << m_id_count;
+    out << "* #variable= " << m_id_count;
     if (i == 0)
-        output << " #constraint= " << m_constraints.size() << '\n';
+        out << " #constraint= " << m_constraints.size() << '\n';
     else
-        output << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
+        out << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function
-        output << "min:";
+        out << "min:";
         for (Clause *cl : m_soft_clauses) {
             LINT soft_var = -(*(cl->begin())); // cl is unitary clause
-            output << " " << "+1" << m_multiplication_string << "x" << soft_var;
+            out << " " << "+1" << m_multiplication_string << "x" << soft_var;
         }
-        output << ";\n";
+        out << ";\n";
     }
     // print all constraints except for cardinality constraint
     for (Clause *cl : m_constraints) {
-        write_pbconstraint(cl, output);
+        print_pb_constraint(cl, out);
     }
     // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
     for (int j (1); j <= ( i < m_num_objectives - 2 ? i : m_num_objectives - 2 ); ++j)
-        write_atmost_pb(j, output);
+        print_atmost_pb(j, out);
     if (i == m_num_objectives - 1 && m_num_objectives != 1)
-        write_sum_equals_pb(1, output); // in the last iteration print =1 cardinality constraint
-    output.close();
-    // call the solver
-    return call_solver(input_name);
+        print_sum_equals_pb(1, out); // in the last iteration print =1 cardinality constraint
+    out.close();
+    return 0;
 }
 
-int Leximax_encoder:: solve_lp(int i)
+int Leximax_encoder::solve_pbo(int i)
 {
-    std::string input_name (m_pid);
-    input_name += "_" + std::to_string(i) + ".lp";
-    std::ofstream output(input_name.c_str());
+    if (write_opb_file(i) != 0)
+        return -1;
+    // call the solver
+    if (call_solver() != 0)
+        return -1;
+    m_solver_output = true; // there is solver output to read
+    // read output of solver
+    if (read_solver_output() != 0)
+        return -1; // TODO: check to see how this can fail and if it fails should we stop program or ignore?
+    m_solver_output = false; // I have read solver output
+    if (!m_leave_temporary_files)
+        remove_tmp_files();    // if it fails does not matter
+    return 0;
+}
+
+int Leximax_encoder::write_lp_file(int i)
+{
+    std::string file_name (m_pid + "_" + std::to_string(i) + ".lp");
+    std::ofstream output(file_name); 
+    if (!output) {
+        print_error_msg("Could not open " + file_name + " for writing");
+        return -1;
+    }
     // prepare input for the solver
     output << "Minimize\n";
     output << " obj: ";
@@ -324,18 +345,29 @@ int Leximax_encoder:: solve_lp(int i)
     output << "Subject To\n";
     // print all constraints except for cardinality constraint
     for (Clause *cl : m_constraints) {
-        write_lpconstraint(cl, output);
+        print_lp_constraint(cl, output);
     }
+    // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
+    for (int j (1); j <= ( i < m_num_objectives - 2 ? i : m_num_objectives - 2 ); ++j)
+        print_atmost_lp(j, output);
     if (i == m_num_objectives - 1 && m_num_objectives != 1)
-        write_sum_equals_lp(1, output); // in the last iteration print =1 cardinality constraint
-    else if (i != 0)
-        write_atmost_lp(i, output); // in other iterations print at most i constraint  
+        print_sum_equals_lp(1, output); // in the last iteration print =1 cardinality constraint 
     // print all variables after Binaries
     output << "Binaries\n";
     for (size_t j (1); j <= m_id_count; ++j)
         output << "x" << j << '\n';
     output << "End";
     output.close();
+}
+
+int Leximax_encoder:: solve_lp(int i)
+{
+    // TODO: separate the writing phase: write_lp_file; write_wcnf_file; write_opb_file.
+    // TODO: if gurobi or scip then write OPB! if cplex or cbc then write lp!
+    if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
+        write_opb_file(i);
+    if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
+        write_lp_file(i);
     // call the solver
     return call_solver(input_name);
 }
@@ -354,4 +386,21 @@ int Leximax_encoder::external_solve(int i)
         print_error_msg(msg);
         return -1;
     }
+}
+
+void Leximax_encoder::remove_tmp_files()
+{
+    std::string output_filename (m_file_name);
+    if (m_solver_format == "lp" && m_lp_solver == "gurobi") {
+        output_filename += ".sol";
+    }
+    else
+        output_filename += ".out";
+    std::string error_filename (m_file_name + ".err");
+    if (remove(m_file_name.c_str()) != 0)
+        print_error_msg("Failed to remove file: '" + m_file_name + "'");
+    if (remove(output_filename.c_str()) != 0)
+        print_error_msg("Failed to remove file: '" + output_filename + "'");
+    if (remove(error_filename.c_str()) != 0)
+        print_error_msg("Failed to remove file: '" + error_filename + "'");
 }

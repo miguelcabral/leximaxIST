@@ -37,14 +37,14 @@ Leximax_encoder::Leximax_encoder(const std::vector<std::vector<LINT>> &constrain
     m_solver_format("wcnf"),
     m_lp_solver("cplex"),
     m_valid_lp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"},
-    m_pid(),
+    m_file_name(),
     m_child_pid(0),
     m_leave_temporary_files(false),
     m_sat(false),
     m_multiplication_string(" "),
     m_solution(),
     m_sorting_net_size(0)
-{  
+{  // TODO: what to do when constraints are empty or when objective functions are empty...
     for (const std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count
         update_id_count(hard_clause);
@@ -77,5 +77,5 @@ Leximax_encoder::Leximax_encoder(const std::vector<std::vector<LINT>> &constrain
     // name for temporary files
     std::stringstream strstr;
     strstr << getpid();
-    m_pid = strstr.str();
+    m_file_name = strstr.str();
 }

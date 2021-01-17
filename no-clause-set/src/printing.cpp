@@ -1,18 +1,26 @@
 #include <Leximax_encoder.h>
 
-void Leximax_encoder::print_error_msg(const std::string &msg)
+void Leximax_encoder::print_error_msg(const std::string &msg) const
 {
     std::cerr << "Error leximaxIST: " << msg << std::endl;
 }
 
-void Leximax_encoder::print_clause(std::ostream &output, std::vector<LINT> * const clause)
+void Leximax_encoder::print_waitpid_error(const std::string errno_str)
+{
+    std::string errmsg ("When calling");
+    errmsg += " waitpid() on external solver (pid " + m_child_pid + "): '";
+    errmsg += + errno_str + "'";
+    print_error_msg(errmsg);
+}
+
+void Leximax_encoder::print_clause(std::ostream &output, std::vector<LINT> * const clause) const
 {
     for (LINT lit : *clause)
         output << lit << " "; 
     output << "0\n";
 }
 
-void Leximax_encoder::write_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight)
+void Leximax_encoder::print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const
 {
     for (Clause * const cl : clauses) {
         output << weight << " ";
@@ -20,7 +28,8 @@ void Leximax_encoder::write_clauses(std::ostream &output, const std::vector<Clau
     }
 }
 
-void Leximax_encoder::write_pbconstraint(Clause * const cl, std::ostream &output) {
+void Leximax_encoder::print_pb_constraint(Clause * const cl, std::ostream &output) const
+{
     LINT num_negatives(0);
     for (LINT literal : *cl) {
         bool sign = literal > 0;
@@ -31,7 +40,8 @@ void Leximax_encoder::write_pbconstraint(Clause * const cl, std::ostream &output
     output << " >= " << 1 - num_negatives << ";\n";
 }
 
-void Leximax_encoder::write_lpconstraint(Clause * const cl, std::ostream &output) {
+void Leximax_encoder::print_lp_constraint(Clause * const cl, std::ostream &output) const
+{
     LINT num_negatives(0);
     size_t nb_vars_in_line (0);
     for (size_t j (0); j < cl->size(); ++j) {
@@ -52,7 +62,7 @@ void Leximax_encoder::write_lpconstraint(Clause * const cl, std::ostream &output
     output << " >= " << 1 - num_negatives << '\n';
 }
 
-void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
+void Leximax_encoder::print_atmost_pb(int i, std::ostream &output) const
 {
     // i = 1 means position 0, i = 2, means position 1, etc
     const std::forward_list<LINT> &relax_vars (m_all_relax_vars[i-1]);
@@ -62,7 +72,7 @@ void Leximax_encoder::write_atmost_pb(int i, std::ostream &output)
     output << " >= " << -i << ";\n";
 }
 
-void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
+void Leximax_encoder::print_atmost_lp(int i, std::ostream &output) const
 {
     bool first_iteration (true);
     /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
@@ -76,7 +86,7 @@ void Leximax_encoder::write_atmost_lp(int i, std::ostream &output)
     output << " <= " << i << '\n';
 }
 
-void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
+void Leximax_encoder::print_sum_equals_pb(int i, std::ostream &output) const
 {
     const std::forward_list<LINT> &relax_vars (m_all_relax_vars.back());
     for (LINT var : relax_vars) {
@@ -85,7 +95,7 @@ void Leximax_encoder::write_sum_equals_pb(int i, std::ostream &output)
     output << " = " << i << ";\n";
 }
 
-void Leximax_encoder::write_sum_equals_lp(int i, std::ostream &output)
+void Leximax_encoder::print_sum_equals_lp(int i, std::ostream &output) const
 {
     bool first_iteration (true);
     /*for (LINT var : m_relax_vars) {//TODO: if bug is due to relax_vars then change this to m_all_relax_vars!!!!!!
