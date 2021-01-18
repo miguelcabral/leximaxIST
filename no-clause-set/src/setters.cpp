@@ -29,3 +29,5 @@ void Leximax_encoder::set_lp_solver(const std::string &lp_solver)
 void Leximax_encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
 
 void Leximax_encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
+
+void Leximax_encoder::set_err_file(const std::string &name) { m_err_file = name; }

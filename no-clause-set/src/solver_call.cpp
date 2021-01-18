@@ -11,41 +11,82 @@
 #include <unistd.h>
 #include <cstring> // for strerror()
 
-void Leximax_encoder::read_gurobi_output(const std::string &output_filename)
+int Leximax_encoder::read_gurobi_output(std::vector<LINT> &model)
 {
     // TODO
-}
-
-void Leximax_encoder::read_glpk_output(const std::string &output_filename)
-{
-    // TODO
-}
-
-void Leximax_encoder::read_lpsolve_output(const std::string &output_filename)
-{
-    // TODO
-}
-
-void Leximax_encoder::read_scip_output(const std::string &output_filename)
-{
-    // TODO
-}
-
-void Leximax_encoder::read_cbc_output(const std::string &output_filename)
-{
-    // TODO
-}
-
-void Leximax_encoder::read_cplex_output(const std::string &output_filename)
-{
+    std::string output_filename (m_file_name + ".out");
     gzFile of = gzopen(output_filename.c_str(), "rb");
-    assert(of!=NULL);
+    if (of == Z_NULL) {
+        std::string errmsg ("Could not open external solver output file '");
+        errmsg += output_filename + "' for reading";
+        print_error_msg(errmsg);
+        return -1;
+    }
     StreamBuffer r(of);
     bool sat = false;
-    m_solution.resize(static_cast<size_t>(m_id_count + 1), 0);
+    model.resize(static_cast<size_t>(m_id_count + 1), 0);
+    while (*r != EOF) {
+        if (*r != 'x')
+            skipLine(r);
+        else {
+            sat = true;
+            ++r;
+            const LINT var = parseInt(r);
+            assert(model.size()>(size_t)var);
+            ++r; // skip whitespace
+            if (*r == '1')
+                model[var] = var;
+            else if (*r == '0')
+                model[var] = -var;
+            else {
+                // error TODO
+            }
+        }
+    }
+    if (!sat) m_solution.clear();
+    return 0;
+}
+
+int Leximax_encoder::read_glpk_output(std::vector<LINT> &model)
+{
+    // TODO
+    return 0;
+}
+
+int Leximax_encoder::read_lpsolve_output(std::vector<LINT> &model)
+{
+    // TODO
+    return 0;
+}
+
+int Leximax_encoder::read_scip_output(std::vector<LINT> &model)
+{
+    // TODO
+    return 0;
+}
+
+int Leximax_encoder::read_cbc_output(std::vector<LINT> &model)
+{
+    // TODO
+    return 0;
+}
+
+int Leximax_encoder::read_cplex_output(std::vector<LINT> &model)
+{
+    std::string output_filename (m_file_name + ".out");
+    gzFile of = gzopen(output_filename.c_str(), "rb");
+    if (of == Z_NULL) {
+        std::string errmsg ("Could not open external solver output file '");
+        errmsg += output_filename + "' for reading";
+        print_error_msg(errmsg);
+        return -1;
+    }
+    StreamBuffer r(of);
+    bool sat = false;
+    model.resize(static_cast<size_t>(m_id_count + 1), 0);
     // set all variables to false, because we only get the variables that are true
     for (size_t v (1); v < m_id_count + 1; ++v)
-        m_solution[v] = -v;
+        model[v] = -v;
     while (*r != EOF) {
         if (*r != 'C') {// ignore all the other lines
             skipLine(r);
@@ -64,27 +105,33 @@ void Leximax_encoder::read_cplex_output(const std::string &output_filename)
                     else {
                         ++r;
                         const LINT l = parseInt(r);
-                        assert(m_solution.size()>(size_t)l);
-                        m_solution[l] = l;
+                        assert(model.size()>(size_t)l);
+                        model[l] = l;
                     }
                 }
             }
         }
     }
-    if (!sat) m_solution.clear();    
+    if (!sat) m_solution.clear();   
+    return 0;
 }
 
-void Leximax_encoder::read_solver_output(const std::string &input_filename)
+int Leximax_encoder::read_solver_output(std::vector<LINT> &model)
 // TODO: Change this to a function that receives a std::vector<LINT> model and stores solution in that model.
 //          Why? For flexibility - I can use this function to read an approximate solution that solver outputs (when program is interrupted)
 {
     if (m_solver_format == "wcnf" || m_solver_format == "opb") {
-        std::string output_filename (input_filename + ".out");
+        std::string output_filename (m_file_name + ".out");
         gzFile of = gzopen(output_filename.c_str(), "rb");
-        assert(of!=NULL);
+        if (of == Z_NULL) {
+            std::string errmsg ("Could not open external solver output file '");
+            errmsg += output_filename + "' for reading";
+            print_error_msg(errmsg);
+            return -1;
+        }
         StreamBuffer r(of);
         bool sat = false;
-        m_solution.resize(static_cast<size_t>(m_id_count + 1), 0);
+        model.resize(static_cast<size_t>(m_id_count + 1), 0);
         while (*r != EOF) {
             if (*r != 'v') {// ignore all the other lines
                 skipLine(r);
@@ -98,28 +145,28 @@ void Leximax_encoder::read_solver_output(const std::string &input_filename)
                     if ((*r == 'x')) ++r;
                     if (*r < '0' || *r > '9') break;
                     const LINT l = parseInt(r);
-                    assert(m_solution.size()>(size_t)l);
-                    m_solution[l] = (sign ? l : -l);
+                    assert(model.size()>(size_t)l);
+                    model[l] = (sign ? l : -l);
                 }
                 assert (*r=='\n');
                 ++r; // skip '\n'
             }
         }
-        if (!sat) m_solution.clear();
+        if (!sat) model.clear();
     }
     else if (m_solver_format == "lp") {
         if (m_lp_solver == "cplex")
-            read_cplex_output(input_filename);
+            return read_cplex_output(model);
         else if (m_lp_solver == "gurobi")
-            read_gurobi_output(input_filename);
+            return read_gurobi_output(model);
         else if (m_lp_solver == "glpk")
-            read_glpk_output(input_filename);
+            return read_glpk_output(model);
         else if (m_lp_solver == "scip")
-            read_scip_output(input_filename);
+            return read_scip_output(model);
         else if (m_lp_solver == "cbc")
-            read_cbc_output(input_filename);
+            return read_cbc_output(model);
         else if (m_lp_solver == "lpsolve")
-            read_lpsolve_output(input_filename);
+            return read_lpsolve_output(model);
     }
 }
 
@@ -309,6 +356,7 @@ int Leximax_encoder::solve_pbo(int i)
     if (read_solver_output() != 0)
         return -1; // TODO: check to see how this can fail and if it fails should we stop program or ignore?
     m_solver_output = false; // I have read solver output
+    // set m_file_name back to pid
     if (!m_leave_temporary_files)
         remove_tmp_files();    // if it fails does not matter
     return 0;
@@ -397,10 +445,11 @@ void Leximax_encoder::remove_tmp_files()
     else
         output_filename += ".out";
     std::string error_filename (m_file_name + ".err");
+    std::string explanation ("File does not exist or some error occured.");
     if (remove(m_file_name.c_str()) != 0)
-        print_error_msg("Failed to remove file: '" + m_file_name + "'");
+        print_error_msg("Failed to remove file: '" + m_file_name + "'. " + explanation);
     if (remove(output_filename.c_str()) != 0)
-        print_error_msg("Failed to remove file: '" + output_filename + "'");
+        print_error_msg("Failed to remove file: '" + output_filename + "'. " + explanation);
     if (remove(error_filename.c_str()) != 0)
-        print_error_msg("Failed to remove file: '" + error_filename + "'");
+        print_error_msg("Failed to remove file: '" + error_filename + "'. " + explanation);
 }

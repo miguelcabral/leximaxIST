@@ -15,6 +15,23 @@ const std::vector<LINT>& Leximax_encoder::get_solution() const
     return m_solution;
 }
 
+// if unsat return empty vector
+std::vector<LINT> get_objective_vector(const std::vector<LINT> &assignment) const
+{
+    std::vector<LINT> objective_vector;
+    if (!assignment.empty()) {
+        for (std::vector<LINT> *obj_func : m_objectives) {
+            LINT obj_value (0);
+            for (LINT var : *obj_func) {
+                if (assignment[var] > 0)
+                    ++obj_value;
+            }
+            objective_vector.push_back(obj_value);
+        }
+    }
+    return objective_vector;
+}
+
 std::vector<LINT> Leximax_encoder::get_objective_vector()  const
 {
     std::vector<LINT> objective_vector;

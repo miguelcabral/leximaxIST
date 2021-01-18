@@ -2,10 +2,15 @@
 
 void Leximax_encoder::print_error_msg(const std::string &msg) const
 {
-    std::cerr << "Error leximaxIST: " << msg << std::endl;
+    if (m_err_file.empty())
+        std::cerr << "Error leximaxIST: " << msg << std::endl;
+    else {
+        std::ofstream err (m_err_file);
+        err << "Error leximaxIST: " << msg << std::endl;
+    }
 }
 
-void Leximax_encoder::print_waitpid_error(const std::string errno_str)
+void Leximax_encoder::print_waitpid_error(const std::string errno_str) const
 {
     std::string errmsg ("When calling");
     errmsg += " waitpid() on external solver (pid " + m_child_pid + "): '";

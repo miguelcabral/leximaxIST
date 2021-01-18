@@ -28,6 +28,7 @@ private:
     std::string m_lp_solver;
     std::string m_valid_lp_solvers[6];
     std::string m_file_name;
+    std::string m_err_file;
     bool m_solver_output; // is there an output file to read?
     pid_t m_child_pid;
     double m_timeout; // timeout for signal handling in milliseconds
@@ -73,6 +74,8 @@ public:
     
     void set_solver_format(const std::string &format);
     
+    void set_err_file(const std::string &name);
+    
     void set_lp_solver(const std::string &lp_solver);
     
     void set_leave_temporary_files(bool val);
@@ -82,6 +85,10 @@ public:
     void terminate(int signum);
     
 private:
+    
+    // getters.cpp
+    
+    std::vector<LINT> get_objective_vector(const std::vector<LINT> &assignment) const;
     
     // constructors.cpp
     
@@ -139,27 +146,29 @@ private:
     
     int call_solver(const std::string &input_filename);
     
-    void read_solver_output(const std::string &output_filename);
+    int read_solver_output(std::vector<LINT> &model);
     
     int external_solve(int i);
     
     int solve_lp(int i);
     
-    void read_cplex_output(const std::string &output_filename);
+    int read_cplex_output(std::vector<LINT> &model);
     
-    void read_gurobi_output(const std::string &output_filename);
+    int read_gurobi_output(std::vector<LINT> &model);
     
-    void read_glpk_output(const std::string &output_filename);
+    int read_glpk_output(std::vector<LINT> &model);
     
-    void read_lpsolve_output(const std::string &output_filename);
+    int read_lpsolve_output(std::vector<LINT> &model);
     
-    void read_scip_output(const std::string &output_filename);
+    int read_scip_output(std::vector<LINT> &model);
     
-    void read_cbc_output(const std::string &output_filename);
+    int read_cbc_output(std::vector<LINT> &model);
     
     // printing.cpp
     
-    void print_error_msg(const std::string &msg);
+    void print_error_msg(const std::string &msg) const;
+    
+    void print_waitpid_error(const std::string errno_str) const;
     
     void print_clause(std::ostream &output, Clause * const cl);
     

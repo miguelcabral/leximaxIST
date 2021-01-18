@@ -4,17 +4,24 @@
 #include <thread>
 #include <string.h>
 #include <errno.h>
+#include <algorithm> // for std::sort()
 
-void Leximax_encoder::terminate(int signum)
+bool descending_order (LINT i, LINT j) { return (i>j); }
+
+// send signal signum to external solver if it is running, and get best solution
+int Leximax_encoder::terminate(int signum)
 {
     // TODO
     if (m_child_pid == 0) { // external solver is not running
-        // check if there is output file to be read
+        // check if there is output file to be read 
+        // (this happens if signal is caught after external solver has finished
+        //      and before the solution has been read)
         if (m_solver_output) {
-            // if there is: read solver output
-            read_solver_output();
+            read_solver_output(m_solution);
         }
-        return;
+        if (!m_leave_temporary_files)
+            remove_tmp_files(); 
+        return 0;
     }
     else {
         // if external solver is running then:
@@ -25,6 +32,8 @@ void Leximax_encoder::terminate(int signum)
             errmsg += " kill() to send a signal to the external solver (pid ";
             errmsg += m_child_pid + "): '" + err_str + "'";
             print_error_msg(errmsg);
+            if (!m_leave_temporary_files)
+                remove_tmp_files(); 
             return -1;
         }
         double accumulated_time (0.0);
@@ -40,28 +49,40 @@ void Leximax_encoder::terminate(int signum)
             }
             else if (retv == m_child_pid) {
                 // external solver has finished
-                read_solver_output();
+                // but solution may be worse than previous iteration - compare
+                std::vector<LINT> new_sol;
+                if (read_solver_output(new_sol) != 0) {
+                    if (!m_leave_temporary_files)
+                        remove_tmp_files();
+                    return -1;
+                }
+                if (!new_sol.empty()) { // otherwise unsat, nothing to do
+                    if (m_solution.empty())
+                         m_solution = new_sol;
+                    else {
+                        // check which solution is leximax-better
+                        std::vector<LINT> new_obj_vec (get_objective_vector(new_sol));
+                        std::vector<LINT> old_obj_vec (get_objective_vector(m_solution));
+                        std::sort(new_obj_vec.begin(), new_obj_vec.end(), descending_order());
+                        std::sort(old_obj_vec.begin(), old_obj_vec.end(), descending_order());
+                        for (size_t j (0); j < new_obj_vec.size(); ++j) {
+                            if (new_obj_vec[j] < old_obj_vec[j]) {
+                                m_solution = new_sol;
+                                break;
+                            }
+                            else if (new_obj_vec[j] > old_obj_vec[j])
+                                break; // m_solution is better
+                        }
+                    }
+                }
                 if (!m_leave_temporary_files)
                     remove_tmp_files(); 
                 return 0;
             }
         }
-
-        // at the end check if there is output to read
-        read_solver_output();
+        // timeout has been reached, clean up and return
         if (!m_leave_temporary_files)
             remove_tmp_files(); 
-        // if not return, otherwise:
-        // read solution file and store this solution
-        // if unsatisfiable return
-        // otherwise:
-        // if I have a solution from previous iteration then compare with new solution
-        // choose best solution and return
-
-        // wait a few seconds for the external solver to return the best solution so far
-        // read solution
-        // if satisfiable set m_sat to true, else m_sat to false and m_solution to empty
-        // store solution in m_solution, if one exists
     }
-
+    return 0;
 }
