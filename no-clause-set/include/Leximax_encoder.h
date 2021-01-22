@@ -72,11 +72,11 @@ public:
     
     void set_solver_command(const std::string &command);
     
-    void set_solver_format(const std::string &format);
+    int set_solver_format(const std::string &format);
     
     void set_err_file(const std::string &name);
     
-    void set_lp_solver(const std::string &lp_solver);
+    int set_lp_solver(const std::string &lp_solver);
     
     void set_leave_temporary_files(bool val);
     
@@ -137,11 +137,9 @@ private:
     void componentwise_OR(int i);
     
     // solver_call.cpp
+    
+    void reset_file_name();
 
-    int solve_maxsat(int i);
-    
-    int solve_pbo(int i);
-    
     int split_solver_command(const std::string &command, std::vector<std::string> &command_split);
     
     int call_solver(const std::string &input_filename);
@@ -150,7 +148,13 @@ private:
     
     int external_solve(int i);
     
-    int solve_lp(int i);
+    int write_solver_input(int i);
+    
+    int write_lp_file(int i);
+    
+    int write_opb_file(int i);
+    
+    int write_wcnf_file(int i);
     
     int read_cplex_output(std::vector<LINT> &model);
     
@@ -172,19 +176,19 @@ private:
     
     void print_clause(std::ostream &output, Clause * const cl);
     
-    void write_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight);
+    void print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight);
     
-    void write_atmost_lp(int i, std::ostream &output);
+    void print_atmost_lp(int i, std::ostream &output);
     
-    void write_lpconstraint(Clause * const cl, std::ostream &output);
+    void print_lpconstraint(Clause * const cl, std::ostream &output);
     
-    void write_sum_equals_lp(int i, std::ostream &output);
+    void print_sum_equals_lp(int i, std::ostream &output);
     
-    void write_atmost_pb(int i, std::ostream &output);
+    void print_atmost_pb(int i, std::ostream &output);
     
-    void write_pbconstraint(Clause * const cl, std::ostream &output);
+    void print_pbconstraint(Clause * const cl, std::ostream &output);
     
-    void write_sum_equals_pb(int i, std::ostream &output);
+    void print_sum_equals_pb(int i, std::ostream &output);
 
 };
     

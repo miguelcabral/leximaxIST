@@ -39,11 +39,13 @@ int Leximax_encoder::read_gurobi_output(std::vector<LINT> &model)
             else if (*r == '0')
                 model[var] = -var;
             else {
-                // error TODO
+                std::string errmsg ("Can not read gurobi output '" + output_filename);
+                char current_char (*r);
+                errmsg += "' - expecting '1' or '0' but instead got '" + current_char + "'";
             }
         }
     }
-    if (!sat) m_solution.clear();
+    if (!sat) model.clear();
     return 0;
 }
 
@@ -112,7 +114,7 @@ int Leximax_encoder::read_cplex_output(std::vector<LINT> &model)
             }
         }
     }
-    if (!sat) m_solution.clear();   
+    if (!sat) model.clear();   
     return 0;
 }
 
@@ -212,10 +214,10 @@ int Leximax_encoder::split_solver_command(const std::string &command, std::vecto
     return 0;
 }
 
-int Leximax_encoder::call_solver(const std::string &input_filename)
+int Leximax_encoder::call_solver()
 {
-    const std::string output_filename = input_filename + ".out";
-    const std::string error_filename = input_filename + ".err";
+    const std::string output_filename = m_file_name + ".out";
+    const std::string error_filename = m + ".err";
     std::string command (m_solver_command + " ");
     if (m_solver_format == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
         if (m_lp_solver == "cplex")
@@ -292,27 +294,29 @@ int Leximax_encoder::call_solver(const std::string &input_filename)
     return 0;
 }
 
-int Leximax_encoder::solve_maxsat(int i)
+int Leximax_encoder::write_wcnf_file(int i)
 {
-    std::string input_name (m_pid);
-    input_name += "_" + std::to_string(i) + ".wcnf";
-    std::ofstream output(input_name.c_str());
+    m_file_name += "_" + std::to_string(i) + ".opb";
+    std::ofstream out (m_file_name);
+    if (!out) {
+        print_error_msg("Could not open " + file_name + " for writing");
+        return -1;
+    }
     // prepare input for the solver
     size_t weight = m_soft_clauses.size() + 1;
     output << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
     // print hard clauses
-    write_clauses(output, m_constraints, weight);
+    print_clauses(output, m_constraints, weight);
     // print soft clauses
-    write_clauses(output, m_soft_clauses, 1);
+    print_clauses(output, m_soft_clauses, 1);
     output.close();
-    // call the solver
-    return call_solver(input_name);
+    return 0;
 }
 
 int Leximax_encoder::write_opb_file(int i)
 {
     m_file_name += "_" + std::to_string(i) + ".opb";
-    std::ofstream out(m_file_name);
+    std::ofstream out (m_file_name);
     if (!out) {
         print_error_msg("Could not open " + file_name + " for writing");
         return -1;
@@ -344,19 +348,44 @@ int Leximax_encoder::write_opb_file(int i)
     return 0;
 }
 
-int Leximax_encoder::solve_pbo(int i)
+int Leximax_encoder::write_solver_input(int i)
 {
-    if (write_opb_file(i) != 0)
+    if (m_solver_format == "wcnf")
+        return write_wcnf_file(i);
+    else if (m_solver_format == "opb")
+        return write_opb_file(i);
+    else if (m_solver_format == "lp") {
+        if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
+            return write_opb_file(i);
+        if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
+            return write_lp_file(i);
+    }
+    else
+        return -1; // wrong m_solver_format - error msg already in set_solver_format
+}
+
+void Leximax_encoder::reset_file_name()
+{
+    // right now m_file_name looks like this: pid_i.wcnf
+    while (m_file_name.back() != '_')
+        m_file_name.pop_back();
+    m_file_name.pop_back(); // remove '_'
+}
+
+int Leximax_encoder::external_solve(int i)
+{
+    if (write_solver_input(i) != 0)
         return -1;
     // call the solver
     if (call_solver() != 0)
         return -1;
     m_solver_output = true; // there is solver output to read
     // read output of solver
-    if (read_solver_output() != 0)
-        return -1; // TODO: check to see how this can fail and if it fails should we stop program or ignore?
+    if (read_solver_output(m_solution) != 0)
+        return -1;
     m_solver_output = false; // I have read solver output
     // set m_file_name back to pid
+    reset_file_name();
     if (!m_leave_temporary_files)
         remove_tmp_files();    // if it fails does not matter
     return 0;
@@ -364,7 +393,7 @@ int Leximax_encoder::solve_pbo(int i)
 
 int Leximax_encoder::write_lp_file(int i)
 {
-    std::string file_name (m_pid + "_" + std::to_string(i) + ".lp");
+    m_file_name += "_" + std::to_string(i) + ".lp");
     std::ofstream output(file_name); 
     if (!output) {
         print_error_msg("Could not open " + file_name + " for writing");
@@ -406,34 +435,7 @@ int Leximax_encoder::write_lp_file(int i)
         output << "x" << j << '\n';
     output << "End";
     output.close();
-}
-
-int Leximax_encoder:: solve_lp(int i)
-{
-    // TODO: separate the writing phase: write_lp_file; write_wcnf_file; write_opb_file.
-    // TODO: if gurobi or scip then write OPB! if cplex or cbc then write lp!
-    if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
-        write_opb_file(i);
-    if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
-        write_lp_file(i);
-    // call the solver
-    return call_solver(input_name);
-}
-
-int Leximax_encoder::external_solve(int i)
-{
-    if(m_solver_format == "wcnf")
-        return solve_maxsat(i);
-    else if(m_solver_format == "opb")
-        return solve_pbo(i);
-    else if(m_solver_format == "lp")
-        return solve_lp(i);
-    else {
-        std::string msg ("The external solver format entered: '" + m_solver_format + "' is not valid\n");
-        msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
-        print_error_msg(msg);
-        return -1;
-    }
+    return 0;
 }
 
 void Leximax_encoder::remove_tmp_files()

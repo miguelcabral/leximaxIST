@@ -363,10 +363,10 @@ int Leximax_encoder::solve()
         // call solver
         if (external_solve(i) == -1)
             return -1;
-        // read model returned by the solver and fix value of current maximum
+        // check if unsat and set m_sat
         if (m_solution.empty()){
             m_sat = false;
-            break;
+            return 0;
         }
         m_sat = true;
         // fix value of current maximum; in the end of last iteration there is no need for this

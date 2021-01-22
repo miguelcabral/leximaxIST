@@ -5,12 +5,19 @@ void Leximax_encoder::set_solver_command(const std::string &command)
     m_solver_command = command;
 }
 
-void Leximax_encoder::set_solver_format(const std::string &format)
+int Leximax_encoder::set_solver_format(const std::string &format)
 {
     m_solver_format = format;
+    if (format != "wcnf" && format != "opb" && format != "lp") {
+        std::string msg ("The external solver format entered: '" + format + "' is not valid\n");
+        msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
+        print_error_msg(msg);
+        return -1;
+    }
+    return 0;    
 }
 
-void Leximax_encoder::set_lp_solver(const std::string &lp_solver)
+int Leximax_encoder::set_lp_solver(const std::string &lp_solver)
 {
     m_lp_solver = lp_solver;
     bool found (false);
@@ -23,7 +30,9 @@ void Leximax_encoder::set_lp_solver(const std::string &lp_solver)
         for (std::string &valid_lp_solver : m_valid_lp_solvers)
             msg += valid_lp_solver + ' ';
         print_error_msg(msg);
+        return -1;
     }
+    return 0;
 }
 
 void Leximax_encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
