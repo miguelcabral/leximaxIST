@@ -53,8 +53,9 @@ bool Options::parse(int argc,char **argv) {
 #endif
        ,{"multiplication-string",  required_argument,  0, 503}
        ,{"temporary-directory",    required_argument,  0, 504}
+       ,{"formalism",    required_argument,  0, 505}
+       ,{"lp-solver",    required_argument,  0, 506}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
-       ,{"max-sat", no_argument,  &max_solver, 1}
        ,{"leximax", no_argument,  &leximax, 1}
        ,{0, 0, 0, 0}
              };
@@ -79,6 +80,18 @@ bool Options::parse(int argc,char **argv) {
             case 502: mapping_file    = optarg; break;
             case 503: multiplication_string = optarg; break;
             case 504: temporary_directory   = optarg; break;
+            case 505: formalism = optarg;
+                if (formalism != "wcnf" && formalism != "opb" && formalism != "lp") {
+                    fprintf(stderr, "Invalid option! Available formalism options: 'wcnf', 'opb', 'lp'.\n");
+                    return_value = false;
+                }
+                break;
+            case 505: lp_solver = optarg;
+                if (lp_solver != "gurobi" && lp_solver != "scip" && lp_solver != "cplex" && lp_solver != "cbc") {
+                    fprintf(stderr, "Invalid option! Possible lp solvers: 'gurobi', 'scip', 'cplex', 'cbc'.\n");
+                    return_value = false;
+                }
+                break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);

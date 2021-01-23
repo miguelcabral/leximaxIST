@@ -46,7 +46,7 @@ public:
     string get_multiplication_string() const { return multiplication_string; }
     string get_temporary_directory()   const { return temporary_directory; }
     int    get_leave_temporary_files() const { return leave_temporary_files; }
-    int    get_max_solver()            const { return max_solver; }
+    const string&    get_formalism()   const { return formalism; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
     
@@ -64,8 +64,9 @@ private:
     string multiplication_string;
     int    leave_temporary_files;
     string temporary_directory;
-    int    max_solver;
+    string formalism;
     int    leximax;
+    string lp_solver;
 };
 
 #endif	/* OPTIONS_HH */
