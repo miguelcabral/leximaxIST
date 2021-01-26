@@ -99,6 +99,7 @@ void print_usage(ostream &output) {
     output << "\t\t\t\t\t otherwise it is a PBO solver"<< endl;
     output << "\t--leximax\t\t\t The user criteria are optimised with the leximax order;" << endl;
     output << "\t\t\t\t\t otherwise the lexicographic order is used"<< endl;
+    output << "\tFalta: --lpsolver e --formalism neste print_usage! TODO" << endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
@@ -119,7 +120,7 @@ int main(int argc, char** argv) {
     print_header();
     
     /* set up signals */
-#ifdef EXTERNAL_SOLVER
+/*#ifdef EXTERNAL_SOLVER
 // Miguel: in this case nothing is done
     // assuming external solver received as well
     struct sigaction new_act1;
@@ -131,14 +132,14 @@ int main(int argc, char** argv) {
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
     sigaction(SIGUSR2, &new_act3, 0);
-#else
+#else*/
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
     signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
     //signal(SIGALRM,SIG_handler);
     //alarm(290);  // Specify alarm interrupt given timeout
-#endif
+//#endif
 
     /* parse options */
     Options options;
