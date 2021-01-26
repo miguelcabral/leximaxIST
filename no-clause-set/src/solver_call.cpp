@@ -13,7 +13,7 @@
 
 int Leximax_encoder::read_gurobi_output(std::vector<LINT> &model)
 {
-    std::string output_filename (m_file_name + ".out");
+    std::string output_filename (m_file_name + ".sol");
     gzFile of = gzopen(output_filename.c_str(), "rb");
     if (of == Z_NULL) {
         std::string errmsg ("Could not open external solver output file '");
@@ -229,7 +229,7 @@ int Leximax_encoder::call_solver()
         if (m_lp_solver == "gurobi") {
             output_filename = m_file_name + ".sol"; // gurobi only accepts this file extension
             command = "gurobi_cl";
-            command += "Threads=1 ResultFile=" + output_filename;
+            command += " Threads=1 ResultFile=" + output_filename;
             command += " LogFile=\"\" LogToConsole=0 "; // disable logging
             command += m_file_name;
         }
@@ -293,7 +293,9 @@ int Leximax_encoder::call_solver()
         print_error_msg("The external solver finished with non-zero error status: " + errmsg);
         return -1;
     }  */
-    command += " > " + output_filename;
+    if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+        command += " > " + output_filename;
+    }
     command += " 2> " + error_filename;
     system(command.c_str());
     // set to zero, i.e. no external solver is currently running
