@@ -55,7 +55,7 @@ bool Options::parse(int argc,char **argv) {
        ,{"multiplication-string",  required_argument,  0, 503}
        ,{"temporary-directory",    required_argument,  0, 504}
        ,{"formalism",    required_argument,  0, 505}
-       ,{"lp-solver",    required_argument,  0, 506}
+       ,{"lpsolver",    required_argument,  0, 506}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"leximax", no_argument,  &leximax, 1}
        ,{0, 0, 0, 0}
