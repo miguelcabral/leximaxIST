@@ -43,14 +43,27 @@ The constructor of the Leximax_encoder class receives
 
 
 ## External Solvers
+(Dividir por formalismos: wcnf (MaxSAT), opb (PBO), lp (Linear Programming) )
 The software has been tested with the following external solvers:
 
 * RC2
 * MaxHS
 * rounding-sat
 * UwrMaxSAT??
+* gurobi
 
-By default the tool uses the MaxSAT solver RC2. To install this solver one must have python and pip installed and then run the following command `pip install python-sat`. For more information run `./leximaxIST -h`.
+# Gurobi
+To use the Gurobi command line tool you must follow the steps in the [Software Installation Guide](https://www.gurobi.com/documentation/9.1/quickstart_linux/software_installation_guid.html) of Gurobi.
+Note: Each time you want to execute a program compiled with the LeximaxIST library, using Gurobi as external solver, you must previously set the environment variables as explained in the guide.
+
+By default the tool uses the MaxSAT solver RC2.
+
+# RC2
+To install this MaxSAT solver you must have python and pip installed and then run the following command `pip install python-sat`.
+You can also get the code from the [MaxSAT Evaluation web page] (https://maxsat-evaluations.github.io/2020/descriptions.html).
+Em cima foi instalação. Em baixo já tem a ver com a utilização. Dividir estes assuntos - instalação e utilização.
+Para ser mais simples: mostrar os comandos dos solvers (com opções default) para o utilizador não ter de fazer essa pesquisa se não estiver familiarizado com os MaxSAT solvers. Senão a pessoa tem de ir ver quais são os comandos. Interessa ver os comandos quando se quer mudar por exemplo o algoritmo do solver ou certos parâmetros.
+To execute the solver run the following command `rc2.py -vv`. For the list of options run `rc2.py --help`.
 
 ## Build
 Instruções para compilar a ferramenta e a biblioteca.

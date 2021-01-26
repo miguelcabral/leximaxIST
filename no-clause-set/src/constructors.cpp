@@ -34,18 +34,25 @@ Leximax_encoder::Leximax_encoder(const std::vector<std::vector<LINT>> &constrain
     m_sorted_relax_vecs(objective_functions.size(), nullptr),
     m_all_relax_vars(),
     m_solver_command("rc2.py -vv"),
-    m_solver_format("wcnf"),
-    m_lp_solver("cplex"),
+    m_formalism("wcnf"),
+    m_lp_solver("gurobi"),
     m_valid_lp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"},
     m_file_name(),
     m_err_file(),
+    m_solver_output(false),
     m_child_pid(0),
+    m_timeout(3000.0), // 3 seconds
     m_leave_temporary_files(false),
     m_sat(false),
     m_multiplication_string(" "),
     m_solution(),
     m_sorting_net_size(0)
 {  // TODO: what to do when constraints are empty or when objective functions are empty...
+    // if a constraint is empty or an objective function is empty then error
+    // if constraints or objective functions are empty then error -> nothing to optimise or no constraints -> trivial problem
+    // when problem occurs clear constraints and objective functions so that when solving return right away with error
+    // Maybe change things: constructor does not read constraints nor objective_functions
+    // Create method: read_problem for this phase so that I can have return value indicating if some error occured or not
     for (const std::vector<LINT> &hard_clause : constraints) {
         // determine max id and update m_id_count
         update_id_count(hard_clause);

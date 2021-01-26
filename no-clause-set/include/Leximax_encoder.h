@@ -24,7 +24,7 @@ private:
     std::vector<std::vector<std::vector<LINT>*>>  m_sorted_relax_collection;
     std::vector<std::forward_list<LINT>> m_all_relax_vars; // relax_vars of each iteration
     std::string m_solver_command;
-    std::string m_solver_format;
+    std::string m_formalism;
     std::string m_lp_solver;
     std::string m_valid_lp_solvers[6];
     std::string m_file_name;
@@ -72,7 +72,7 @@ public:
     
     void set_solver_command(const std::string &command);
     
-    int set_solver_format(const std::string &format);
+    int set_formalism(const std::string &format);
     
     void set_err_file(const std::string &name);
     
@@ -82,7 +82,7 @@ public:
     
     void set_multiplication_string(const std::string &str);
     
-    void terminate(int signum);
+    int terminate(int signum);
     
 private:
     
@@ -139,10 +139,12 @@ private:
     // solver_call.cpp
     
     void reset_file_name();
+    
+    void remove_tmp_files() const;
 
     int split_solver_command(const std::string &command, std::vector<std::string> &command_split);
     
-    int call_solver(const std::string &input_filename);
+    int call_solver();
     
     int read_solver_output(std::vector<LINT> &model);
     
@@ -172,23 +174,23 @@ private:
     
     void print_error_msg(const std::string &msg) const;
     
-    void print_waitpid_error(const std::string errno_str) const;
+    void print_waitpid_error(const std::string &errno_str) const;
     
-    void print_clause(std::ostream &output, Clause * const cl);
+    void print_clause(std::ostream &output, const Clause *cl) const;
     
-    void print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight);
+    void print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const;
     
-    void print_atmost_lp(int i, std::ostream &output);
+    void print_atmost_lp(int i, std::ostream &output) const;
     
-    void print_lpconstraint(Clause * const cl, std::ostream &output);
+    void print_lp_constraint(const Clause *cl, std::ostream &output) const;
     
-    void print_sum_equals_lp(int i, std::ostream &output);
+    void print_sum_equals_lp(int i, std::ostream &output) const;
     
-    void print_atmost_pb(int i, std::ostream &output);
+    void print_atmost_pb(int i, std::ostream &output) const;
     
-    void print_pbconstraint(Clause * const cl, std::ostream &output);
+    void print_pb_constraint(const Clause *cl, std::ostream &output) const;
     
-    void print_sum_equals_pb(int i, std::ostream &output);
+    void print_sum_equals_pb(int i, std::ostream &output) const;
 
 };
     

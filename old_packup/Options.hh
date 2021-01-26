@@ -47,6 +47,7 @@ public:
     string get_temporary_directory()   const { return temporary_directory; }
     int    get_leave_temporary_files() const { return leave_temporary_files; }
     const string&    get_formalism()   const { return formalism; }
+    const string&    get_lp_solver()   const { return lp_solver; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
     

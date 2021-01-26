@@ -13,7 +13,6 @@
 
 int Leximax_encoder::read_gurobi_output(std::vector<LINT> &model)
 {
-    // TODO
     std::string output_filename (m_file_name + ".out");
     gzFile of = gzopen(output_filename.c_str(), "rb");
     if (of == Z_NULL) {
@@ -41,7 +40,8 @@ int Leximax_encoder::read_gurobi_output(std::vector<LINT> &model)
             else {
                 std::string errmsg ("Can not read gurobi output '" + output_filename);
                 char current_char (*r);
-                errmsg += "' - expecting '1' or '0' but instead got '" + current_char + "'";
+                std::string current_char_str (1, current_char);
+                errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
             }
         }
     }
@@ -119,10 +119,8 @@ int Leximax_encoder::read_cplex_output(std::vector<LINT> &model)
 }
 
 int Leximax_encoder::read_solver_output(std::vector<LINT> &model)
-// TODO: Change this to a function that receives a std::vector<LINT> model and stores solution in that model.
-//          Why? For flexibility - I can use this function to read an approximate solution that solver outputs (when program is interrupted)
 {
-    if (m_solver_format == "wcnf" || m_solver_format == "opb") {
+    if (m_formalism == "wcnf" || m_formalism == "opb") {
         std::string output_filename (m_file_name + ".out");
         gzFile of = gzopen(output_filename.c_str(), "rb");
         if (of == Z_NULL) {
@@ -155,8 +153,9 @@ int Leximax_encoder::read_solver_output(std::vector<LINT> &model)
             }
         }
         if (!sat) model.clear();
+        return 0;
     }
-    else if (m_solver_format == "lp") {
+    else if (m_formalism == "lp") {
         if (m_lp_solver == "cplex")
             return read_cplex_output(model);
         else if (m_lp_solver == "gurobi")
@@ -170,6 +169,7 @@ int Leximax_encoder::read_solver_output(std::vector<LINT> &model)
         else if (m_lp_solver == "lpsolve")
             return read_lpsolve_output(model);
     }
+    return -1; // wrong formalism 
 }
 
 int Leximax_encoder::split_solver_command(const std::string &command, std::vector<std::string> &command_split)
@@ -216,19 +216,26 @@ int Leximax_encoder::split_solver_command(const std::string &command, std::vecto
 
 int Leximax_encoder::call_solver()
 {
-    const std::string output_filename = m_file_name + ".out";
-    const std::string error_filename = m + ".err";
+    std::string output_filename = m_file_name + ".out";
+    const std::string error_filename = m_file_name + ".err";
     std::string command (m_solver_command + " ");
-    if (m_solver_format == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
+    if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
         if (m_lp_solver == "cplex")
-            command += "-c \"read " + input_filename + "\" \"optimize\" \"display solution variables -\"";
+            command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
         if (m_lp_solver == "cbc")
-            command += input_filename + " solve solution $";
+            command += m_file_name + " solve solution $";
         if (m_lp_solver == "scip")
-            command += "-f " + input_filename;
+            command += "-f " + m_file_name;
+        if (m_lp_solver == "gurobi") {
+            output_filename = m_file_name + ".sol"; // gurobi only accepts this file extension
+            command = "gurobi_cl";
+            command += "Threads=1 ResultFile=" + output_filename;
+            command += " LogFile=\"\" LogToConsole=0 "; // disable logging
+            command += m_file_name;
+        }
     }
     else
-        command += input_filename;
+        command += m_file_name;
     /*pid_t pid (fork());
     if (pid == -1) {
         std::string errmsg (strerror(errno));
@@ -296,20 +303,20 @@ int Leximax_encoder::call_solver()
 
 int Leximax_encoder::write_wcnf_file(int i)
 {
-    m_file_name += "_" + std::to_string(i) + ".opb";
+    m_file_name += "_" + std::to_string(i) + ".wcnf";
     std::ofstream out (m_file_name);
     if (!out) {
-        print_error_msg("Could not open " + file_name + " for writing");
+        print_error_msg("Could not open " + m_file_name + " for writing");
         return -1;
     }
     // prepare input for the solver
     size_t weight = m_soft_clauses.size() + 1;
-    output << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
+    out << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
     // print hard clauses
-    print_clauses(output, m_constraints, weight);
+    print_clauses(out, m_constraints, weight);
     // print soft clauses
-    print_clauses(output, m_soft_clauses, 1);
-    output.close();
+    print_clauses(out, m_soft_clauses, 1);
+    out.close();
     return 0;
 }
 
@@ -318,7 +325,7 @@ int Leximax_encoder::write_opb_file(int i)
     m_file_name += "_" + std::to_string(i) + ".opb";
     std::ofstream out (m_file_name);
     if (!out) {
-        print_error_msg("Could not open " + file_name + " for writing");
+        print_error_msg("Could not open " + m_file_name + " for writing");
         return -1;
     }
     // prepare input for the solver
@@ -329,14 +336,14 @@ int Leximax_encoder::write_opb_file(int i)
         out << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
     if (m_soft_clauses.size() > 0) {// print minimization function
         out << "min:";
-        for (Clause *cl : m_soft_clauses) {
+        for (const Clause *cl : m_soft_clauses) {
             LINT soft_var = -(*(cl->begin())); // cl is unitary clause
             out << " " << "+1" << m_multiplication_string << "x" << soft_var;
         }
         out << ";\n";
     }
     // print all constraints except for cardinality constraint
-    for (Clause *cl : m_constraints) {
+    for (const Clause *cl : m_constraints) {
         print_pb_constraint(cl, out);
     }
     // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
@@ -350,18 +357,17 @@ int Leximax_encoder::write_opb_file(int i)
 
 int Leximax_encoder::write_solver_input(int i)
 {
-    if (m_solver_format == "wcnf")
+    if (m_formalism == "wcnf")
         return write_wcnf_file(i);
-    else if (m_solver_format == "opb")
+    else if (m_formalism == "opb")
         return write_opb_file(i);
-    else if (m_solver_format == "lp") {
+    else if (m_formalism == "lp") {
         if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
             return write_opb_file(i);
         if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
             return write_lp_file(i);
     }
-    else
-        return -1; // wrong m_solver_format - error msg already in set_solver_format
+    return -1; // wrong m_formalism - error msg already in set_formalism
 }
 
 void Leximax_encoder::reset_file_name()
@@ -383,20 +389,21 @@ int Leximax_encoder::external_solve(int i)
     // read output of solver
     if (read_solver_output(m_solution) != 0)
         return -1;
+    m_sat = !(m_solution.empty());
     m_solver_output = false; // I have read solver output
+    if (!m_leave_temporary_files)
+        remove_tmp_files();    // if it fails it does not matter - I will not stop computation just because 
     // set m_file_name back to pid
     reset_file_name();
-    if (!m_leave_temporary_files)
-        remove_tmp_files();    // if it fails does not matter
     return 0;
 }
 
 int Leximax_encoder::write_lp_file(int i)
 {
-    m_file_name += "_" + std::to_string(i) + ".lp");
-    std::ofstream output(file_name); 
+    m_file_name += "_" + std::to_string(i) + ".lp";
+    std::ofstream output(m_file_name); 
     if (!output) {
-        print_error_msg("Could not open " + file_name + " for writing");
+        print_error_msg("Could not open " + m_file_name + " for writing");
         return -1;
     }
     // prepare input for the solver
@@ -405,7 +412,7 @@ int Leximax_encoder::write_lp_file(int i)
     if (m_soft_clauses.size() > 0) {// print minimization function
         size_t nb_vars_in_line (0);
         for (size_t j (0); j < m_soft_clauses.size(); ++j) {
-            Clause *cl (m_soft_clauses[j]);
+            const Clause *cl (m_soft_clauses[j]);
             LINT soft_var = -(*(cl->begin())); // cl is unitary clause
             if (j == 0)
                 output << 'x' << soft_var;
@@ -421,7 +428,7 @@ int Leximax_encoder::write_lp_file(int i)
     }
     output << "Subject To\n";
     // print all constraints except for cardinality constraint
-    for (Clause *cl : m_constraints) {
+    for (const Clause *cl : m_constraints) {
         print_lp_constraint(cl, output);
     }
     // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
@@ -438,10 +445,10 @@ int Leximax_encoder::write_lp_file(int i)
     return 0;
 }
 
-void Leximax_encoder::remove_tmp_files()
+void Leximax_encoder::remove_tmp_files() const
 {
     std::string output_filename (m_file_name);
-    if (m_solver_format == "lp" && m_lp_solver == "gurobi") {
+    if (m_formalism == "lp" && m_lp_solver == "gurobi") {
         output_filename += ".sol";
     }
     else

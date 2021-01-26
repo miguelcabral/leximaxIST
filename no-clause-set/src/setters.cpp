@@ -5,12 +5,12 @@ void Leximax_encoder::set_solver_command(const std::string &command)
     m_solver_command = command;
 }
 
-int Leximax_encoder::set_solver_format(const std::string &format)
+int Leximax_encoder::set_formalism(const std::string &format)
 {
-    m_solver_format = format;
+    m_formalism = format;
     if (format != "wcnf" && format != "opb" && format != "lp") {
-        std::string msg ("The external solver format entered: '" + format + "' is not valid\n");
-        msg += "Valid external solver formats: 'wcnf' 'opb' 'lp'";
+        std::string msg ("The external solver formalism entered: '" + format + "' is not valid\n");
+        msg += "Valid external solver formalisms: 'wcnf' 'opb' 'lp'";
         print_error_msg(msg);
         return -1;
     }

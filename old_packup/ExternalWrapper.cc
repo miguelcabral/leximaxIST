@@ -41,7 +41,6 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,leave_temporary_files(false)
 ,leximax(false)
 ,leximax_enc(nullptr)
-,iterative(true)
 {}
 
 void clause_to_constraint(BasicClause& clause, vector<LINT>& constraint);
@@ -60,8 +59,15 @@ bool ExternalWrapper::solve() {
     min_cost=get_top(); 
     if (leximax)
         return solve_leximax();
-    else 
-        return iterative ? solve_it() : solve_max();
+    else {
+        if (formalism == "opb")
+            return solve_it();
+        if (formalism == "wcnf")
+            return solve_max();
+        // otherwise:
+        std::cerr << "Error: Can not solve lexicographic with formalism '" << formalism << "'. Try 'opb' or 'wcnf'." << std::endl;
+        return false;
+    }
 }
 
 bool ExternalWrapper::solve_it() {
@@ -449,12 +455,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_solver_command(solver_command);
      leximax_enc->set_multiplication_string(multiplication_string);
      leximax_enc->set_leave_temporary_files(leave_temporary_files);
-     if (iterative) {
-         leximax_enc->set_solver_format("opb");
-		 leximax_enc->set_lp_solver("gurobi");
-	 }
-     else
-         leximax_enc->set_solver_format("wcnf");     
+     leximax_enc->set_formalism(formalism);
+     leximax_enc->set_lp_solver(lp_solver);    
      // solve() returns 0 if all went well, and -1 otherwise. 
      if (leximax_enc->solve() == -1) {
          model.clear();

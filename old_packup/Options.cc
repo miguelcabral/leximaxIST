@@ -37,7 +37,8 @@ Options::Options()
 , trendy(0)
 , leave_temporary_files(0)
 , leximax(0)
-, max_solver(0)
+, formalism("wcnf")
+, lp_solver("gurobi")
 {}
 
 bool Options::parse(int argc,char **argv) {
@@ -86,7 +87,7 @@ bool Options::parse(int argc,char **argv) {
                     return_value = false;
                 }
                 break;
-            case 505: lp_solver = optarg;
+            case 506: lp_solver = optarg;
                 if (lp_solver != "gurobi" && lp_solver != "scip" && lp_solver != "cplex" && lp_solver != "cbc") {
                     fprintf(stderr, "Invalid option! Possible lp solvers: 'gurobi', 'scip', 'cplex', 'cbc'.\n");
                     return_value = false;

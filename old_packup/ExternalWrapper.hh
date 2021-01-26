@@ -57,6 +57,8 @@ public:
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
     inline void set_leximax(bool value=true);
+    inline void set_lp_solver (const string &solver_name);
+    inline void set_formalism (const string &format);
     void print_leximax_info();
     Leximax_encoder* get_leximax_enc() {return leximax_enc;}
 
@@ -71,8 +73,7 @@ public:
     virtual void dump(ostream& out);
 
     virtual bool has_solution();
-    void set_iterative(bool iterative) {this->iterative = iterative;}
-    bool is_iterative() const {return iterative;}
+    
 private:
     XLINT                      min_cost;
     XLINT                      solution_value;
@@ -93,7 +94,11 @@ private:
     bool   leave_temporary_files;
     bool   leximax;
     Leximax_encoder *leximax_enc;
-    bool   iterative;
+    string formalism;
+    string lp_solver;
+    
+    
+    // TODO: change some parameters and code: new options : formalism and lp_solver
 
     vector< vector<LINT> > constraints;
     void   split();
@@ -126,5 +131,9 @@ inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
 inline void ExternalWrapper::set_leximax(bool value) {
     leximax = true; }
+inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
+    lp_solver = solver_name; }
+inline void ExternalWrapper::set_formalism (const string &format) {
+    formalism = format; }
 #endif	/* EXTERNALWRAPPER_HH */
 

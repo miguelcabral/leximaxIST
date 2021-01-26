@@ -185,12 +185,13 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_iv(3);
     parser.get_encoder().set_opt_not_removed(true);    
 #ifdef EXTERNAL_SOLVER
-    if (!options.get_external_solver().empty ())       solver.set_solver_command(options.get_external_solver ());
-    if (!options.get_multiplication_string().empty ()) solver.set_multiplication_string(options.get_multiplication_string());
+    if (!options.get_external_solver().empty())        solver.set_solver_command(options.get_external_solver ());
+    if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
     if (options.get_leximax())                         solver.set_leximax();
-    if (options.get_max_solver())                      solver.set_iterative(false);
-    if (!options.get_temporary_directory().empty ()) {
+    if (!options.get_lp_solver().empty())              solver.set_lp_solver(options.get_lp_solver());
+    if (!options.get_formalism().empty())              solver.set_formalism(options.get_formalism());
+    if (!options.get_temporary_directory().empty()) {
         solver.set_temporary_directory(options.get_temporary_directory());
     } else {
         char * pPath;

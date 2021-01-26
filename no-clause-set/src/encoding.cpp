@@ -177,7 +177,7 @@ void Leximax_encoder::encode_relaxation(int i)
             }
         }
         // at most i constraint 
-        if(m_solver_format == "wcnf") {
+        if(m_formalism == "wcnf") {
             if (m_debug)
                 std::cerr << "---------------- At most " << i << " Constraint ----------------\n";
             at_most(relax_vars, i);
@@ -229,7 +229,7 @@ void Leximax_encoder::encode_relaxation(int i)
             }
             ++k;
         }
-        if(m_solver_format == "wcnf") { // when solving with pbo or lp, this constraint is written before calling the solver
+        if(m_formalism == "wcnf") { // when solving with pbo or lp, this constraint is written before calling the solver
             // at most 1 constraint
             if (m_debug)
                 std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
@@ -341,9 +341,8 @@ int Leximax_encoder::solve()
     // if there is only one objective function then it is a simple single objective problem
     if (m_num_objectives == 1) {
         generate_soft_clauses(0);
-        // call solver 
+        // call solver and read output 
         int retv = external_solve(0);
-        // read model returned by the solver
         m_sat = !(m_solution.empty());
         return retv;
     }
@@ -363,12 +362,9 @@ int Leximax_encoder::solve()
         // call solver
         if (external_solve(i) == -1)
             return -1;
-        // check if unsat and set m_sat
-        if (m_solution.empty()){
-            m_sat = false;
+        // if unsat end computation
+        if (!m_sat)
             return 0;
-        }
-        m_sat = true;
         // fix value of current maximum; in the end of last iteration there is no need for this
         if (i != m_num_objectives - 1) {
             for (Clause *cl : m_soft_clauses) {
