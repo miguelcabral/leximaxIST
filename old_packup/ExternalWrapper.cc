@@ -419,10 +419,10 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
  
  bool ExternalWrapper::solve_leximax() {
      // create constraints and objective functions as vectors of vectors...
-     std::vector<std::vector<LINT>> input_constraints(hard_clauses.size());
+     std::vector<std::vector<long long>> input_constraints(hard_clauses.size());
      size_t j(0);
      for (BasicClause *clause : hard_clauses) {
-         std::vector<LINT> &con(input_constraints[j]);
+         std::vector<long long> &con(input_constraints[j]);
          con.resize(clause->size());
          size_t k(0);
          for (LINT lit : *clause) {
@@ -431,14 +431,14 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          }
          ++j;
      }
-     std::vector<std::vector<std::vector<LINT>>> obj_functions(clause_split.size());
+     std::vector<std::vector<std::vector<long long>>> obj_functions(clause_split.size());
      j = 0;
      for (BasicClauseVector &soft_cls: clause_split) {
-         std::vector<std::vector<LINT>> &obj = obj_functions[j];
+         std::vector<std::vector<long long>> &obj = obj_functions[j];
          obj.resize(soft_cls.size());
          size_t k(0);
          for (BasicClause *clause : soft_cls) {
-            std::vector<LINT> &literals(obj[k]);
+            std::vector<long long> &literals(obj[k]);
             literals.resize(clause->size());
             size_t i(0);
             for (LINT lit : *clause) {
@@ -450,7 +450,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     leximax_enc = new Leximax_encoder(input_constraints, obj_functions);
+     leximax_enc = new leximaxIST::Encoder(input_constraints, obj_functions);
      // set external solver and parameters of Leximax_encoder
      leximax_enc->set_solver_command(solver_command);
      leximax_enc->set_multiplication_string(multiplication_string);
@@ -462,7 +462,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          model.clear();
          return false;
      }
-     model = leximax_enc->get_solution();
+     std::vector<long long> sol (leximax_enc->get_solution());
+     model.assign(sol.begin(), sol.end());
      print_leximax_info();
      // return satisfiable or not?
      return leximax_enc->get_sat();

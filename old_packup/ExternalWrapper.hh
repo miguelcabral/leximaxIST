@@ -29,7 +29,7 @@
 #include "id_manager.hh"
 #include "basic_clset.hh"
 #include "SolverWrapperBase.hh"
-#include <Leximax_encoder.h>
+#include <leximaxIST_Encoder.h>
 
 class ExternalWrapper : public SolverWrapperBase<BasicClause*> {
 public:
@@ -60,7 +60,7 @@ public:
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
     void print_leximax_info();
-    Leximax_encoder* get_leximax_enc() {return leximax_enc;}
+    leximaxIST::Encoder* get_leximax_enc() {return leximax_enc;}
 
     void _output_clause (/*const*/ LiteralVector& literals);
     void _output_unary_clause(LINT l);
@@ -93,7 +93,7 @@ private:
     string temporary_directory;
     bool   leave_temporary_files;
     bool   leximax;
-    Leximax_encoder *leximax_enc;
+    leximaxIST::Encoder *leximax_enc;
     string formalism;
     string lp_solver;
     

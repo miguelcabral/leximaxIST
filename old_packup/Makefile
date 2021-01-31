@@ -29,7 +29,7 @@ LIBS +=-lz
 LEXIMAXDIR = ~/thesis/no-clause-set
 INCD += $(LEXIMAXDIR)/include
 LIBD += $(LEXIMAXDIR)/lib
-LIBS += -lleximax
+LIBS += -lleximaxIST
 
 # comment out if arbitrary precision not needed
 # LIBS+=-lgmpxx -lgmp

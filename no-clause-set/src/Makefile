@@ -6,6 +6,7 @@ OBJS1 = $(SRCS1:.cc=.o)
 OBJS2 = $(SRCS2:.cpp=.o)
 OBJS := $(OBJS1)
 OBJS += $(OBJS2)
+LIBNAME = libleximaxIST.a
 
 ifdef PROF
 	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
@@ -15,15 +16,15 @@ endif
 
 release : CFLAGS += -O3 -w
 release : SEDSTR=s/m_debug(true)/m_debug(false)/g
-release : libleximax.a
+release : $(LIBNAME)
 
 debug : CFLAGS += -g -Wall -Wextra -pedantic
 debug : SEDSTR=s/m_debug(false)/m_debug(true)/g
-debug : libleximax.a
+debug : $(LIBNAME)
 
-libleximax.a : $(OBJS)
-	@echo "Archiving: libleximax.a"
-	@ar -rcs ../lib/libleximax.a $(OBJS)
+$(LIBNAME) : $(OBJS)
+	@echo "Archiving: $(LIBNAME)"
+	@ar -rcs ../lib/$(LIBNAME) $(OBJS)
 	@rm -f *.o
 
 $(OBJS1) : %.o: %.cc
@@ -36,7 +37,7 @@ $(OBJS2) : %.o: %.cpp
 	@g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
-	@rm -f ../lib/libleximax.a *.o
-	@echo "Removing: libleximax.a $(OBJS)"
+	@rm -f ../lib/$(LIBNAME) *.o
+	@echo "Removing: $(LIBNAME) $(OBJS)"
 	
 

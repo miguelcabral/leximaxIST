@@ -25,7 +25,7 @@
 #include "SolutionReader.hh"
 #include "SolverWrapperTypes.hh"
 #include "Options.hh"
-#include <Leximax_encoder.h>
+#include <leximaxIST_Encoder.h>
 using std::ifstream;
 
 static const char* dist_date = ""DISTDATE"";
@@ -60,7 +60,7 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
 #ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n'; 
-  Leximax_encoder *leximax_enc (solver.get_leximax_enc());
+  leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
   if (leximax_enc != nullptr) {
       leximax_enc->terminate(signum);
       solver.set_model(leximax_enc->get_solution());
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     print_header();
     
     /* set up signals */
-/*#ifdef EXTERNAL_SOLVER
+#ifdef EXTERNAL_SOLVER
 // Miguel: in this case nothing is done
     // assuming external solver received as well
     struct sigaction new_act1;
@@ -132,14 +132,14 @@ int main(int argc, char** argv) {
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
     sigaction(SIGUSR2, &new_act3, 0);
-#else*/
+#else
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
     signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
     //signal(SIGALRM,SIG_handler);
     //alarm(290);  // Specify alarm interrupt given timeout
-//#endif
+#endif
 
     /* parse options */
     Options options;

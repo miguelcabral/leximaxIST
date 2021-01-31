@@ -17,7 +17,7 @@
 //jpms:bc
 /*----------------------------------------------------------------------------*\
  * File:        basic_types.h
- *	--> Edit: Miguel Cabral 2020 - File: leximax_types.h
+ *	--> Edit: Miguel Cabral 2020 - File: leximaxIST_types.h
  * Description: Basic types used by BOLT.
  *	--> Edit: Miguel Cabral 2020 - Descr.: integer types, sorting network
  *	and clauses used in leximax library.
@@ -29,41 +29,44 @@
 \*----------------------------------------------------------------------------*/
 //jpms:ec
 
-#ifndef LEXIMAX_TYPES
-#define LEXIMAX_TYPES
-
+#ifndef LEXIMAXIST_TYPES
+#define LEXIMAXIST_TYPES
+#include <vector>
+#include <utility>
 
 /*----------------------------------------------------------------------------*\
  * Values besides 0 and 1
 \*----------------------------------------------------------------------------*/
 
-#ifdef __LP64__
-typedef unsigned long long int ULINT;
-typedef long long int LINT;
-#define MAXLINT LLONG_MAX;
-#define MINLINT LLONG_MIN;
-#define MAXULINT ULLONG_MAX;
-#else
-typedef unsigned long int ULINT;
-typedef long int LINT;
-#define MAXLINT LONG_MAX;
-#define MINLINT LONG_MIN;
-#define MAXULINT ULONG_MAX;
-#endif
+namespace leximaxIST {
+/*
+    #ifdef __LP64__
+    typedef unsigned long long int ULINT;
+    typedef long long int LINT;
+    #define MAXLINT LLONG_MAX;
+    #define MINLINT LLONG_MIN;
+    #define MAXULINT ULLONG_MAX;
+    #else
+    typedef unsigned long int ULINT;
+    typedef long int LINT;
+    #define MAXLINT LONG_MAX;
+    #define MINLINT LONG_MIN;
+    #define MAXULINT ULONG_MAX;
+    #endif
 
-#ifdef GMPDEF
-#include <gmpxx.h>
-typedef mpz_class XLINT;
-#define ToLint(x) x.get_si()
-#else
-typedef LINT XLINT;
-#define ToLint(x) (LINT)x
-#endif
-
-// sorting network and clauses:
-typedef std::vector<std::pair<LINT, LINT>*> SNET;
-typedef std::vector<LINT> Clause;
-
-#endif /* LEXIMAX_TYPES */
+    #ifdef GMPDEF
+    #include <gmpxx.h>
+    typedef mpz_class XLINT;
+    #define ToLint(x) x.get_si()
+    #else
+    typedef LINT XLINT;
+    #define ToLint(x) (LINT)x
+    #endif
+*/
+    // sorting network and clauses:
+    typedef std::vector<std::pair<long long, long long>*> SNET;
+    typedef std::vector<long long> Clause;
+}
+#endif /* LEXIMAXIST_TYPES */
 
 /*----------------------------------------------------------------------------*/
