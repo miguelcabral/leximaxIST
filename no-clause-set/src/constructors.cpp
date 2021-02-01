@@ -5,13 +5,13 @@
 
 namespace leximaxIST {
 
-    void Encoder::add_hard_clause(const std::vector<long long> &lits)
+    void Encoder::add_hard_clause(const Clause &lits)
     {
         Clause *cl (new Clause(lits));
         m_constraints.push_back(cl);
     }
 
-    void Encoder::add_soft_clause(const std::vector<long long> &lits)
+    void Encoder::add_soft_clause(const Clause &lits)
     {
         Clause *cl (new Clause(lits));
         m_soft_clauses.push_back(cl);
@@ -47,6 +47,7 @@ namespace leximaxIST {
         m_timeout(3000.0), // 3 seconds
         m_leave_temporary_files(false),
         m_sat(false),
+        m_algorithm(0), // default: original algorithm
         m_multiplication_string(" "),
         m_solution(),
         m_sorting_net_size(0)

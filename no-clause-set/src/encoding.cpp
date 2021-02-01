@@ -337,8 +337,47 @@ namespace leximaxIST {
         }
     }
 
+    // TODO: Maybe add constraints to sorted_relax_vecs and soft variables
+    void Encoder::encode_upper_bound(int i)
+    {
+        // iter 0: just sat call -> only sorted vec
+        // iter 1: smaller maximum -> sorted vec and now upper bound on 2nd max: ys and s's
+        // iter 2: smaller 2nd maximum -> upper bound on 3rd max: ys and s's
+        // ...
+        // last iter: nothing to do I think, don't call
+        // TODO: I need to store the previous max somewhere -> member variable?
+        std::vector<long long> obj_vec (get_objective_vector());
+        if (obj_vec.empty())
+            return;
+        long long max (obj_vec[0]);
+        for (long long obj_val : obj_vec) {
+            if (obj_val > max)
+                max = obj_val;
+        }
+        if (m_debug) {
+            std::cerr << "------------- Upper bound encoding -------------" << std::endl;
+            std::cerr << "max = " << max << std::endl;
+        }
+        // encode sorted vecs equal to zero
+        for (std::vector<long long> *sorted_vec : m_sorted_vecs) {
+            std::cerr << "Sorted Vec: " << std::endl;
+            for (size_t j (0); j + max < sorted_vec->size(); ++j) {
+                Clause cl;
+                cl.push_back(-(sorted_vec->at(j))); // neg sorted vec
+                if (m_debug) {
+                    std::cerr << -(sorted_vec->at(j)) << std::endl;
+                }
+                add_hard_clause(cl);
+            }
+        }
+    }
+    
     int Encoder::solve()
     {
+        if (m_num_objectives == 0) {
+            print_error_msg("No objective function");
+            return -1;
+        }
         std::vector<std::vector<long long>> true_ys; // for debugging
         std::vector<long long> y_vector; // for debugging
         // if there is only one objective function then it is a simple single objective problem
@@ -348,6 +387,12 @@ namespace leximaxIST {
             int retv = external_solve(0);
             m_sat = !(m_solution.empty());
             return retv;
+        }
+        if (m_algorithm == 1) { // call sat solver first to get upper bound of optimum
+            if (sat_solve() != 0)
+                return -1;    
+            if (!m_sat)
+                return 0;
         }
         // encode sorted vectors with sorting network
         encode_sorted();
@@ -362,6 +407,9 @@ namespace leximaxIST {
             // encode the componentwise OR between sorted_relax vectors except in the last iteration
             if (i != m_num_objectives - 1)
                 componentwise_OR(i);
+            // encode upper bound obtained from sat solver call
+            if (m_algorithm == 1 && i <= 1) // if i = 0 -> maximum found in sat call; if i = 1 -> maximum found in first iteration
+                encode_upper_bound();
             // call solver
             if (external_solve(i) == -1)
                 return -1;
@@ -387,6 +435,8 @@ namespace leximaxIST {
                 true_ys.push_back(current_true_ys);
             }
         }
+        // solving ends here
+        // the rest of the code of this function is just debugging
         if (m_debug) {
             if (!m_solution.empty()){
                 // compare y_vector with objective vector and print true sorted vector variables

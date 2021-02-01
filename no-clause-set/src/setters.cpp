@@ -3,6 +3,16 @@
 
 namespace leximaxIST {
 
+    int Encoder::set_algorithm(int val)
+    {
+        if (val < 0 || val > 1) {
+            print_error_msg("Invalid value '" + val + "' for algorithm parameter");
+            return -1;
+        }
+        m_algorithm = val;
+        return 0;
+    }
+    
     void Encoder::set_solver_command(const std::string &command)
     {
         m_solver_command = command;

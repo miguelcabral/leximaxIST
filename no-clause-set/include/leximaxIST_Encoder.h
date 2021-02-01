@@ -36,6 +36,7 @@ namespace leximaxIST
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_temporary_files;
         bool m_sat;
+        int m_algorithm; // different values lead to different adjustments to the original algorithm
         std::string m_multiplication_string;
         std::vector<long long> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
@@ -70,6 +71,8 @@ namespace leximaxIST
         
         // empty if unsat
         std::vector<long long> get_objective_vector() const;
+        
+        int set_algorithm(int val);
         
         void set_solver_command(const std::string &command);
         
