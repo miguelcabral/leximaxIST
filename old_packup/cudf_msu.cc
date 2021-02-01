@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
     
     /* set up signals */
 #ifdef EXTERNAL_SOLVER
-// Miguel: in this case nothing is done
+// Miguel: in this case nothing is done TODO
     // assuming external solver received as well
     struct sigaction new_act1;
     new_act1.sa_handler = SIG_IGN;
