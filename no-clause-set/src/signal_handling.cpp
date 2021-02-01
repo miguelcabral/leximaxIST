@@ -14,9 +14,19 @@ namespace leximaxIST {
     bool descending_order (long long i, long long j) { return i > j; }
 
     // send signal signum to external solver if it is running, and get best solution
-    int Encoder::terminate(int signum)
+    int Encoder::terminate()
     {
-        // TODO
+        // TODO MAYBE CHANGE THIS: set m_child_pid = 0 in the beggining of solving and in constructor
+        // each time fork() is run you update m_child_pid. What can occur: m_child_pid may be from previous iteration
+        // in this case waitpid will fail and say: no child pid. If it fails just return
+        // Or: m_child_pid = 0. In this case I know I have not called fork() -> just return
+        // Otherwise: m_child_pid has not been waited for -> call waitpid. If it does not fail, the external solver is running.
+        // In that case, send the signal SIGTERM
+        // In https://www.gnu.org/software/libc/manual/html_node/Signals-in-Handler.html it is explained that:
+        // I can send signals to child process because handlers block signals. Hence,
+        // Send SIGTERM to child process and wait until timeout.
+        // WARNING: if timeout is reached then parent does not wait for child process and it becomes a zombie
+        // In this case, return the m_child_pid so that the caller can clean up the zombie process in the future by calling waitpid
         if (m_child_pid == 0) { // external solver is not running
             // check if there is output file to be read 
             // (this happens if signal is caught after external solver has finished
@@ -38,7 +48,9 @@ namespace leximaxIST {
         else {
             // if external solver is running then:
             // send signal to external solver with kill function
-            if (kill(m_child_pid, signum) != 0) {
+            // I think it might be unlikely, but it could happen: child has finished and I do not know it
+            // in that case, kill() will fail because child does not exist any more
+            if (kill(m_child_pid, SIGTERM) != 0) {
                 std::string errno_str (strerror(errno));
                 std::string errmsg ("In Encoder::terminate: when calling");
                 errmsg += " kill() to send a signal to the external solver (pid ";

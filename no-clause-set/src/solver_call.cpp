@@ -234,7 +234,7 @@ namespace leximaxIST {
         }
         else
             command += m_file_name;
-       /* pid_t pid (fork());
+       /* pid_t pid (fork()); // TODO: maybe change this part to m_child_pid
         if (pid == -1) {
             std::string errmsg (strerror(errno));
             print_error_msg("Can't fork process: " + errmsg);
