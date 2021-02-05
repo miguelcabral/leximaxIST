@@ -54,8 +54,8 @@ namespace leximaxIST {
         //std::cerr << "Inserting comparator between wires " << el1 << " and " << el2 << std::endl;
         m_sorting_net_size++;
         // if the entry is empty, then it is the first comparator for that wire
-        long long var_in1 = (sorting_network[el1] == nullptr) ? objective->at(el1) : sorting_network[el1]->second;
-        long long var_in2 = (sorting_network[el2] == nullptr) ? objective->at(el2) : sorting_network[el2]->second;
+        long long var_in1 = (sorting_network[el1].first == -1) ? objective->at(el1) : sorting_network[el1].second;
+        long long var_in2 = (sorting_network[el2].first == -1) ? objective->at(el2) : sorting_network[el2].second;
         long long var_out_min = m_id_count + 1;
         m_id_count++;
         long long var_out_max = m_id_count + 1;
@@ -63,21 +63,17 @@ namespace leximaxIST {
         // encode outputs, if el1 > el2 then el1 is the largest, that is, the or. Otherwise, el1 is the smallest, i.e. the and.
         encode_max(var_out_max, var_in1, var_in2);
         encode_min(var_out_min, var_in1, var_in2);
-        std::pair<long long,long long> *comp1;
-        std::pair<long long,long long> *comp2;
+        std::pair<long long,long long> comp1 (el2, 0);
+        std::pair<long long,long long> comp2 (el1, 0);
         if(el1 > el2)
-            comp1 = new std::pair<long long,long long>(el2, var_out_max);
+            comp1.second = var_out_max;
         else
-            comp1 = new std::pair<long long,long long>(el2, var_out_min);
-        // free memory occupied by previous comparator
-        delete sorting_network[el1];
+            comp1.second = var_out_min;
         sorting_network[el1] = comp1;
         if(el2 > el1)
-            comp2 = new std::pair<long long,long long>(el1, var_out_max);
+            comp2.second = var_out_max;
         else
-            comp2 = new std::pair<long long,long long>(el1, var_out_min);
-        // free memory occupied by previous comparator
-        delete sorting_network[el2];
+            comp2.second = var_out_min;
         sorting_network[el2] = comp2;
     }
 
@@ -170,13 +166,6 @@ namespace leximaxIST {
             std::pair<std::pair<long long,long long>,long long> seq2(split2,1);
             odd_even_merge(seq1, seq2, objective, sorting_network);
         }
-    }
-
-    void Encoder::delete_snet(SNET &sorting_network)
-    {
-        // free memory allocated for the comparators
-        for (std::pair<long long, long long> *comp : sorting_network)
-            delete comp;
     }
     
 }/* namespace leximaxIST */

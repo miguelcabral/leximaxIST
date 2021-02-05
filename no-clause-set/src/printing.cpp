@@ -37,7 +37,7 @@ namespace leximaxIST {
         output << "0\n";
     }
 
-    void Encoder::print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const
+    void Encoder::print_wcnf_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const
     {
         for (Clause * const cl : clauses) {
             output << weight << " ";

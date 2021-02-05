@@ -12,6 +12,7 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
+#include <cctype>
 
 namespace leximaxIST {
 
@@ -48,6 +49,7 @@ namespace leximaxIST {
             }
         }
         if (!sat) model.clear();
+        gzclose(of);
         return 0;
     }
 
@@ -114,45 +116,52 @@ namespace leximaxIST {
                 }
             }
         }
-        if (!sat) model.clear();   
+        if (!sat) model.clear();
+        gzclose(of);
         return 0;
     }
 
+    // if model.empty() in the end then unsat, else sat
+    int Encoder::read_sat_output(std::vector<long long> &model)
+    {
+        std::string output_filename (m_file_name + ".out");
+        gzFile of = gzopen(output_filename.c_str(), "rb");
+        if (of == Z_NULL) {
+            print_error_msg("Can't open file '" + output_filename + "' for reading");
+            return -1;
+        }
+        StreamBuffer r(of);
+        bool sat = false;
+        model.resize(static_cast<size_t>(m_id_count + 1), 0);
+        while (*r != EOF) {
+            if (*r != 'v') {// ignore all the other lines
+                skipLine(r);
+            } else {
+                sat=true;
+                ++r; // skip 'v'
+                while ( (*r != '\n')  && (*r != EOF)  && (*r != '\r') ) {
+                    skipTrueWhitespace(r);
+                    const bool sign = (*r) != '-';
+                    if ((*r == '+') || (*r == '-')) ++r;
+                    if ((*r == 'x')) ++r;
+                    if (*r < '0' || *r > '9') break;
+                    const long long l = parseInt(r);
+                    assert(model.size()>(size_t)l);
+                    model[l] = (sign ? l : -l);
+                }
+                assert (*r=='\n');
+                ++r; // skip '\n'
+            }
+        }
+        if (!sat) model.clear();
+        gzclose(of);
+        return 0;
+    }
+    
     int Encoder::read_solver_output(std::vector<long long> &model)
     {
-        if (m_formalism == "wcnf" || m_formalism == "opb") {
-            std::string output_filename (m_file_name + ".out");
-            gzFile of = gzopen(output_filename.c_str(), "rb");
-            if (of == Z_NULL) {
-                print_error_msg("Can't open file '" + output_filename + "' for reading");
-                return -1;
-            }
-            StreamBuffer r(of);
-            bool sat = false;
-            model.resize(static_cast<size_t>(m_id_count + 1), 0);
-            while (*r != EOF) {
-                if (*r != 'v') {// ignore all the other lines
-                    skipLine(r);
-                } else {
-                    sat=true;
-                    ++r; // skip 'v'
-                    while ( (*r != '\n')  && (*r != EOF)  && (*r != '\r') ) {
-                        skipTrueWhitespace(r);
-                        const bool sign = (*r) != '-';
-                        if ((*r == '+') || (*r == '-')) ++r;
-                        if ((*r == 'x')) ++r;
-                        if (*r < '0' || *r > '9') break;
-                        const long long l = parseInt(r);
-                        assert(model.size()>(size_t)l);
-                        model[l] = (sign ? l : -l);
-                    }
-                    assert (*r=='\n');
-                    ++r; // skip '\n'
-                }
-            }
-            if (!sat) model.clear();
-            return 0;
-        }
+        if (m_formalism == "wcnf" || m_formalism == "opb")
+            return read_sat_output(model);
         else if (m_formalism == "lp") {
             if (m_lp_solver == "cplex")
                 return read_cplex_output(model);
@@ -170,7 +179,7 @@ namespace leximaxIST {
         return -1; // wrong formalism 
     }
 
-    int Encoder::split_solver_command(const std::string &command, std::vector<std::string> &command_split)
+    int Encoder::split_command(const std::string &command, std::vector<std::string> &command_split)
     {
         size_t pos (0);
         while (pos < command.length()) {
@@ -212,12 +221,30 @@ namespace leximaxIST {
         return 0;
     }
 
-    int Encoder::call_solver()
+    int Encoder::call_solver(const std::string &solver_type)
     {
         std::string output_filename = m_file_name + ".out";
         const std::string error_filename = m_file_name + ".err";
-        std::string command (m_solver_command + " ");
-        if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
+        std::string command;
+        if (solver_type == "optimisation") {
+            if (m_opt_solver_cmd.empty()) {
+                print_error_msg("Empty optimisation solver command");
+                return -1;
+            }
+            command = m_opt_solver_cmd + " ";
+        }
+        else if (solver_type == "decision") {
+            if (m_sat_solver_cmd.empty()) {
+                print_error_msg("Empty SAT solver command");
+                return -1;
+            }
+            command = m_sat_solver_cmd + " ";
+        }
+        else {
+            print_error_msg("In Encoder::call_solver(), wrong solver_type");
+            return -1;
+        }
+        if (m_formalism == "lp" && solver_type == "optimisation") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
             if (m_lp_solver == "cplex")
                 command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
             if (m_lp_solver == "cbc")
@@ -276,7 +303,7 @@ namespace leximaxIST {
             }
             // convert command to vector of strings (split by whitespace)
             std::vector<std::string> command_split;
-            if (split_solver_command(command, command_split) == -1)
+            if (split_command(command, command_split) == -1)
                 exit(-1);
             /*command_split.clear();
             command_split.push_back("grep");
@@ -330,6 +357,23 @@ namespace leximaxIST {
         return 0;
     }
 
+    int Encoder::write_cnf_file(int i)
+    {
+        m_file_name += "_" + std::to_string(i) + ".cnf";
+        std::ofstream out (m_file_name);
+        if (!out) {
+            print_error_msg("Can't open " + m_file_name + " for writing");
+            return -1;
+        }
+        // print header
+        out << "p cnf " << m_id_count << " " << m_constraints.size() << '\n';
+        // print clauses
+        for (const Clause *clause : m_constraints)
+            print_clause(out, clause);
+        out.close();
+        return 0;
+    }
+    
     int Encoder::write_wcnf_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".wcnf";
@@ -342,9 +386,9 @@ namespace leximaxIST {
         size_t weight = m_soft_clauses.size() + 1;
         out << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
         // print hard clauses
-        print_clauses(out, m_constraints, weight);
+        print_wcnf_clauses(out, m_constraints, weight);
         // print soft clauses
-        print_clauses(out, m_soft_clauses, 1);
+        print_wcnf_clauses(out, m_soft_clauses, 1);
         out.close();
         return 0;
     }
@@ -399,22 +443,14 @@ namespace leximaxIST {
         return -1; // wrong m_formalism - error msg already in set_formalism
     }
 
-    void Encoder::reset_file_name()
-    {
-        // right now m_file_name looks like this: pid_i.wcnf
-        while (m_file_name.back() != '_')
-            m_file_name.pop_back();
-        m_file_name.pop_back(); // remove '_'
-    }
-
     int Encoder::external_solve(int i)
     {
         if (write_solver_input(i) != 0)
             return -1;
         // call the solver
-        if (call_solver() != 0) {
+        if (call_solver("optimisation") != 0) {
             if (!m_leave_temporary_files)
-                remove_all_tmp_files();
+                remove_tmp_files();
             return -1;
         }
         m_solver_output = true; // there is solver output to read
@@ -422,14 +458,14 @@ namespace leximaxIST {
         std::vector<long long> model;
         if (read_solver_output(model) != 0) {
             if (!m_leave_temporary_files)
-                remove_all_tmp_files();
+                remove_tmp_files();
             return -1;
         }
         m_solution = model;
         m_sat = !(m_solution.empty());
         m_solver_output = false; // I have read solver output
         if (!m_leave_temporary_files)
-            remove_all_tmp_files();
+            remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
         return 0;
@@ -481,14 +517,8 @@ namespace leximaxIST {
         output.close();
         return 0;
     }
-
-    void Encoder::remove_tmp_file(const std::string &filename) const
-    {
-        if (remove(filename.c_str()) != 0)
-            print_error_msg("Can't remove temporary file: '" + filename + "'");
-    }
     
-    void Encoder::remove_all_tmp_files() const
+    void Encoder::remove_tmp_files() const
     {
         std::string output_filename (m_file_name);
         if (m_formalism == "lp" && m_lp_solver == "gurobi") {
@@ -497,9 +527,52 @@ namespace leximaxIST {
         else
             output_filename += ".out";
         std::string error_filename (m_file_name + ".err");
-        remove_tmp_file(m_file_name);
-        remove_tmp_file(output_filename);
-        remove_tmp_file(error_filename);
+        remove(m_file_name.c_str());
+        remove(output_filename.c_str());
+        remove(error_filename.c_str());
+    }
+    
+    int Encoder::sat_solve()
+    {
+        if (write_cnf_file(0) != 0)
+            return -1;
+        // call the solver
+        if (call_solver("decision") != 0) {
+            if (!m_leave_temporary_files)
+                remove_tmp_files();
+            return -1;
+        }
+        m_solver_output = true; // there is solver output to read
+        // read output of solver
+        std::vector<long long> model;
+        if (read_sat_output(model) != 0) {
+            if (!m_leave_temporary_files)
+                remove_tmp_files();
+            return -1;
+        }
+        m_solution = model;
+        m_sat = !(m_solution.empty());
+        m_solver_output = false; // I have read solver output
+        if (!m_leave_temporary_files)
+            remove_tmp_files();
+        // set m_file_name back to pid
+        reset_file_name();
+        return 0;
     }
 
+    int Encoder::calculate_upper_bound()
+    {
+        if (m_ub_encoding == 1) { // call sat solver once
+            return sat_solve();
+        }
+        else if (m_ub_encoding == 2) { // calculate an MSS of the problem with sum of obj funcs 
+            // TODO return clause_d_solve();
+        }
+        else if (m_ub_encoding == 3) { // get optimal solution of problem with sum of obj funcs 
+            // TODO add negate all objective variables to form soft clauses and call external_solve(0)
+            // be careful that external_solve may add cardinality constraints in non-zero iterations
+        }
+        return 0;
+    }
+    
 } /* namespace leximaxIST */

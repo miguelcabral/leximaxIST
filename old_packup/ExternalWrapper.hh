@@ -34,7 +34,7 @@
 class ExternalWrapper : public SolverWrapperBase<BasicClause*> {
 public:
     explicit ExternalWrapper(IDManager& id_manager);
-    ~ExternalWrapper() {};
+    ~ExternalWrapper();
 
     virtual void  init();
     virtual XLINT get_top();
@@ -43,7 +43,9 @@ public:
     bool solve_leximax();
 
     virtual IntVector& get_model()          { return model; }
-    virtual void set_model(const IntVector &my_model) { model = my_model; }
+    virtual void set_leximax_model(const std::vector<long long> &lib_model) {
+        model.assign(lib_model.begin(), lib_model.end()); // this allows type conversion (if LINT is not long long)
+    }
     
     virtual XLINT      get_min_unsat_cost() {return min_cost;}
 
@@ -52,13 +54,15 @@ public:
         return r.second;
     }
 
-    inline void set_solver_command(const string& solver_command);
+    inline void set_sat_solver_cmd(const string& sat_solver_cmd);
+    inline void set_opt_solver_cmd(const string& opt_solver_cmd);
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
     inline void set_leximax(bool value=true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
+    inline void set_ub_encoding (int val);
     void print_leximax_info();
     leximaxIST::Encoder* get_leximax_enc() {return leximax_enc;}
 
@@ -88,7 +92,9 @@ private:
     vector<XLINT>  sorted_weights;
     int    call_counter;
     time_t stamp;
-    string solver_command;
+    string opt_solver_cmd;
+    string sat_solver_cmd;
+    int    ub_encoding;
     string multiplication_string;
     string temporary_directory;
     bool   leave_temporary_files;
@@ -97,8 +103,6 @@ private:
     string formalism;
     string lp_solver;
     
-    
-    // TODO: change some parameters and code: new options : formalism and lp_solver
 
     vector< vector<LINT> > constraints;
     void   split();
@@ -121,8 +125,8 @@ private:
     void print_clause(XLINT weight, ostream& out, BasicClause& clause);
 };
 
-inline void ExternalWrapper::set_solver_command(const string& _solver_command) {
-  solver_command =_solver_command; }
+inline void ExternalWrapper::set_opt_solver_cmd(const string& _opt_solver_cmd) {
+  opt_solver_cmd =_opt_solver_cmd; }
 inline void ExternalWrapper::set_multiplication_string(const string& _multiplication_string) {
   multiplication_string =_multiplication_string; }
 inline void ExternalWrapper::set_temporary_directory(const string& value) {
@@ -135,5 +139,7 @@ inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {
     formalism = format; }
+inline void ExternalWrapper::set_ub_encoding (int val) {
+    ub_encoding = val;}
 #endif	/* EXTERNALWRAPPER_HH */
 

@@ -15,7 +15,7 @@ namespace leximaxIST {
 
     // send signal signum to external solver if it is running, and get best solution
     int Encoder::terminate()
-    {
+    { // TODO: in the end also do clean up: free dynamically allocated memory
         // TODO MAYBE CHANGE THIS: set m_child_pid = 0 in the beggining of solving and in constructor
         // each time fork() is run you update m_child_pid. What can occur: m_child_pid may be from previous iteration
         // in this case waitpid will fail and say: no child pid. If it fails just return
@@ -35,14 +35,14 @@ namespace leximaxIST {
                 std::vector<long long> model;
                 if (read_solver_output(model) != 0) {
                     if (!m_leave_temporary_files)
-                        remove_all_tmp_files();
+                        remove_tmp_files();
                     return -1;
                 }
                 m_solution = model;
                 m_sat = !(m_solution.empty());
             }
             if (!m_leave_temporary_files)
-                remove_all_tmp_files();
+                remove_tmp_files();
             return 0;
         }
         else {
@@ -57,7 +57,7 @@ namespace leximaxIST {
                 errmsg += m_child_pid + "): '" + errno_str + "'";
                 print_error_msg(errmsg);
                 if (!m_leave_temporary_files)
-                    remove_all_tmp_files(); 
+                    remove_tmp_files(); 
                 return -1;
             }
             double accumulated_time (0.0);
@@ -72,7 +72,7 @@ namespace leximaxIST {
                     std::string errmsg (strerror(errno));
                     print_error_msg("Error waiting for child process: " + errmsg);
                     if (!m_leave_temporary_files)
-                        remove_all_tmp_files();
+                        remove_tmp_files();
                     return -1;
                 }
                 else if (retv == m_child_pid) {
@@ -81,7 +81,7 @@ namespace leximaxIST {
                     std::vector<long long> new_sol;
                     if (read_solver_output(new_sol) != 0) {
                         if (!m_leave_temporary_files)
-                            remove_all_tmp_files();
+                            remove_tmp_files();
                         return -1;
                     }
                     m_sat = !(new_sol.empty());
@@ -105,13 +105,13 @@ namespace leximaxIST {
                         }
                     }
                     if (!m_leave_temporary_files)
-                        remove_all_tmp_files(); 
+                        remove_tmp_files(); 
                     return 0;
                 }
             }
             // timeout has been reached, clean up and return
             if (!m_leave_temporary_files)
-                remove_all_tmp_files(); 
+                remove_tmp_files(); 
         }
         return 0;
     }

@@ -13,11 +13,13 @@ namespace leximaxIST {
 
     void Encoder::clear_sorted_relax()
     {
-        // in first iteration (of the algorithm) nullptr is ignored by delete
-        for (size_t i (0); i < m_sorted_relax_vecs.size(); ++i) {
-            delete m_sorted_relax_vecs[i];
-            m_sorted_relax_vecs[i] = nullptr;
+        for (std::vector<std::vector<long long>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+            for (size_t i (0); i < sorted_relax_vecs.size(); ++i) {
+                delete sorted_relax_vecs[i];
+                sorted_relax_vecs[i] = nullptr;
+            }
         }
+        m_sorted_relax_collection.clear();
     }
 
     // free clauses in m_constraints and clear vector
@@ -28,19 +30,38 @@ namespace leximaxIST {
         m_constraints.clear();
     }
 
-    // remove temporary files and free memory
-    Encoder::~Encoder()
+    // frees memory, and sets parameters to their default initial value
+    void Encoder::clear()
     {
         // free m_objectives
         for (std::vector<long long> *objective : m_objectives)
             delete objective;
+        m_objectives.clear();
         // free m_sorted_vecs
         for (std::vector<long long> *sorted_vec : m_sorted_vecs)
             delete sorted_vec;
-        // free m_sorted_relax_vecs
+        m_sorted_vecs.clear();
+        // clear relaxation variables
+        m_all_relax_vars.clear();
+        // free sorted_relax_vecs
         clear_sorted_relax();
         clear_hard_clauses();
         clear_soft_clauses();
+        m_solution.clear();
+        m_id_count = 0;
+        m_num_objectives = 0;
+        m_solver_output = false;
+        m_child_pid = 0;
+        m_sat = false;
+        m_sorting_net_size = 0;
+    }
+    
+    // remove temporary files and free memory
+    Encoder::~Encoder()
+    {
+        if (!m_leave_temporary_files)
+            remove_tmp_files();
+        clear();
     }
 
 }/* namespace leximaxIST */

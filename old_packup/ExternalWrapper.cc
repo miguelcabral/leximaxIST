@@ -35,13 +35,21 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 :min_cost(LONG_MAX)
 ,solution_value(-1)
 ,_id_manager(id_manager)
-,solver_command("minisat+ -cs -ansi")
+,opt_solver_cmd("minisat+ -cs -ansi")
+,sat_solver_cmd()
+,ub_encoding(0)
 ,multiplication_string("*")
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
 ,leximax(false)
 ,leximax_enc(nullptr)
 {}
+
+ExternalWrapper::~ExternalWrapper()
+{
+    delete leximax_enc;
+    leximax_enc = nullptr;
+}
 
 void clause_to_constraint(BasicClause& clause, vector<LINT>& constraint);
 
@@ -171,7 +179,7 @@ int ExternalWrapper::external_solve(const vector<LINT>& function, vector< vector
     // call the solver
     stringstream scommand;
     const string output_filename = input_file_name + ".out";
-    scommand << solver_command << " " << input_file_name << " >" << output_filename;
+    scommand << opt_solver_cmd << " " << input_file_name << " >" << output_filename;
     const string command = scommand.str();
     const int retv = system (command.c_str());
     cerr << "# " <<  "external command finished with exit value " << retv << endl;
@@ -234,7 +242,7 @@ int ExternalWrapper::external_solve_max(IntVector&  tmp_model) {
     // call the solver
     stringstream scommand;
     const string output_filename = input_file_name + ".out";
-    scommand << solver_command << " " << input_file_name << " >" << output_filename;
+    scommand << opt_solver_cmd << " " << input_file_name << " >" << output_filename;
     const string command = scommand.str();
     const int retv = system (command.c_str());
     cerr << "# " <<  "external command finished with exit value " << retv << endl;
@@ -450,9 +458,15 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     leximax_enc = new leximaxIST::Encoder(input_constraints, obj_functions);
+     leximax_enc = new leximaxIST::Encoder();
+     if (leximax_enc->set_problem(input_constraints, obj_functions) != 0) {
+         model.clear();
+         return false;
+     }
      // set external solver and parameters of Leximax_encoder
-     leximax_enc->set_solver_command(solver_command);
+     leximax_enc->set_ub_encoding(ub_encoding);
+     leximax_enc->set_sat_solver_cmd(sat_solver_cmd);
+     leximax_enc->set_opt_solver_cmd(opt_solver_cmd);
      leximax_enc->set_multiplication_string(multiplication_string);
      leximax_enc->set_leave_temporary_files(leave_temporary_files);
      leximax_enc->set_formalism(formalism);

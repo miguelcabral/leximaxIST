@@ -64,7 +64,7 @@ namespace leximaxIST {
     #endif
 */
     // sorting network and clauses:
-    typedef std::vector<std::pair<long long, long long>*> SNET;
+    typedef std::vector<std::pair<long long, long long>> SNET;
     typedef std::vector<long long> Clause;
 }
 #endif /* LEXIMAXIST_TYPES */

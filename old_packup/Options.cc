@@ -26,6 +26,8 @@
 #include <stdlib.h>
 #include <getopt.h>
 #include <stdio.h>
+#include <string>
+#include <cctype>
 #include "Options.hh"
 using std::cerr;
 using std::endl;
@@ -37,6 +39,7 @@ Options::Options()
 , trendy(0)
 , leave_temporary_files(0)
 , leximax(0)
+, ub_encoding(0)
 , formalism("wcnf")
 , lp_solver("gurobi")
 {}
@@ -47,7 +50,7 @@ bool Options::parse(int argc,char **argv) {
     static struct option long_options[] = {
          {"help", no_argument,    &help, 1}
        , {"no-sol", no_argument,  &solving_disabled, 1}
-       ,{"external-solver", required_argument,  0, 500}
+       ,{"opt-solver", required_argument,  0, 500}
        ,{"solution-check",  required_argument,  0, 501}
 #ifdef MAPPING
        ,{"mapping-file",    required_argument,  0, 502}
@@ -56,6 +59,8 @@ bool Options::parse(int argc,char **argv) {
        ,{"temporary-directory",    required_argument,  0, 504}
        ,{"formalism",    required_argument,  0, 505}
        ,{"lpsolver",    required_argument,  0, 506}
+       ,{"sat-solver", required_argument,  0, 507}
+       ,{"ub-enc", required_argument,  0, 508}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"leximax", no_argument,  &leximax, 1}
        ,{0, 0, 0, 0}
@@ -76,7 +81,7 @@ bool Options::parse(int argc,char **argv) {
             case 't': trendy   = 1; break;
             case 'h': help     = 1; break;
             case 'u': user_criterion  = optarg; break;
-            case 500: external_solver = optarg; break;
+            case 500: opt_solver = optarg; break;
             case 501: solution_check  = optarg; break;
             case 502: mapping_file    = optarg; break;
             case 503: multiplication_string = optarg; break;
@@ -92,6 +97,15 @@ bool Options::parse(int argc,char **argv) {
                     fprintf(stderr, "Invalid option! Possible lp solvers: 'gurobi', 'scip', 'cplex', 'cbc'.\n");
                     return_value = false;
                 }
+                break;
+            case 507: sat_solver = optarg; break;
+            case 508: std::string ub_enc_str (optarg);
+                if (ub_enc_str.size() != 1 || !isdigit(ub_enc_str[0])) {
+                    std::cerr << "Option ub-enc accepts only one digit." << std::endl;
+                    return_value = false;
+                }
+                else
+                    ub_encoding = std::stoi(ub_enc_str);
                 break;
            case '?':
              if ( (optopt == 'u') )

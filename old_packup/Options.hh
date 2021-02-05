@@ -35,7 +35,9 @@ public:
     virtual ~Options();
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
-    string get_external_solver()   const { return external_solver; }
+    string get_opt_solver()   const { return opt_solver; }
+    string get_sat_solver()   const { return sat_solver; }
+    int    get_ub_encoding()     const { return ub_encoding; }
     int    get_paranoid()          const { return paranoid; }
     int    get_trendy()            const { return trendy; }
     string get_solution_check()    const { return solution_check; }
@@ -54,7 +56,9 @@ public:
 private:
     int    help;
     int    solving_disabled;
-    string external_solver;
+    string opt_solver;
+    string sat_solver;
+    int    ub_encoding;
     int    paranoid;
     int    trendy;
     string solution_check;

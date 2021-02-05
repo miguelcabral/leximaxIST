@@ -22,10 +22,9 @@ namespace leximaxIST
         std::vector<std::vector<long long>*> m_objectives;
         int m_num_objectives;
         std::vector<std::vector<long long>*> m_sorted_vecs;
-        std::vector<std::vector<long long>*> m_sorted_relax_vecs;
         std::vector<std::vector<std::vector<long long>*>>  m_sorted_relax_collection;
         std::vector<std::forward_list<long long>> m_all_relax_vars; // relax_vars of each iteration
-        std::string m_solver_command;
+        std::string m_opt_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
         std::string m_lp_solver;
         std::string m_valid_lp_solvers[6];
@@ -36,25 +35,16 @@ namespace leximaxIST
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_temporary_files;
         bool m_sat;
-        int m_algorithm; // different values lead to different adjustments to the original algorithm
+        std::string m_sat_solver_cmd; // for external call to sat solver
+        int m_ub_encoding; // 0: do nothing, 1: get upper bound with sat call, 2: get upper bound with MSS, 3: get upper bound with MaxSAT
         std::string m_multiplication_string;
         std::vector<long long> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
         
     public:    
 
-        /* a clause is a disjunction of literals;
-        * a literal is a variable or a negation of a variable;
-        * each variable is represented as a positive integer (long long);
-        * a clause is represented as a vector of literals (integers)
-        * constraints is a collection of clauses;
-        * each entry of constraints contains a clause, stored as a vector;
-        * each entry of the clause vector is a literal of that clause.
-        * objective_functions is a collection of objective functions;
-        * each objective function is a vector of soft clauses;*/
-        // each objective function is the sum of its falsified soft clauses.
-        Encoder(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions); 
-        // TODO: add checks if constraints and/or obj functions is empty
+        Encoder(); 
+
         ~Encoder();
         
         // returns 0 if all want well, -1 otherwise
@@ -72,9 +62,13 @@ namespace leximaxIST
         // empty if unsat
         std::vector<long long> get_objective_vector() const;
         
-        int set_algorithm(int val);
+        int set_problem(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions);
         
-        void set_solver_command(const std::string &command);
+        int set_ub_encoding(int val);
+        
+        void set_timeout(double val); // for terminate function
+        
+        void set_opt_solver_cmd(const std::string &command);
         
         int set_formalism(const std::string &format);
         
@@ -86,7 +80,9 @@ namespace leximaxIST
         
         void set_multiplication_string(const std::string &str);
         
-        int terminate(int signum);
+        int terminate(); // kill external solver and read approximate solution
+        
+        void clear(); // frees memory, and sets parameters to their default initial value
         
     private:
         
@@ -96,9 +92,9 @@ namespace leximaxIST
         
         // constructors.cpp
         
-        void add_soft_clause(const std::vector<long long> &lits);
+        int add_soft_clause(const std::vector<long long> &lits);
         
-        void add_hard_clause(const std::vector<long long> &lits);
+        int add_hard_clause(const std::vector<long long> &lits);
         
         void update_id_count(const std::vector<long long> &clause);
         
@@ -122,7 +118,7 @@ namespace leximaxIST
         
         void encode_network(std::pair<long long,long long> elems_to_sort, std::vector<long long> *objective, SNET &sorting_network);
         
-        void delete_snet(SNET &sorting_network);
+        //void delete_snet(SNET &sorting_network);
         
         // encoding.cpp
         
@@ -140,17 +136,23 @@ namespace leximaxIST
         
         void componentwise_OR(int i);
         
+        void encode_upper_bound(int i, std::vector<long long> &old_obj_vec);
+        
+        void debug_print_all(const std::vector<std::vector<long long>> &true_ys, const std::vector<long long> &y_vector);
+        
         // solver_call.cpp
+        
+        int sat_solve();
+        
+        int calculate_upper_bound();
         
         void reset_file_name();
         
-        void remove_all_tmp_files() const;
-        
-        void remove_tmp_file(const std::string &filename) const;
+        void remove_tmp_files() const;
 
-        int split_solver_command(const std::string &command, std::vector<std::string> &command_split);
+        int split_command(const std::string &command, std::vector<std::string> &command_split);
         
-        int call_solver();
+        int call_solver(const std::string &solver_type);
         
         int read_solver_output(std::vector<long long> &model);
         
@@ -158,11 +160,15 @@ namespace leximaxIST
         
         int write_solver_input(int i);
         
+        int write_cnf_file(int i);
+        
         int write_lp_file(int i);
         
         int write_opb_file(int i);
         
         int write_wcnf_file(int i);
+        
+        int read_sat_output(std::vector<long long> &model);
         
         int read_cplex_output(std::vector<long long> &model);
         
@@ -184,7 +190,7 @@ namespace leximaxIST
         
         void print_clause(std::ostream &output, const Clause *cl) const;
         
-        void print_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const;
+        void print_wcnf_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const;
         
         void print_atmost_lp(int i, std::ostream &output) const;
         

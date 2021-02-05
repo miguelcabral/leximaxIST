@@ -4,10 +4,13 @@
 #include <string>
 #include <iostream>
 #include <utility>
+#include <algorithm>
 #include <forward_list>
 
 namespace leximaxIST {
 
+    bool descending_order (long long i, long long j);
+    
     void Encoder::encode_sorted()
     {
         if (m_num_objectives != 1) { // when there is only one objective function there is no need for this
@@ -15,21 +18,17 @@ namespace leximaxIST {
                 std::vector<long long> *objective = m_objectives[i];
                 size_t num_terms = objective->size();
                 m_sorted_vecs[i] = new std::vector<long long>(num_terms, 0);
-                SNET sorting_network(num_terms, nullptr); // sorting_network is initialized to a vector of nullptrs
+                // sorting_network is initialized to a vector of (-1,-1)
+                SNET sorting_network(num_terms, {-1,-1});
                 // elems_to_sort is represented by a pair (first element, number of elements).
                 std::pair<long long,long long> elems_to_sort(0, num_terms);
                 if (m_debug) {
                     std::cerr << "--------------- Objective Function " << i << " --------------\n";
-                    for (size_t j = 0; j < num_terms; ++j) {
-                        std::cerr << objective->at(j);
-                        if (j != num_terms - 1)
-                            std::cerr << " + ";
-                        else
-                            std::cerr << '\n';
-                    }
+                    for (size_t j = 0; j < num_terms; ++j)
+                        std::cerr << objective->at(j) << std::endl;
                 }
                 size_t old_snet_size (m_sorting_net_size);
-                m_sorting_net_size = 0;
+//                 m_sorting_net_size = 0;
                 encode_network(elems_to_sort, objective, sorting_network);
                 if (m_debug)
                     std::cerr << "-------------- Size of Sorting Network " << i << ": " << m_sorting_net_size << " --------------\n";
@@ -42,13 +41,11 @@ namespace leximaxIST {
                 }
                 else {
                     for (size_t j{0}; j < num_terms; j++) {
-                        long long output_j = sorting_network[j]->second;
+                        long long output_j = sorting_network[j].second;
                         std::vector<long long> *sorted_vec = m_sorted_vecs[i];
                         sorted_vec->at(j) = output_j;
                     }
                 }
-                // free memory allocated for the comparators of the sorting network
-                delete_snet(sorting_network);
                 if (m_debug) {
                     std::cerr << "---------------- m_sorted_vecs[" << i << "] -----------------\n";
                     for(size_t j{0}; j < num_terms; j++)
@@ -121,10 +118,6 @@ namespace leximaxIST {
 
     void Encoder::encode_relaxation(int i)
     {
-        // free dynamic memory in m_sorted_relax_vecs of previous iteration (i-1)
-        if (!m_debug) {
-            clear_sorted_relax();
-        }
         long long first_relax_var = m_id_count + 1;
         //m_relax_vars.clear(); // clear from previous iteration
         std::forward_list<long long> relax_vars;
@@ -140,13 +133,14 @@ namespace leximaxIST {
                 std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
         }
         if (i != m_num_objectives - 1) {
+            std::vector<std::vector<long long>*> sorted_relax_vecs(m_num_objectives, nullptr);
             for (int j = 0; j < m_num_objectives; ++j) {
                 // encode relaxation variable of the j-th objective
                 std::vector<long long> *sorted_vec = m_sorted_vecs[j];
                 std::vector<long long> *sorted_relax = new std::vector<long long>(sorted_vec->size(), 0);
-                m_sorted_relax_vecs[j] = sorted_relax;
+                sorted_relax_vecs[j] = sorted_relax;
                 if (m_debug)
-                    std::cerr << "--------------- m_sorted_relax_vecs[" << j << "] ---------------\n";
+                    std::cerr << "--------------- sorted_relax_vecs[" << j << "] ---------------\n";
                 for (size_t k = 0; k < sorted_relax->size(); ++k) {
                     // create sorted_relax variables
                     sorted_relax->at(k) = m_id_count + 1;
@@ -186,6 +180,7 @@ namespace leximaxIST {
                 at_most(relax_vars, i);
                 // at least i constraint -> is not necessary
             }
+            m_sorted_relax_collection.push_back(sorted_relax_vecs);
         }
         else { // last iteration
             // choose exactly one obj function to minimise
@@ -248,9 +243,6 @@ namespace leximaxIST {
                 add_hard_clause(lits);
             }
         }
-        if (m_debug) {
-            m_sorted_relax_collection.push_back(m_sorted_relax_vecs);
-        }
     }
 
     size_t Encoder::largest_obj()
@@ -274,7 +266,7 @@ namespace leximaxIST {
         }
         else {
             // the OR is between sorted vecs after relaxation
-            sorted_vecs = &m_sorted_relax_vecs;
+            sorted_vecs = &m_sorted_relax_collection[i-1];
         }
         size_t k = 0;
         for (Clause *cl : m_soft_clauses) {
@@ -337,37 +329,122 @@ namespace leximaxIST {
         }
     }
 
-    // TODO: Maybe add constraints to sorted_relax_vecs and soft variables
-    void Encoder::encode_upper_bound(int i)
+    void Encoder::encode_upper_bound(int i, std::vector<long long> &old_obj_vec)
     {
-        // iter 0: just sat call -> only sorted vec
-        // iter 1: smaller maximum -> sorted vec and now upper bound on 2nd max: ys and s's
-        // iter 2: smaller 2nd maximum -> upper bound on 3rd max: ys and s's
-        // ...
-        // last iter: nothing to do I think, don't call
-        // TODO: I need to store the previous max somewhere -> member variable?
         std::vector<long long> obj_vec (get_objective_vector());
         if (obj_vec.empty())
             return;
-        long long max (obj_vec[0]);
-        for (long long obj_val : obj_vec) {
-            if (obj_val > max)
-                max = obj_val;
-        }
-        if (m_debug) {
+        std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
+        if (m_debug)
             std::cerr << "------------- Upper bound encoding -------------" << std::endl;
-            std::cerr << "max = " << max << std::endl;
-        }
-        // encode sorted vecs equal to zero
-        for (std::vector<long long> *sorted_vec : m_sorted_vecs) {
-            std::cerr << "Sorted Vec: " << std::endl;
-            for (size_t j (0); j + max < sorted_vec->size(); ++j) {
-                Clause cl;
-                cl.push_back(-(sorted_vec->at(j))); // neg sorted vec
+        if (i == 0 || i == 1) { // refine upper bound on all obj functions (sorted vecs)
+            if (m_debug)
+                std::cerr << "--- Upper bound on Sorted Vecs ---" << std::endl;
+            long long first_max (obj_vec[0]);
+            for (const std::vector<long long> *sorted_vec : m_sorted_vecs) {
+                size_t size (sorted_vec->size());
+                long long old_first_max ( i == 0 ? size - 1 : old_obj_vec[0]);
+                long long starting_position (size - 1 - old_first_max);
+                long long end_position (size - 1 - first_max);
                 if (m_debug) {
-                    std::cerr << -(sorted_vec->at(j)) << std::endl;
+                    std::cerr << "----- Sorted Vec -----" << std::endl;
+                    std::cerr << "size: " << size << std::endl;
+                    std::cerr << "upper bound: " << first_max << std::endl;
                 }
-                add_hard_clause(cl);
+                for (long long j (starting_position); j < end_position; ++j) {
+                    Clause cl;
+                    cl.push_back(-(sorted_vec->at(j))); // neg sorted vec
+                    if (m_debug)
+                        print_clause(std::cerr, &cl);
+                    add_hard_clause(cl);
+                }
+            }
+        }
+        if (i >= 1 && i != m_num_objectives - 1) { // upper bound on sorted relax and soft clauses
+            // the ub on sorted relax comes from soft clauses by unit propagation
+            long long max_i (obj_vec[i]); // upper bound on minimum max_i
+            long long end_position (m_soft_clauses.size() - 1 - max_i);
+            if (m_debug) {
+                std::cerr << "--- Upper bound on soft clauses, i=" << i << " ---" << std::endl;
+                std::cerr << "upper bound: " << max_i << std::endl;
+            }
+            for (long long j (0); j < end_position; ++j) {
+                const Clause *cl (m_soft_clauses[j]);
+                if (m_debug)
+                    print_clause(std::cerr, cl);
+                add_hard_clause(*cl);
+            }
+        }
+        old_obj_vec = obj_vec;
+    }
+    
+    void Encoder::debug_print_all(const std::vector<std::vector<long long>> &true_ys, const std::vector<long long> &y_vector)
+    {
+        if (!m_solution.empty()){
+            // compare y_vector with objective vector and print true sorted vector variables
+            std::cerr << "Y vector: ";
+            for (long long v : y_vector)
+                std::cerr << v << ' ';
+            std::cerr << std::endl;
+            std::vector<std::vector<long long>> true_input;
+            for (std::vector<long long> *obj : m_objectives) {
+                std::vector<long long> true_obj_vars;
+                for (long long var : *obj) {
+                    if (m_solution[var] > 0)
+                        true_obj_vars.push_back(var);
+                }
+                true_input.push_back(true_obj_vars);
+            }
+            std::vector<long long> obj_vector (m_num_objectives, 0);
+            std::cerr << "Input vector: ";
+            for (const std::vector<long long> &true_obj_vars : true_input)
+                std::cerr << true_obj_vars.size() << ' ';
+            std::cerr << std::endl;      
+            std::cerr << "Y true variables:" << std::endl;
+            int j (0);
+            for (const std::vector<long long> &true_vars : true_ys) {
+                std::cerr << "Maximum " << j << ": ";
+                for (long long var : true_vars)
+                    std::cerr << var << ' ';
+                std::cerr << std::endl;
+                ++j;
+            }
+            std::cerr << "Input true variables:" << std::endl;
+            j = 0;
+            for (const std::vector<long long> &true_vars : true_input) {
+                std::cerr << "Function " << j << ": ";
+                for (long long var : true_vars)
+                    std::cerr << var << ' ';
+                std::cerr << std::endl;
+                ++j;
+            }
+            std::cerr << "Sorted vecs true variables:" << std::endl;
+            j = 0;
+            for (std::vector<long long> *sorted_vec : m_sorted_vecs) {
+                std::cerr << "Sorted vec " << j << ": ";
+                for (long long var : *sorted_vec) {
+                    if (m_solution[var] > 0)
+                        std::cerr << var << ' ';
+                }
+                std::cerr << std::endl;
+                ++j;
+            }
+            j = 1;
+            for (std::vector<std::vector<long long>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+                std::cerr << "Sorted Relax Vecs true variables of iteration " << j << ":" << std::endl;
+                int k (0);
+                for (std::vector<long long> *sorted_relax : sorted_relax_vecs) {
+                    if (sorted_relax != nullptr) {
+                        std::cerr << "Sorted Relax vec " << k << ": ";
+                        for (long long var : *sorted_relax) {
+                            if (m_solution[var] > 0)
+                                std::cerr << var << ' ';
+                        }
+                        std::cerr << std::endl;
+                        ++k;
+                    }
+                }
+                ++j;
             }
         }
     }
@@ -378,6 +455,10 @@ namespace leximaxIST {
             print_error_msg("No objective function");
             return -1;
         }
+        if (m_constraints.empty()) {
+            print_error_msg("Empty constraints");
+            return -1;
+        }
         std::vector<std::vector<long long>> true_ys; // for debugging
         std::vector<long long> y_vector; // for debugging
         // if there is only one objective function then it is a simple single objective problem
@@ -385,18 +466,16 @@ namespace leximaxIST {
             generate_soft_clauses(0);
             // call solver and read output 
             int retv = external_solve(0);
-            m_sat = !(m_solution.empty());
             return retv;
         }
-        if (m_algorithm == 1) { // call sat solver first to get upper bound of optimum
-            if (sat_solve() != 0)
-                return -1;    
-            if (!m_sat)
-                return 0;
+        if (m_ub_encoding != 0) { // call sat solver (or MSS or MaxSAT/PBO/ILP solver) first to get upper bound of optimum
+            if (calculate_upper_bound() != 0)
+                return -1;
         }
+        std::vector<long long> old_obj_vec; // used in upper bound encoding
         // encode sorted vectors with sorting network
         encode_sorted();
-        // iteratively call (MaxSAT or PBO) solver       
+        // iteratively call (MaxSAT, PBO or ILP) solver       
         for (int i = 0; i < m_num_objectives; ++i) {
             clear_soft_clauses();
             generate_soft_clauses(i);
@@ -407,9 +486,10 @@ namespace leximaxIST {
             // encode the componentwise OR between sorted_relax vectors except in the last iteration
             if (i != m_num_objectives - 1)
                 componentwise_OR(i);
-            // encode upper bound obtained from sat solver call
-            if (m_algorithm == 1 && i <= 1) // if i = 0 -> maximum found in sat call; if i = 1 -> maximum found in first iteration
-                encode_upper_bound();
+            // encode upper bound obtained from sat solver (or MSS or MaxSAT) call
+            if (m_ub_encoding != 0 && i != m_num_objectives - 1) {
+                encode_upper_bound(i, old_obj_vec);
+            }
             // call solver
             if (external_solve(i) == -1)
                 return -1;
@@ -435,77 +515,9 @@ namespace leximaxIST {
                 true_ys.push_back(current_true_ys);
             }
         }
-        // solving ends here
-        // the rest of the code of this function is just debugging
-        if (m_debug) {
-            if (!m_solution.empty()){
-                // compare y_vector with objective vector and print true sorted vector variables
-                std::cerr << "Y vector: ";
-                for (long long v : y_vector)
-                    std::cerr << v << ' ';
-                std::cerr << std::endl;
-                std::vector<std::vector<long long>> true_input;
-                for (std::vector<long long> *obj : m_objectives) {
-                    std::vector<long long> true_obj_vars;
-                    for (long long var : *obj) {
-                        if (m_solution[var] > 0)
-                            true_obj_vars.push_back(var);
-                    }
-                    true_input.push_back(true_obj_vars);
-                }
-                std::vector<long long> obj_vector (m_num_objectives, 0);
-                std::cerr << "Input vector: ";
-                for (const std::vector<long long> &true_obj_vars : true_input)
-                    std::cerr << true_obj_vars.size() << ' ';
-                std::cerr << std::endl;      
-                std::cerr << "Y true variables:" << std::endl;
-                int j (0);
-                for (const std::vector<long long> &true_vars : true_ys) {
-                    std::cerr << "Maximum " << j << ": ";
-                    for (long long var : true_vars)
-                        std::cerr << var << ' ';
-                    std::cerr << std::endl;
-                    ++j;
-                }
-                std::cerr << "Input true variables:" << std::endl;
-                j = 0;
-                for (const std::vector<long long> &true_vars : true_input) {
-                    std::cerr << "Function " << j << ": ";
-                    for (long long var : true_vars)
-                        std::cerr << var << ' ';
-                    std::cerr << std::endl;
-                    ++j;
-                }
-                std::cerr << "Sorted vecs true variables:" << std::endl;
-                j = 0;
-                for (std::vector<long long> *sorted_vec : m_sorted_vecs) {
-                    std::cerr << "Sorted vec " << j << ": ";
-                    for (long long var : *sorted_vec) {
-                        if (m_solution[var] > 0)
-                            std::cerr << var << ' ';
-                    }
-                    std::cerr << std::endl;
-                    ++j;
-                }
-                j = 1;
-                for (std::vector<std::vector<long long>*> &sorted_relax_vecs : m_sorted_relax_collection) {
-                    std::cerr << "Sorted Relax Vecs true variables of iteration " << j << ":" << std::endl;
-                    int k (0);
-                    for (std::vector<long long> *sorted_relax : sorted_relax_vecs) {
-                        if (sorted_relax != nullptr) {
-                            std::cerr << "Sorted Relax vec " << k << ": ";
-                            for (long long var : *sorted_relax) {
-                                if (m_solution[var] > 0)
-                                    std::cerr << var << ' ';
-                            }
-                            std::cerr << std::endl;
-                            ++k;
-                        }
-                    }
-                    ++j;
-                }
-            }
-        }
+        if (m_debug)
+            debug_print_all(true_ys, y_vector);
+        clear(); // this is only called if no error occured
         return 0;
     }
 

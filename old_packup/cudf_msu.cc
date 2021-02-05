@@ -62,8 +62,8 @@ static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n'; 
   leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
   if (leximax_enc != nullptr) {
-      leximax_enc->terminate(signum);
-      solver.set_model(leximax_enc->get_solution());
+      leximax_enc->terminate();
+      solver.set_leximax_model(leximax_enc->get_solution());
       solver.print_leximax_info();
   }
   parser.get_encoder().print_time();
@@ -186,7 +186,9 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_iv(3);
     parser.get_encoder().set_opt_not_removed(true);    
 #ifdef EXTERNAL_SOLVER
-    if (!options.get_external_solver().empty())        solver.set_solver_command(options.get_external_solver ());
+    if (!options.get_sat_solver().empty())             solver.set_sat_solver_cmd(options.get_sat_solver ());
+    if (!options.get_opt_solver().empty())             solver.set_opt_solver_cmd(options.get_opt_solver ());
+    solver.set_ub_encoding(options.get_ub_encoding());
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
     if (options.get_leximax())                         solver.set_leximax();
