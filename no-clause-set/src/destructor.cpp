@@ -30,7 +30,7 @@ namespace leximaxIST {
         m_constraints.clear();
     }
 
-    // frees memory, and sets parameters to their default initial value
+    // members that are not a user parameter are cleared and set to initial value
     void Encoder::clear()
     {
         // free m_objectives

@@ -25,6 +25,11 @@ namespace leximaxIST {
         m_opt_solver_cmd = command;
     }
 
+    void Encoder::set_sat_solver_cmd(const std::string &command)
+    {
+        m_sat_solver_cmd = command;
+    }
+    
     int Encoder::set_formalism(const std::string &format)
     {
         m_formalism = format;
@@ -74,7 +79,7 @@ namespace leximaxIST {
     
     int Encoder::set_problem(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions)
     {
-        // restart object: if it has not been cleared from a previous problem (abnormal termination of solve())
+        // restart object: if it has not been cleared from a previous problem
         clear();
         // name for temporary files
         reset_file_name();
@@ -110,6 +115,7 @@ namespace leximaxIST {
             std::vector<long long> lits;
             int j(0);
             for (const std::vector<long long> &soft_clause : obj) {
+                // neg fresh_var implies soft_clause
                 long long fresh_var(m_id_count + 1);
                 m_id_count++;
                 lits = soft_clause;
@@ -118,6 +124,15 @@ namespace leximaxIST {
                 add_hard_clause(lits);
                 lits.clear();
                 j++;
+                // other implication: soft_clause implies neg fresh_var
+                /*
+                for (const long long soft_lit : soft_clause) {
+                    lits.push_back(-soft_lit);
+                    lits.push_back(-fresh_var);
+                    add_hard_clause(lits);
+                    lits.clear();
+                }
+                */
             }
             ++i;
         }

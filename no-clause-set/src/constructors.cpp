@@ -26,7 +26,7 @@ namespace leximaxIST {
     
     
     Encoder::Encoder() : 
-        m_debug(false),
+        m_debug(true),
         m_id_count(0),
         m_constraints(),
         m_soft_clauses(),

@@ -125,8 +125,10 @@ private:
     void print_clause(XLINT weight, ostream& out, BasicClause& clause);
 };
 
-inline void ExternalWrapper::set_opt_solver_cmd(const string& _opt_solver_cmd) {
-  opt_solver_cmd =_opt_solver_cmd; }
+inline void ExternalWrapper::set_opt_solver_cmd(const string& cmd) {
+  opt_solver_cmd = cmd; }
+inline void ExternalWrapper::set_sat_solver_cmd(const string& cmd) {
+  sat_solver_cmd = cmd; }
 inline void ExternalWrapper::set_multiplication_string(const string& _multiplication_string) {
   multiplication_string =_multiplication_string; }
 inline void ExternalWrapper::set_temporary_directory(const string& value) {
@@ -134,7 +136,7 @@ inline void ExternalWrapper::set_temporary_directory(const string& value) {
 inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
 inline void ExternalWrapper::set_leximax(bool value) {
-    leximax = true; }
+    leximax = value; }
 inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {

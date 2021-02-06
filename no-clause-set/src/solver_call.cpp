@@ -347,7 +347,7 @@ namespace leximaxIST {
             print_error_msg("The external solver finished with non-zero error status: " + errmsg);
             return -1;
         }*/
-        if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+        if (m_formalism != "lp" || m_lp_solver != "gurobi" || solver_type == "decision") {
             command += " > " + output_filename;
         }
         command += " 2> " + error_filename;

@@ -44,6 +44,17 @@ Options::Options()
 , lp_solver("gurobi")
 {}
 
+int Options::read_ub_enc(const char *optarg)
+{
+    std::string ub_enc_str (optarg);
+    if (ub_enc_str.size() != 1 || !isdigit(ub_enc_str[0])) {
+        std::cerr << "Option ub-enc accepts only one digit." << std::endl;
+        return -1;
+    }
+    ub_encoding = std::stoi(ub_enc_str);
+    return 0;
+}
+
 bool Options::parse(int argc,char **argv) {
     bool return_value = true;
 
@@ -99,14 +110,10 @@ bool Options::parse(int argc,char **argv) {
                 }
                 break;
             case 507: sat_solver = optarg; break;
-            case 508: std::string ub_enc_str (optarg);
-                if (ub_enc_str.size() != 1 || !isdigit(ub_enc_str[0])) {
-                    std::cerr << "Option ub-enc accepts only one digit." << std::endl;
-                    return_value = false;
-                }
-                else
-                    ub_encoding = std::stoi(ub_enc_str);
-                break;
+            case 508: if (read_ub_enc(optarg) == -1) {
+                        return_value = false;
+                    }
+                    break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);

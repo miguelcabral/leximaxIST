@@ -70,6 +70,8 @@ namespace leximaxIST
         
         void set_opt_solver_cmd(const std::string &command);
         
+        void set_sat_solver_cmd(const std::string &command);
+        
         int set_formalism(const std::string &format);
         
         void set_err_file(const std::string &name);
@@ -82,7 +84,7 @@ namespace leximaxIST
         
         int terminate(); // kill external solver and read approximate solution
         
-        void clear(); // frees memory, and sets parameters to their default initial value
+        void clear(); // frees memory, and sets internal parameters to their initial value
         
     private:
         

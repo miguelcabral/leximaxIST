@@ -28,7 +28,7 @@ namespace leximaxIST {
                         std::cerr << objective->at(j) << std::endl;
                 }
                 size_t old_snet_size (m_sorting_net_size);
-//                 m_sorting_net_size = 0;
+                m_sorting_net_size = 0;
                 encode_network(elems_to_sort, objective, sorting_network);
                 if (m_debug)
                     std::cerr << "-------------- Size of Sorting Network " << i << ": " << m_sorting_net_size << " --------------\n";
@@ -335,23 +335,30 @@ namespace leximaxIST {
         if (obj_vec.empty())
             return;
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
-        if (m_debug)
-            std::cerr << "------------- Upper bound encoding -------------" << std::endl;
+        if (m_debug) {
+            std::cerr << "------------ Upper bound encoding ------------" << std::endl;
+            std::cerr << "Sorted objective vector: ";
+            for (long long v : obj_vec)
+                std::cerr << v << ' ';
+            std::cerr << std::endl;
+        }
         if (i == 0 || i == 1) { // refine upper bound on all obj functions (sorted vecs)
             if (m_debug)
-                std::cerr << "--- Upper bound on Sorted Vecs ---" << std::endl;
+                std::cerr << "------------ Upper bound on Sorted Vecs ------------" << std::endl;
             long long first_max (obj_vec[0]);
             for (const std::vector<long long> *sorted_vec : m_sorted_vecs) {
-                size_t size (sorted_vec->size());
+                long long size (sorted_vec->size());
                 long long old_first_max ( i == 0 ? size - 1 : old_obj_vec[0]);
                 long long starting_position (size - 1 - old_first_max);
+                if (starting_position < 0)
+                    starting_position = 0;
                 long long end_position (size - 1 - first_max);
                 if (m_debug) {
                     std::cerr << "----- Sorted Vec -----" << std::endl;
                     std::cerr << "size: " << size << std::endl;
                     std::cerr << "upper bound: " << first_max << std::endl;
                 }
-                for (long long j (starting_position); j < end_position; ++j) {
+                for (long long j (starting_position); j <= end_position; ++j) {
                     Clause cl;
                     cl.push_back(-(sorted_vec->at(j))); // neg sorted vec
                     if (m_debug)
@@ -365,10 +372,11 @@ namespace leximaxIST {
             long long max_i (obj_vec[i]); // upper bound on minimum max_i
             long long end_position (m_soft_clauses.size() - 1 - max_i);
             if (m_debug) {
-                std::cerr << "--- Upper bound on soft clauses, i=" << i << " ---" << std::endl;
+                std::cerr << "------------ Upper bound on soft clauses ------------" << std::endl;
+                std::cerr << "size: " << m_soft_clauses.size() << std::endl;
                 std::cerr << "upper bound: " << max_i << std::endl;
             }
-            for (long long j (0); j < end_position; ++j) {
+            for (long long j (0); j <= end_position; ++j) {
                 const Clause *cl (m_soft_clauses[j]);
                 if (m_debug)
                     print_clause(std::cerr, cl);
@@ -517,7 +525,6 @@ namespace leximaxIST {
         }
         if (m_debug)
             debug_print_all(true_ys, y_vector);
-        clear(); // this is only called if no error occured
         return 0;
     }
 

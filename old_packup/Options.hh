@@ -33,6 +33,7 @@ class Options {
 public:
     Options();
     virtual ~Options();
+    int    read_ub_enc(const char *optarg);
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
     string get_opt_solver()   const { return opt_solver; }
