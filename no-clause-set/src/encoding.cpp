@@ -479,6 +479,8 @@ namespace leximaxIST {
         if (m_ub_encoding != 0) { // call sat solver (or MSS or MaxSAT/PBO/ILP solver) first to get upper bound of optimum
             if (calculate_upper_bound() != 0)
                 return -1;
+            if (!m_sat)
+                return 0;
         }
         std::vector<long long> old_obj_vec; // used in upper bound encoding
         // encode sorted vectors with sorting network
