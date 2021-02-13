@@ -57,21 +57,21 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
     return true;
 }
 
-#ifdef EXTERNAL_SOLVER
+//#ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n'; 
   leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
   if (leximax_enc != nullptr) {
-      leximax_enc->terminate();
+      //leximax_enc->terminate(); // terminate is not ready yet
       solver.set_leximax_model(leximax_enc->get_solution());
       solver.print_leximax_info();
   }
   parser.get_encoder().print_time();
   parser.get_encoder().print_solution();
-  cerr << "Terminating ..." << '\n';
+  cerr << "# Terminating ..." << '\n';
   exit(0);
 }
-#else
+/*#else
 static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n';
   parser.get_encoder().print_time();
@@ -79,7 +79,7 @@ static void SIG_handler(int signum) {
   cerr << "Terminating ..." << '\n';
   exit(0);
 }
-#endif /* !EXTERNAL_SOLVER */
+#endif*/ /* !EXTERNAL_SOLVER */
 
 void print_usage(ostream &output) {
     output << "USAGE " << endl;
@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     print_header();
     
     /* set up signals */
-#ifdef EXTERNAL_SOLVER
+/*#ifdef EXTERNAL_SOLVER
 // Miguel: in this case nothing is done TODO
     // assuming external solver received as well
     struct sigaction new_act1;
@@ -132,14 +132,15 @@ int main(int argc, char** argv) {
     struct sigaction new_act3;     
     new_act3.sa_handler = SIG_IGN;
     sigaction(SIGUSR2, &new_act3, 0);
-#else
+#else*/
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
     signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
+    signal(SIGINT, SIG_handler);
     //signal(SIGALRM,SIG_handler);
     //alarm(290);  // Specify alarm interrupt given timeout
-#endif
+//#endif
 
     /* parse options */
     Options options;
@@ -192,6 +193,7 @@ int main(int argc, char** argv) {
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
     if (options.get_leximax())                         solver.set_leximax();
+    if (options.get_simplify_last())                   solver.set_simplify_last();
     if (!options.get_lp_solver().empty())              solver.set_lp_solver(options.get_lp_solver());
     if (!options.get_formalism().empty())              solver.set_formalism(options.get_formalism());
     if (!options.get_temporary_directory().empty()) {

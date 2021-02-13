@@ -423,6 +423,15 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
             std::cerr << o << ' ';
      	std::cerr << '\n';
      }
+     std::cerr << "# Number of guaranteed optimal values found: ";
+     std::cerr << leximax_enc->get_num_opts() << '\n';
+     if (ub_encoding != 0) {
+        std::cerr << "# Upper bound: " << leximax_enc->get_ub_vec().at(0) << '\n';
+        long largest (0);
+        for (const BasicClauseVector &soft_cls: clause_split)
+            largest = (soft_cls.size() > largest) ? soft_cls.size() : largest;
+        std::cerr << "# Trivial upper bound (size of largest objective): " << largest << '\n';
+     }
  }
  
  bool ExternalWrapper::solve_leximax() {
@@ -463,7 +472,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          model.clear();
          return false;
      }
-     // set external solver and parameters of Leximax_encoder
+     // set external solvers and parameters of Leximax_encoder
+     leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_encoding(ub_encoding);
      leximax_enc->set_sat_solver_cmd(sat_solver_cmd);
      leximax_enc->set_opt_solver_cmd(opt_solver_cmd);

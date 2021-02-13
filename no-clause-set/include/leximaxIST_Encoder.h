@@ -19,7 +19,7 @@ namespace leximaxIST
         size_t m_id_count;
         std::vector<Clause*> m_constraints;
         std::vector<Clause*> m_soft_clauses;
-        std::vector<std::vector<long long>*> m_objectives;
+        std::vector<std::vector<long long>*> m_objectives; // TODO: change vectors to pair(first elem, size) if makes sense
         int m_num_objectives;
         std::vector<std::vector<long long>*> m_sorted_vecs;
         std::vector<std::vector<std::vector<long long>*>>  m_sorted_relax_collection;
@@ -34,12 +34,18 @@ namespace leximaxIST
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_temporary_files;
+        bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
         bool m_sat;
         std::string m_sat_solver_cmd; // for external call to sat solver
         int m_ub_encoding; // 0: do nothing, 1: get upper bound with sat call, 2: get upper bound with MSS, 3: get upper bound with MaxSAT
+        // the next one is usefull if computation is stoped and you get an intermediate solution
+        // you want to know which values of the objective vector are in theory guaranteed to be optimal
+        //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
         std::string m_multiplication_string;
         std::vector<long long> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
+        std::vector<long long> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
+        std::vector<double> m_iteration_times; // TODO; how long took iteration 0, 1, ... 
         
     public:    
 
@@ -50,7 +56,11 @@ namespace leximaxIST
         // returns 0 if all want well, -1 otherwise
         int solve();
         
+        std::vector<long long> get_ub_vec() const;
+        
         bool get_sat() const;
+        
+        //int get_num_opts() const;
         
         size_t get_sorting_net_size() const;
         
@@ -63,6 +73,8 @@ namespace leximaxIST
         std::vector<long long> get_objective_vector() const;
         
         int set_problem(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions);
+        
+        void set_simplify_last(bool val);
         
         int set_ub_encoding(int val);
         

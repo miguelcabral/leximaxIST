@@ -419,11 +419,16 @@ namespace leximaxIST {
         for (const Clause *cl : m_constraints) {
             print_pb_constraint(cl, out);
         }
-        // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
-        for (int j (1); j <= ( i < m_num_objectives - 2 ? i : m_num_objectives - 2 ); ++j)
+        int last_j (i);
+        if (m_simplify_last) {
+            // last_j is min(i, m_num_objectives - 2)
+            last_j = i < m_num_objectives - 2 ? i : m_num_objectives - 2;
+        }
+        for (int j (1); j <= last_j; ++j)
             print_atmost_pb(j, out);
-        if (i == m_num_objectives - 1 && m_num_objectives != 1)
-            print_sum_equals_pb(1, out); // in the last iteration print =1 cardinality constraint
+        // if m_simplify_last, in the last iteration print =1 cardinality constraint
+        if (i == m_num_objectives - 1 && m_num_objectives != 1 && m_simplify_last)
+            print_sum_equals_pb(1, out);
         out.close();
         return 0;
     }
@@ -461,8 +466,17 @@ namespace leximaxIST {
                 remove_tmp_files();
             return -1;
         }
-        m_solution = model;
-        m_sat = !(m_solution.empty());
+        // check if there is already a solution (from a previous iteration for example)
+        // if ext solver is killed before it finds a sol, the problem might not be unsat
+        if (m_solution.empty()) {
+            m_solution = model;
+            m_sat = !(m_solution.empty());
+        }
+        else {
+            if (!model.empty()) // if it is empty then something went wrong with ext solver
+                m_solution = model;
+            m_sat = true;
+        }
         m_solver_output = false; // I have read solver output
         if (!m_leave_temporary_files)
             remove_tmp_files();
@@ -504,11 +518,16 @@ namespace leximaxIST {
         for (const Clause *cl : m_constraints) {
             print_lp_constraint(cl, output);
         }
-        // write at most constraint for 1, 2, 3, ..., until min(i, m_num_objectives - 2)
-        for (int j (1); j <= ( i < m_num_objectives - 2 ? i : m_num_objectives - 2 ); ++j)
+        int last_j (i);
+        if (m_simplify_last) {
+            // last_j is min(i, m_num_objectives - 2)
+            last_j = i < m_num_objectives - 2 ? i : m_num_objectives - 2;
+        }
+        for (int j (1); j <= last_j; ++j)
             print_atmost_lp(j, output);
-        if (i == m_num_objectives - 1 && m_num_objectives != 1)
-            print_sum_equals_lp(1, output); // in the last iteration print =1 cardinality constraint 
+        // if m_simplify_last, in the last iteration print =1 cardinality constraint
+        if (i == m_num_objectives - 1 && m_num_objectives != 1 && m_simplify_last)
+            print_sum_equals_lp(1, output);
         // print all variables after Binaries
         output << "Binaries\n";
         for (size_t j (1); j <= m_id_count; ++j)

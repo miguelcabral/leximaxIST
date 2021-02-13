@@ -62,6 +62,8 @@ namespace leximaxIST {
         return 0;
     }
 
+    void Encoder::set_simplify_last(bool val) { m_simplify_last = val; }
+    
     void Encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
 
     void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
@@ -93,6 +95,7 @@ namespace leximaxIST {
             return -1;
         }
         m_num_objectives = objective_functions.size();
+        m_ub_vec.resize(m_num_objectives, -1);
         m_objectives.resize(m_num_objectives, nullptr);
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         // read problem
@@ -125,14 +128,12 @@ namespace leximaxIST {
                 lits.clear();
                 j++;
                 // other implication: soft_clause implies neg fresh_var
-                /*
                 for (const long long soft_lit : soft_clause) {
                     lits.push_back(-soft_lit);
                     lits.push_back(-fresh_var);
                     add_hard_clause(lits);
                     lits.clear();
                 }
-                */
             }
             ++i;
         }

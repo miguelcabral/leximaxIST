@@ -45,12 +45,15 @@ namespace leximaxIST {
         m_child_pid(0),
         m_timeout(3000.0), // 3 seconds
         m_leave_temporary_files(false),
+        m_simplify_last(true),
         m_sat(false),
         m_sat_solver_cmd(), // for external call to sat solver
         m_ub_encoding(0), // 0 - no upper bound encoding; 1 - sat solver; 2 - MSS; 3 - MaxSAT/PBO/ILP solver
+        //m_num_opts(0),
         m_multiplication_string(" "),
         m_solution(),
-        m_sorting_net_size(0)
+        m_sorting_net_size(0),
+        m_ub_vec()
     {}
 
 }/* namespace leximaxIST */

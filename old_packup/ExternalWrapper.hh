@@ -60,6 +60,7 @@ public:
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
     inline void set_leximax(bool value=true);
+    inline void set_simplify_last(bool value=true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
     inline void set_ub_encoding (int val);
@@ -87,6 +88,7 @@ private:
     vector<BasicClauseVector>  clause_split;
     vector<LINT>               solution_weights;
     vector< vector <LINT>  >   functions;
+    leximaxIST::Encoder        *leximax_enc;
     IntVector      model;
     WeightSet      weights;
     vector<XLINT>  sorted_weights;
@@ -99,7 +101,8 @@ private:
     string temporary_directory;
     bool   leave_temporary_files;
     bool   leximax;
-    leximaxIST::Encoder *leximax_enc;
+    bool   simplify_last;
+
     string formalism;
     string lp_solver;
     
@@ -137,6 +140,8 @@ inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
 inline void ExternalWrapper::set_leximax(bool value) {
     leximax = value; }
+inline void ExternalWrapper::set_simplify_last(bool value) {
+    simplify_last = value; }
 inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {

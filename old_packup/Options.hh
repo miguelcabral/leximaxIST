@@ -53,6 +53,7 @@ public:
     const string&    get_lp_solver()   const { return lp_solver; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
+    int    get_simplify_last() const { return simplify_last; }
     
 private:
     int    help;
@@ -72,6 +73,7 @@ private:
     string temporary_directory;
     string formalism;
     int    leximax;
+    int    simplify_last;
     string lp_solver;
 };
 

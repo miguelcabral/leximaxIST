@@ -23,7 +23,8 @@ namespace leximaxIST {
                 // elems_to_sort is represented by a pair (first element, number of elements).
                 std::pair<long long,long long> elems_to_sort(0, num_terms);
                 if (m_debug) {
-                    std::cerr << "--------------- Objective Function " << i << " --------------\n";
+                    std::cerr << "--------------- Objective Function " << i << " (size = ";
+                    std::cerr << num_terms << ") --------------\n";
                     for (size_t j = 0; j < num_terms; ++j)
                         std::cerr << objective->at(j) << std::endl;
                 }
@@ -129,10 +130,10 @@ namespace leximaxIST {
             std::cerr << "------------ Relaxation variables of iteration " << i << " ------------\n";
             for (int j = 0; j < m_num_objectives; ++j)
                 std::cerr << first_relax_var + j << '\n';
-            if (i != m_num_objectives - 1)
+            if (!m_simplify_last || i != m_num_objectives - 1)
                 std::cerr << "------------ Sorted vecs after relax of iteration " << i << " ------------\n";
         }
-        if (i != m_num_objectives - 1) {
+        if (!m_simplify_last || i != m_num_objectives - 1) {
             std::vector<std::vector<long long>*> sorted_relax_vecs(m_num_objectives, nullptr);
             for (int j = 0; j < m_num_objectives; ++j) {
                 // encode relaxation variable of the j-th objective
@@ -328,13 +329,14 @@ namespace leximaxIST {
             lits.clear();
         }
     }
-
+    
     void Encoder::encode_upper_bound(int i, std::vector<long long> &old_obj_vec)
     {
         std::vector<long long> obj_vec (get_objective_vector());
         if (obj_vec.empty())
             return;
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
+        m_ub_vec[i] = obj_vec[i];
         if (m_debug) {
             std::cerr << "------------ Upper bound encoding ------------" << std::endl;
             std::cerr << "Sorted objective vector: ";
@@ -367,9 +369,9 @@ namespace leximaxIST {
                 }
             }
         }
-        if (i >= 1 && i != m_num_objectives - 1) { // upper bound on sorted relax and soft clauses
-            // the ub on sorted relax comes from soft clauses by unit propagation
+        if (!m_simplify_last || i != m_num_objectives - 1) { // upper bound on soft clauses
             long long max_i (obj_vec[i]); // upper bound on minimum max_i
+            m_ub_vec[i] = max_i; // update upper bound of current iteration
             long long end_position (m_soft_clauses.size() - 1 - max_i);
             if (m_debug) {
                 std::cerr << "------------ Upper bound on soft clauses ------------" << std::endl;
@@ -491,13 +493,13 @@ namespace leximaxIST {
             generate_soft_clauses(i);
             if (m_debug)
                 std::cerr << "------------------ ITERATION " << i << " ------------------\n";
-            if (i != 0 && m_num_objectives != 1) // in the first iteration i == 0 there is no relaxation
+            if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i);
-            // encode the componentwise OR between sorted_relax vectors except in the last iteration
-            if (i != m_num_objectives - 1)
+            // encode the componentwise OR between sorted_relax vectors (except maybe in the last iteration)
+            if (!m_simplify_last || i != m_num_objectives - 1)
                 componentwise_OR(i);
-            // encode upper bound obtained from sat solver (or MSS or MaxSAT) call
-            if (m_ub_encoding != 0 && i != m_num_objectives - 1) {
+            // encode upper bound obtained from sat solver (or MSS or MaxSAT)
+            if (m_ub_encoding != 0 && (!m_simplify_last || i != m_num_objectives - 1)) {
                 encode_upper_bound(i, old_obj_vec);
             }
             // call solver
