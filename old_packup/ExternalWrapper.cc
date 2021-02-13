@@ -423,8 +423,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
             std::cerr << o << ' ';
      	std::cerr << '\n';
      }
-     std::cerr << "# Number of guaranteed optimal values found: ";
-     std::cerr << leximax_enc->get_num_opts() << '\n';
+     /*std::cerr << "# Number of guaranteed optimal values found: ";
+     std::cerr << leximax_enc->get_num_opts() << '\n';*/
      if (ub_encoding != 0) {
         std::cerr << "# Upper bound: " << leximax_enc->get_ub_vec().at(0) << '\n';
         long largest (0);
