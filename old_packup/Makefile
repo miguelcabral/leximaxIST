@@ -22,14 +22,21 @@ CFLAGS += -Wall -Wextra -Wno-parentheses
 CFLAGS += -DBUILDDATE='"$(BUILDDATE)"' -DDISTDATE='"$(DISTDATE)"'
 CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
 # CFLAGS+=-D __STDC_LIMIT_MACROS -D __STDC_FORMAT_MACROS -Wno-parentheses -Wno-deprecated
-LIBS +=-lz
 #LNFLAGS+=-static
+
+# zlib library
+LIBS +=-lz
 
 # change LEXIMAXDIR to the root directory of the leximax library
 LEXIMAXDIR = ~/thesis/no-clause-set
-INCD += $(LEXIMAXDIR)/include
-LIBD += $(LEXIMAXDIR)/lib
+INCD += -I $(LEXIMAXDIR)/include
+LIBD += -L $(LEXIMAXDIR)/lib
 LIBS += -lleximaxIST
+
+# library of sat solver that implements ipasir (e.g. cadical)
+IPASIRDIR = ~/solvers/sat/cadical
+LIBS += -lcadical
+LIBD += -L $(IPASIRDIR)/build
 
 # comment out if arbitrary precision not needed
 # LIBS+=-lgmpxx -lgmp
@@ -61,7 +68,7 @@ debug : $(XTRGT)
 
 $(XTRGT): objs 
 	@echo Linking: $@
-	$(CXX) $(COBJS) $(LNFLAGS) -L $(LIBD) $(LIBS) -o $@ 
+	$(CXX) $(COBJS) $(LNFLAGS) $(LIBD) $(LIBS) -o $@ 
 
 objs: Lexer.o p.tab.o $(COBJS) 
 
@@ -71,7 +78,7 @@ depend:
 ## Build rule
 %.o:	%.cc *.hh
 	@echo Compiling: $@
-	$(CXX) -I $(INCD) $(CFLAGS) -c -o $@ $<
+	$(CXX) $(INCD) $(CFLAGS) -c -o $@ $<
 
 ##  This  needs bison and ragel, comment in if parsing changes
 #Lexer.cc: p.tab.cc  l.rl Lexer.hh

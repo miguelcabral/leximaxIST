@@ -1,4 +1,5 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_error.h>
 #include <vector>
 #include <signal.h>
 #include <chrono>
@@ -11,7 +12,7 @@
 
 namespace leximaxIST {
 
-    bool descending_order (long long i, long long j) { return i > j; }
+    bool descending_order (int i, int j) { return i > j; }
 
     // send signal signum to external solver if it is running, and get best solution
     int Encoder::terminate()
@@ -32,7 +33,7 @@ namespace leximaxIST {
             // (this happens if signal is caught after external solver has finished
             //      and before the solution has been read)
             if (m_solver_output) {
-                std::vector<long long> model;
+                std::vector<int> model;
                 if (read_solver_output(model) != 0) {
                     if (!m_leave_temporary_files)
                         remove_tmp_files();
@@ -78,7 +79,7 @@ namespace leximaxIST {
                 else if (retv == m_child_pid) {
                     // external solver has finished
                     // but solution may be worse than previous iteration - compare
-                    std::vector<long long> new_sol;
+                    std::vector<int> new_sol;
                     if (read_solver_output(new_sol) != 0) {
                         if (!m_leave_temporary_files)
                             remove_tmp_files();
@@ -90,8 +91,8 @@ namespace leximaxIST {
                             m_solution = new_sol;
                         else {
                             // check which solution is leximax-better
-                            std::vector<long long> new_obj_vec (get_objective_vector(new_sol));
-                            std::vector<long long> old_obj_vec (get_objective_vector(m_solution));
+                            std::vector<int> new_obj_vec (get_objective_vector(new_sol));
+                            std::vector<int> old_obj_vec (get_objective_vector(m_solution));
                             std::sort(new_obj_vec.begin(), new_obj_vec.end(), descending_order);
                             std::sort(old_obj_vec.begin(), old_obj_vec.end(), descending_order);
                             for (size_t j (0); j < new_obj_vec.size(); ++j) {

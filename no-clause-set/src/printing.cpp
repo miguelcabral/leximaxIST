@@ -1,27 +1,16 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_error.h>
 #include <fstream>
 #include <iostream>
-#include <forward_list>
+#include <list>
 
 namespace leximaxIST {
 
-    void Encoder::print_error_msg(const std::string &msg) const
+    void print_error_msg(const std::string &msg)
     {
-        if (m_err_file.empty())
-            std::cerr << "Error leximaxIST: " << msg << std::endl;
-        else {
-            std::ofstream err (m_err_file, std::ofstream::app);
-            if (err.is_open())
-                err << "Error leximaxIST: " << msg << std::endl;
-            else {
-                std::cerr << "Error leximaxIST: " << "Can't open error log file '";
-                std::cerr << m_err_file << "'. Logging to Standard error instead.";
-                std::cerr << std::endl;
-                std::cerr << "Error leximaxIST: " << msg << std::endl;
-            }
-        }
+        std::cerr << "Error leximaxIST: " << msg << std::endl;
     }
-
+    
     void Encoder::print_waitpid_error(const std::string &errno_str) const
     {
         std::string errmsg ("When calling");
@@ -32,7 +21,7 @@ namespace leximaxIST {
 
     void Encoder::print_clause(std::ostream &output, const Clause *clause) const
     {
-        for (long long lit : *clause)
+        for (int lit : *clause)
             output << lit << " "; 
         output << "0\n";
     }
@@ -47,8 +36,8 @@ namespace leximaxIST {
 
     void Encoder::print_pb_constraint(const Clause *cl, std::ostream &output) const
     {
-        long long num_negatives(0);
-        for (long long literal : *cl) {
+        int num_negatives(0);
+        for (int literal : *cl) {
             bool sign = literal > 0;
             if (!sign)
                 ++num_negatives;
@@ -59,10 +48,10 @@ namespace leximaxIST {
 
     void Encoder::print_lp_constraint(const Clause *cl, std::ostream &output) const
     {
-        long long num_negatives(0);
+        int num_negatives(0);
         size_t nb_vars_in_line (0);
         for (size_t j (0); j < cl->size(); ++j) {
-            long long literal (cl->at(j));
+            int literal (cl->at(j));
             bool sign = literal > 0;
             if (!sign)
                 ++num_negatives;
@@ -82,8 +71,8 @@ namespace leximaxIST {
     void Encoder::print_atmost_pb(int i, std::ostream &output) const
     {
         // i = 1 means position 0, i = 2, means position 1, etc
-        const std::forward_list<long long> &relax_vars (m_all_relax_vars[i-1]);
-        for (long long var : relax_vars) {
+        const std::list<int> &relax_vars (m_all_relax_vars[i-1]);
+        for (int var : relax_vars) {
             output << "-1" << m_multiplication_string << "x" << var << " ";
         }
         output << " >= " << -i << ";\n";
@@ -92,9 +81,9 @@ namespace leximaxIST {
     void Encoder::print_atmost_lp(int i, std::ostream &output) const
     {
         // i = 1 means position 0, i = 2, means position 1, etc
-        const std::forward_list<long long> &relax_vars (m_all_relax_vars[i-1]);
+        const std::list<int> &relax_vars (m_all_relax_vars[i-1]);
         bool first_iteration (true);
-        for (long long var : relax_vars) {
+        for (int var : relax_vars) {
             if (first_iteration) {
                 output << 'x' << var;
                 first_iteration = false;
@@ -107,8 +96,8 @@ namespace leximaxIST {
 
     void Encoder::print_sum_equals_pb(int i, std::ostream &output) const
     {
-        const std::forward_list<long long> &relax_vars (m_all_relax_vars.back());
-        for (long long var : relax_vars) {
+        const std::list<int> &relax_vars (m_all_relax_vars.back());
+        for (int var : relax_vars) {
             output << "+1" << m_multiplication_string << "x" << var << " ";
         }
         output << " = " << i << ";\n";
@@ -116,9 +105,9 @@ namespace leximaxIST {
 
     void Encoder::print_sum_equals_lp(int i, std::ostream &output) const
     {
-        const std::forward_list<long long> &relax_vars (m_all_relax_vars.back()); // last relax vars
+        const std::list<int> &relax_vars (m_all_relax_vars.back()); // last relax vars
         bool first_iteration (true);
-        for (long long var : relax_vars) {
+        for (int var : relax_vars) {
             if (first_iteration) {
                 output << 'x' << var;
                 first_iteration = false;

@@ -417,9 +417,9 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      size_t sorting_net_size (leximax_enc->get_sorting_net_size());
      std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';
      if (leximax_enc->get_sat()) {
-     	const std::vector<LINT> obj_vector(leximax_enc->get_objective_vector());
+     	const std::vector<int> obj_vector (leximax_enc->get_objective_vector());
      	std::cerr << "# Objective vector: ";
-     	for (LINT o : obj_vector)
+     	for (int o : obj_vector)
             std::cerr << o << ' ';
      	std::cerr << '\n';
      }
@@ -427,7 +427,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      std::cerr << leximax_enc->get_num_opts() << '\n';*/
      if (ub_encoding != 0) {
         std::cerr << "# Upper bound: " << leximax_enc->get_ub_vec().at(0) << '\n';
-        long largest (0);
+        int largest (0);
         for (const BasicClauseVector &soft_cls: clause_split)
             largest = (soft_cls.size() > largest) ? soft_cls.size() : largest;
         std::cerr << "# Trivial upper bound (size of largest objective): " << largest << '\n';
@@ -436,10 +436,10 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
  
  bool ExternalWrapper::solve_leximax() {
      // create constraints and objective functions as vectors of vectors...
-     std::vector<std::vector<long long>> input_constraints(hard_clauses.size());
+     std::vector<std::vector<int>> input_constraints(hard_clauses.size());
      size_t j(0);
      for (BasicClause *clause : hard_clauses) {
-         std::vector<long long> &con(input_constraints[j]);
+         std::vector<int> &con(input_constraints[j]);
          con.resize(clause->size());
          size_t k(0);
          for (LINT lit : *clause) {
@@ -448,14 +448,14 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          }
          ++j;
      }
-     std::vector<std::vector<std::vector<long long>>> obj_functions(clause_split.size());
+     std::vector<std::vector<std::vector<int>>> obj_functions(clause_split.size());
      j = 0;
      for (BasicClauseVector &soft_cls: clause_split) {
-         std::vector<std::vector<long long>> &obj = obj_functions[j];
+         std::vector<std::vector<int>> &obj = obj_functions[j];
          obj.resize(soft_cls.size());
          size_t k(0);
          for (BasicClause *clause : soft_cls) {
-            std::vector<long long> &literals(obj[k]);
+            std::vector<int> &literals(obj[k]);
             literals.resize(clause->size());
             size_t i(0);
             for (LINT lit : *clause) {
@@ -486,7 +486,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          model.clear();
          return false;
      }
-     std::vector<long long> sol (leximax_enc->get_solution());
+     std::vector<int> sol (leximax_enc->get_solution());
      model.assign(sol.begin(), sol.end());
      print_leximax_info();
      // return satisfiable or not?

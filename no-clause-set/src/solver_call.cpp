@@ -1,11 +1,13 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_parsing_utils.h>
+#include <leximaxIST_error.h>
+#include <IpasirWrap.h>
 #include <zlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h> // for errno
-#include <stdlib.h>
+#include <stdlib.h> // exit, system
 #include <stdio.h> // for fopen()
 #include <fstream>
 #include <cstring> // for strerror()
@@ -16,7 +18,7 @@
 
 namespace leximaxIST {
 
-    int Encoder::read_gurobi_output(std::vector<long long> &model)
+    int Encoder::read_gurobi_output(std::vector<int> &model)
     {
         std::string output_filename (m_file_name + ".sol");
         gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -33,7 +35,7 @@ namespace leximaxIST {
             else {
                 sat = true;
                 ++r;
-                const long long var = parseInt(r);
+                const int var = parseInt(r);
                 assert(model.size()>(size_t)var);
                 ++r; // skip whitespace
                 if (*r == '1')
@@ -53,31 +55,31 @@ namespace leximaxIST {
         return 0;
     }
 
-    int Encoder::read_glpk_output(std::vector<long long> &model)
+    int Encoder::read_glpk_output(std::vector<int> &model)
     {
         // TODO
         return 0;
     }
 
-    int Encoder::read_lpsolve_output(std::vector<long long> &model)
+    int Encoder::read_lpsolve_output(std::vector<int> &model)
     {
         // TODO
         return 0;
     }
 
-    int Encoder::read_scip_output(std::vector<long long> &model)
+    int Encoder::read_scip_output(std::vector<int> &model)
     {
         // TODO
         return 0;
     }
 
-    int Encoder::read_cbc_output(std::vector<long long> &model)
+    int Encoder::read_cbc_output(std::vector<int> &model)
     {
         // TODO
         return 0;
     }
 
-    int Encoder::read_cplex_output(std::vector<long long> &model)
+    int Encoder::read_cplex_output(std::vector<int> &model)
     {
         std::string output_filename (m_file_name + ".out");
         gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -108,7 +110,7 @@ namespace leximaxIST {
                             skipLine(r);
                         else {
                             ++r;
-                            const long long l = parseInt(r);
+                            const int l = parseInt(r);
                             assert(model.size()>(size_t)l);
                             model[l] = l;
                         }
@@ -122,7 +124,7 @@ namespace leximaxIST {
     }
 
     // if model.empty() in the end then unsat, else sat
-    int Encoder::read_sat_output(std::vector<long long> &model)
+    int Encoder::read_sat_output(std::vector<int> &model)
     {
         std::string output_filename (m_file_name + ".out");
         gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -145,7 +147,7 @@ namespace leximaxIST {
                     if ((*r == '+') || (*r == '-')) ++r;
                     if ((*r == 'x')) ++r;
                     if (*r < '0' || *r > '9') break;
-                    const long long l = parseInt(r);
+                    const int l = parseInt(r);
                     assert(model.size()>(size_t)l);
                     model[l] = (sign ? l : -l);
                 }
@@ -158,7 +160,7 @@ namespace leximaxIST {
         return 0;
     }
     
-    int Encoder::read_solver_output(std::vector<long long> &model)
+    int Encoder::read_solver_output(std::vector<int> &model)
     {
         if (m_formalism == "wcnf" || m_formalism == "opb")
             return read_sat_output(model);
@@ -410,7 +412,7 @@ namespace leximaxIST {
         if (m_soft_clauses.size() > 0) {// print minimization function
             out << "min:";
             for (const Clause *cl : m_soft_clauses) {
-                long long soft_var = -(*(cl->begin())); // cl is unitary clause
+                int soft_var = -(*(cl->begin())); // cl is unitary clause
                 out << " " << "+1" << m_multiplication_string << "x" << soft_var;
             }
             out << ";\n";
@@ -460,7 +462,7 @@ namespace leximaxIST {
         }
         m_solver_output = true; // there is solver output to read
         // read output of solver
-        std::vector<long long> model;
+        std::vector<int> model;
         if (read_solver_output(model) != 0) {
             if (!m_leave_temporary_files)
                 remove_tmp_files();
@@ -500,7 +502,7 @@ namespace leximaxIST {
             size_t nb_vars_in_line (0);
             for (size_t j (0); j < m_soft_clauses.size(); ++j) {
                 const Clause *cl (m_soft_clauses[j]);
-                long long soft_var = -(*(cl->begin())); // cl is unitary clause
+                int soft_var = -(*(cl->begin())); // cl is unitary clause
                 if (j == 0)
                     output << 'x' << soft_var;
                 else
@@ -563,7 +565,7 @@ namespace leximaxIST {
         }
         m_solver_output = true; // there is solver output to read
         // read output of solver
-        std::vector<long long> model;
+        std::vector<int> model;
         if (read_sat_output(model) != 0) {
             if (!m_leave_temporary_files)
                 remove_tmp_files();
@@ -579,13 +581,68 @@ namespace leximaxIST {
         return 0;
     }
 
+    // choose next variable in todo (using heuristic) and remove it from todo
+    int Encoder::mss_choose_next_var(std::list<int> &todo)
+    {
+        if (todo.empty()) {
+            print_error_msg("In function mss_choose_next_var(), todo parameter is empty");
+            exit(EXIT_FAILURE);
+        }
+        int next_var (todo.front());
+        todo.pop_front();
+        return next_var;
+    }
+    
+    int Encoder::mss_solve()
+    {
+        // TODO: see how this can behave with signals
+        // Can something go wrong with the sat solver?
+        IpasirWrap solver(m_id_count);
+        for (const Clause *hard_cl : m_constraints)
+            solver.addClause(hard_cl);
+        m_sat = solver.solve();
+        if (!m_sat)
+            return 0;
+        m_solution = solver.model(); // TODO: maybe change this to move assignment
+        std::list<int> todo;
+        for (const std::vector<int> *objective : m_objectives) {
+            for (int var : *objective)
+                todo.push_back(var);
+        }
+        std::vector<int> mss;
+        while (!todo.empty()) {
+            // choose variable in todo (using an heuristic); variable is removed from todo
+            int next_var (mss_choose_next_var(todo));
+            mss.push_back(-next_var);
+            if (!solver.solve(mss)) {
+                // neg next_var does not belong to mss
+                mss.pop_back();
+                // next_var has been learnt by the sat solver - should I add it to mss?
+            }
+            else {
+                m_solution = solver.model(); // TODO: maybe change this to move assignment
+                // add all other falsified variables in todo to mss
+                for (auto i (todo.begin()); i != todo.end(); /*increment inside body*/) {
+                    int var (*i);
+                    if (m_solution[var] < 0) {
+                       mss.push_back(-var);
+                       i = todo.erase(i); // erase() returns iterator to the next element
+                    }
+                    else // do not remove var from todo nor add it to mss
+                        ++i;
+                }
+            }
+        }
+        return 0;
+    }
+    
     int Encoder::calculate_upper_bound()
     {
         if (m_ub_encoding == 1) { // call sat solver once
             return sat_solve();
         }
         else if (m_ub_encoding == 2) { // calculate an MSS of the problem with sum of obj funcs 
-            // TODO return clause_d_solve();
+            return mss_solve();
         }
         else if (m_ub_encoding == 3) { // get optimal solution of problem with sum of obj funcs 
             // TODO add negate all objective variables to form soft clauses and call external_solve(0)

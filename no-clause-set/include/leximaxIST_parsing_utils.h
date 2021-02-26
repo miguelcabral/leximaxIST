@@ -134,9 +134,9 @@ namespace leximaxIST {
     return rstr; }
 
     template<class B>
-    static long long parseInt(B& in) {
-        long long    val = 0;
-        bool    neg = false;
+    static int parseInt(B& in) {
+        int    val = 0;
+        bool   neg = false;
         skipWhitespace(in);
         if      (*in == '-') neg = true, ++in;
         else if (*in == '+') ++in;

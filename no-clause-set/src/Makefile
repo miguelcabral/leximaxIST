@@ -8,6 +8,9 @@ OBJS := $(OBJS1)
 OBJS += $(OBJS2)
 LIBNAME = libleximaxIST.a
 
+# Edit the following line to change the path to cadical include directory
+CFLAGS += -I ~/solvers/sat/cadical/src
+
 ifdef PROF
 	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
 endif
@@ -24,20 +27,20 @@ debug : $(LIBNAME)
 
 $(LIBNAME) : $(OBJS)
 	@echo "Archiving: $(LIBNAME)"
-	@ar -rcs ../lib/$(LIBNAME) $(OBJS)
-	@rm -f *.o
+	ar -rcs ../lib/$(LIBNAME) $(OBJS)
+	rm -f *.o
 
 $(OBJS1) : %.o: %.cc
 	@echo "Compiling: $@"
-	@g++ $(CFLAGS) -c -o $@ $<
+	g++ $(CFLAGS) -c -o $@ $<
 
 $(OBJS2) : %.o: %.cpp
 	@echo "Compiling: $@"
 	@sed -i '$(SEDSTR)' constructors.cpp
-	@g++ $(CFLAGS) -c -o $@ $<
+	g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
-	@rm -f ../lib/$(LIBNAME) *.o
 	@echo "Removing: $(LIBNAME) $(OBJS)"
+	rm -f ../lib/$(LIBNAME) *.o
 	
 

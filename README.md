@@ -68,6 +68,9 @@ To execute the solver run the following command `rc2.py -vv`. For the list of op
 ## Build
 Instruções para compilar a ferramenta e a biblioteca.
 
+### Dependencies
+zlib (reading files), a sat solver that implements the IPASIR interface (finding MSSes to get upper bound of first optimum).
+
 #### Example:
 The objective function x_1 + x_2 + x_3 can be specified in a .cnf file as follows.
 

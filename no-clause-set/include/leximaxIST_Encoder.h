@@ -1,17 +1,17 @@
 #ifndef LEXIMAXIST_ENCODER
 #define LEXIMAXIST_ENCODER
 #include <leximaxIST_types.h>
-#include <string>
+#include <string> // std::string
 #include <vector> // std::vector
 #include <utility> // std::pair
-#include <forward_list> // std::forward_list
-#include <sys/types.h>
+#include <list> // std::list
+#include <sys/types.h> // pid_t
 
 
 namespace leximaxIST
 {
 
-    class Encoder {
+    class Encoder {// TODO: try to eliminate dynamic memory allocation using move semantics
 
     private:
 
@@ -19,17 +19,16 @@ namespace leximaxIST
         size_t m_id_count;
         std::vector<Clause*> m_constraints;
         std::vector<Clause*> m_soft_clauses;
-        std::vector<std::vector<long long>*> m_objectives; // TODO: change vectors to pair(first elem, size) if makes sense
+        std::vector<std::vector<int>*> m_objectives; // TODO: change vectors to pair(first elem, size) if makes sense
         int m_num_objectives;
-        std::vector<std::vector<long long>*> m_sorted_vecs;
-        std::vector<std::vector<std::vector<long long>*>>  m_sorted_relax_collection;
-        std::vector<std::forward_list<long long>> m_all_relax_vars; // relax_vars of each iteration
+        std::vector<std::vector<int>*> m_sorted_vecs;
+        std::vector<std::vector<std::vector<int>*>>  m_sorted_relax_collection;
+        std::vector<std::list<int>> m_all_relax_vars; // relax_vars of each iteration
         std::string m_opt_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
         std::string m_lp_solver;
         std::string m_valid_lp_solvers[6];
         std::string m_file_name;
-        std::string m_err_file;
         bool m_solver_output; // is there an output file to read?
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
@@ -42,9 +41,9 @@ namespace leximaxIST
         // you want to know which values of the objective vector are in theory guaranteed to be optimal
         //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
         std::string m_multiplication_string;
-        std::vector<long long> m_solution;
+        std::vector<int> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
-        std::vector<long long> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
+        std::vector<int> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
         std::vector<double> m_iteration_times; // TODO; how long took iteration 0, 1, ... 
         
     public:    
@@ -56,7 +55,7 @@ namespace leximaxIST
         // returns 0 if all want well, -1 otherwise
         int solve();
         
-        std::vector<long long> get_ub_vec() const;
+        const std::vector<int>& get_ub_vec() const;
         
         bool get_sat() const;
         
@@ -67,12 +66,12 @@ namespace leximaxIST
         /* if the problem is satisfiable, then m_solution is a satisfying assignment;
         * each entry i of m_solution is +i if variable i is true and -i otherwise;
         * if the problem is not satisfiable, m_solution is empty.*/
-        const std::vector<long long>& get_solution() const;
+        const std::vector<int>& get_solution() const;
         
-        // empty if unsat
-        std::vector<long long> get_objective_vector() const;
+        // empty if unsat; not a const reference because it is not a member variable
+        std::vector<int> get_objective_vector() const;
         
-        int set_problem(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions);
+        int set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions);
         
         void set_simplify_last(bool val);
         
@@ -86,8 +85,6 @@ namespace leximaxIST
         
         int set_formalism(const std::string &format);
         
-        void set_err_file(const std::string &name);
-        
         int set_lp_solver(const std::string &lp_solver);
         
         void set_leave_temporary_files(bool val); // TODO: change temporary to tmp
@@ -100,17 +97,23 @@ namespace leximaxIST
         
     private:
         
+        // setters.cpp
+        
+        int fresh();
+        
+        void reset_file_name();
+        
+        void update_id_count(const Clause &clause);
+        
         // getters.cpp
         
-        std::vector<long long> get_objective_vector(const std::vector<long long> &assignment) const;
+        std::vector<int> get_objective_vector(const std::vector<int> &assignment) const;
         
         // constructors.cpp
         
-        int add_soft_clause(const std::vector<long long> &lits);
+        int add_soft_clause(const Clause &c);
         
-        int add_hard_clause(const std::vector<long long> &lits);
-        
-        void update_id_count(const std::vector<long long> &clause);
+        int add_hard_clause(const Clause &c);
         
         // destructor.cpp
         
@@ -122,15 +125,15 @@ namespace leximaxIST
         
         // sorting_net.cpp
         
-        void encode_max(long long var_out_max, long long var_in1, long long var_in2);
+        void encode_max(int var_out_max, int var_in1, int var_in2);
         
-        void encode_min(long long var_out_min, long long var_in1, long long var_in2);
+        void encode_min(int var_out_min, int var_in1, int var_in2);
         
-        void insert_comparator(long long el1, long long el2, std::vector<long long> *objective, SNET &sorting_network);
+        void insert_comparator(int el1, int el2, std::vector<int> *objective, SNET &sorting_network);
         
-        void odd_even_merge(std::pair<std::pair<long long,long long>,long long> seq1, std::pair<std::pair<long long,long long>,long long> seq2, std::vector<long long> *objective, SNET &sorting_network);
+        void odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, std::vector<int> *objective, SNET &sorting_network);
         
-        void encode_network(std::pair<long long,long long> elems_to_sort, std::vector<long long> *objective, SNET &sorting_network);
+        void encode_network(std::pair<int,int> elems_to_sort, std::vector<int> *objective, SNET &sorting_network);
         
         //void delete_snet(SNET &sorting_network);
         
@@ -142,25 +145,27 @@ namespace leximaxIST
         
         void generate_soft_clauses(int i);
         
-        void all_subsets(std::forward_list<long long> set, int i, std::vector<long long> &clause_vec);
+        void all_subsets(std::list<int> set, int i, Clause &clause);
         
-        void at_most(std::forward_list<long long> &set, int i);
+        void at_most(const std::list<int> &set, int i);
         
         void encode_relaxation(int i);
         
         void componentwise_OR(int i);
         
-        void encode_upper_bound(int i, std::vector<long long> &old_obj_vec);
+        void encode_upper_bound(int i, std::vector<int> &old_obj_vec);
         
-        void debug_print_all(const std::vector<std::vector<long long>> &true_ys, const std::vector<long long> &y_vector);
+        void debug_print_all(const std::vector<std::vector<int>> &true_ys, const std::vector<int> &y_vector);
         
         // solver_call.cpp
+        
+        int mss_choose_next_var(std::list<int> &todo);
+        
+        int mss_solve();
         
         int sat_solve();
         
         int calculate_upper_bound();
-        
-        void reset_file_name();
         
         void remove_tmp_files() const;
 
@@ -168,7 +173,7 @@ namespace leximaxIST
         
         int call_solver(const std::string &solver_type);
         
-        int read_solver_output(std::vector<long long> &model);
+        int read_solver_output(std::vector<int> &model);
         
         int external_solve(int i);
         
@@ -182,23 +187,21 @@ namespace leximaxIST
         
         int write_wcnf_file(int i);
         
-        int read_sat_output(std::vector<long long> &model);
+        int read_sat_output(std::vector<int> &model);
         
-        int read_cplex_output(std::vector<long long> &model);
+        int read_cplex_output(std::vector<int> &model);
         
-        int read_gurobi_output(std::vector<long long> &model);
+        int read_gurobi_output(std::vector<int> &model);
         
-        int read_glpk_output(std::vector<long long> &model);
+        int read_glpk_output(std::vector<int> &model);
         
-        int read_lpsolve_output(std::vector<long long> &model);
+        int read_lpsolve_output(std::vector<int> &model);
         
-        int read_scip_output(std::vector<long long> &model);
+        int read_scip_output(std::vector<int> &model);
         
-        int read_cbc_output(std::vector<long long> &model);
+        int read_cbc_output(std::vector<int> &model);
         
         // printing.cpp
-        
-        void print_error_msg(const std::string &msg) const;
         
         void print_waitpid_error(const std::string &errno_str) const;
         

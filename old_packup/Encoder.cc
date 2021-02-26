@@ -1395,10 +1395,10 @@ void Encoder::print_time()
     double parent_time (RUSAGE::read_cpu_time_self());
     double children_time (RUSAGE::read_cpu_time_children());
     double total_time (parent_time + children_time);
-    std::cerr << "# solving time:\n";
-    std::cerr << "#\t parent process: " << parent_time << "s\n";
-    std::cerr << "#\t child processes: " << children_time << "s\n";
-    std::cerr << "#\t total time: " << total_time << "s\n";
+    std::cerr << "# solving time: ";
+    //std::cerr << "#\t parent process: " << parent_time << "s\n";
+    //std::cerr << "#\t child processes: " << children_time << "s\n";
+    std::cerr /*<< "#\t total time: " */ << total_time << "s\n";
 }
 
 bool Encoder::solution() {

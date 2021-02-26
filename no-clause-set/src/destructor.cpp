@@ -1,4 +1,5 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_error.h>
 #include <vector>
 
 namespace leximaxIST {
@@ -13,7 +14,7 @@ namespace leximaxIST {
 
     void Encoder::clear_sorted_relax()
     {
-        for (std::vector<std::vector<long long>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+        for (std::vector<std::vector<int>*> &sorted_relax_vecs : m_sorted_relax_collection) {
             for (size_t i (0); i < sorted_relax_vecs.size(); ++i) {
                 delete sorted_relax_vecs[i];
                 sorted_relax_vecs[i] = nullptr;
@@ -34,11 +35,11 @@ namespace leximaxIST {
     void Encoder::clear()
     {
         // free m_objectives
-        for (std::vector<long long> *objective : m_objectives)
+        for (std::vector<int> *objective : m_objectives)
             delete objective;
         m_objectives.clear();
         // free m_sorted_vecs
-        for (std::vector<long long> *sorted_vec : m_sorted_vecs)
+        for (std::vector<int> *sorted_vec : m_sorted_vecs)
             delete sorted_vec;
         m_sorted_vecs.clear();
         // clear relaxation variables
@@ -47,6 +48,7 @@ namespace leximaxIST {
         clear_sorted_relax();
         clear_hard_clauses();
         clear_soft_clauses();
+        m_ub_vec.clear();
         m_solution.clear();
         //m_num_opts = 0;
         m_id_count = 0;

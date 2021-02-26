@@ -13,7 +13,7 @@ namespace leximaxIST {
         return m_sat; 
     }
 
-    std::vector<long long> Encoder::get_ub_vec() const
+    const std::vector<int>& Encoder::get_ub_vec() const
     {
         return m_ub_vec;
     }
@@ -23,19 +23,19 @@ namespace leximaxIST {
         return m_sorting_net_size; 
     }
 
-    const std::vector<long long>& Encoder::get_solution() const 
+    const std::vector<int>& Encoder::get_solution() const 
     { 
         return m_solution;
     }
 
     // if unsat return empty vector
-    std::vector<long long> Encoder::get_objective_vector(const std::vector<long long> &assignment) const
+    std::vector<int> Encoder::get_objective_vector(const std::vector<int> &assignment) const
     {
-        std::vector<long long> objective_vector;
+        std::vector<int> objective_vector;
         if (!assignment.empty()) {
-            for (std::vector<long long> *obj_func : m_objectives) {
-                long long obj_value (0);
-                for (long long var : *obj_func) {
+            for (std::vector<int> *obj_func : m_objectives) {
+                int obj_value (0);
+                for (int var : *obj_func) {
                     if (assignment[var] > 0)
                         ++obj_value;
                 }
@@ -45,13 +45,13 @@ namespace leximaxIST {
         return objective_vector;
     }
 
-    std::vector<long long> Encoder::get_objective_vector() const
+    std::vector<int> Encoder::get_objective_vector() const
     {
-        std::vector<long long> objective_vector;
+        std::vector<int> objective_vector;
         if (!m_solution.empty()) {
-            for (std::vector<long long> *obj_func : m_objectives) {
-                long long obj_value (0);
-                for (long long var : *obj_func) {
+            for (std::vector<int> *obj_func : m_objectives) {
+                int obj_value (0);
+                for (int var : *obj_func) {
                     if (m_solution[var] > 0)
                         ++obj_value;
                 }

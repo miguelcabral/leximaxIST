@@ -1,10 +1,23 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_error.h>
 #include <string>
+#include <climits>
+#include <cstdlib>
 #include <sys/types.h>
 #include <unistd.h>
 
 namespace leximaxIST {
 
+    int Encoder::fresh()
+    {
+        // check for overflow
+        if (m_id_count == INT_MAX) {
+            print_error_msg("The number of variables exceeded INT_MAX");
+            exit(EXIT_FAILURE);
+        }
+        return ++m_id_count; 
+    }
+    
     void Encoder::reset_file_name()
     {
         m_file_name = std::to_string(getpid());
@@ -67,19 +80,17 @@ namespace leximaxIST {
     void Encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
 
     void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
-
-    void Encoder::set_err_file(const std::string &name) { m_err_file = name; }
     
-    void Encoder::update_id_count(const std::vector<long long> &clause)
+    void Encoder::update_id_count(const Clause &clause)
     {
-        for (long long lit : clause) {
-            long long var( lit < 0 ? -lit : lit );
+        for (int lit : clause) {
+            int var( lit < 0 ? -lit : lit );
             if (var > m_id_count)
                 m_id_count = var;
         }
     }
     
-    int Encoder::set_problem(const std::vector<std::vector<long long>> &constraints, const std::vector<std::vector<std::vector<long long>>> &objective_functions)
+    int Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
     {
         // restart object: if it has not been cleared from a previous problem
         clear();
@@ -99,7 +110,7 @@ namespace leximaxIST {
         m_objectives.resize(m_num_objectives, nullptr);
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         // read problem
-        for (const std::vector<long long> &hard_clause : constraints) {
+        for (const std::vector<int> &hard_clause : constraints) {
             // determine max id and update m_id_count
             update_id_count(hard_clause);
             // store clause (check if it is empty)
@@ -107,32 +118,29 @@ namespace leximaxIST {
                 return -1;
         }
         // update m_id_count if there are new variables in objective_functions
-        for (const std::vector<std::vector<long long>> &obj : objective_functions) {
-            for (const std::vector<long long> &soft_clause : obj)
+        for (const std::vector<std::vector<int>> &obj : objective_functions) {
+            for (const std::vector<int> &soft_clause : obj)
                 update_id_count(soft_clause);
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
         int i(0);
-        for (const std::vector<std::vector<long long>> &obj : objective_functions) {
-            m_objectives[i] = new std::vector<long long>(obj.size(), 0);
-            std::vector<long long> lits;
+        for (const std::vector<std::vector<int>> &obj : objective_functions) {
+            m_objectives[i] = new std::vector<int>(obj.size(), 0);
             int j(0);
-            for (const std::vector<long long> &soft_clause : obj) {
+            for (const std::vector<int> &soft_clause : obj) {
                 // neg fresh_var implies soft_clause
-                long long fresh_var(m_id_count + 1);
-                m_id_count++;
-                lits = soft_clause;
+                int fresh_var (fresh());
+                Clause hard_clause (soft_clause); // copy constructor
                 (m_objectives.at(i))->at(j) = fresh_var;
-                lits.push_back(fresh_var);
-                add_hard_clause(lits);
-                lits.clear();
+                hard_clause.push_back(fresh_var);
+                add_hard_clause(hard_clause);
+                hard_clause.clear();
                 j++;
                 // other implication: soft_clause implies neg fresh_var
-                for (const long long soft_lit : soft_clause) {
-                    lits.push_back(-soft_lit);
-                    lits.push_back(-fresh_var);
-                    add_hard_clause(lits);
-                    lits.clear();
+                for (const int soft_lit : soft_clause) {
+                    hard_clause.push_back(-soft_lit);
+                    hard_clause.push_back(-fresh_var);
+                    add_hard_clause(hard_clause);
                 }
             }
             ++i;
