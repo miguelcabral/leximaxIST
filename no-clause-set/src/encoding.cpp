@@ -173,43 +173,38 @@ namespace leximaxIST {
         else { // last iteration
             // choose exactly one obj function to minimise
             int k = 0;
-            std::vector<int> lits;
             for (int relax_var : relax_vars) {
                 std::vector<int> *objective = m_objectives[k];
                 size_t j = 0;
                 for (Clause *cl : m_soft_clauses) {
                     int soft_var = -(*(cl->begin()));
-                    lits.clear();
                     if (j >= objective->size()) {
                         // relax_vars[k] implies neg soft_var[j]
-                        lits.push_back(-relax_var);
-                        lits.push_back(-soft_var);
+                        Clause cl {-relax_var, -soft_var};
                         if (m_debug) {
                             std::cerr << "relax_var implies neg soft_var: ";
-                            print_clause(std::cerr, &lits);
+                            print_clause(std::cerr, &cl);
                         }
-                        add_hard_clause(lits);
+                        add_hard_clause(cl);
                     }
                     else {
                         // relax_vars[k] implies objective[j] implies soft_var[j]
-                        lits.push_back(-relax_var);
-                        lits.push_back(-(objective->at(j)));
-                        lits.push_back(soft_var);
+                        Clause cl {-relax_var, -(objective->at(j)), soft_var};
                         if (m_debug) {
                             std::cerr << "relax_var implies obj_var implies soft_var: ";
-                            print_clause(std::cerr, &lits);
+                            print_clause(std::cerr, &cl);
                         }
-                        add_hard_clause(lits);
-                        lits.clear();
+                        add_hard_clause(cl);
+                        cl.resize(3);
                         // let's check: m_relax_vars[k] implies soft_var[j] implies objective[j]
-                        lits.push_back(-relax_var);
-                        lits.push_back(objective->at(j));
-                        lits.push_back(-soft_var);
+                        cl[0] = -relax_var;
+                        cl[1] = objective->at(j);
+                        cl[2] = -soft_var;
                         if (m_debug) {
                             std::cerr << "relax_var implies soft_var implies obj: ";
-                            print_clause(std::cerr, &lits);
+                            print_clause(std::cerr, &cl);
                         }
-                        add_hard_clause(lits);
+                        add_hard_clause(cl);
                     }
                     ++j;
                 }
@@ -221,14 +216,12 @@ namespace leximaxIST {
                     std::cerr << "---------------- At most " << 1 << " Constraint ----------------\n";
                 at_most(relax_vars, 1);
                 // at least 1 constraint
-                lits.clear();
-                for (int relax_var : relax_vars)
-                    lits.push_back(relax_var);
+                Clause cl (relax_vars.begin(), relax_vars.end());
                 if (m_debug) {
                     std::cerr << "---------------- At least " << 1 << " Constraint ----------------\n";
-                    print_clause(std::cerr, &lits);
+                    print_clause(std::cerr, &cl);
                 }
-                add_hard_clause(lits);
+                add_hard_clause(cl);
             }
         }
     }

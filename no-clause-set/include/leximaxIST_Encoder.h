@@ -44,7 +44,7 @@ namespace leximaxIST
         std::vector<int> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
         std::vector<int> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
-        std::vector<double> m_iteration_times; // TODO; how long took iteration 0, 1, ... 
+        std::vector<double> m_times; // time of each step of solving (only external solver times)
         
     public:    
 

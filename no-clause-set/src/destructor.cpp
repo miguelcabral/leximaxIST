@@ -57,6 +57,7 @@ namespace leximaxIST {
         m_child_pid = 0;
         m_sat = false;
         m_sorting_net_size = 0;
+        m_times.clear();
     }
     
     // remove temporary files and free memory

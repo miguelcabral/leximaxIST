@@ -4,6 +4,7 @@
 #include <IpasirWrap.h>
 #include <zlib.h>
 #include <sys/wait.h>
+#include <sys/resource.h> // for getrusage()
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h> // for errno
@@ -455,11 +456,14 @@ namespace leximaxIST {
         if (write_solver_input(i) != 0)
             return -1;
         // call the solver
+        double initial_time (read_cpu_time());
         if (call_solver("optimisation") != 0) {
             if (!m_leave_temporary_files)
                 remove_tmp_files();
             return -1;
         }
+        double final_time (read_cpu_time());
+        add_solving_time(final_time - initial_time);
         m_solver_output = true; // there is solver output to read
         // read output of solver
         std::vector<int> model;
@@ -604,6 +608,7 @@ namespace leximaxIST {
         if (!m_sat)
             return 0;
         m_solution = solver.model(); // TODO: maybe change this to move assignment
+        // std::vector<std::list> lista de todos, para cada func objetivo.
         std::list<int> todo;
         for (const std::vector<int> *objective : m_objectives) {
             for (int var : *objective)
@@ -637,18 +642,42 @@ namespace leximaxIST {
     }
     
     int Encoder::calculate_upper_bound()
-    {
+    {   
+        int retv (0);
+        double initial_time (read_cpu_time());
         if (m_ub_encoding == 1) { // call sat solver once
-            return sat_solve();
+            retv = sat_solve();
         }
         else if (m_ub_encoding == 2) { // calculate an MSS of the problem with sum of obj funcs 
-            return mss_solve();
+            retv = mss_solve();
         }
         else if (m_ub_encoding == 3) { // get optimal solution of problem with sum of obj funcs 
             // TODO add negate all objective variables to form soft clauses and call external_solve(0)
             // be careful that external_solve may add cardinality constraints in non-zero iterations
         }
-        return 0;
+        double final_time (read_cpu_time());
+        add_solving_time(final_time - initial_time);
+        return retv;
+    }
+    
+    double read_cpu_time()
+    {
+        struct rusage ru;
+        getrusage(RUSAGE_SELF, &ru);
+        long double total_time ((long double)ru.ru_utime.tv_sec + (long double)ru.ru_utime.tv_usec / 1000000);
+        getrusage(RUSAGE_CHILDREN, &ru);
+        total_time += (long double)ru.ru_utime.tv_sec + (long double)ru.ru_utime.tv_usec / 1000000;
+        return total_time;
+    }
+    
+    void Encoder::add_solving_time(double t)
+    {
+        // set to t the first position of m_times that has 0.0
+        for (double &time : m_times) {
+            if (std::abs(time - 0.0) < 0.00001)
+                time = t;
+                return;
+        }
     }
     
 } /* namespace leximaxIST */
