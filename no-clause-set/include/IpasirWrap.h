@@ -36,7 +36,8 @@ namespace leximaxIST {
         inline int fresh() { return ++_nvars; }
         inline bool is_ok_var(int v) { return 1 <= _nvars && v <= _nvars; }
         inline bool is_ok_lit(int l) { return is_ok_var(std::abs(l)); }
-        const std::vector<int>& model() const { return _model; }
+        // return a non-const reference to be able to steal _model's data with move semantics
+        std::vector<int>& model() { return _model; }
         const std::vector<int>& conflict() const { return _conflict; }
 
         int nVars() const {return _nvars;}

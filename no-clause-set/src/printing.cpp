@@ -11,6 +11,41 @@ namespace leximaxIST {
         std::cerr << "Error leximaxIST: " << msg << std::endl;
     }
     
+    // in this case we already have computed obj_vec
+    void Encoder::print_obj_vector(const std::vector<int> &obj_vec) const
+    {
+        if (!obj_vec.empty()) {
+            std::cout << "o ";
+            for (int v : obj_vec)
+                std::cout << v << ' ';
+            std::cout << std::endl;
+        }
+    }
+    
+    // in this case we compute obj_vec
+    void Encoder::print_obj_vector() const
+    {
+        const std::vector<int> &obj_vec (get_objective_vector());
+        if (!obj_vec.empty()) {
+            std::cout << "o ";
+            for (int v : obj_vec)
+                std::cout << v << ' ';
+            std::cout << std::endl;
+        }
+    }
+    
+    void Encoder::print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const
+    {
+        std::cout << "c MSS:\n";
+        for (int c : mss)
+            std::cout << "c " << c << '\n';
+        for (int i(0); i < m_num_objectives; ++i) {
+            std::cout << "c Todo of Objective " << i << ":\n";
+            for (int var : todo_vec.at(i))
+                std::cout << "c " << var << '\n';
+        }
+    }
+    
     void Encoder::print_waitpid_error(const std::string &errno_str) const
     {
         std::string errmsg ("When calling");
@@ -19,8 +54,9 @@ namespace leximaxIST {
         print_error_msg(errmsg);
     }
 
-    void Encoder::print_clause(std::ostream &output, const Clause *clause) const
+    void Encoder::print_clause(std::ostream &output, const Clause *clause, const std::string &leadingStr) const
     {
+        output << leadingStr;
         for (int lit : *clause)
             output << lit << " "; 
         output << "0\n";

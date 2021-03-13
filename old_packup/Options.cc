@@ -41,6 +41,7 @@ Options::Options()
 , leximax(0)
 , simplify_last(0)
 , ub_encoding(0)
+, verbosity("0")
 , formalism("wcnf")
 , lp_solver("gurobi")
 {}
@@ -77,6 +78,7 @@ bool Options::parse(int argc,char **argv) {
        ,{"sat-solver", required_argument,  0, 507}
        ,{"ssol", required_argument,  0, 507}
        ,{"ub-enc", required_argument,  0, 508}
+       ,{"v", required_argument,  0, 509}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
        ,{"leximax", no_argument,  &leximax, 1}
@@ -88,7 +90,7 @@ bool Options::parse(int argc,char **argv) {
     while (1) {
        /* getopt_long stores the option index here. */
        int option_index = 0;
-       c = getopt_long(argc, argv, "hu:ptf:", long_options, &option_index);
+       c = getopt_long(argc, argv, "hu:ptf:v:", long_options, &option_index);
        opterr = 0;
        /* Detect the end of the options. */
        if (c == -1) break;
@@ -99,6 +101,7 @@ bool Options::parse(int argc,char **argv) {
             case 't': trendy   = 1; break;
             case 'h': help     = 1; break;
             case 'u': user_criterion  = optarg; break;
+            case 'v': verbosity = optarg; break;
             case 'f': formalism = optarg;
                 if (formalism != "wcnf" && formalism != "opb" && formalism != "lp") {
                     fprintf(stderr, "Invalid option! Available formalism options: 'wcnf', 'opb', 'lp'.\n");

@@ -11,18 +11,25 @@
 namespace leximaxIST
 {
 
-    class Encoder {// TODO: try to eliminate dynamic memory allocation using move semantics
+    class Encoder {
+        /* TODO: check if pointers can be removed without affecting performance
+         * I think we can do that since vectors are about 24 bytes
+         * (because they only store the pointer to the array, not the entire array)
+         * and when there is a copy, only the 24 bytes are copied, not the array.
+         * ADVANTAGES: The code becomes simpler and safer (no memory leaks guaranteed)
+         * DISADVANTAGES: Maybe it gets slower, but I do not think so
+         */
 
     private:
 
-        bool m_debug;
-        size_t m_id_count;
-        std::vector<Clause*> m_constraints;
-        std::vector<Clause*> m_soft_clauses;
-        std::vector<std::vector<int>*> m_objectives; // TODO: change vectors to pair(first elem, size) if makes sense
+        int m_verbosity; // 0: nothing, 1: general solving info, 2: everything including encoding
+        int m_id_count;
+        std::vector<Clause*> m_constraints; // TODO: remove pointers?
+        std::vector<Clause*> m_soft_clauses; // TODO: remove pointers?
+        std::vector<std::vector<int>*> m_objectives; // TODO: remove pointers?
         int m_num_objectives;
-        std::vector<std::vector<int>*> m_sorted_vecs;
-        std::vector<std::vector<std::vector<int>*>>  m_sorted_relax_collection;
+        std::vector<std::vector<int>*> m_sorted_vecs; // TODO: remove pointers?
+        std::vector<std::vector<std::vector<int>*>>  m_sorted_relax_collection; // TODO: remove pointers?
         std::vector<std::list<int>> m_all_relax_vars; // relax_vars of each iteration
         std::string m_opt_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
@@ -44,7 +51,7 @@ namespace leximaxIST
         std::vector<int> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
         std::vector<int> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
-        std::vector<double> m_times; // time of each step of solving (only external solver times)
+        //std::vector<double> m_times; // time of each step of solving (only external solver times)
         
     public:    
 
@@ -60,6 +67,8 @@ namespace leximaxIST
         bool get_sat() const;
         
         //int get_num_opts() const;
+        
+        const std::vector<double>& get_times() const;
         
         size_t get_sorting_net_size() const;
         
@@ -84,6 +93,8 @@ namespace leximaxIST
         void set_sat_solver_cmd(const std::string &command);
         
         int set_formalism(const std::string &format);
+        
+        int set_verbosity(int v); // if value is invalid return -1 and leave m_verbosity as it was
         
         int set_lp_solver(const std::string &lp_solver);
         
@@ -111,9 +122,15 @@ namespace leximaxIST
         
         // constructors.cpp
         
+        int add_hard_clause(const Clause &c);
+        
+        // uses move constructor; if Clause is small don't use
+        int add_hard_clause(Clause &&cl);
+        
         int add_soft_clause(const Clause &c);
         
-        int add_hard_clause(const Clause &c);
+        // uses move constructor; if Clause is small don't use
+        int add_soft_clause(Clause &&cl); // for move constructor
         
         // destructor.cpp
         
@@ -159,7 +176,11 @@ namespace leximaxIST
         
         // solver_call.cpp
         
-        int mss_choose_next_var(std::list<int> &todo);
+        void add_falsified_to_mss(std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector);
+        
+        int mss_choose_var_max(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index);
+        
+        int mss_choose_var_seq(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index);
         
         int mss_solve();
         
@@ -203,9 +224,15 @@ namespace leximaxIST
         
         // printing.cpp
         
+        void print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const;
+        
+        void print_obj_vector(const std::vector<int> &obj_vec) const;
+        
+        void print_obj_vector() const; // this one computes the obj_vector
+        
         void print_waitpid_error(const std::string &errno_str) const;
         
-        void print_clause(std::ostream &output, const Clause *cl) const;
+        void print_clause(std::ostream &output, const Clause *cl, const std::string &leadingStr = "") const;
         
         void print_wcnf_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const;
         

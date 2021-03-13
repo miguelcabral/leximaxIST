@@ -467,7 +467,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     leximax_enc = new leximaxIST::Encoder();
+     leximax_enc = new leximaxIST::Encoder(); // WARNING: memory leak
      if (leximax_enc->set_problem(input_constraints, obj_functions) != 0) {
          model.clear();
          return false;

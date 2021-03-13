@@ -1,4 +1,5 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_rusage.h>
 #include <leximaxIST_parsing_utils.h>
 #include <leximaxIST_error.h>
 #include <IpasirWrap.h>
@@ -463,7 +464,10 @@ namespace leximaxIST {
             return -1;
         }
         double final_time (read_cpu_time());
-        add_solving_time(final_time - initial_time);
+        if (m_verbosity >= 1 && m_verbosity <= 2) {
+            std::cout << "c Minimisation time: " << final_time - initial_time;
+            std::cout << " seconds" << std::endl;
+        }
         m_solver_output = true; // there is solver output to read
         // read output of solver
         std::vector<int> model;
@@ -475,12 +479,12 @@ namespace leximaxIST {
         // check if there is already a solution (from a previous iteration for example)
         // if ext solver is killed before it finds a sol, the problem might not be unsat
         if (m_solution.empty()) {
-            m_solution = model;
+            m_solution = std::move(model);
             m_sat = !(m_solution.empty());
         }
         else {
             if (!model.empty()) // if it is empty then something went wrong with ext solver
-                m_solution = model;
+                m_solution = std::move(model);
             m_sat = true;
         }
         m_solver_output = false; // I have read solver output
@@ -536,7 +540,7 @@ namespace leximaxIST {
             print_sum_equals_lp(1, output);
         // print all variables after Binaries
         output << "Binaries\n";
-        for (size_t j (1); j <= m_id_count; ++j)
+        for (int j (1); j <= m_id_count; ++j)
             output << "x" << j << '\n';
         output << "End";
         output.close();
@@ -559,6 +563,8 @@ namespace leximaxIST {
     
     int Encoder::sat_solve()
     {
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            std::cout << "c Calling SAT solver..." << std::endl;
         if (write_cnf_file(0) != 0)
             return -1;
         // call the solver
@@ -575,7 +581,7 @@ namespace leximaxIST {
                 remove_tmp_files();
             return -1;
         }
-        m_solution = model;
+        m_solution = std::move(model);
         m_sat = !(m_solution.empty());
         m_solver_output = false; // I have read solver output
         if (!m_leave_temporary_files)
@@ -585,56 +591,135 @@ namespace leximaxIST {
         return 0;
     }
 
-    // choose next variable in todo (using heuristic) and remove it from todo
-    int Encoder::mss_choose_next_var(std::list<int> &todo)
+    // choose next variable in todo sequentially
+    int Encoder::mss_choose_var_seq (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
     {
-        if (todo.empty()) {
-            print_error_msg("In function mss_choose_next_var(), todo parameter is empty");
+        if (todo_vec.empty()) {
+            print_error_msg("In function mss_choose_var_seq(), todo_vec parameter is empty");
             exit(EXIT_FAILURE);
         }
-        int next_var (todo.front());
-        todo.pop_front();
+        // search for the next todo variable sequentially (1st obj, 2nd obj, ...)
+        obj_index = 0;
+        auto todo_it (todo_vec.begin());
+        while (todo_it->empty() && todo_it != todo_vec.end()) {
+            ++todo_it;
+            ++obj_index;
+        }
+        if (todo_it == todo_vec.end()) {
+            print_error_msg("In function mss_choose_var_seq(), all todos are empty");
+            exit(EXIT_FAILURE);
+        }
+        int next_var (todo_it->at(0));
+        // erase next_var from todo by moving last element to next_var's position
+        todo_it->at(0) = todo_it->back();
+        todo_it->pop_back();
+        // decrement obj_vector
+        --obj_vector[obj_index];
         return next_var;
+    }
+    
+    // choose next variable in todo from one of the objectives available with the maximum value
+    int Encoder::mss_choose_var_max(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    {
+        if (todo_vec.empty()) {
+            print_error_msg("In function mss_choose_var_max(), todo_vec parameter is empty");
+            exit(EXIT_FAILURE);
+        }
+        // obj_index points to an objective whose todo is not empty
+        for (obj_index = 0; obj_index < m_num_objectives; ++obj_index) {
+            if (!todo_vec.at(obj_index).empty())
+                break;
+        }
+        if (obj_index == m_num_objectives) {
+            print_error_msg("In function mss_choose_var_max(), all todos are empty");
+            exit(EXIT_FAILURE);
+        }
+        // and now obj_index will point to a non-empty obj with maximum value
+        for (int i (0); i < m_num_objectives; ++i) {
+            if (!todo_vec.at(i).empty() && obj_vector.at(i) > obj_vector.at(obj_index))
+                obj_index = i;
+        }
+        int next_var (todo_vec.at(obj_index).at(0));
+        // erase next_var from todo by moving last element to its position
+        todo_vec.at(obj_index).at(0) = todo_vec.at(obj_index).back();
+        todo_vec.at(obj_index).pop_back();
+        return next_var;
+    }
+    
+    // move falsified variables in todo to mss; decrement obj_vector accordingly
+    void Encoder::add_falsified_to_mss (std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector)
+    {
+        for (int j (0); j < m_num_objectives; ++j) {
+            std::vector<int> &todo (todo_vec[j]);
+            for (size_t i (0); i < todo.size(); ++i) {
+                int var (todo.at(i));
+                if (m_solution[var] < 0) {
+                    mss.push_back(-var);
+                    // decrement objective value
+                    --obj_vector[j];
+                    // erase element in todo by moving last element to current position
+                    todo.at(i) = todo.back();
+                    todo.pop_back();
+                }
+            }
+        }    
     }
     
     int Encoder::mss_solve()
     {
-        // TODO: see how this can behave with signals
-        // Can something go wrong with the sat solver?
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            std::cout << "c Finding MSS..." << std::endl;
+        /* TODO: see how this can behave with signals
+         * Can something go wrong with the sat solver?*/
         IpasirWrap solver(m_id_count);
         for (const Clause *hard_cl : m_constraints)
             solver.addClause(hard_cl);
-        m_sat = solver.solve();
+        bool is_sat = solver.solve();
+        m_sat = is_sat;
         if (!m_sat)
             return 0;
-        m_solution = solver.model(); // TODO: maybe change this to move assignment
-        // std::vector<std::list> lista de todos, para cada func objetivo.
-        std::list<int> todo;
-        for (const std::vector<int> *objective : m_objectives) {
-            for (int var : *objective)
-                todo.push_back(var);
+        m_solution = std::move(solver.model());
+        // solver.model() is in a valid but unspecified state - so clear it
+        solver.model().clear();
+        // obj_vector starts as if all variables are true and is decremented along the way
+        std::vector<int> obj_vector (m_num_objectives);
+        std::vector<std::vector<int>> todo_vec (m_num_objectives); // fill constructor
+        for (int i (0); i < m_num_objectives; ++i) {
+            const std::vector<int> *objective (m_objectives[i]);
+            todo_vec[i] = *objective; // copy assignment
+            obj_vector[i] = objective->size();
         }
         std::vector<int> mss;
-        while (!todo.empty()) {
-            // choose variable in todo (using an heuristic); variable is removed from todo
-            int next_var (mss_choose_next_var(todo));
-            mss.push_back(-next_var);
-            if (!solver.solve(mss)) {
-                // neg next_var does not belong to mss
-                mss.pop_back();
-                // next_var has been learnt by the sat solver - should I add it to mss?
+        bool todo_is_empty (false);
+        int obj_index (0);
+        add_falsified_to_mss (mss, todo_vec, obj_vector);
+        while (!todo_is_empty) {
+            if (m_verbosity == 2)
+                print_mss_and_todo(mss, todo_vec);
+            /* choose var in todo using an heuristic
+             * var is removed from todo
+             * The obj value in obj_vector is decremented
+             * obj_index is set to the objective that contains var */
+            //int next_var (mss_choose_var_seq (todo_vec, obj_vector, obj_index));
+            int next_var (mss_choose_var_max (todo_vec, obj_vector, obj_index));
+            mss.push_back (-next_var);
+            if (solver.solve(mss)) {
+                m_solution = std::move(solver.model());
+                solver.model().clear();
+                add_falsified_to_mss (mss, todo_vec, obj_vector);
+                if (m_verbosity > 0 && m_verbosity <= 2)
+                    print_obj_vector(obj_vector);
             }
             else {
-                m_solution = solver.model(); // TODO: maybe change this to move assignment
-                // add all other falsified variables in todo to mss
-                for (auto i (todo.begin()); i != todo.end(); /*increment inside body*/) {
-                    int var (*i);
-                    if (m_solution[var] < 0) {
-                       mss.push_back(-var);
-                       i = todo.erase(i); // erase() returns iterator to the next element
-                    }
-                    else // do not remove var from todo nor add it to mss
-                        ++i;
+                mss.pop_back(); // remove last assumption from mss
+                ++obj_vector[obj_index]; // correct obj value (it was decremented before)
+            }
+            // check if todo is empty
+            todo_is_empty = true;
+            for (const std::vector<int> &todo : todo_vec) {
+                if (!todo.empty()) {
+                    todo_is_empty = false;
+                    break;
                 }
             }
         }
@@ -643,6 +728,8 @@ namespace leximaxIST {
     
     int Encoder::calculate_upper_bound()
     {   
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            std::cout << "c Presolving to obtain upper bound..." << std::endl;
         int retv (0);
         double initial_time (read_cpu_time());
         if (m_ub_encoding == 1) { // call sat solver once
@@ -656,7 +743,10 @@ namespace leximaxIST {
             // be careful that external_solve may add cardinality constraints in non-zero iterations
         }
         double final_time (read_cpu_time());
-        add_solving_time(final_time - initial_time);
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            std::cout << "c Time of Upper Bound Presolve: " << final_time - initial_time;
+            std::cout << " seconds" << std::endl;
+        }
         return retv;
     }
     
@@ -664,13 +754,13 @@ namespace leximaxIST {
     {
         struct rusage ru;
         getrusage(RUSAGE_SELF, &ru);
-        long double total_time ((long double)ru.ru_utime.tv_sec + (long double)ru.ru_utime.tv_usec / 1000000);
+        double total_time ((double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000);
         getrusage(RUSAGE_CHILDREN, &ru);
-        total_time += (long double)ru.ru_utime.tv_sec + (long double)ru.ru_utime.tv_usec / 1000000;
+        total_time += (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000;
         return total_time;
     }
     
-    void Encoder::add_solving_time(double t)
+    /*void Encoder::add_solving_time(double t)
     {
         // set to t the first position of m_times that has 0.0
         for (double &time : m_times) {
@@ -678,6 +768,6 @@ namespace leximaxIST {
                 time = t;
                 return;
         }
-    }
+    }*/
     
 } /* namespace leximaxIST */

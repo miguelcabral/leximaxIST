@@ -18,11 +18,9 @@ endif
 .PHONY: clean release debug
 
 release : CFLAGS += -O3 -w
-release : SEDSTR=s/m_debug(true)/m_debug(false)/g
 release : $(LIBNAME)
 
 debug : CFLAGS += -g -Wall -Wextra -pedantic
-debug : SEDSTR=s/m_debug(false)/m_debug(true)/g
 debug : $(LIBNAME)
 
 $(LIBNAME) : $(OBJS)
@@ -36,7 +34,6 @@ $(OBJS1) : %.o: %.cc
 
 $(OBJS2) : %.o: %.cpp
 	@echo "Compiling: $@"
-	@sed -i '$(SEDSTR)' constructors.cpp
 	g++ $(CFLAGS) -c -o $@ $<
 	
 clean :

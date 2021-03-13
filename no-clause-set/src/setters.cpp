@@ -77,6 +77,18 @@ namespace leximaxIST {
 
     void Encoder::set_simplify_last(bool val) { m_simplify_last = val; }
     
+    int Encoder::set_verbosity(int v)
+    {
+        if (v < 0 || v > 2) {
+            std::string msg ("Invalid value '");
+            msg += std::to_string(v) + "' for verbosity parameter";
+            print_error_msg(msg);
+            return -1;
+        }
+        m_verbosity = v;
+        return 0;
+    }
+    
     void Encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
 
     void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
@@ -92,6 +104,8 @@ namespace leximaxIST {
     
     int Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
     {
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            std::cout << "c Reading problem..." << std::endl;
         // restart object: if it has not been cleared from a previous problem
         clear();
         // name for temporary files
@@ -107,10 +121,10 @@ namespace leximaxIST {
         }
         m_num_objectives = objective_functions.size();
         m_ub_vec.resize(m_num_objectives, -1);
-        if (m_ub_encoding > 0)
+        /*if (m_ub_encoding > 0)
             m_times.resize(m_num_objectives + 1, 0.0); // presolve, 1st iter, 2nd iter, ...
         else
-            m_times.resize(m_num_objectives, 0.0); // no presolve
+            m_times.resize(m_num_objectives, 0.0); // no presolve*/
         m_objectives.resize(m_num_objectives, nullptr);
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         // read problem
@@ -125,6 +139,11 @@ namespace leximaxIST {
         for (const std::vector<std::vector<int>> &obj : objective_functions) {
             for (const std::vector<int> &soft_clause : obj)
                 update_id_count(soft_clause);
+        }
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            std::cout << "c Number of input variables: " << m_id_count << '\n';
+            std::cout << "c Number of input hard clauses: " << m_constraints.size() << '\n';
+            std::cout << "c Number of objective functions: " << m_num_objectives << std::endl;
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
         int i(0);
@@ -145,6 +164,7 @@ namespace leximaxIST {
                     hard_clause.push_back(-soft_lit);
                     hard_clause.push_back(-fresh_var);
                     add_hard_clause(hard_clause);
+                    hard_clause.clear();
                 }
             }
             ++i;

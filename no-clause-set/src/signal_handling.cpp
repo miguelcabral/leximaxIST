@@ -1,6 +1,7 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_error.h>
 #include <vector>
+#include <utility>
 #include <signal.h>
 #include <chrono>
 #include <thread>
@@ -39,7 +40,7 @@ namespace leximaxIST {
                         remove_tmp_files();
                     return -1;
                 }
-                m_solution = model;
+                m_solution = std::move(model);
                 m_sat = !(m_solution.empty());
             }
             if (!m_leave_temporary_files)
@@ -88,7 +89,7 @@ namespace leximaxIST {
                     m_sat = !(new_sol.empty());
                     if (m_sat) { // otherwise unsat, nothing to do
                         if (m_solution.empty()) // first iteration
-                            m_solution = new_sol;
+                            m_solution = std::move(new_sol);
                         else {
                             // check which solution is leximax-better
                             std::vector<int> new_obj_vec (get_objective_vector(new_sol));
@@ -97,7 +98,7 @@ namespace leximaxIST {
                             std::sort(old_obj_vec.begin(), old_obj_vec.end(), descending_order);
                             for (size_t j (0); j < new_obj_vec.size(); ++j) {
                                 if (new_obj_vec[j] < old_obj_vec[j]) {
-                                    m_solution = new_sol;
+                                    m_solution = std::move(new_sol);
                                     break;
                                 }
                                 else if (new_obj_vec[j] > old_obj_vec[j])

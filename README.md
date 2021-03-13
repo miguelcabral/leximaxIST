@@ -41,6 +41,17 @@ The constructor of the Leximax_encoder class receives two arguments:
 as a vector of vector of integers. Each constraint is a clause, stored as a vector of integers. Each entry of a clause is a literal (an integer).
 The constructor of the Leximax_encoder class receives
 
+## Verbosity
+Sets the level of verbosity in what gets printed to standard output. Possible values:
+* 0 : print nothing
+* 1 :
+    * number of vars and constraints?
+    * header with name of solver?
+    * print which solving phase the solver is in;
+    * print objective vector as soon as a solution is found
+    * print cpu time of each solving phase
+* 2 : everything in 1 plus:
+    * encoding variables and clauses
 
 ## External Solvers
 (Dividir por formalismos: wcnf (MaxSAT), opb (PBO), lp (Linear Programming) )

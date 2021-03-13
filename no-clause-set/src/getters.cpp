@@ -3,11 +3,13 @@
 
 namespace leximaxIST {
 
-   /* int Encoder:: get_num_opts() const
+    /* int Encoder:: get_num_opts() const
     {
         return m_num_opts;
     }*/
-    
+
+    //const std::vector<double>& Encoder::get_times() const { return m_times; }
+
     bool Encoder::get_sat() const
     {
         return m_sat; 
@@ -17,7 +19,7 @@ namespace leximaxIST {
     {
         return m_ub_vec;
     }
-    
+
     size_t Encoder::get_sorting_net_size() const
     {
         return m_sorting_net_size; 

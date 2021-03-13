@@ -3,19 +3,31 @@
 
 namespace leximaxIST {
 
-    // TODO: see if it is possible to store vector of vectors using move semantics
+    // this uses copy constructor
     int Encoder::add_hard_clause(const Clause &cl)
     {
         if (cl.empty()) {
             print_error_msg("Empty hard clause");
             return -1;
         }
-        Clause *clptr (new Clause(cl));
+        Clause *clptr (new Clause(cl)); // copy constructor
+        m_constraints.push_back(clptr);
+        return 0;
+    }
+    
+    // this uses move constructor; cl is cleared
+    int Encoder::add_hard_clause(Clause &&cl)
+    {
+        if (cl.empty()) {
+            print_error_msg("Empty hard clause");
+            return -1;
+        }
+        Clause *clptr (new Clause(cl)); // move constructor
+        cl.clear(); // cl was in an unspecified, but valid state
         m_constraints.push_back(clptr);
         return 0;
     }
 
-    // TODO: see if it is possible to store vector of vectors using move semantics
     int Encoder::add_soft_clause(const Clause &cl)
     {
         if (cl.empty()) {
@@ -27,9 +39,30 @@ namespace leximaxIST {
         return 0;
     }
     
+    // this uses move constructor; cl is cleared
+    int Encoder::add_soft_clause(Clause &&cl)
+    {
+        if (cl.empty()) {
+            print_error_msg("Empty soft clause");
+            return -1;
+        }
+        Clause *clptr (new Clause(cl)); // move constructor
+        cl.clear(); // cl was in an unspecified, but valid state
+        m_soft_clauses.push_back(clptr);
+        return 0;
+    }
     
+    void print_header()
+    {
+        std::cout << "c ----------------------------------------------------------------------\n";
+        std::cout << "c leximaxIST\n";
+        std::cout << "c C++ library for leximax optimisation in a Boolean Satisfaction setting\n";
+        std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
+        std::cout << "c ----------------------------------------------------------------------" << std::endl;
+    }
+        
     Encoder::Encoder() : 
-        m_debug(false),
+        m_verbosity(0),
         m_id_count(0),
         m_constraints(),
         m_soft_clauses(),
@@ -56,6 +89,9 @@ namespace leximaxIST {
         m_solution(),
         m_sorting_net_size(0),
         m_ub_vec()
-    {}
+    {
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            print_header();
+    }
 
 }/* namespace leximaxIST */
