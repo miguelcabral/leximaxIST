@@ -41,19 +41,29 @@ Options::Options()
 , leximax(0)
 , simplify_last(0)
 , ub_encoding(0)
-, verbosity("0")
+, verbosity(0)
 , formalism("wcnf")
 , lp_solver("gurobi")
 {}
 
-int Options::read_ub_enc(const char *optarg)
+int Options::read_digit(const char *optarg, const std::string &optname, int &member)
 {
-    std::string ub_enc_str (optarg);
-    if (ub_enc_str.size() != 1 || !isdigit(ub_enc_str[0])) {
-        std::cerr << "Option ub-enc accepts only one digit." << std::endl;
+    std::string s (optarg);
+    try {
+        member = std::stoi(s);
+    }
+    catch (const std::invalid_argument&) {
+        std::cerr << "Option " << optname << " must be an integer between 0 and 9" << std::endl;
         return -1;
     }
-    ub_encoding = std::stoi(ub_enc_str);
+    catch (const std::out_of_range&) {
+        std::cerr << "Out of range integer for Option " << optname << std::endl;
+        return -1;
+    }
+    if (member > 9 || member < 0) {
+        std::cerr << "Option " << optname << " must be an integer between 0 and 9" << std::endl;
+        return -1;
+    }    
     return 0;
 }
 
@@ -78,7 +88,6 @@ bool Options::parse(int argc,char **argv) {
        ,{"sat-solver", required_argument,  0, 507}
        ,{"ssol", required_argument,  0, 507}
        ,{"ub-enc", required_argument,  0, 508}
-       ,{"v", required_argument,  0, 509}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
        ,{"leximax", no_argument,  &leximax, 1}
@@ -101,7 +110,10 @@ bool Options::parse(int argc,char **argv) {
             case 't': trendy   = 1; break;
             case 'h': help     = 1; break;
             case 'u': user_criterion  = optarg; break;
-            case 'v': verbosity = optarg; break;
+            case 'v': if (read_digit(optarg, "v", verbosity) == -1) {
+                        return_value = false;
+                    }
+                    break;
             case 'f': formalism = optarg;
                 if (formalism != "wcnf" && formalism != "opb" && formalism != "lp") {
                     fprintf(stderr, "Invalid option! Available formalism options: 'wcnf', 'opb', 'lp'.\n");
@@ -126,7 +138,7 @@ bool Options::parse(int argc,char **argv) {
                 }
                 break;
             case 507: sat_solver = optarg; break;
-            case 508: if (read_ub_enc(optarg) == -1) {
+            case 508: if (read_digit(optarg, "ub-enc", ub_encoding) == -1) {
                         return_value = false;
                     }
                     break;

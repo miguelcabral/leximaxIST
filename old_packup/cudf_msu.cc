@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     if (!options.get_sat_solver().empty())             solver.set_sat_solver_cmd(options.get_sat_solver ());
     if (!options.get_opt_solver().empty())             solver.set_opt_solver_cmd(options.get_opt_solver ());
     solver.set_ub_encoding(options.get_ub_encoding());
-    // TODO: verbosity
+    solver.set_verbosity(options.get_verbosity());
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
     if (options.get_leximax())                         solver.set_leximax();

@@ -64,6 +64,7 @@ public:
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
     inline void set_ub_encoding (int val);
+    inline void set_verbosity (int val);
     void print_leximax_info();
     leximaxIST::Encoder* get_leximax_enc() {return leximax_enc;}
 
@@ -102,7 +103,7 @@ private:
     bool   leave_temporary_files;
     bool   leximax;
     bool   simplify_last;
-
+    int verbosity;
     string formalism;
     string lp_solver;
     
@@ -146,6 +147,8 @@ inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {
     formalism = format; }
+inline void ExternalWrapper::set_verbosity (int val) {
+    verbosity = val; }
 inline void ExternalWrapper::set_ub_encoding (int val) {
     ub_encoding = val;}
 #endif	/* EXTERNALWRAPPER_HH */

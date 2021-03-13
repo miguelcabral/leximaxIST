@@ -33,7 +33,7 @@ class Options {
 public:
     Options();
     virtual ~Options();
-    int    read_ub_enc(const char *optarg);
+    int    read_digit(const char *optarg, const std::string &optname, int &member);
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
     string get_opt_solver()   const { return opt_solver; }
@@ -51,7 +51,7 @@ public:
     int    get_leave_temporary_files() const { return leave_temporary_files; }
     const string&    get_formalism()   const { return formalism; }
     const string&    get_lp_solver()   const { return lp_solver; }
-    int    get_verbosity()             const { return std::stoi(verbosity); }
+    int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
     int    get_simplify_last() const { return simplify_last; }
@@ -62,7 +62,7 @@ private:
     string opt_solver;
     string sat_solver;
     int    ub_encoding;
-    string verbosity;
+    int    verbosity;
     int    paranoid;
     int    trendy;
     string solution_check;

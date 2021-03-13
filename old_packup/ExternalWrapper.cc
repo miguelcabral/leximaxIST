@@ -475,6 +475,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_encoding(ub_encoding);
+     leximax_enc->set_verbosity(verbosity);
      leximax_enc->set_sat_solver_cmd(sat_solver_cmd);
      leximax_enc->set_opt_solver_cmd(opt_solver_cmd);
      leximax_enc->set_multiplication_string(multiplication_string);
@@ -486,7 +487,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          model.clear();
          return false;
      }
-     std::vector<int> sol (leximax_enc->get_solution());
+     const std::vector<int> &sol (leximax_enc->get_solution());
      model.assign(sol.begin(), sol.end());
      print_leximax_info();
      // return satisfiable or not?
