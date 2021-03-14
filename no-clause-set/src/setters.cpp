@@ -102,10 +102,21 @@ namespace leximaxIST {
         }
     }
     
+    void print_header()
+    {
+        std::cout << "c ----------------------------------------------------------------------\n";
+        std::cout << "c leximaxIST\n";
+        std::cout << "c C++ library for leximax optimisation in a Boolean Satisfaction setting\n";
+        std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
+        std::cout << "c ----------------------------------------------------------------------" << std::endl;
+    }
+    
     int Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
     {
-        if (m_verbosity > 0 && m_verbosity <= 2)
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            print_header();
             std::cout << "c Reading problem..." << std::endl;
+        }
         // restart object: if it has not been cleared from a previous problem
         clear();
         // name for temporary files

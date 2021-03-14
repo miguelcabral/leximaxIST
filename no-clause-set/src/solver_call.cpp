@@ -457,16 +457,18 @@ namespace leximaxIST {
         if (write_solver_input(i) != 0)
             return -1;
         // call the solver
-        double initial_time (read_cpu_time());
+        double initial_time, final_time;
+        if (m_verbosity >= 1 && m_verbosity <= 2)
+            initial_time = read_cpu_time();
         if (call_solver("optimisation") != 0) {
             if (!m_leave_temporary_files)
                 remove_tmp_files();
             return -1;
         }
-        double final_time (read_cpu_time());
         if (m_verbosity >= 1 && m_verbosity <= 2) {
-            std::cout << "c Minimisation time: " << final_time - initial_time;
-            std::cout << " seconds" << std::endl;
+            final_time = read_cpu_time();
+            std::cout << "c Minimisation CPU time: " << final_time - initial_time;
+            std::cout << 's' << std::endl;
         }
         m_solver_output = true; // there is solver output to read
         // read output of solver
@@ -744,8 +746,8 @@ namespace leximaxIST {
         }
         double final_time (read_cpu_time());
         if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Time of Upper Bound Presolve: " << final_time - initial_time;
-            std::cout << " seconds" << std::endl;
+            std::cout << "c Upper Bound Presolving CPU time: " << final_time - initial_time;
+            std::cout << 's' << std::endl;
         }
         return retv;
     }
@@ -753,10 +755,18 @@ namespace leximaxIST {
     double read_cpu_time()
     {
         struct rusage ru;
+        // parent process
         getrusage(RUSAGE_SELF, &ru);
+        // user time
         double total_time ((double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000);
+        // system time
+        total_time += (double)ru.ru_stime.tv_sec + (double)ru.ru_stime.tv_usec / 1000000;
+        // children that have been waited for
         getrusage(RUSAGE_CHILDREN, &ru);
+        // user time
         total_time += (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000;
+        // system time
+        total_time += (double)ru.ru_stime.tv_sec + (double)ru.ru_stime.tv_usec / 1000000;
         return total_time;
     }
     

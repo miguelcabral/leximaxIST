@@ -1,4 +1,5 @@
 #include <leximaxIST_Encoder.h>
+#include <leximaxIST_rusage.h>
 #include <leximaxIST_error.h>
 #include <stdlib.h>
 #include <vector>
@@ -116,7 +117,7 @@ namespace leximaxIST {
         if (m_verbosity == 2) {
             std::cout << "c ------------ Relaxation variables of iteration " << i << " ------------\n";
             for (int v : relax_vars)
-                std::cout << v << '\n';
+                std::cout << "c " << v << '\n';
             if (!m_simplify_last || i != m_num_objectives - 1)
                 std::cout << "c ------------ Sorted vecs after relax of iteration " << i << " ------------\n";
         }
@@ -145,19 +146,20 @@ namespace leximaxIST {
                     }
                     add_hard_clause(cl);
                     // not relax_j implies sorted_relax_j_k equals sorted_j_k
+                    cl.clear();
                     cl.push_back(first_relax_var + j);
                     cl.push_back(-sorted_relax->at(k));
                     cl.push_back(sorted_vec->at(k));
                     if (m_verbosity == 2)
                         print_clause(std::cout, &cl, "c ");
                     add_hard_clause(cl);
+                    cl.clear();
                     cl.push_back(first_relax_var + j);
                     cl.push_back(sorted_relax->at(k));
                     cl.push_back(-(sorted_vec->at(k)));
                     if (m_verbosity == 2)
                         print_clause(std::cout, &cl, "c ");
                     add_hard_clause(cl);
-
                 }
             }
             // at most i constraint 
@@ -194,7 +196,6 @@ namespace leximaxIST {
                             print_clause(std::cout, &cl);
                         }
                         add_hard_clause(cl);
-                        cl.resize(3);
                         // let's check: m_relax_vars[k] implies soft_var[j] implies objective[j]
                         cl[0] = -relax_var;
                         cl[1] = objective->at(j);
@@ -335,8 +336,7 @@ namespace leximaxIST {
                     std::cout << "c upper bound: " << first_max << '\n';
                 }
                 for (int j (starting_position); j <= end_position; ++j) {
-                    Clause cl;
-                    cl.push_back(-(sorted_vec->at(j))); // neg sorted vec
+                    Clause cl {-(sorted_vec->at(j))}; // neg sorted vec
                     if (m_verbosity == 2)
                         print_clause(std::cout, &cl, "c ");
                     add_hard_clause(cl);
@@ -435,6 +435,9 @@ namespace leximaxIST {
     
     int Encoder::solve()
     {
+        double initial_time (0.0);
+        if (m_verbosity > 0 && m_verbosity < 3)
+            initial_time = read_cpu_time();
         if (m_num_objectives == 0) {
             print_error_msg("No objective function");
             return -1;
@@ -513,6 +516,10 @@ namespace leximaxIST {
         }
         if (m_verbosity == 2)
             debug_print_all(true_ys, y_vector);
+        if (m_verbosity > 0 && m_verbosity < 3) { // print total solving time
+            std::cout << "c Total solving CPU time: ";
+            std::cout << read_cpu_time() - initial_time << 's' << std::endl;
+        }
         return 0;
     }
 

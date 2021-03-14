@@ -468,10 +468,6 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      }
      // create Leximax_encoder object
      leximax_enc = new leximaxIST::Encoder(); // WARNING: memory leak
-     if (leximax_enc->set_problem(input_constraints, obj_functions) != 0) {
-         model.clear();
-         return false;
-     }
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_encoding(ub_encoding);
@@ -481,7 +477,11 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_multiplication_string(multiplication_string);
      leximax_enc->set_leave_temporary_files(leave_temporary_files);
      leximax_enc->set_formalism(formalism);
-     leximax_enc->set_lp_solver(lp_solver);    
+     leximax_enc->set_lp_solver(lp_solver); 
+     if (leximax_enc->set_problem(input_constraints, obj_functions) != 0) {
+         model.clear();
+         return false;
+     }
      // solve() returns 0 if all went well, and -1 otherwise. 
      if (leximax_enc->solve() == -1) {
          model.clear();

@@ -51,15 +51,6 @@ namespace leximaxIST {
         m_soft_clauses.push_back(clptr);
         return 0;
     }
-    
-    void print_header()
-    {
-        std::cout << "c ----------------------------------------------------------------------\n";
-        std::cout << "c leximaxIST\n";
-        std::cout << "c C++ library for leximax optimisation in a Boolean Satisfaction setting\n";
-        std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
-        std::cout << "c ----------------------------------------------------------------------" << std::endl;
-    }
         
     Encoder::Encoder() : 
         m_verbosity(0),
@@ -89,9 +80,6 @@ namespace leximaxIST {
         m_solution(),
         m_sorting_net_size(0),
         m_ub_vec()
-    {
-        if (m_verbosity > 0 && m_verbosity <= 2)
-            print_header();
-    }
+    {}
 
 }/* namespace leximaxIST */
