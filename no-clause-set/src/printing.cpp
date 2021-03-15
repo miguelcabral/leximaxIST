@@ -11,6 +11,8 @@ namespace leximaxIST {
         std::cerr << "Error leximaxIST: " << msg << std::endl;
     }
     
+    std::string ordinal (int i);
+    
     // in this case we already have computed obj_vec
     void Encoder::print_obj_vector(const std::vector<int> &obj_vec) const
     {
@@ -34,15 +36,42 @@ namespace leximaxIST {
         }
     }
     
+    void Encoder::print_soft_clauses(int i) const
+    {
+        std::cout << "c ------------ Soft Clauses of iteration " << i << " ------------\n";
+        for (const Clause *cl : m_soft_clauses)
+            print_clause(std::cout, cl, "c ");
+    }
+    
+    void Encoder::print_sorted_vec (int i) const
+    {
+        std::cout << "c ---------------- m_sorted_vecs[" << i << "] -----------------\n";
+        for(size_t j{0}; j < m_sorted_vecs.at(i)->size(); j++)
+            std::cout << "c sorted_vec[" << j << "]: " << m_sorted_vecs.at(i)->at(j) << '\n';
+    }
+    
+    void Encoder::print_obj_func(int i) const
+    {
+        const std::vector<int> *objective (m_objectives.at(i));
+        size_t num_terms (objective->size());
+        std::cout << "c --------------- Objective Function " << i << " (size = ";
+        std::cout << num_terms << ") --------------\n";
+        for (size_t j = 0; j < num_terms; ++j)
+            std::cout << objective->at(j) << '\n';
+    }
+    
+    void Encoder::print_snet_size(int i) const
+    {
+        std::cout << "c Sorting network size (no. of comparators) of the " << ordinal(i + 1);
+        std::cout << " objective: " << m_sorting_net_size << "\n";
+    }
+    
     void Encoder::print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const
     {
-        std::cout << "c MSS:\n";
-        for (int c : mss)
-            std::cout << "c " << c << '\n';
+        std::cout << "c Size of MSS: " << mss.size() << '\n';
         for (int i(0); i < m_num_objectives; ++i) {
-            std::cout << "c Todo of Objective " << i << ":\n";
-            for (int var : todo_vec.at(i))
-                std::cout << "c " << var << '\n';
+            std::cout << "c Size of Todo of Objective " << i << ": ";
+            std::cout << todo_vec.at(i).size() << '\n';
         }
     }
     

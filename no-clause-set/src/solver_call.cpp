@@ -15,6 +15,7 @@
 #include <cstring> // for strerror()
 #include <iostream>
 #include <vector>
+#include <algorithm> // std::max_element
 #include <sstream>
 #include <cctype>
 
@@ -586,70 +587,68 @@ namespace leximaxIST {
         m_solution = std::move(model);
         m_sat = !(m_solution.empty());
         m_solver_output = false; // I have read solver output
+        if (m_sat && m_verbosity >= 1 && m_verbosity <= 2)
+            print_obj_vector();
         if (!m_leave_temporary_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
         return 0;
     }
-
-    // choose next variable in todo sequentially
-    int Encoder::mss_choose_var_seq (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
-    {
-        if (todo_vec.empty()) {
-            print_error_msg("In function mss_choose_var_seq(), todo_vec parameter is empty");
-            exit(EXIT_FAILURE);
-        }
-        // search for the next todo variable sequentially (1st obj, 2nd obj, ...)
-        obj_index = 0;
-        auto todo_it (todo_vec.begin());
-        while (todo_it->empty() && todo_it != todo_vec.end()) {
-            ++todo_it;
-            ++obj_index;
-        }
-        if (todo_it == todo_vec.end()) {
-            print_error_msg("In function mss_choose_var_seq(), all todos are empty");
-            exit(EXIT_FAILURE);
-        }
-        int next_var (todo_it->at(0));
-        // erase next_var from todo by moving last element to next_var's position
-        todo_it->at(0) = todo_it->back();
-        todo_it->pop_back();
-        // decrement obj_vector
-        --obj_vector[obj_index];
-        return next_var;
-    }
     
-    // choose next variable in todo from one of the objectives available with the maximum value
-    int Encoder::mss_choose_var_max(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    void mss_choose_obj_seq (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
     {
-        if (todo_vec.empty()) {
-            print_error_msg("In function mss_choose_var_max(), todo_vec parameter is empty");
-            exit(EXIT_FAILURE);
-        }
-        // obj_index points to an objective whose todo is not empty
-        for (obj_index = 0; obj_index < m_num_objectives; ++obj_index) {
+        // obj_index points to the first objective whose todo is not empty
+        for (obj_index = 0; obj_index < todo_vec.size(); ++obj_index) {
             if (!todo_vec.at(obj_index).empty())
                 break;
         }
-        if (obj_index == m_num_objectives) {
-            print_error_msg("In function mss_choose_var_max(), all todos are empty");
-            exit(EXIT_FAILURE);
-        }
-        // and now obj_index will point to a non-empty obj with maximum value
-        for (int i (0); i < m_num_objectives; ++i) {
-            if (!todo_vec.at(i).empty() && obj_vector.at(i) > obj_vector.at(obj_index))
-                obj_index = i;
-        }
-        int next_var (todo_vec.at(obj_index).at(0));
+        if (obj_index == todo_vec.size())
+            obj_index = -1;
+    }
+    
+    void erase_and_decrement (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    {
         // erase next_var from todo by moving last element to its position
         todo_vec.at(obj_index).at(0) = todo_vec.at(obj_index).back();
         todo_vec.at(obj_index).pop_back();
+        // decrement obj_vector
+        --obj_vector[obj_index];
+    }
+    
+    void mss_choose_obj_max (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    {
+        std::vector<int> max_index_set;
+        int max (*(std::max_element(obj_vector.begin(), obj_vector.end())));
+        for (int i (0); i < todo_vec.size(); ++i) {
+            if (obj_vector.at(i) == max)
+                max_index_set.push_back(i);
+        }
+        // select a todo set with an index in max_index_set
+        obj_index = max_index_set.at(0);
+        // if one of the todos corresponding to max is empty, the ub can't be improved
+        for (int i : max_index_set) {
+            if (todo_vec.at(i).empty()) {
+                obj_index = -1;
+                break;
+            }
+        }
+    }
+    
+    int mss_choose_var (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    {
+        mss_choose_obj_seq (todo_vec, obj_vector, obj_index);
+        //mss_choose_obj_max (todo_vec, obj_vector, obj_index);
+        // -1 means stop computing mss - possibly because the upper bound can't be improved
+        if (obj_index == -1)
+            return -1;
+        int next_var (todo_vec.at(obj_index).at(0));
+        erase_and_decrement (todo_vec, obj_vector, obj_index);
         return next_var;
     }
     
     // move falsified variables in todo to mss; decrement obj_vector accordingly
-    void Encoder::add_falsified_to_mss (std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector)
+    void Encoder::add_falsified_to_mss (std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const
     {
         for (int j (0); j < m_num_objectives; ++j) {
             std::vector<int> &todo (todo_vec[j]);
@@ -692,18 +691,20 @@ namespace leximaxIST {
             obj_vector[i] = objective->size();
         }
         std::vector<int> mss;
-        bool todo_is_empty (false);
         int obj_index (0);
         add_falsified_to_mss (mss, todo_vec, obj_vector);
-        while (!todo_is_empty) {
+        if (m_verbosity > 0 && m_verbosity <= 2)
+            print_obj_vector(obj_vector);
+        while (true /*stops when next_var == -1*/) {
             if (m_verbosity == 2)
                 print_mss_and_todo(mss, todo_vec);
             /* choose var in todo using an heuristic
              * var is removed from todo
              * The obj value in obj_vector is decremented
              * obj_index is set to the objective that contains var */
-            //int next_var (mss_choose_var_seq (todo_vec, obj_vector, obj_index));
-            int next_var (mss_choose_var_max (todo_vec, obj_vector, obj_index));
+            int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
+            if (next_var == -1)
+                return 0;
             mss.push_back (-next_var);
             if (solver.solve(mss)) {
                 m_solution = std::move(solver.model());
@@ -716,14 +717,6 @@ namespace leximaxIST {
                 mss.pop_back(); // remove last assumption from mss
                 ++obj_vector[obj_index]; // correct obj value (it was decremented before)
             }
-            // check if todo is empty
-            todo_is_empty = true;
-            for (const std::vector<int> &todo : todo_vec) {
-                if (!todo.empty()) {
-                    todo_is_empty = false;
-                    break;
-                }
-            }
         }
         return 0;
     }
@@ -731,7 +724,7 @@ namespace leximaxIST {
     int Encoder::calculate_upper_bound()
     {   
         if (m_verbosity > 0 && m_verbosity <= 2)
-            std::cout << "c Presolving to obtain upper bound..." << std::endl;
+            std::cout << "c Presolving to obtain upper bound on optimal 1st maximum..." << std::endl;
         int retv (0);
         double initial_time (read_cpu_time());
         if (m_ub_encoding == 1) { // call sat solver once

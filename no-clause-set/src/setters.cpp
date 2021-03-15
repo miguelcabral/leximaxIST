@@ -131,7 +131,6 @@ namespace leximaxIST {
             return -1;
         }
         m_num_objectives = objective_functions.size();
-        m_ub_vec.resize(m_num_objectives, -1);
         /*if (m_ub_encoding > 0)
             m_times.resize(m_num_objectives + 1, 0.0); // presolve, 1st iter, 2nd iter, ...
         else

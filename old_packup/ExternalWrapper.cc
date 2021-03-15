@@ -414,8 +414,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
 
  void ExternalWrapper::print_leximax_info() {
      assert(leximax_enc != nullptr);
-     size_t sorting_net_size (leximax_enc->get_sorting_net_size());
-     std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';
+     /*size_t sorting_net_size (leximax_enc->get_sorting_net_size());
+     std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';*/
      if (leximax_enc->get_sat()) {
      	const std::vector<int> obj_vector (leximax_enc->get_objective_vector());
      	std::cerr << "# Objective vector: ";
@@ -425,13 +425,13 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      }
      /*std::cerr << "# Number of guaranteed optimal values found: ";
      std::cerr << leximax_enc->get_num_opts() << '\n';*/
-     if (ub_encoding != 0) {
+     /*if (ub_encoding != 0) {
         std::cerr << "# Upper bound: " << leximax_enc->get_ub_vec().at(0) << '\n';
         int largest (0);
         for (const BasicClauseVector &soft_cls: clause_split)
             largest = (soft_cls.size() > largest) ? soft_cls.size() : largest;
         std::cerr << "# Trivial upper bound (size of largest objective): " << largest << '\n';
-     }
+     }*/
  }
  
  bool ExternalWrapper::solve_leximax() {

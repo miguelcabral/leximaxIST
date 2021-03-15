@@ -50,7 +50,7 @@ namespace leximaxIST {
         add_hard_clause(c);
     }
 
-    void Encoder::insert_comparator(int el1, int el2, std::vector<int> *objective, SNET &sorting_network)
+    void Encoder::insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network)
     {
         //std::cerr << "Inserting comparator between wires " << el1 << " and " << el2 << std::endl;
         m_sorting_net_size++;
@@ -86,7 +86,7 @@ namespace leximaxIST {
         return result;
     }
 
-    void Encoder::odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, std::vector<int> *objective, SNET &sorting_network)
+    void Encoder::odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network)
     {
         int el1;
         int el2;
@@ -145,7 +145,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::encode_network(std::pair<int,int> elems_to_sort, std::vector<int> *objective, SNET &sorting_network)
+    void Encoder::encode_network(std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network)
     {
         int size = elems_to_sort.second;
         int first_elem = elems_to_sort.first;

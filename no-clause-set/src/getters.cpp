@@ -15,16 +15,6 @@ namespace leximaxIST {
         return m_sat; 
     }
 
-    const std::vector<int>& Encoder::get_ub_vec() const
-    {
-        return m_ub_vec;
-    }
-
-    size_t Encoder::get_sorting_net_size() const
-    {
-        return m_sorting_net_size; 
-    }
-
     const std::vector<int>& Encoder::get_solution() const 
     { 
         return m_solution;

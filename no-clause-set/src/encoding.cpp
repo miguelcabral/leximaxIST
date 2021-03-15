@@ -13,30 +13,35 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
     
+    std::string ordinal (int i)
+    {
+        std::string i_str (std::to_string(i));
+        if (i_str.back() == '1')
+            i_str += "st";
+        else if (i_str.back() == '2')
+            i_str += "nd";
+        else if (i_str.back() == '3')
+            i_str += "rd";
+        return i_str;
+    }
+    
     void Encoder::encode_sorted()
     {
         if (m_num_objectives != 1) { // when there is only one objective function there is no need for this
             for (int i{0}; i < m_num_objectives; ++i) {   
-                std::vector<int> *objective = m_objectives[i];
+                const std::vector<int> *objective = m_objectives[i];
                 const size_t num_terms = objective->size();
                 m_sorted_vecs[i] = new std::vector<int>(num_terms, 0);
                 // sorting_network is initialized to a vector of pairs (-1,-1)
                 SNET sorting_network(num_terms, {-1,-1});
                 // elems_to_sort is represented by a pair (first element, number of elements).
                 std::pair<int,int> elems_to_sort(0, num_terms);
-                if (m_verbosity == 2) {
-                    std::cout << "c --------------- Objective Function " << i << " (size = ";
-                    std::cout << num_terms << ") --------------\n";
-                    for (size_t j = 0; j < num_terms; ++j)
-                        std::cout << objective->at(j) << '\n';
-                }
-                size_t old_snet_size (m_sorting_net_size);
-                m_sorting_net_size = 0;
-                encode_network(elems_to_sort, objective, sorting_network);
                 if (m_verbosity == 2)
-                    std::cout << "c -------------- Size of Sorting Network " << i << ": " << m_sorting_net_size << " --------------\n";
-                if (old_snet_size > m_sorting_net_size)
-                    m_sorting_net_size = old_snet_size; // in the end m_sorting_net_size is the size of the largest sorting network
+                    print_obj_func(i);
+                m_sorting_net_size = 0; // it is incremented every time a comparator is inserted
+                encode_network(elems_to_sort, objective, sorting_network);
+                if (m_verbosity >= 1)
+                    print_snet_size(i);
                 // sorted_vec variables are the outputs of sorting_network
                 if (num_terms == 1) { // in this case the sorting network is empty
                     std::vector<int> *sorted_vec = m_sorted_vecs[i];
@@ -49,11 +54,8 @@ namespace leximaxIST {
                         sorted_vec->at(j) = output_j;
                     }
                 }
-                if (m_verbosity == 2) {
-                    std::cout << "c ---------------- m_sorted_vecs[" << i << "] -----------------\n";
-                    for(size_t j{0}; j < num_terms; j++)
-                        std::cout << "c sorted_vec[" << j << "]: " << m_sorted_vecs[i]->at(j) << '\n';
-                }
+                if (m_verbosity == 2)
+                    print_sorted_vec(i);
             }
         }
     }
@@ -298,11 +300,8 @@ namespace leximaxIST {
             Clause c (1, -fresh()); // fill constructor; unit clause, neg of var
             add_soft_clause(c);
         }
-        if (m_verbosity == 2) {
-            std::cout << "c ------------ Soft Clauses of iteration " << i << " ------------\n";
-            for (const Clause *cl : m_soft_clauses)
-                print_clause(std::cout, cl, "c ");
-        }
+        if (m_verbosity == 2)
+            print_soft_clauses(i);
     }
     
     void Encoder::encode_upper_bound(int i, std::vector<int> &old_obj_vec)
@@ -311,7 +310,14 @@ namespace leximaxIST {
         if (obj_vec.empty())
             return;
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
-        m_ub_vec[i] = obj_vec[i];
+        if (m_verbosity >= 1 && m_verbosity <= 2) {
+            std::cout << "c Upper bound: ";
+            std::cout << obj_vec[i] << std::endl;
+            if (i == 0) {
+                std::cout << "c Trival upper bound (size of largest objective): ";
+                std::cout << largest_obj() << std::endl;
+            }
+        }
         if (m_verbosity == 2) {
             std::cout << "c ------------ Upper bound encoding ------------\n";
             std::cout << "c Sorted objective vector: ";
@@ -345,7 +351,6 @@ namespace leximaxIST {
         }
         if (!m_simplify_last || i != m_num_objectives - 1) { // upper bound on soft clauses
             int max_i (obj_vec[i]); // upper bound on minimum max_i
-            m_ub_vec[i] = max_i; // update upper bound of current iteration
             int end_position (m_soft_clauses.size() - 1 - max_i);
             if (m_verbosity == 2) {
                 std::cout << "c ------------ Upper bound on soft clauses ------------\n";
@@ -466,16 +471,8 @@ namespace leximaxIST {
         encode_sorted();
         // iteratively call (MaxSAT, PBO or ILP) solver       
         for (int i = 0; i < m_num_objectives; ++i) {
-            if (m_verbosity >= 1) {
-                std::string i_str (std::to_string(i + 1));
-                if (i_str.back() == '1')
-                    i_str += "st";
-                else if (i_str.back() == '2')
-                    i_str += "nd";
-                else if (i_str.back() == '3')
-                    i_str += "rd";
-                std::cout << "c Minimising " << i_str << " maximum..." << std::endl;
-            }
+            if (m_verbosity >= 1 && m_verbosity <= 2)
+                std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << std::endl;
             clear_soft_clauses();
             generate_soft_clauses(i);
             if (i != 0) // in the first iteration i == 0 there is no relaxation

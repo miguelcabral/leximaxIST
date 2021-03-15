@@ -78,8 +78,7 @@ namespace leximaxIST {
         //m_num_opts(0),
         m_multiplication_string(" "),
         m_solution(),
-        m_sorting_net_size(0),
-        m_ub_vec()
+        m_sorting_net_size(0)
     {}
 
 }/* namespace leximaxIST */

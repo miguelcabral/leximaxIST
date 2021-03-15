@@ -50,7 +50,6 @@ namespace leximaxIST
         std::string m_multiplication_string;
         std::vector<int> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
-        std::vector<int> m_ub_vec; // upper bounds used in each iteration (in last iteration maybe no ub is used)
         //std::vector<double> m_times; // time of each step of solving (only external solver times)
         
     public:    
@@ -61,16 +60,12 @@ namespace leximaxIST
         
         // returns 0 if all want well, -1 otherwise
         int solve();
-        
-        const std::vector<int>& get_ub_vec() const;
-        
+                
         bool get_sat() const;
         
         //int get_num_opts() const;
         
         const std::vector<double>& get_times() const;
-        
-        size_t get_sorting_net_size() const;
         
         /* if the problem is satisfiable, then m_solution is a satisfying assignment;
         * each entry i of m_solution is +i if variable i is true and -i otherwise;
@@ -146,11 +141,11 @@ namespace leximaxIST
         
         void encode_min(int var_out_min, int var_in1, int var_in2);
         
-        void insert_comparator(int el1, int el2, std::vector<int> *objective, SNET &sorting_network);
+        void insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network);
         
-        void odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, std::vector<int> *objective, SNET &sorting_network);
+        void odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network);
         
-        void encode_network(std::pair<int,int> elems_to_sort, std::vector<int> *objective, SNET &sorting_network);
+        void encode_network(std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
         
         //void delete_snet(SNET &sorting_network);
         
@@ -176,11 +171,7 @@ namespace leximaxIST
         
         // solver_call.cpp
         
-        void add_falsified_to_mss(std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector);
-        
-        int mss_choose_var_max(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index);
-        
-        int mss_choose_var_seq(std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index);
+        void add_falsified_to_mss(std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const;
         
         int mss_solve();
         
@@ -223,6 +214,14 @@ namespace leximaxIST
         int read_cbc_output(std::vector<int> &model);
         
         // printing.cpp
+        
+        void print_soft_clauses(int i) const;
+        
+        void print_sorted_vec (int i) const;
+        
+        void print_obj_func(int i) const;
+        
+        void print_snet_size(int i) const;
         
         void print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const;
         

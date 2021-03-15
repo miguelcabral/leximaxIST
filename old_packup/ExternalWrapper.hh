@@ -44,7 +44,7 @@ public:
 
     virtual IntVector& get_model()          { return model; }
     virtual void set_leximax_model(const std::vector<int> &lib_model) {
-        model.assign(lib_model.begin(), lib_model.end()); // this allows type conversion (if LINT is not long long)
+        model.assign(lib_model.begin(), lib_model.end()); // this allows type conversion (int to LINT)
     }
     
     virtual XLINT      get_min_unsat_cost() {return min_cost;}

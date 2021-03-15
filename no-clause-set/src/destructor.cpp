@@ -48,7 +48,6 @@ namespace leximaxIST {
         clear_sorted_relax();
         clear_hard_clauses();
         clear_soft_clauses();
-        m_ub_vec.clear();
         m_solution.clear();
         //m_num_opts = 0;
         m_id_count = 0;
