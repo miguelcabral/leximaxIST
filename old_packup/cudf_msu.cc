@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_solution_file(&output_stream);
     try {
         yyparse();
-    } catch(ReadException e) {
+    } catch(const ReadException &e) {
         cerr << "Error in parsing the input file:" << e.what() << endl;
         cerr << "Terminating." << endl;
     }
