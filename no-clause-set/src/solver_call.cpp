@@ -760,8 +760,6 @@ namespace leximaxIST {
         user_time += (double)ru.ru_utime.tv_sec + (double)ru.ru_utime.tv_usec / 1000000;
         //system time - negligible ?
         sys_time += (double)ru.ru_stime.tv_sec + (double)ru.ru_stime.tv_usec / 1000000;
-        std::cout << "c User time: " << user_time << '\n';
-        std::cout << "c System time: " << sys_time << std::endl;
         double total_time (user_time + sys_time);
         return total_time;
     }
