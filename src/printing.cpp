@@ -57,7 +57,7 @@ namespace leximaxIST {
         std::cout << "c --------------- Objective Function " << i << " (size = ";
         std::cout << num_terms << ") --------------\n";
         for (size_t j = 0; j < num_terms; ++j)
-            std::cout << objective->at(j) << '\n';
+            std::cout << "c " << objective->at(j) << '\n';
     }
     
     void Encoder::print_snet_size(int i) const

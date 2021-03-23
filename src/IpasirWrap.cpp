@@ -1,6 +1,6 @@
 #include <leximaxIST_error.h>
 #include <IpasirWrap.h>
-#include "ipasir.h"
+#include <ipasir.h>
 #include <cstdlib>
 #include <cmath>
 
@@ -59,7 +59,7 @@ namespace leximaxIST {
             _model.resize(_nvars + 1, 0);
             for (int v = _nvars; v; v--) {
             _model[v] = ipasir_val(_s, v);
-        }
+            }
         } else {
             for (auto l : assumps) {
                 if (ipasir_failed(_s, l))
