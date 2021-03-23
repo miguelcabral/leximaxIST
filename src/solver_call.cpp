@@ -647,15 +647,15 @@ namespace leximaxIST {
         return next_var;
     }
     
-    // move falsified variables in todo to mss; decrement obj_vector accordingly
-    void Encoder::add_falsified_to_mss (std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const
+    // add falsified variables in todo to hard clauses of sat solver; decrement obj_vector accordingly
+    void Encoder::mss_add_falsified (IpasirWrap &solver, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const
     {
         for (int j (0); j < m_num_objectives; ++j) {
             std::vector<int> &todo (todo_vec[j]);
             for (size_t i (0); i < todo.size(); ++i) {
                 int var (todo.at(i));
                 if (m_solution[var] < 0) {
-                    mss.push_back(-var);
+                    solver.addClause(-var);
                     // decrement objective value
                     --obj_vector[j];
                     // erase element in todo by moving last element to current position
@@ -675,8 +675,7 @@ namespace leximaxIST {
         IpasirWrap solver(m_id_count);
         for (const Clause *hard_cl : m_constraints)
             solver.addClause(hard_cl);
-        bool is_sat = solver.solve();
-        m_sat = is_sat;
+        m_sat = solver.solve();
         if (!m_sat)
             return 0;
         m_solution = std::move(solver.model());
@@ -690,14 +689,14 @@ namespace leximaxIST {
             todo_vec[i] = *objective; // copy assignment
             obj_vector[i] = objective->size();
         }
-        std::vector<int> mss;
+        std::vector<int> assumps;
         int obj_index (0);
-        add_falsified_to_mss (mss, todo_vec, obj_vector);
+        mss_add_falsified (solver, todo_vec, obj_vector);
         if (m_verbosity > 0 && m_verbosity <= 2)
             print_obj_vector(obj_vector);
         while (true /*stops when next_var == -1*/) {
             if (m_verbosity == 2)
-                print_mss_and_todo(mss, todo_vec);
+                print_mss_todo(todo_vec);
             /* choose var in todo using an heuristic
              * var is removed from todo
              * The obj value in obj_vector is decremented
@@ -705,18 +704,20 @@ namespace leximaxIST {
             int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
             if (next_var == -1)
                 return 0;
-            mss.push_back (-next_var);
-            if (solver.solve(mss)) {
+            assumps.push_back (-next_var);
+            if (solver.solve(assumps)) {
                 m_solution = std::move(solver.model());
                 solver.model().clear();
-                add_falsified_to_mss (mss, todo_vec, obj_vector);
+                solver.addClause(-next_var);
+                mss_add_falsified (solver, todo_vec, obj_vector);
                 if (m_verbosity > 0 && m_verbosity <= 2)
                     print_obj_vector(obj_vector);
             }
             else {
-                mss.pop_back(); // remove last assumption from mss
+                solver.addClause(next_var);
                 ++obj_vector[obj_index]; // correct obj value (it was decremented before)
             }
+            assumps.clear();
         }
         return 0;
     }

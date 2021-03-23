@@ -66,9 +66,8 @@ namespace leximaxIST {
         std::cout << " objective: " << m_sorting_net_size << "\n";
     }
     
-    void Encoder::print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const
+    void Encoder::print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const
     {
-        std::cout << "c Size of MSS: " << mss.size() << '\n';
         for (int i(0); i < m_num_objectives; ++i) {
             std::cout << "c Size of Todo of Objective " << i << ": ";
             std::cout << todo_vec.at(i).size() << '\n';

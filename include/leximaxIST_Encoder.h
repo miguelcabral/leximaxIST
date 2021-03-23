@@ -1,6 +1,7 @@
 #ifndef LEXIMAXIST_ENCODER
 #define LEXIMAXIST_ENCODER
 #include <leximaxIST_types.h>
+#include <IpasirWrap.h>
 #include <string> // std::string
 #include <vector> // std::vector
 #include <utility> // std::pair
@@ -171,7 +172,7 @@ namespace leximaxIST
         
         // solver_call.cpp
         
-        void add_falsified_to_mss(std::vector<int> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const;
+        void mss_add_falsified (IpasirWrap &solver, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const;
         
         int mss_solve();
         
@@ -223,7 +224,7 @@ namespace leximaxIST
         
         void print_snet_size(int i) const;
         
-        void print_mss_and_todo(const std::vector<int> &mss, const std::vector<std::vector<int>> &todo_vec) const;
+        void print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const;
         
         void print_obj_vector(const std::vector<int> &obj_vec) const;
         
