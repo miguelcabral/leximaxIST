@@ -84,7 +84,7 @@ namespace leximaxIST {
 
     int Encoder::read_cplex_output(std::vector<int> &model)
     {
-        std::string output_filename (m_file_name + ".out");
+        std::string output_filename (m_file_name + ".sol");
         gzFile of = gzopen(output_filename.c_str(), "rb");
         if (of == Z_NULL) {
             print_error_msg("Can't open file '" + output_filename + "' for reading");
@@ -129,7 +129,7 @@ namespace leximaxIST {
     // if model.empty() in the end then unsat, else sat
     int Encoder::read_sat_output(std::vector<int> &model)
     {
-        std::string output_filename (m_file_name + ".out");
+        std::string output_filename (m_file_name + ".sol");
         gzFile of = gzopen(output_filename.c_str(), "rb");
         if (of == Z_NULL) {
             print_error_msg("Can't open file '" + output_filename + "' for reading");
@@ -228,7 +228,7 @@ namespace leximaxIST {
 
     int Encoder::call_solver(const std::string &solver_type)
     {
-        std::string output_filename = m_file_name + ".out";
+        std::string output_filename = m_file_name + ".sol";
         const std::string error_filename = m_file_name + ".err";
         std::string command;
         if (solver_type == "optimisation") {
@@ -257,7 +257,6 @@ namespace leximaxIST {
             if (m_lp_solver == "scip")
                 command += "-f " + m_file_name;
             if (m_lp_solver == "gurobi") {
-                output_filename = m_file_name + ".sol"; // gurobi only accepts this file extension
                 command = "gurobi_cl";
                 command += " Threads=1 ResultFile=" + output_filename;
                 command += " LogFile=\"\" LogToConsole=0 "; // disable logging
@@ -352,9 +351,8 @@ namespace leximaxIST {
             print_error_msg("The external solver finished with non-zero error status: " + errmsg);
             return -1;
         }*/
-        if (m_formalism != "lp" || m_lp_solver != "gurobi" || solver_type == "decision") {
+        if (m_formalism != "lp" || m_lp_solver != "gurobi" || solver_type == "decision")
             command += " > " + output_filename;
-        }
         command += " 2> " + error_filename;
         system(command.c_str());
         // set to zero, i.e. no external solver is currently running
@@ -552,12 +550,7 @@ namespace leximaxIST {
     
     void Encoder::remove_tmp_files() const
     {
-        std::string output_filename (m_file_name);
-        if (m_formalism == "lp" && m_lp_solver == "gurobi") {
-            output_filename += ".sol";
-        }
-        else
-            output_filename += ".out";
+        std::string output_filename (m_file_name + ".sol");
         std::string error_filename (m_file_name + ".err");
         remove(m_file_name.c_str());
         remove(output_filename.c_str());
