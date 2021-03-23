@@ -3,3 +3,4 @@ examples/*
 *.gcda
 *.gcno
 gmon.out
+*.a
