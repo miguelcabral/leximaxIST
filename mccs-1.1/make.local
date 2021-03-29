@@ -11,7 +11,7 @@
 ifeq ($(USEGLPK),1)
 
 # Path to GLPK main dir
-GLPKDIR=/home/mcabral/solvers/mccs/glpk-4.65
+GLPKDIR=/home/mcabral/solvers/lp/glpk-4.65
 
 # Path to the GPLK include files
 GLPKINC=$(GLPKDIR)/src/
@@ -28,13 +28,13 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
-USELPSOLVE=1
+#USELPSOLVE=1
 
 
 ifeq ($(USELPSOLVE),1)
 
 # Path to the LPSOLVE main dir
-LPSOLVEDIR=/home/mcabral/solvers/mccs/lp_solve_5.5
+LPSOLVEDIR=/home/mcabral/solvers/lp/lp_solve_5.5
 
 # Path to the LPSOLVE include files
 LPSOLVEINC=${LPSOLVEDIR}/ 
@@ -51,13 +51,13 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-#USECPLEX=1
+USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)
 
 # Path to the CPLEX main dir
-CPXDIR=/home/mcabral/solvers/CPLEX_Studio1210
+CPXDIR=/home/mcabral/solvers/lp/CPLEX_Studio1210
 
 # path to cplex include directory
 CPXINC=$(CPXDIR)/cplex/include/
@@ -83,7 +83,7 @@ endif
 ifeq ($(USEGUROBI),1)
 
 # Path to the main GUROBI dir
-GUROBIDIR=/home/mcabral/solvers/mccs/gurobi903/linux64
+GUROBIDIR=/home/mcabral/solvers/lp/gurobi903/linux64
 
 # path to gurobi include directory
 GUROBIINC=$(GUROBIDIR)/include/ 

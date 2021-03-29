@@ -38,14 +38,13 @@ int cplex_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages, 
 
   
    /* Enhance EPGAP to handle big values correctly */
-  // Edit: Miguel comment EPGAP
-  /*status = CPXsetdblparam (env, CPX_PARAM_EPGAP, 0.0);
+  status = CPXsetdblparam (env, CPX_PARAM_EPGAP, 0.0);
   if ( status ) {
     fprintf (stderr, "Failure to set EPGAP, error %d.\n", status);
     exit(-1);
-  }*/
+  }
   /* Edit: Miguel - use EPAGAP */
-  status = CPXsetdblparam (env, CPXPARAM_MIP_Tolerances_AbsMIPGap, 0.0);
+  /*status = CPXsetdblparam (env, CPXPARAM_MIP_Tolerances_AbsMIPGap, 0.0);
   if ( status ) {
     fprintf (stderr, "Failure to set EPAGAP, error %d.\n", status);
     exit(-1);
@@ -54,20 +53,20 @@ int cplex_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages, 
   if ( status ) {
     fprintf (stderr, "Failure to set Integrality tolerance, error %d.\n", status);
     exit(-1);
-  }
+  }*/
   // End of edit: Miguel
-  /* Limit the number of thread to 1 */  
+  /* Limit the number of threads to 1 */  
   status = CPXsetintparam (env, CPXPARAM_Threads, 1);
   if ( status ) {
     fprintf (stderr, "Failure to set thread limit to 1, error %d.\n", status);
     exit(-1);
   }
   // Miguel edit:
-  status = CPXsetintparam (env, CPXPARAM_Emphasis_Numerical, 1);
+  /*status = CPXsetintparam (env, CPXPARAM_Emphasis_Numerical, 1);
   if ( status ) {
     fprintf (stderr, "Failure to set numerical emphasis, error %d.\n", status);
     exit(-1);
-  }
+  }*/
   // end of Miguel edit
 
 
