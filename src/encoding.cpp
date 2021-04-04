@@ -8,6 +8,7 @@
 #include <utility>
 #include <algorithm>
 #include <list>
+#include <cmath>
 
 namespace leximaxIST {
 
@@ -57,6 +58,9 @@ namespace leximaxIST {
                 if (m_verbosity == 2)
                     print_sorted_vec(i);
             }
+            // add order encoding to each sorted vector
+            for (const std::vector<int> *svec : m_sorted_vecs)
+                order_encoding(*svec);
         }
     }
 
@@ -114,7 +118,7 @@ namespace leximaxIST {
         std::list<int> relax_vars;
         for (int j = 0; j < m_num_objectives; ++j)
             relax_vars.push_back(fresh());
-        m_all_relax_vars.push_back(relax_vars); // TODO: maybe move the relax_vars
+        m_all_relax_vars.push_back(relax_vars);
         int first_relax_var (relax_vars.front());
         if (m_verbosity == 2) {
             std::cout << "c ------------ Relaxation variables of iteration " << i << " ------------\n";
@@ -136,41 +140,30 @@ namespace leximaxIST {
                     // create sorted_relax variables
                     sorted_relax->at(k) = fresh();
                     // encoding:
-                    Clause cl;
                     // relax_j implies not sorted_relax_j_k
-                    cl.push_back(-(first_relax_var + j));
-                    cl.push_back(-sorted_relax->at(k));
+                    const Clause *cl (add_hard_clause(-(first_relax_var + j), -sorted_relax->at(k)));
                     if (m_verbosity == 2) {
                         std::cout << "c sorted_relax[" << k << "]: " << sorted_relax->at(k) << "\n";
                         std::cout << "c -------------- relax_var implies not sorted_relax["<< k << "] ------\n";
-                        print_clause(std::cout, &cl, "c ");
+                        print_clause(std::cout, cl, "c ");
                         std::cout << "c ------- not relax_var implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
                     }
-                    add_hard_clause(cl);
                     // not relax_j implies sorted_relax_j_k equals sorted_j_k
-                    cl.clear();
-                    cl.push_back(first_relax_var + j);
-                    cl.push_back(-sorted_relax->at(k));
-                    cl.push_back(sorted_vec->at(k));
+                    cl = add_hard_clause(first_relax_var + j, -sorted_relax->at(k), sorted_vec->at(k));
                     if (m_verbosity == 2)
-                        print_clause(std::cout, &cl, "c ");
-                    add_hard_clause(cl);
-                    cl.clear();
-                    cl.push_back(first_relax_var + j);
-                    cl.push_back(sorted_relax->at(k));
-                    cl.push_back(-(sorted_vec->at(k)));
+                        print_clause(std::cout, cl, "c ");
+                    cl = add_hard_clause(first_relax_var + j, sorted_relax->at(k), -(sorted_vec->at(k)));
                     if (m_verbosity == 2)
-                        print_clause(std::cout, &cl, "c ");
-                    add_hard_clause(cl);
+                        print_clause(std::cout, cl, "c ");
                 }
             }
-            // at most i constraint 
-            if(m_formalism == "wcnf") {
-                if (m_verbosity == 2)
-                    std::cout << "c ---------------- At most " << i << " Constraint ----------------\n";
-                at_most(relax_vars, i);
-                // at least i constraint -> is not necessary
-            }
+            // add order encoding to each sorted vector after relaxation
+            for (const std::vector<int> *srel : sorted_relax_vecs)
+                order_encoding(*srel);
+            // at most i constraint on relaxation variables
+            if (m_verbosity == 2)
+                std::cout << "c ---------------- At most " << i << " Constraint ----------------\n";
+            at_most(relax_vars, i);
             m_sorted_relax_collection.push_back(sorted_relax_vecs);
         }
         else { // last iteration
@@ -179,51 +172,44 @@ namespace leximaxIST {
             for (int relax_var : relax_vars) {
                 std::vector<int> *objective = m_objectives[k];
                 size_t j = 0;
-                for (Clause *cl : m_soft_clauses) {
-                    int soft_var = -(*(cl->begin()));
+                for (const int lit : m_soft_clauses) {
+                    int soft_var = -lit;
                     if (j >= objective->size()) {
                         // relax_vars[k] implies neg soft_var[j]
-                        Clause cl {-relax_var, -soft_var};
+                        const Clause *cl (add_hard_clause(-relax_var, -soft_var));
                         if (m_verbosity == 2) {
                             std::cout << "c relax_var implies neg soft_var: ";
-                            print_clause(std::cout, &cl);
+                            print_clause(std::cout, cl);
                         }
-                        add_hard_clause(cl);
                     }
                     else {
                         // relax_vars[k] implies objective[j] implies soft_var[j]
-                        Clause cl {-relax_var, -(objective->at(j)), soft_var};
+                        const Clause *cl (add_hard_clause(-relax_var, -(objective->at(j)), soft_var));
                         if (m_verbosity == 2) {
                             std::cout << "c relax_var implies obj_var implies soft_var: ";
-                            print_clause(std::cout, &cl);
+                            print_clause(std::cout, cl);
                         }
-                        add_hard_clause(cl);
-                        // let's check: m_relax_vars[k] implies soft_var[j] implies objective[j]
-                        cl[0] = -relax_var;
-                        cl[1] = objective->at(j);
-                        cl[2] = -soft_var;
+                        // let's check: relax_vars[k] implies soft_var[j] implies objective[j]
+                        cl = add_hard_clause(-relax_var, objective->at(j), -soft_var);
                         if (m_verbosity == 2) {
                             std::cout << "c relax_var implies soft_var implies obj: ";
-                            print_clause(std::cout, &cl);
+                            print_clause(std::cout, cl);
                         }
-                        add_hard_clause(cl);
                     }
                     ++j;
                 }
                 ++k;
             }
-            if(m_formalism == "wcnf") { // when solving with pbo or lp, this constraint is written before calling the solver
-                // at most 1 constraint
-                if (m_verbosity == 2)
-                    std::cout << "c ---------------- At most " << 1 << " Constraint ----------------\n";
-                at_most(relax_vars, 1);
-                // at least 1 constraint
-                Clause cl (relax_vars.begin(), relax_vars.end());
-                if (m_verbosity == 2) {
-                    std::cout << "c ---------------- At least " << 1 << " Constraint ----------------\n";
-                    print_clause(std::cout, &cl, "c ");
-                }
-                add_hard_clause(cl);
+            // encode at most 1 constraint to cnf
+            if (m_verbosity == 2)
+                std::cout << "c ---------------- At most " << 1 << " Constraint ----------------\n";
+            at_most(relax_vars, 1);
+            // encode at least 1 constraint to cnf
+            const Clause cl (relax_vars.begin(), relax_vars.end());
+            add_hard_clause(cl);
+            if (m_verbosity == 2) {
+                std::cout << "c ---------------- At least " << 1 << " Constraint ----------------\n";
+                print_clause(std::cout, &cl, "c ");
             }
         }
     }
@@ -252,7 +238,7 @@ namespace leximaxIST {
             sorted_vecs = &m_sorted_relax_collection[i-1];
         }
         size_t k = 0;
-        for (Clause *cl : m_soft_clauses) {
+        for (int soft_lit : m_soft_clauses) {
             std::vector<int> disjunction;
             for (int j = 0; j < m_num_objectives; ++j) {
                 std::vector<int> *sorted_vec = sorted_vecs->at(j);
@@ -266,14 +252,10 @@ namespace leximaxIST {
                 }
             }
             // disjunction implies soft variable
-            int soft_lit = *(cl->begin());
             for (int component : disjunction) {
-                Clause c;
-                c.push_back(-soft_lit);
-                c.push_back(-component);
-                add_hard_clause(c);
+                const Clause *c (add_hard_clause(-soft_lit, -component));
                 if (m_verbosity == 2)
-                    print_clause(std::cout, &c, "c ");
+                    print_clause(std::cout, c, "c ");
             }
             ++k;        
             // soft variable implies disjunction -> It is not necessary
@@ -282,42 +264,51 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::generate_soft_clauses(int i)
+    void Encoder::order_encoding(const std::vector<int>& vars)
+    {
+        if (m_verbosity == 2)
+            std::cout << "c ------------ Order Encoding ------------\n";
+        int size (vars.size());
+        for (int i (0); i < size - 1; ++i) {
+            // vars[i] implies vars[i+1]
+            const Clause *c = add_hard_clause(-vars.at(i), vars.at(i + 1));
+            if (m_verbosity == 2)
+                print_clause(std::cout, c, "c ");
+        }
+    }
+    
+    void Encoder::generate_soft_clauses()
     {
         // if m_num_objectives is 1 then this is a single objective problem
         if (m_num_objectives == 1) {
             std::vector<int> *objective = m_objectives[0];
-            for (size_t j (0); j < objective->size(); ++j) {
-                Clause c (1, -(objective->at(j))); // fill constructor
-                add_soft_clause(c);
-            }
-                return;
+            m_soft_clauses = *objective;
+            for (size_t j (0); j < objective->size(); ++j)
+                m_soft_clauses.at(j) = -objective->at(j);
+            return;
         }
         // find size of largest objective function
         size_t largest = largest_obj();
         // create new soft vars and soft clauses
+        m_soft_clauses.resize(largest);
+        std::vector<int> soft_vars(largest, 0);
         for (size_t j (0); j < largest; ++j) {
-            Clause c (1, -fresh()); // fill constructor; unit clause, neg of var
-            add_soft_clause(c);
+            int f (fresh());
+            soft_vars.at(j) = f;
+            m_soft_clauses.at(j) = -f;
         }
+        order_encoding(soft_vars);
         if (m_verbosity == 2)
-            print_soft_clauses(i);
+            print_soft_clauses();
     }
     
-    void Encoder::encode_upper_bound(int i, std::vector<int> &old_obj_vec)
+    // returns the upper bound of the optimal i-th max
+    int Encoder::encode_upper_bound(int i)
     {
+        if (i == 0 && m_ub_presolve == 0)
+            return m_soft_clauses.size();
         std::vector<int> obj_vec (get_objective_vector());
-        if (obj_vec.empty())
-            return;
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
-        if (m_verbosity >= 1 && m_verbosity <= 2) {
-            std::cout << "c Upper bound: ";
-            std::cout << obj_vec[i] << std::endl;
-            if (i == 0) {
-                std::cout << "c Trival upper bound (size of largest objective): ";
-                std::cout << largest_obj() << std::endl;
-            }
-        }
         if (m_verbosity == 2) {
             std::cout << "c ------------ Upper bound encoding ------------\n";
             std::cout << "c Sorted objective vector: ";
@@ -325,199 +316,158 @@ namespace leximaxIST {
                 std::cout << v << ' ';
             std::cout << '\n';
         }
-        if (i == 0 || i == 1) { // refine upper bound on all obj functions (sorted vecs)
-            if (m_verbosity == 2)
-                std::cout << "c ------------ Upper bound on Sorted Vecs ------------\n";
-            int first_max (obj_vec[0]);
-            for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
-                int size (sorted_vec->size());
-                int old_first_max ( i == 0 ? size : old_obj_vec[0]);
-                int starting_position (size - old_first_max);
-                if (starting_position < 0)
-                    starting_position = 0;
-                int end_position (size - 1 - first_max);
-                if (m_verbosity == 2) {
-                    std::cout << "c ----- Sorted Vec -----\n";
-                    std::cout << "c size: " << size << '\n';
-                    std::cout << "c upper bound: " << first_max << '\n';
-                }
-                for (int j (starting_position); j <= end_position; ++j) {
-                    Clause cl {-(sorted_vec->at(j))}; // neg sorted vec
-                    if (m_verbosity == 2)
-                        print_clause(std::cout, &cl, "c ");
-                    add_hard_clause(cl);
-                }
+        if (m_verbosity >= 1 && m_verbosity <= 2) {
+            if (i == 0) {
+                std::cout << "c Trival upper bound (size of largest objective): ";
+                std::cout << m_soft_clauses.size() << std::endl;
             }
+            std::cout << "c Upper bound of current optimal maximum: ";
+            std::cout << obj_vec.at(i) << std::endl;
         }
-        if (!m_simplify_last || i != m_num_objectives - 1) { // upper bound on soft clauses
-            int max_i (obj_vec[i]); // upper bound on minimum max_i
-            int end_position (m_soft_clauses.size() - 1 - max_i);
+        if (i == 0 || i == 1)
+            encode_ub_sorted(obj_vec.at(0)); // ub on all obj funcs
+        // in the last iteration, if m_simplify_last, current max is not sorted
+        if ((!m_simplify_last || i != m_num_objectives - 1))
+            encode_ub_soft(obj_vec.at(i)); // ub on current max
+        return obj_vec.at(i);
+    }
+    
+    // upper bound on current maximum
+    void Encoder::encode_ub_soft(int max_i)
+    {
+        int pos (m_soft_clauses.size() - 1 - max_i);
+        if (m_verbosity == 2) {
+            std::cout << "c ------------ Upper bound on soft clauses ------------\n";
+            std::cout << "c size: " << m_soft_clauses.size() << '\n';
+            std::cout << "c upper bound: " << max_i << '\n';
+        }
+        const Clause *c (add_hard_clause(m_soft_clauses.at(pos)));
+        if (m_verbosity == 2)
+            print_clause(std::cout, c, "c ");
+    }
+    
+    // upper bound on all objective functions (first and second iterations)
+    void Encoder::encode_ub_sorted(int first_max)
+    {
+        // refine upper bound on all obj functions (sorted vecs)
+        if (m_verbosity == 2)
+            std::cout << "c ------------ Upper bound on Sorted Vecs ------------\n";
+        for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
+            int size (sorted_vec->size());
+            int pos (size - 1 - first_max); // pos might be < 0
             if (m_verbosity == 2) {
-                std::cout << "c ------------ Upper bound on soft clauses ------------\n";
-                std::cout << "c size: " << m_soft_clauses.size() << '\n';
-                std::cout << "c upper bound: " << max_i << '\n';
+                std::cout << "c ----- Sorted Vec -----\n";
+                std::cout << "c size: " << size << '\n';
+                std::cout << "c upper bound: " << first_max << '\n';
             }
-            for (int j (0); j <= end_position; ++j) {
-                const Clause *cl (m_soft_clauses[j]);
+            if (pos >= 0) {
+                const Clause *c (add_hard_clause(-(sorted_vec->at(pos)))); // neg sorted vec
                 if (m_verbosity == 2)
-                    print_clause(std::cout, cl, "c ");
-                add_hard_clause(*cl);
-            }
-        }
-        old_obj_vec = obj_vec;
-    }
-    
-    void Encoder::debug_print_all(const std::vector<std::vector<int>> &true_ys, const std::vector<int> &y_vector)
-    {
-        if (!m_solution.empty()){
-            // compare y_vector with objective vector and print true sorted vector variables
-            std::cout << "c Y vector: ";
-            for (int v : y_vector)
-                std::cout << v << ' ';
-            std::cout << '\n';
-            std::vector<std::vector<int>> true_input;
-            for (std::vector<int> *obj : m_objectives) {
-                std::vector<int> true_obj_vars;
-                for (int var : *obj) {
-                    if (m_solution[var] > 0)
-                        true_obj_vars.push_back(var);
-                }
-                true_input.push_back(true_obj_vars);
-            }
-            std::vector<int> obj_vector (m_num_objectives, 0);
-            std::cout << "c Input vector: ";
-            for (const std::vector<int> &true_obj_vars : true_input)
-                std::cout << true_obj_vars.size() << ' ';
-            std::cout << '\n';      
-            std::cout << "c Y true variables:" << '\n';
-            int j (0);
-            for (const std::vector<int> &true_vars : true_ys) {
-                std::cout << "c Maximum " << j << ": ";
-                for (int var : true_vars)
-                    std::cout << var << ' ';
-                std::cout << '\n';
-                ++j;
-            }
-            std::cout << "c Input true variables:" << '\n';
-            j = 0;
-            for (const std::vector<int> &true_vars : true_input) {
-                std::cout << "c Function " << j << ": ";
-                for (int var : true_vars)
-                    std::cout << var << ' ';
-                std::cout << '\n';
-                ++j;
-            }
-            std::cout << "c Sorted vecs true variables:" << '\n';
-            j = 0;
-            for (std::vector<int> *sorted_vec : m_sorted_vecs) {
-                std::cout << "c Sorted vec " << j << ": ";
-                for (int var : *sorted_vec) {
-                    if (m_solution[var] > 0)
-                        std::cout << var << ' ';
-                }
-                std::cout << '\n';
-                ++j;
-            }
-            j = 1;
-            for (std::vector<std::vector<int>*> &sorted_relax_vecs : m_sorted_relax_collection) {
-                std::cout << "c Sorted Relax Vecs true variables of iteration " << j << ":" << '\n';
-                int k (0);
-                for (std::vector<int> *sorted_relax : sorted_relax_vecs) {
-                    if (sorted_relax != nullptr) {
-                        std::cout << "c Sorted Relax vec " << k << ": ";
-                        for (int var : *sorted_relax) {
-                            if (m_solution[var] > 0)
-                                std::cout << var << ' ';
-                        }
-                        std::cout << '\n';
-                        ++k;
-                    }
-                }
-                ++j;
+                    print_clause(std::cout, c, "c ");
             }
         }
     }
     
-    int Encoder::solve()
+    void Encoder::fix_only_some()
     {
-        double initial_time (0.0);
-        if (m_verbosity > 0 && m_verbosity < 3)
-            initial_time = read_cpu_time();
+        // y variables are sorted: 0...01...1
+        // find first occurrence of 1
+        size_t j (0);
+        for (; j < m_soft_clauses.size(); ++j) {
+            int var (-m_soft_clauses.at(j));
+            if (m_solution.at(var) > 0)
+                break;
+        }
+        if (j != m_soft_clauses.size()) {
+            // y_j
+            const Clause *c (add_hard_clause(-m_soft_clauses.at(j)));
+            if (m_verbosity == 2)
+                print_clause(std::cout, c, "c ");
+        }
+        if (j != 0) {
+            // neg y_j-1
+            const Clause *c (add_hard_clause(m_soft_clauses.at(j - 1)));
+            if (m_verbosity == 2)
+                print_clause(std::cout, c, "c ");
+        }
+    }
+    
+    void Encoder::fix_all()
+    {
+        for (int l : m_soft_clauses) {
+            const Clause *c (add_hard_clause(m_solution.at(std::abs(l))));
+            if (m_verbosity == 2)
+                print_clause(std::cout, c, "c ");
+        }
+    }
+    
+    void Encoder::fix_soft_vars()
+    {
+        if (m_verbosity == 2)
+            std::cout << "c ---------- Fix value of current maximum ----------\n";
+        // fix_only_some(); // this needs the order encoding
+        fix_all(); // this may allow the sat solver to eliminate the order encoding
+    }
+    
+    void Encoder::solve()
+    {
+        double initial_time (read_cpu_time());
         if (m_num_objectives == 0) {
-            print_error_msg("No objective function");
-            return -1;
+            print_error_msg("Can not solve - no objective function");
+            exit(EXIT_FAILURE);
         }
-        if (m_constraints.empty()) {
-            print_error_msg("Empty constraints");
-            return -1;
+        if (m_hard_clauses.empty()) {
+            print_error_msg("Can not solve - no hard clauses");
+            exit(EXIT_FAILURE);
         }
-        std::vector<std::vector<int>> true_ys; // for debugging
-        std::vector<int> y_vector; // for debugging
         // if there is only one objective function then it is a simple single objective problem
         if (m_num_objectives == 1) {
-            generate_soft_clauses(0);
-            // call solver and read output 
-            int retv = external_solve(0);
-            return retv;
+            if (m_opt_mode != "external") {
+                print_error_msg("Can't use internal optimisation in single-objective problems");
+                exit(EXIT_FAILURE);
+            }
+            generate_soft_clauses();
+            external_solve(0);
+            return;
         }
-        if (m_ub_encoding != 0) { // call sat solver (or MSS or MaxSAT/PBO/ILP solver) first to get upper bound of optimum
-            if (calculate_upper_bound() != 0)
-                return -1;
-            if (!m_sat)
-                return 0;
+        if (m_ub_presolve != 0) { // call sat solver (once or MSS) to get upper bound of optimum
+            calculate_upper_bound();
+            if (m_status == 'u')
+                return;
         }
-        std::vector<int> old_obj_vec; // used in upper bound encoding
         // encode sorted vectors with sorting network
         encode_sorted();
-        // iteratively call (MaxSAT, PBO or ILP) solver       
+        // iteratively call (SAT/MaxSAT/PBO/ILP) solver
         for (int i = 0; i < m_num_objectives; ++i) {
             if (m_verbosity >= 1 && m_verbosity <= 2)
                 std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << std::endl;
             clear_soft_clauses();
-            generate_soft_clauses(i);
+            generate_soft_clauses();
             if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i);
             // encode the componentwise OR between sorted_relax vectors (except maybe in the last iteration)
             if (!m_simplify_last || i != m_num_objectives - 1)
                 componentwise_OR(i);
-            // encode upper bound obtained from sat solver (or MSS or MaxSAT)
-            if (m_ub_encoding != 0 && (!m_simplify_last || i != m_num_objectives - 1)) {
-                encode_upper_bound(i, old_obj_vec);
-            }
-            // call solver
-            if (external_solve(i) == -1)
-                return -1;
+            // encode upper bound obtained from presolving or previous iteration
+            int ub (encode_upper_bound(i));
+            // call optimisation solver (external solver or internal optimisation with SAT solver)
+            if (m_opt_mode == "external")
+                external_solve(i);
+            else
+                internal_solve(i, ub);
             // if unsat end computation
-            if (!m_sat)
-                return 0;
-            if (m_verbosity >= 1 && m_verbosity <= 2)
-                print_obj_vector();
+            if (m_status == 'u')
+                return;
             // fix value of current maximum; in the end of last iteration there is no need for this
-            if (i != m_num_objectives - 1) {
-                for (Clause *scl : m_soft_clauses) {
-                    int soft_var = -(*(scl->begin()));
-                    Clause hc (1, m_solution[soft_var]); // fill constructor
-                    add_hard_clause(hc);
-                }
-            }
-            if (m_verbosity == 2) {
-                std::vector<int> current_true_ys;
-                for (Clause *cl : m_soft_clauses) {
-                    int soft_var = -(*(cl->begin()));
-                    if (m_solution[soft_var] > 0)
-                        current_true_ys.push_back(soft_var);
-                }
-                y_vector.push_back(current_true_ys.size());
-                true_ys.push_back(current_true_ys);
-            }
+            if (i != m_num_objectives - 1)
+                fix_soft_vars();
         }
         if (m_verbosity == 2)
-            debug_print_all(true_ys, y_vector);
+            print_sorted_true();
         if (m_verbosity > 0 && m_verbosity < 3) { // print total solving time
             std::cout << "c Total solving CPU time: ";
             std::cout << read_cpu_time() - initial_time << 's' << std::endl;
         }
-        return 0;
     }
 
 }/* namespace leximaxIST */

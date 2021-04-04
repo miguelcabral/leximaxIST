@@ -43,6 +43,7 @@ Options::Options()
 , ub_encoding(0)
 , verbosity(0)
 , formalism("wcnf")
+, opt_mode ("bin")
 , lp_solver("gurobi")
 {}
 
@@ -73,8 +74,7 @@ bool Options::parse(int argc,char **argv) {
     static struct option long_options[] = {
          {"help", no_argument,    &help, 1}
        , {"no-sol", no_argument,  &solving_disabled, 1}
-       ,{"opt-solver", required_argument,  0, 500}
-       ,{"osol", required_argument,  0, 500}
+       ,{"ext-solver", required_argument,  0, 500}
        ,{"solution-check",  required_argument,  0, 501}
 #ifdef MAPPING
        ,{"mapping-file",    required_argument,  0, 502}
@@ -85,9 +85,8 @@ bool Options::parse(int argc,char **argv) {
        ,{"formalism",    required_argument,  0, 505}
        ,{"lpsolver",    required_argument,  0, 506}
        ,{"lpsol",    required_argument,  0, 506}
-       ,{"sat-solver", required_argument,  0, 507}
-       ,{"ssol", required_argument,  0, 507}
-       ,{"ub-enc", required_argument,  0, 508}
+       ,{"ub-enc", required_argument,  0, 507}
+       ,{"opt-mode", required_argument,  0, 508}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
        ,{"leximax", no_argument,  &leximax, 1}
@@ -137,11 +136,11 @@ bool Options::parse(int argc,char **argv) {
                     return_value = false;
                 }
                 break;
-            case 507: sat_solver = optarg; break;
-            case 508: if (read_digit(optarg, "ub-enc", ub_encoding) == -1) {
+            case 507: if (read_digit(optarg, "ub-enc", ub_encoding) == -1) {
                         return_value = false;
                     }
                     break;
+            case 508: opt_mode = optarg; break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);

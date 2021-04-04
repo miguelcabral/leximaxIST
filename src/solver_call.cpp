@@ -21,17 +21,8 @@
 
 namespace leximaxIST {
 
-    int Encoder::read_gurobi_output(std::vector<int> &model)
+    void Encoder::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
-        std::string output_filename (m_file_name + ".sol");
-        gzFile of = gzopen(output_filename.c_str(), "rb");
-        if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + output_filename + "' for reading");
-            return -1;
-        }
-        StreamBuffer r(of);
-        bool sat = false;
-        model.resize(static_cast<size_t>(m_id_count + 1), 0);
         while (*r != EOF) {
             if (*r != 'x')
                 skipLine(r);
@@ -46,56 +37,44 @@ namespace leximaxIST {
                 else if (*r == '0')
                     model[var] = -var;
                 else {
-                    std::string errmsg ("Can't read gurobi output '" + output_filename);
+                    std::string errmsg ("Can't read gurobi output '" + m_file_name + ".sol");
                     char current_char (*r);
                     std::string current_char_str (1, current_char);
                     errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
+                    print_error_msg(errmsg);
+                    if (!m_leave_tmp_files)
+                        remove_tmp_files();
+                    exit(EXIT_FAILURE);
                 }
             }
         }
-        if (!sat) model.clear();
-        gzclose(of);
-        return 0;
     }
-
-    int Encoder::read_glpk_output(std::vector<int> &model)
+/*
+    int Encoder::read_glpk_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
-        return 0;
     }
 
-    int Encoder::read_lpsolve_output(std::vector<int> &model)
+    int Encoder::read_lpsolve_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
-        return 0;
     }
 
-    int Encoder::read_scip_output(std::vector<int> &model)
+    void Encoder::read_scip_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
-        return 0;
     }
 
-    int Encoder::read_cbc_output(std::vector<int> &model)
+    void Encoder::read_cbc_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
-        return 0;
     }
-
-    int Encoder::read_cplex_output(std::vector<int> &model)
+*/
+    void Encoder::read_cplex_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
-        std::string output_filename (m_file_name + ".sol");
-        gzFile of = gzopen(output_filename.c_str(), "rb");
-        if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + output_filename + "' for reading");
-            return -1;
-        }
-        StreamBuffer r(of);
-        bool sat = false;
-        model.resize(static_cast<size_t>(m_id_count + 1), 0);
         // set all variables to false, because we only get the variables that are true
         for (size_t v (1); v < m_id_count + 1; ++v)
-            model[v] = -v;
+            model.at(v) = -v;
         while (*r != EOF) {
             if (*r != 'C') {// ignore all the other lines
                 skipLine(r);
@@ -115,29 +94,17 @@ namespace leximaxIST {
                             ++r;
                             const int l = parseInt(r);
                             assert(model.size()>(size_t)l);
-                            model[l] = l;
+                            model.at(l) = l;
                         }
                     }
                 }
             }
         }
-        if (!sat) model.clear();
-        gzclose(of);
-        return 0;
     }
 
     // if model.empty() in the end then unsat, else sat
-    int Encoder::read_sat_output(std::vector<int> &model)
+    void Encoder::read_sat_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
-        std::string output_filename (m_file_name + ".sol");
-        gzFile of = gzopen(output_filename.c_str(), "rb");
-        if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + output_filename + "' for reading");
-            return -1;
-        }
-        StreamBuffer r(of);
-        bool sat = false;
-        model.resize(static_cast<size_t>(m_id_count + 1), 0);
         while (*r != EOF) {
             if (*r != 'v') {// ignore all the other lines
                 skipLine(r);
@@ -158,33 +125,42 @@ namespace leximaxIST {
                 ++r; // skip '\n'
             }
         }
-        if (!sat) model.clear();
-        gzclose(of);
-        return 0;
     }
     
-    int Encoder::read_solver_output(std::vector<int> &model)
+    void Encoder::read_solver_output(std::vector<int> &model)
     {
+        std::string output_filename (m_file_name + ".sol");
+        gzFile of = gzopen(output_filename.c_str(), "rb");
+        if (of == Z_NULL) {
+            print_error_msg("Can't open file '" + output_filename + "' for reading");
+            if (!m_leave_tmp_files)
+                remove_tmp_files();
+            exit(EXIT_FAILURE);
+        }
+        StreamBuffer r(of);
+        bool sat = false;
+        model.resize(static_cast<size_t>(m_id_count + 1), 0);
         if (m_formalism == "wcnf" || m_formalism == "opb")
-            return read_sat_output(model);
+            read_sat_output(model, sat, r);
         else if (m_formalism == "lp") {
             if (m_lp_solver == "cplex")
-                return read_cplex_output(model);
+                read_cplex_output(model, sat, r);
             else if (m_lp_solver == "gurobi")
-                return read_gurobi_output(model);
-            else if (m_lp_solver == "glpk")
-                return read_glpk_output(model);
+                read_gurobi_output(model, sat, r);
+            /*else if (m_lp_solver == "glpk")
+                read_glpk_output(model, sat, r);
             else if (m_lp_solver == "scip")
-                return read_scip_output(model);
+                read_scip_output(model, sat, r);
             else if (m_lp_solver == "cbc")
-                return read_cbc_output(model);
+                read_cbc_output(model, sat, r);
             else if (m_lp_solver == "lpsolve")
-                return read_lpsolve_output(model);
+                read_lpsolve_output(model, sat, r);*/
         }
-        return -1; // wrong formalism 
+        if (!sat) model.clear();
+            gzclose(of);
     }
 
-    int Encoder::split_command(const std::string &command, std::vector<std::string> &command_split)
+    void Encoder::split_command(const std::string &command, std::vector<std::string> &command_split)
     {
         size_t pos (0);
         while (pos < command.length()) {
@@ -209,7 +185,7 @@ namespace leximaxIST {
                     }
                     msg += "^";
                     print_error_msg(msg);
-                    return -1;
+                    exit(EXIT_FAILURE);
                 }
                 else
                     found++;
@@ -221,38 +197,28 @@ namespace leximaxIST {
         }
         if (command_split.empty()) {
             print_error_msg("Empty external solver command");
-            return -1;
+            exit(EXIT_FAILURE);
         }
-        return 0;
     }
 
-    int Encoder::call_solver(const std::string &solver_type)
+    void Encoder::call_ext_solver()
     {
+        if (m_verbosity >= 1)
+            std::cout << "c Calling external solver..." << std::endl;
         std::string output_filename = m_file_name + ".sol";
         const std::string error_filename = m_file_name + ".err";
         std::string command;
-        if (solver_type == "optimisation") {
-            if (m_opt_solver_cmd.empty()) {
-                print_error_msg("Empty optimisation solver command");
-                return -1;
-            }
-            command = m_opt_solver_cmd + " ";
+        if (m_ext_solver_cmd.empty()) {
+            print_error_msg("Empty external solver command");
+            if (!m_leave_tmp_files)
+                remove_tmp_files();
+            exit(EXIT_FAILURE);
         }
-        else if (solver_type == "decision") {
-            if (m_sat_solver_cmd.empty()) {
-                print_error_msg("Empty SAT solver command");
-                return -1;
-            }
-            command = m_sat_solver_cmd + " ";
-        }
-        else {
-            print_error_msg("In Encoder::call_solver(), wrong solver_type");
-            return -1;
-        }
-        if (m_formalism == "lp" && solver_type == "optimisation") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
+        command = m_ext_solver_cmd + " ";
+        if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
             if (m_lp_solver == "cplex")
                 command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
-            if (m_lp_solver == "cbc")
+            if (m_lp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
                 command += m_file_name + " solve solution $";
             if (m_lp_solver == "scip")
                 command += "-f " + m_file_name;
@@ -351,158 +317,119 @@ namespace leximaxIST {
             print_error_msg("The external solver finished with non-zero error status: " + errmsg);
             return -1;
         }*/
-        if (m_formalism != "lp" || m_lp_solver != "gurobi" || solver_type == "decision")
+        if (m_formalism != "lp" || m_lp_solver != "gurobi")
             command += " > " + output_filename;
         command += " 2> " + error_filename;
         system(command.c_str());
         // set to zero, i.e. no external solver is currently running
         m_child_pid = 0;
-        return 0;
     }
 
-    int Encoder::write_cnf_file(int i)
+    void Encoder::write_cnf_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".cnf";
         std::ofstream out (m_file_name);
         if (!out) {
             print_error_msg("Can't open " + m_file_name + " for writing");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         // print header
-        out << "p cnf " << m_id_count << " " << m_constraints.size() << '\n';
-        // print clauses
-        for (const Clause *clause : m_constraints)
-            print_clause(out, clause);
+        out << "p cnf " << m_id_count << " " << m_hard_clauses.size() << '\n';
+        print_hard_clauses(out);
         out.close();
-        return 0;
     }
     
-    int Encoder::write_wcnf_file(int i)
+    void Encoder::write_wcnf_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".wcnf";
         std::ofstream out (m_file_name);
         if (!out) {
             print_error_msg("Can't open " + m_file_name + " for writing");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         // prepare input for the solver
         size_t weight = m_soft_clauses.size() + 1;
-        out << "p wcnf " << m_id_count << " " << m_constraints.size() << " " << weight << '\n';
-        // print hard clauses
-        print_wcnf_clauses(out, m_constraints, weight);
-        // print soft clauses
-        print_wcnf_clauses(out, m_soft_clauses, 1);
+        out << "p wcnf " << m_id_count << " " << m_hard_clauses.size() << " " << weight << '\n';
+        print_hard_clauses(out);
+        print_soft_clauses(out);
         out.close();
-        return 0;
     }
 
-    int Encoder::write_opb_file(int i)
+    void Encoder::write_opb_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".opb";
         std::ofstream out (m_file_name);
         if (!out.is_open()) {
             print_error_msg("Can't open " + m_file_name + " for writing");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         // prepare input for the solver
         out << "* #variable= " << m_id_count;
-        if (i == 0)
-            out << " #constraint= " << m_constraints.size() << '\n';
-        else
-            out << " #constraint= " << m_constraints.size() + 1 << '\n'; // + 1 because of card. const.
+        out << " #constraint= " << m_hard_clauses.size() << '\n';
         if (m_soft_clauses.size() > 0) {// print minimization function
             out << "min:";
-            for (const Clause *cl : m_soft_clauses) {
-                int soft_var = -(*(cl->begin())); // cl is unitary clause
-                out << " " << "+1" << m_multiplication_string << "x" << soft_var;
-            }
+            for (int neg_var : m_soft_clauses)
+                out << " " << "+1" << m_multiplication_string << "x" << -neg_var;
             out << ";\n";
         }
-        // print all constraints except for cardinality constraint
-        for (const Clause *cl : m_constraints) {
+        for (const Clause *cl : m_hard_clauses)
             print_pb_constraint(cl, out);
-        }
-        int last_j (i);
-        if (m_simplify_last) {
-            // last_j is min(i, m_num_objectives - 2)
-            last_j = i < m_num_objectives - 2 ? i : m_num_objectives - 2;
-        }
-        for (int j (1); j <= last_j; ++j)
-            print_atmost_pb(j, out);
-        // if m_simplify_last, in the last iteration print =1 cardinality constraint
-        if (i == m_num_objectives - 1 && m_num_objectives != 1 && m_simplify_last)
-            print_sum_equals_pb(1, out);
         out.close();
-        return 0;
     }
 
-    int Encoder::write_solver_input(int i)
+    void Encoder::write_solver_input(int i)
     {
         if (m_formalism == "wcnf")
-            return write_wcnf_file(i);
+            write_wcnf_file(i);
         else if (m_formalism == "opb")
-            return write_opb_file(i);
+            write_opb_file(i);
         else if (m_formalism == "lp") {
             if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
-                return write_opb_file(i);
+                write_opb_file(i);
             if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
-                return write_lp_file(i);
+                write_lp_file(i);
         }
-        return -1; // wrong m_formalism - error msg already in set_formalism
     }
 
-    int Encoder::external_solve(int i)
+    void Encoder::external_solve(int i)
     {
-        if (write_solver_input(i) != 0)
-            return -1;
+        write_solver_input(i);
         // call the solver
         double initial_time, final_time;
         if (m_verbosity >= 1 && m_verbosity <= 2)
             initial_time = read_cpu_time();
-        if (call_solver("optimisation") != 0) {
-            if (!m_leave_temporary_files)
-                remove_tmp_files();
-            return -1;
-        }
+        call_ext_solver();
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             final_time = read_cpu_time();
             std::cout << "c Minimisation CPU time: " << final_time - initial_time;
             std::cout << 's' << std::endl;
         }
-        m_solver_output = true; // there is solver output to read
         // read output of solver
         std::vector<int> model;
-        if (read_solver_output(model) != 0) {
-            if (!m_leave_temporary_files)
-                remove_tmp_files();
-            return -1;
-        }
+        read_solver_output(model);
         // check if there is already a solution (from a previous iteration for example)
         // if ext solver is killed before it finds a sol, the problem might not be unsat
-        if (m_solution.empty()) {
+        if (m_status == '?') {
             m_solution = std::move(model);
-            m_sat = !(m_solution.empty());
+            m_status = (m_solution.empty()) ? 'u' : 's';
         }
-        else {
-            if (!model.empty()) // if it is empty then something went wrong with ext solver
-                m_solution = std::move(model);
-            m_sat = true;
-        }
-        m_solver_output = false; // I have read solver output
-        if (!m_leave_temporary_files)
+        else if (!model.empty()) // if it is empty then something went wrong with ext solver
+            m_solution = std::move(model);
+        if (!m_leave_tmp_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
-        return 0;
+        if (m_status == 's' && m_verbosity >= 1 && m_verbosity <= 2)
+            print_obj_vector();
     }
 
-    int Encoder::write_lp_file(int i)
+    void Encoder::write_lp_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".lp";
         std::ofstream output(m_file_name); 
         if (!output) {
             print_error_msg("Could not open " + m_file_name + " for writing");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         // prepare input for the solver
         output << "Minimize\n";
@@ -510,8 +437,7 @@ namespace leximaxIST {
         if (m_soft_clauses.size() > 0) {// print minimization function
             size_t nb_vars_in_line (0);
             for (size_t j (0); j < m_soft_clauses.size(); ++j) {
-                const Clause *cl (m_soft_clauses[j]);
-                int soft_var = -(*(cl->begin())); // cl is unitary clause
+                int soft_var (-m_soft_clauses[j]);
                 if (j == 0)
                     output << 'x' << soft_var;
                 else
@@ -525,27 +451,15 @@ namespace leximaxIST {
             output << '\n';
         }
         output << "Subject To\n";
-        // print all constraints except for cardinality constraint
-        for (const Clause *cl : m_constraints) {
+        // print constraints
+        for (const Clause *cl : m_hard_clauses)
             print_lp_constraint(cl, output);
-        }
-        int last_j (i);
-        if (m_simplify_last) {
-            // last_j is min(i, m_num_objectives - 2)
-            last_j = i < m_num_objectives - 2 ? i : m_num_objectives - 2;
-        }
-        for (int j (1); j <= last_j; ++j)
-            print_atmost_lp(j, output);
-        // if m_simplify_last, in the last iteration print =1 cardinality constraint
-        if (i == m_num_objectives - 1 && m_num_objectives != 1 && m_simplify_last)
-            print_sum_equals_lp(1, output);
         // print all variables after Binaries
         output << "Binaries\n";
         for (int j (1); j <= m_id_count; ++j)
             output << "x" << j << '\n';
         output << "End";
         output.close();
-        return 0;
     }
     
     void Encoder::remove_tmp_files() const
@@ -557,39 +471,22 @@ namespace leximaxIST {
         remove(error_filename.c_str());
     }
     
-    int Encoder::sat_solve()
+    void Encoder::sat_solve()
     {
         if (m_verbosity > 0 && m_verbosity <= 2)
             std::cout << "c Calling SAT solver..." << std::endl;
-        if (write_cnf_file(0) != 0)
-            return -1;
-        // call the solver
-        if (call_solver("decision") != 0) {
-            if (!m_leave_temporary_files)
-                remove_tmp_files();
-            return -1;
+        if (m_sat_solver->solve()) {
+            m_status = 's';
+            m_solution = std::move(m_sat_solver->model());
+            m_sat_solver->model().clear();
+            if (m_verbosity >= 1)
+                print_obj_vector();
         }
-        m_solver_output = true; // there is solver output to read
-        // read output of solver
-        std::vector<int> model;
-        if (read_sat_output(model) != 0) {
-            if (!m_leave_temporary_files)
-                remove_tmp_files();
-            return -1;
-        }
-        m_solution = std::move(model);
-        m_sat = !(m_solution.empty());
-        m_solver_output = false; // I have read solver output
-        if (m_sat && m_verbosity >= 1 && m_verbosity <= 2)
-            print_obj_vector();
-        if (!m_leave_temporary_files)
-            remove_tmp_files();
-        // set m_file_name back to pid
-        reset_file_name();
-        return 0;
+        else
+            m_status = 'u';
     }
     
-    void mss_choose_obj_seq (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    void mss_choose_obj_seq (std::vector<std::vector<int>> &todo_vec, int &obj_index)
     {
         // obj_index points to the first objective whose todo is not empty
         for (obj_index = 0; obj_index < todo_vec.size(); ++obj_index) {
@@ -628,10 +525,12 @@ namespace leximaxIST {
         }
     }
     
-    int mss_choose_var (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    int Encoder::mss_choose_var (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index) const
     {
-        mss_choose_obj_seq (todo_vec, obj_vector, obj_index);
-        //mss_choose_obj_max (todo_vec, obj_vector, obj_index);
+        if (m_ub_presolve == 2)
+            mss_choose_obj_seq (todo_vec, obj_index);
+        else if (m_ub_presolve == 3)
+            mss_choose_obj_max (todo_vec, obj_vector, obj_index);
         // -1 means stop computing mss - possibly because the upper bound can't be improved
         if (obj_index == -1)
             return -1;
@@ -659,18 +558,19 @@ namespace leximaxIST {
         }    
     }
     
-    int Encoder::mss_solve()
+    // Compute an MSS of the problem with sum of obj funcs 
+    // stop if the upper bound can't be improved
+    void Encoder::mss_solve()
     {
         if (m_verbosity > 0 && m_verbosity <= 2)
             std::cout << "c Finding MSS..." << std::endl;
-        /* TODO: see how this can behave with signals
-         * Can something go wrong with the sat solver?*/
-        IpasirWrap solver(m_id_count);
-        for (const Clause *hard_cl : m_constraints)
+        // must use a different ipasir solver, because we add unit clauses of MSS
+        IpasirWrap solver;
+        for (const Clause *hard_cl : m_hard_clauses)
             solver.addClause(hard_cl);
-        m_sat = solver.solve();
-        if (!m_sat)
-            return 0;
+        m_status = solver.solve() ? 's' : 'u';
+        if (m_status == 'u')
+            return;
         m_solution = std::move(solver.model());
         // solver.model() is in a valid but unspecified state - so clear it
         solver.model().clear();
@@ -696,7 +596,7 @@ namespace leximaxIST {
              * obj_index is set to the objective that contains var */
             int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
             if (next_var == -1)
-                return 0;
+                return;
             assumps.push_back (-next_var);
             if (solver.solve(assumps)) {
                 m_solution = std::move(solver.model());
@@ -712,31 +612,126 @@ namespace leximaxIST {
             }
             assumps.clear();
         }
-        return 0;
     }
     
-    int Encoder::calculate_upper_bound()
+    void Encoder::calculate_upper_bound()
     {   
         if (m_verbosity > 0 && m_verbosity <= 2)
             std::cout << "c Presolving to obtain upper bound on optimal 1st maximum..." << std::endl;
-        int retv (0);
         double initial_time (read_cpu_time());
-        if (m_ub_encoding == 1) { // call sat solver once
-            retv = sat_solve();
-        }
-        else if (m_ub_encoding == 2) { // calculate an MSS of the problem with sum of obj funcs 
-            retv = mss_solve();
-        }
-        else if (m_ub_encoding == 3) { // get optimal solution of problem with sum of obj funcs 
-            // TODO add negate all objective variables to form soft clauses and call external_solve(0)
-            // be careful that external_solve may add cardinality constraints in non-zero iterations
-        }
-        double final_time (read_cpu_time());
+        if (m_ub_presolve == 1)// call sat solver once
+            sat_solve();
+        else if (m_ub_presolve == 2 || m_ub_presolve == 3)
+            mss_solve();
         if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Upper Bound Presolving CPU time: " << final_time - initial_time;
+            std::cout << "c Upper Bound Presolving CPU time: " << read_cpu_time() - initial_time;
             std::cout << 's' << std::endl;
         }
-        return retv;
+    }
+    
+    inline void print_bounds(int lb, int ub)
+    {
+        std::cout << "\tlb = " << lb << "\tub = " << ub << '\n';
+    }
+    
+    inline void print_nb_sat_calls(int nb_calls)
+    {
+        std::cout << "c Number of SAT calls: " << nb_calls << std::endl;
+    }
+    
+    // if possible, reduces ub and returns last satisfied soft clause
+    // if all soft clauses are falsified, returns 0
+    int Encoder::lucky_ub_reduce(int &ub)
+    {
+        int size (m_soft_clauses.size());
+        int sc (0);
+        if (ub != size)
+            sc = m_soft_clauses.at(size - ub - 1);
+        for (int pos (size - ub); pos < size; ++pos) {
+            if (m_solution.at(-sc) < 0) {
+                sc = m_soft_clauses.at(pos);
+                --ub;
+            }
+            else
+                break;
+        }
+        return sc;
+    }
+    
+    void Encoder::binary_search(int lb, int ub)
+    {
+        if (m_verbosity == 2)
+            print_bounds(lb, ub);
+        int size (m_soft_clauses.size());
+        int nb_calls (0);
+        while (ub != lb) {
+            int half ((ub - lb)/2); // floor
+            std::vector<int> assumps;
+            // y <= k means size - k zeros
+            // last position = size - k - 1
+            int sc (m_soft_clauses.at(size - half - 1));
+            assumps.push_back(sc);
+            if (m_sat_solver->solve(assumps)) { // y <= half ?
+                // get solution
+                m_solution = std::move(m_sat_solver->model());
+                m_sat_solver->model().clear();
+                if (m_verbosity >= 1)
+                    print_obj_vector();
+                ub = half;
+                // check if the obj value is, by chance, better than half
+                for (int pos (size - half); pos < size; ++pos) {
+                    sc = m_soft_clauses.at(pos);
+                    if (m_solution.at(-sc) < 0)
+                        --ub;
+                    else
+                        break;
+                }
+                m_sat_solver->addClause(sc);
+            }
+            else {
+                lb = half + 1;
+                // y >= k means at least k ones
+                // size - 1 means 1 one, size - 2 means 2 ones, ...
+                sc = m_soft_clauses.at(size - lb);
+                m_sat_solver->addClause(-sc); // (-sc > 0)
+            }
+            ++nb_calls;
+            if (m_verbosity == 2)
+                print_bounds(lb, ub);
+        }
+        if (m_verbosity >= 1)
+            print_nb_sat_calls(nb_calls);
+    }
+    
+    void Encoder::internal_solve(int i, int ub)
+    {
+        double initial_time;
+        if (m_verbosity >= 1) {
+            initial_time = read_cpu_time();
+            std::cout << "c Solving internally with IPASIR..." << std::endl;
+        }
+        if (m_ub_presolve == 0 && i == 0) { // no presolve, first check if problem is sat
+            if (!m_sat_solver->solve()) {
+                m_status = 'u';
+                return;
+            }
+            m_status = 's';
+            // get solution
+            m_solution = std::move(m_sat_solver->model());
+            m_sat_solver->model().clear();
+            if (m_verbosity >= 1)
+                print_obj_vector();
+            // check if obj value is, by chance, better than the trivial ub
+            int sc (lucky_ub_reduce(ub));
+            if (sc != 0)
+                m_sat_solver->addClause(sc);
+        }
+        if (m_opt_mode == "bin")
+            binary_search(0, ub);
+        if (m_verbosity >= 1) {
+            std::cout << "c Minimisation CPU time: " << read_cpu_time() - initial_time;
+            std::cout << 's' << std::endl;
+        }
     }
     
     double read_cpu_time()

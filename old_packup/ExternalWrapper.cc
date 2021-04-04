@@ -472,8 +472,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_encoding(ub_encoding);
      leximax_enc->set_verbosity(verbosity);
-     leximax_enc->set_sat_solver_cmd(sat_solver_cmd);
      leximax_enc->set_opt_solver_cmd(opt_solver_cmd);
+     leximax_enc->set_opt_mode(opt_mode);
      leximax_enc->set_multiplication_string(multiplication_string);
      leximax_enc->set_leave_temporary_files(leave_temporary_files);
      leximax_enc->set_formalism(formalism);

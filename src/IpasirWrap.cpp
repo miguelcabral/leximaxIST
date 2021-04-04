@@ -6,7 +6,7 @@
 
 namespace leximaxIST {
     
-    IpasirWrap::IpasirWrap(int nvars) : _nvars(nvars) { _s = ipasir_init(); }
+    IpasirWrap::IpasirWrap() : _nvars(0) { _s = ipasir_init(); }
     
     IpasirWrap::~IpasirWrap() { ipasir_release(_s); }
     
@@ -20,11 +20,11 @@ namespace leximaxIST {
         f();
     }
     
-    bool IpasirWrap::addClause(int p) {  add(p); return f(); }
+    void IpasirWrap::addClause(int p) {  add(p); f(); }
     
-    bool IpasirWrap::addClause(int p, int q) {  add(p); add(q); return f(); }
+    void IpasirWrap::addClause(int p, int q) {  add(p); add(q); f(); }
     
-    bool IpasirWrap::addClause(int p, int q, int r) {  add(p); add(q);  add(r); return f(); }
+    void IpasirWrap::addClause(int p, int q, int r) {  add(p); add(q);  add(r); f(); }
     
     int IpasirWrap::fresh() { return ++_nvars; }
     
@@ -69,14 +69,14 @@ namespace leximaxIST {
         return r == 10;
     }
     
-     void IpasirWrap::add(int p) {
-        is_ok_lit(p);
+    void IpasirWrap::add(int p) {
+         if (std::abs(p) > _nvars)
+             _nvars = p;
         ipasir_add(_s, p);
     }
 
-     bool IpasirWrap::f() {
+    void IpasirWrap::f() {
         ipasir_add(_s, 0);
-        return true;
     }
 
 }

@@ -16,38 +16,17 @@ namespace leximaxIST {
     void Encoder::encode_max(int var_out_max, int var_in1, int var_in2)
     {
         // encode var_out_max is equivalent to var_in1 OR var_in2
-        Clause c;
-        c.push_back(-var_out_max);
-        c.push_back(var_in1);
-        c.push_back(var_in2);
-        add_hard_clause(c);
-        c.clear();
-        c.push_back(var_out_max);
-        c.push_back(-var_in1);
-        add_hard_clause(c);
-        c.clear();
-        c.push_back(var_out_max);
-        c.push_back(-var_in2);
-        add_hard_clause(c);
+        add_hard_clause(-var_out_max, var_in1, var_in2);
+        add_hard_clause(var_out_max, -var_in1);
+        add_hard_clause(var_out_max, -var_in2);
     }
 
     void Encoder::encode_min(int var_out_min, int var_in1, int var_in2)
     {
         // encode var_out_min is equivalent to var_in1 AND var_in2
-        Clause c;
-        c.clear();
-        c.push_back(-var_out_min);
-        c.push_back(var_in1);
-        add_hard_clause(c);
-        c.clear();
-        c.push_back(-var_out_min);
-        c.push_back(var_in2);
-        add_hard_clause(c);
-        c.clear();
-        c.push_back(var_out_min);
-        c.push_back(-var_in1);
-        c.push_back(-var_in2);
-        add_hard_clause(c);
+        add_hard_clause(-var_out_min, var_in1);
+        add_hard_clause(-var_out_min, var_in2);
+        add_hard_clause(var_out_min, -var_in1, -var_in2);
     }
 
     void Encoder::insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network)

@@ -33,17 +33,17 @@ namespace leximaxIST {
             // check if there is output file to be read 
             // (this happens if signal is caught after external solver has finished
             //      and before the solution has been read)
-            if (m_solver_output) {
+            /*if (m_solver_output) {
                 std::vector<int> model;
                 if (read_solver_output(model) != 0) {
-                    if (!m_leave_temporary_files)
+                    if (!m_leave_tmp_files)
                         remove_tmp_files();
                     return -1;
                 }
                 m_solution = std::move(model);
-                m_sat = !(m_solution.empty());
-            }
-            if (!m_leave_temporary_files)
+                //m_sat = !(m_solution.empty());
+            }*/
+            if (!m_leave_tmp_files)
                 remove_tmp_files();
             return 0;
         }
@@ -58,7 +58,7 @@ namespace leximaxIST {
                 errmsg += " kill() to send a signal to the external solver (pid ";
                 errmsg += m_child_pid + "): '" + errno_str + "'";
                 print_error_msg(errmsg);
-                if (!m_leave_temporary_files)
+                if (!m_leave_tmp_files)
                     remove_tmp_files(); 
                 return -1;
             }
@@ -73,7 +73,7 @@ namespace leximaxIST {
                 if (retv == -1) {
                     std::string errmsg (strerror(errno));
                     print_error_msg("Error waiting for child process: " + errmsg);
-                    if (!m_leave_temporary_files)
+                    if (!m_leave_tmp_files)
                         remove_tmp_files();
                     return -1;
                 }
@@ -81,13 +81,13 @@ namespace leximaxIST {
                     // external solver has finished
                     // but solution may be worse than previous iteration - compare
                     std::vector<int> new_sol;
-                    if (read_solver_output(new_sol) != 0) {
-                        if (!m_leave_temporary_files)
+                    if (/*read_solver_output(new_sol) != 0*/false) {
+                        if (!m_leave_tmp_files)
                             remove_tmp_files();
                         return -1;
                     }
-                    m_sat = !(new_sol.empty());
-                    if (m_sat) { // otherwise unsat, nothing to do
+                    //m_sat = !(new_sol.empty());
+                    if (m_status == 's') { // otherwise unsat, nothing to do
                         if (m_solution.empty()) // first iteration
                             m_solution = std::move(new_sol);
                         else {
@@ -106,13 +106,13 @@ namespace leximaxIST {
                             }
                         }
                     }
-                    if (!m_leave_temporary_files)
+                    if (!m_leave_tmp_files)
                         remove_tmp_files(); 
                     return 0;
                 }
             }
             // timeout has been reached, clean up and return
-            if (!m_leave_temporary_files)
+            if (!m_leave_tmp_files)
                 remove_tmp_files(); 
         }
         return 0;

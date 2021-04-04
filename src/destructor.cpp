@@ -7,8 +7,6 @@ namespace leximaxIST {
     // free clauses in m_soft_clauses and clear vector
     void Encoder::clear_soft_clauses()
     {
-        for (Clause *cl : m_soft_clauses)
-            delete cl;
         m_soft_clauses.clear();
     }
 
@@ -23,14 +21,20 @@ namespace leximaxIST {
         m_sorted_relax_collection.clear();
     }
 
-    // free clauses in m_constraints and clear vector
+    // free clauses in m_hard_clauses and clear vector
     void Encoder::clear_hard_clauses()
     {
-        for (Clause *cl : m_constraints)
+        for (Clause *cl : m_hard_clauses)
             delete cl;
-        m_constraints.clear();
+        m_hard_clauses.clear();
     }
 
+    void Encoder::clear_ipasir()
+    {
+        delete m_sat_solver;
+        m_sat_solver = nullptr;
+    }
+    
     // members that are not a user parameter are cleared and set to initial value
     void Encoder::clear()
     {
@@ -52,18 +56,17 @@ namespace leximaxIST {
         //m_num_opts = 0;
         m_id_count = 0;
         m_num_objectives = 0;
-        m_solver_output = false;
         m_child_pid = 0;
-        m_sat = false;
+        m_status = '?';
         m_sorting_net_size = 0;
         //m_times.clear();
+        // clear sat solver
+        clear_ipasir();
     }
     
     // remove temporary files and free memory
     Encoder::~Encoder()
     {
-        if (!m_leave_temporary_files)
-            remove_tmp_files();
         clear();
     }
 

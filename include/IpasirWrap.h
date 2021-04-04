@@ -14,12 +14,12 @@
 namespace leximaxIST {
     class IpasirWrap {
     public:
-        IpasirWrap(int nvars);
+        IpasirWrap();
         virtual ~IpasirWrap();
         void addClause(const Clause *clause);
-        bool addClause(int p);
-        bool addClause(int p, int q);
-        bool addClause(int p, int q, int r);
+        void addClause(int p);
+        void addClause(int p, int q);
+        void addClause(int p, int q, int r);
         int fresh();
         bool is_ok_var(int v);
         bool is_ok_lit(int l);
@@ -41,7 +41,7 @@ namespace leximaxIST {
 
         void add(int p);
 
-        bool f();
+        void f();
     };
 
 } /* namespace leximaxIST */

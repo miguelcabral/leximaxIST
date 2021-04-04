@@ -10,9 +10,9 @@ namespace leximaxIST {
 
     //const std::vector<double>& Encoder::get_times() const { return m_times; }
 
-    bool Encoder::get_sat() const
+    char Encoder::get_status() const
     {
-        return m_sat; 
+        return m_status; 
     }
 
     const std::vector<int>& Encoder::get_solution() const 

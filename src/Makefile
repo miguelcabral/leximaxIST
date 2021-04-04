@@ -8,7 +8,7 @@ OBJS := $(OBJS1)
 OBJS += $(OBJS2)
 LIBNAME = libleximaxIST.a
 
-# Edit the following line to change the path to cadical include directory
+# Edit to change the path to sat solver include directory containing ipasir.h
 CFLAGS += -I ~/solvers/sat/cadical/src
 
 ifdef PROF

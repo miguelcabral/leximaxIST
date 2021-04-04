@@ -23,43 +23,45 @@ namespace leximaxIST {
         m_file_name = std::to_string(getpid());
     }
     
-    int Encoder::set_ub_encoding(int val)
+    void Encoder::set_ub_presolve(int val)
     {
         if (val < 0 || val > 3) {
-            print_error_msg("Invalid value '" + std::to_string(val) + "' for ub_encoding parameter");
-            return -1;
+            print_error_msg("Invalid value '" + std::to_string(val) + "' for ub_presolve parameter");
+            exit(EXIT_FAILURE);
         }
-        m_ub_encoding = val;
-        return 0;
+        m_ub_presolve = val;
     }
     
-    void Encoder::set_opt_solver_cmd(const std::string &command)
+    // Possible values: external, bin. TODO: linear-su, linear-us
+    void Encoder::set_opt_mode(const std::string &mode)
     {
-        m_opt_solver_cmd = command;
-    }
-
-    void Encoder::set_sat_solver_cmd(const std::string &command)
-    {
-        m_sat_solver_cmd = command;
+        if (mode != "external" && mode != "bin") {
+            print_error_msg("Invalid optimisation mode: '" + mode + "'");
+            exit(EXIT_FAILURE);
+        }
+        m_opt_mode = mode;
     }
     
-    int Encoder::set_formalism(const std::string &format)
+    void Encoder::set_ext_solver_cmd(const std::string &command)
     {
-        m_formalism = format;
+        m_ext_solver_cmd = command;
+    }
+    
+    void Encoder::set_formalism(const std::string &format)
+    {
         if (format != "wcnf" && format != "opb" && format != "lp") {
             std::string msg ("The external solver formalism entered: '" + format + "' is not valid\n");
             msg += "Valid external solver formalisms: 'wcnf' 'opb' 'lp'";
             print_error_msg(msg);
-            return -1;
+            exit(EXIT_FAILURE);
         }
-        return 0;    
+        m_formalism = format;  
     }
 
     void Encoder::set_timeout(double val) { m_timeout = val; }
     
-    int Encoder::set_lp_solver(const std::string &lp_solver)
+    void Encoder::set_lp_solver(const std::string &lp_solver)
     {
-        m_lp_solver = lp_solver;
         bool found (false);
         for (std::string &valid_lp_solver : m_valid_lp_solvers)
             if (lp_solver == valid_lp_solver)
@@ -70,26 +72,25 @@ namespace leximaxIST {
             for (std::string &valid_lp_solver : m_valid_lp_solvers)
                 msg += valid_lp_solver + ' ';
             print_error_msg(msg);
-            return -1;
+            exit(EXIT_FAILURE);
         }
-        return 0;
+        m_lp_solver = lp_solver;
     }
 
     void Encoder::set_simplify_last(bool val) { m_simplify_last = val; }
     
-    int Encoder::set_verbosity(int v)
+    void Encoder::set_verbosity(int v)
     {
         if (v < 0 || v > 2) {
             std::string msg ("Invalid value '");
             msg += std::to_string(v) + "' for verbosity parameter";
             print_error_msg(msg);
-            return -1;
+            exit(EXIT_FAILURE);
         }
         m_verbosity = v;
-        return 0;
     }
     
-    void Encoder::set_leave_temporary_files(bool val) { m_leave_temporary_files = val; }
+    void Encoder::set_leave_tmp_files(bool val) { m_leave_tmp_files = val; }
 
     void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
     
@@ -111,7 +112,7 @@ namespace leximaxIST {
         std::cout << "c ----------------------------------------------------------------------" << std::endl;
     }
     
-    int Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
+    void Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
     {
         if (m_verbosity > 0 && m_verbosity <= 2) {
             print_header();
@@ -124,26 +125,22 @@ namespace leximaxIST {
         // check for trivial cases
         if (objective_functions.empty()) {
             print_error_msg("The problem does not have an objective function");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         if (constraints.empty()) {
             print_error_msg("The problem does not have constraints");
-            return -1;
+            exit(EXIT_FAILURE);
         }
         m_num_objectives = objective_functions.size();
-        /*if (m_ub_encoding > 0)
-            m_times.resize(m_num_objectives + 1, 0.0); // presolve, 1st iter, 2nd iter, ...
-        else
-            m_times.resize(m_num_objectives, 0.0); // no presolve*/
         m_objectives.resize(m_num_objectives, nullptr);
         m_sorted_vecs.resize(m_num_objectives, nullptr);
+        m_sat_solver = new IpasirWrap();
         // read problem
         for (const std::vector<int> &hard_clause : constraints) {
             // determine max id and update m_id_count
             update_id_count(hard_clause);
             // store clause (check if it is empty)
-            if (add_hard_clause(hard_clause) != 0)
-                return -1;
+            add_hard_clause(hard_clause);
         }
         // update m_id_count if there are new variables in objective_functions
         for (const std::vector<std::vector<int>> &obj : objective_functions) {
@@ -152,7 +149,7 @@ namespace leximaxIST {
         }
         if (m_verbosity > 0 && m_verbosity <= 2) {
             std::cout << "c Number of input variables: " << m_id_count << '\n';
-            std::cout << "c Number of input hard clauses: " << m_constraints.size() << '\n';
+            std::cout << "c Number of input hard clauses: " << m_hard_clauses.size() << '\n';
             std::cout << "c Number of objective functions: " << m_num_objectives << std::endl;
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
@@ -170,16 +167,11 @@ namespace leximaxIST {
                 hard_clause.clear();
                 j++;
                 // other implication: soft_clause implies neg fresh_var
-                for (const int soft_lit : soft_clause) {
-                    hard_clause.push_back(-soft_lit);
-                    hard_clause.push_back(-fresh_var);
-                    add_hard_clause(hard_clause);
-                    hard_clause.clear();
-                }
+                for (const int soft_lit : soft_clause)
+                    add_hard_clause(-soft_lit, -fresh_var);
             }
             ++i;
         }
-        return 0;
     }
 
 }/* namespace leximaxIST */

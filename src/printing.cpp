@@ -36,11 +36,11 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::print_soft_clauses(int i) const
+    void Encoder::print_soft_clauses() const
     {
-        std::cout << "c ------------ Soft Clauses of iteration " << i << " ------------\n";
-        for (const Clause *cl : m_soft_clauses)
-            print_clause(std::cout, cl, "c ");
+        std::cout << "c -------- Soft Clauses of current iteration --------\n";
+        for (int lit : m_soft_clauses)
+            std::cout << "c " << lit << " 0\n";
     }
     
     void Encoder::print_sorted_vec (int i) const
@@ -82,6 +82,7 @@ namespace leximaxIST {
         print_error_msg(errmsg);
     }
 
+    // leadingStr can be "c ", to print comments, or e.g. "100 " to print weights
     void Encoder::print_clause(std::ostream &output, const Clause *clause, const std::string &leadingStr) const
     {
         output << leadingStr;
@@ -90,9 +91,16 @@ namespace leximaxIST {
         output << "0\n";
     }
 
-    void Encoder::print_wcnf_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const
+    void Encoder::print_soft_clauses(std::ostream &output) const
     {
-        for (Clause * const cl : clauses) {
+        for (int lit : m_soft_clauses)
+            output << "1 " << lit << " 0\n";
+    }
+    
+    void Encoder::print_hard_clauses(std::ostream &output) const
+    {
+        size_t weight (m_soft_clauses.size() + 1);
+        for (const Clause *cl : m_hard_clauses) {
             output << weight << " ";
             print_clause(output, cl);
         }
@@ -131,7 +139,7 @@ namespace leximaxIST {
         }
         output << " >= " << 1 - num_negatives << '\n';
     }
-
+    /*
     void Encoder::print_atmost_pb(int i, std::ostream &output) const
     {
         // i = 1 means position 0, i = 2, means position 1, etc
@@ -180,6 +188,40 @@ namespace leximaxIST {
                 output << " + " << 'x' << var;
         }
         output << " = " << i << '\n';
+    }*/
+    
+    void Encoder::print_sorted_true() const
+    {
+        if (!m_solution.empty()){
+            std::cout << "c Sorted vecs true variables:" << '\n';
+            int j = 0;
+            for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
+                std::cout << "c Sorted vec " << j << ": ";
+                for (int var : *sorted_vec) {
+                    if (m_solution[var] > 0)
+                        std::cout << var << ' ';
+                }
+                std::cout << '\n';
+                ++j;
+            }
+            j = 1;
+            for (const std::vector<std::vector<int>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+                std::cout << "c Sorted Relax Vecs true variables of iteration " << j << ":" << '\n';
+                int k (0);
+                for (const std::vector<int> *sorted_relax : sorted_relax_vecs) {
+                    if (sorted_relax != nullptr) {
+                        std::cout << "c Sorted Relax vec " << k << ": ";
+                        for (int var : *sorted_relax) {
+                            if (m_solution[var] > 0)
+                                std::cout << var << ' ';
+                        }
+                        std::cout << '\n';
+                        ++k;
+                    }
+                }
+                ++j;
+            }
+        }
     }
 
 }/* namespace leximaxIST */

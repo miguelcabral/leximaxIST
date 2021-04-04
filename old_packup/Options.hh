@@ -37,7 +37,6 @@ public:
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
     string get_opt_solver()   const { return opt_solver; }
-    string get_sat_solver()   const { return sat_solver; }
     int    get_ub_encoding()     const { return ub_encoding; }
     int    get_paranoid()          const { return paranoid; }
     int    get_trendy()            const { return trendy; }
@@ -51,16 +50,17 @@ public:
     int    get_leave_temporary_files() const { return leave_temporary_files; }
     const string&    get_formalism()   const { return formalism; }
     const string&    get_lp_solver()   const { return lp_solver; }
+    const string&    get_opt_mode()   const { return opt_mode; }
     int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
     int    get_simplify_last() const { return simplify_last; }
     
+    
 private:
     int    help;
     int    solving_disabled;
     string opt_solver;
-    string sat_solver;
     int    ub_encoding;
     int    verbosity;
     int    paranoid;
@@ -77,6 +77,7 @@ private:
     int    leximax;
     int    simplify_last;
     string lp_solver;
+    string opt_mode;
 };
 
 #endif	/* OPTIONS_HH */
