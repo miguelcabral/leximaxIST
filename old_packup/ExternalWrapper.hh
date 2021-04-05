@@ -54,7 +54,6 @@ public:
         return r.second;
     }
 
-    inline void set_sat_solver_cmd(const string& sat_solver_cmd);
     inline void set_opt_solver_cmd(const string& opt_solver_cmd);
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
@@ -63,6 +62,7 @@ public:
     inline void set_simplify_last(bool value=true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
+    inline void set_opt_mode (const string &mode);
     inline void set_ub_encoding (int val);
     inline void set_verbosity (int val);
     void print_leximax_info();
@@ -96,7 +96,6 @@ private:
     int    call_counter;
     time_t stamp;
     string opt_solver_cmd;
-    string sat_solver_cmd;
     int    ub_encoding;
     string multiplication_string;
     string temporary_directory;
@@ -106,6 +105,7 @@ private:
     int verbosity;
     string formalism;
     string lp_solver;
+    string opt_mode;
     
 
     vector< vector<LINT> > constraints;
@@ -131,8 +131,6 @@ private:
 
 inline void ExternalWrapper::set_opt_solver_cmd(const string& cmd) {
   opt_solver_cmd = cmd; }
-inline void ExternalWrapper::set_sat_solver_cmd(const string& cmd) {
-  sat_solver_cmd = cmd; }
 inline void ExternalWrapper::set_multiplication_string(const string& _multiplication_string) {
   multiplication_string =_multiplication_string; }
 inline void ExternalWrapper::set_temporary_directory(const string& value) {
@@ -147,6 +145,8 @@ inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {
     formalism = format; }
+inline void ExternalWrapper::set_opt_mode (const string &mode) {
+    opt_mode = mode; }
 inline void ExternalWrapper::set_verbosity (int val) {
     verbosity = val; }
 inline void ExternalWrapper::set_ub_encoding (int val) {

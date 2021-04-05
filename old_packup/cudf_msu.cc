@@ -63,7 +63,10 @@ static void SIG_handler(int signum) {
   leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
   if (leximax_enc != nullptr) {
       //leximax_enc->terminate(); // terminate is not ready yet
-      solver.set_leximax_model(leximax_enc->get_solution());
+      if (leximax_enc->get_status() == 's')
+        solver.set_leximax_model(leximax_enc->get_solution());
+      else
+          solver.set_leximax_model(std::vector<int>());
       solver.print_leximax_info();
   }
   parser.get_encoder().print_time();
@@ -84,22 +87,41 @@ static void SIG_handler(int signum) {
 void print_usage(ostream &output) {
     output << "USAGE " << endl;
     output << "\t[OPTIONS] instance_file_name [output_file_name]"  << endl;
-    output << "\t--help,-h \t print this message" << endl;
-    output << "\t-t \t\t trendy" << endl;
-    output << "\t-p \t\t paranoid" << endl;
-    output << "\t-u cs \t\t user criteria" << endl;
-    output << "\t--external-solver\t\t command for the external solver" << endl;
+    output << "General Options:" << endl;
+    output << "--help | -h \t print this message" << endl;
+    output << "--external-solver\t\t command for the external solver" << endl;
     output << "\t\t\t\t\t default 'minisat+ -ansi -cs'"<< endl;
-    output << "\t--multiplication-string\t\t string between coefficients and variables when communicating to the solver"<< endl;
+    output << "-f wcnf|opb|lp\t\t external solver formalism" << endl;
+    output << "\t\t\t\t\t default 'wcnf'"<< endl;
+    output << "--mstr | --multiplication-string <string>\t string used in the opb format"<< endl;
     output << "\t\t\t\t\t default '*'"<< endl;
-    output << "\t--temporary-directory DIR\t where temporary files should be placed"<< endl;
+    output << "--leave-temporary-files\t\t do not delete temporary files" << endl;
+    output << "--leximax\t\t\t Optimisation with the leximax order;" << endl;
+    output << "\t\t\t\t\t default: lexicographic order"<< endl;
+    output << "User criteria:" << endl;
+    output << "-t \t\t trendy" << endl;
+    output << "-p \t\t paranoid" << endl;
+    output << "-u cs \t\t user criteria" << endl;
+    output << "Lexicographic Options:"<< endl;
+    output << "--temporary-directory DIR\t where temporary files should be placed"<< endl;
     output << "\t\t\t\t\t default '/tmp'"<< endl;
-    output << "\t--leave-temporary-files\t\t do not delete temporary files" << endl;
-    output << "\t--max-sat\t\t\t The external solver is a MaxSAT solver;" << endl;
-    output << "\t\t\t\t\t otherwise it is a PBO solver"<< endl;
-    output << "\t--leximax\t\t\t The user criteria are optimised with the leximax order;" << endl;
-    output << "\t\t\t\t\t otherwise the lexicographic order is used"<< endl;
-    output << "\tFalta: --lpsolver e --formalism neste print_usage! TODO" << endl;
+    output << "Leximax Options:"<< endl;
+    output << "--lpsolver <solver>\t\t name of lp solver" << endl;
+    output << "\t\t\t\t\t default 'gurobi'"<< endl;
+    output << "-v <int>\t\t verbosity level of leximax library" << endl;
+    output << "\t 0 - print nothing (default)"<< endl;
+    output << "\t 1 - print general info"<< endl;
+    output << "\t 2 - debug"<< endl;
+    output << "--simplify-last\t\t use a simplified encoding in last iteration"<< endl;
+    output << "\t\t\t\t\t default off"<< endl;
+    output << "--opt-mode external|bin\t\t optimisation mode"<< endl;
+    output << "\t 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
+    output << "\t 'bin' - Use internal incremental SAT solver with binary search (default)"<< endl;
+    output << "--ub-enc <int>\t\t upper bound presolve"<< endl;
+    output << "\t 0 - do not presolve (default)"<< endl;
+    output << "\t 1 - presolve using one call to SAT solver"<< endl;
+    output << "\t 2 - presolve using greedy sequential minimisation"<< endl;
+    output << "\t 3 - presolve using greedy maximum minimisation"<< endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
@@ -187,7 +209,6 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_iv(3);
     parser.get_encoder().set_opt_not_removed(true);    
 #ifdef EXTERNAL_SOLVER
-    if (!options.get_sat_solver().empty())             solver.set_sat_solver_cmd(options.get_sat_solver ());
     if (!options.get_opt_solver().empty())             solver.set_opt_solver_cmd(options.get_opt_solver ());
     solver.set_ub_encoding(options.get_ub_encoding());
     solver.set_verbosity(options.get_verbosity());

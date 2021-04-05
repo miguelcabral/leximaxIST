@@ -89,8 +89,6 @@ namespace leximaxIST
         
         void set_ext_solver_cmd(const std::string &command);
         
-        void set_sat_solver_cmd(const std::string &command);
-        
         void set_formalism(const std::string &format);
         
         void set_verbosity(int v); // if value is invalid the program is terminated
@@ -123,11 +121,11 @@ namespace leximaxIST
         
         void add_hard_clause(const Clause &c);
         
-        const Clause* add_hard_clause(int l);
+        void add_hard_clause(int l);
         
-        const Clause* add_hard_clause(int l1, int l2);
+        void add_hard_clause(int l1, int l2);
         
-        const Clause* add_hard_clause(int l1, int l2, int l3);
+        void add_hard_clause(int l1, int l2, int l3);
         
         // destructor.cpp
         
@@ -161,7 +159,7 @@ namespace leximaxIST
         
         void order_encoding(const std::vector<int>& vars);
         
-        void generate_soft_clauses();
+        void generate_soft_clauses(int i);
         
         void all_subsets(std::list<int> set, int i, Clause &clause);
         
@@ -177,9 +175,9 @@ namespace leximaxIST
         
         void encode_ub_soft(int max_i);
         
-        void fix_soft_vars();
+        void fix_soft_vars(int i);
         
-        void fix_all();
+        void fix_all(int i);
         
         void fix_only_some();
         
@@ -187,9 +185,9 @@ namespace leximaxIST
         
         void internal_solve(int i, int ub);
         
-        void binary_search(int lb, int ub);
+        void binary_search(int i, int lb, int ub);
         
-        int lucky_ub_reduce(int &ub);
+        void get_sol_and_bound(int i, int &ub);
         
         void mss_add_falsified (IpasirWrap &solver, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const;
         

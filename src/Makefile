@@ -26,7 +26,6 @@ debug : $(LIBNAME)
 $(LIBNAME) : $(OBJS)
 	@echo "Archiving: $(LIBNAME)"
 	ar -rcs ../lib/$(LIBNAME) $(OBJS)
-	rm -f *.o
 
 $(OBJS1) : %.o: %.cc
 	@echo "Compiling: $@"

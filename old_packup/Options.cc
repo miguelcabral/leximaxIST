@@ -74,7 +74,7 @@ bool Options::parse(int argc,char **argv) {
     static struct option long_options[] = {
          {"help", no_argument,    &help, 1}
        , {"no-sol", no_argument,  &solving_disabled, 1}
-       ,{"ext-solver", required_argument,  0, 500}
+       ,{"external-solver", required_argument,  0, 500}
        ,{"solution-check",  required_argument,  0, 501}
 #ifdef MAPPING
        ,{"mapping-file",    required_argument,  0, 502}

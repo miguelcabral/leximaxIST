@@ -136,6 +136,8 @@ namespace leximaxIST {
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         m_sat_solver = new IpasirWrap();
         // read problem
+        if (m_verbosity == 2)
+            std::cout << "c ------------- Input hard clauses -------------\n";
         for (const std::vector<int> &hard_clause : constraints) {
             // determine max id and update m_id_count
             update_id_count(hard_clause);
@@ -153,6 +155,8 @@ namespace leximaxIST {
             std::cout << "c Number of objective functions: " << m_num_objectives << std::endl;
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
+        if (m_verbosity == 2)
+            std::cout << "c ---- Input soft clauses conversion to variables ----\n";
         int i(0);
         for (const std::vector<std::vector<int>> &obj : objective_functions) {
             m_objectives[i] = new std::vector<int>(obj.size(), 0);

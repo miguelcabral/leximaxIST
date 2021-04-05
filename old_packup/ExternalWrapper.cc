@@ -36,7 +36,6 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,solution_value(-1)
 ,_id_manager(id_manager)
 ,opt_solver_cmd("minisat+ -cs -ansi")
-,sat_solver_cmd()
 ,ub_encoding(0)
 ,multiplication_string("*")
 ,temporary_directory("/tmp")
@@ -416,7 +415,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      assert(leximax_enc != nullptr);
      /*size_t sorting_net_size (leximax_enc->get_sorting_net_size());
      std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';*/
-     if (leximax_enc->get_sat()) {
+     if (leximax_enc->get_status() == 's') {
      	const std::vector<int> obj_vector (leximax_enc->get_objective_vector());
      	std::cerr << "# Objective vector: ";
      	for (int o : obj_vector)
@@ -470,27 +469,25 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc = new leximaxIST::Encoder(); // WARNING: memory leak
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
-     leximax_enc->set_ub_encoding(ub_encoding);
+     leximax_enc->set_ub_presolve(ub_encoding);
      leximax_enc->set_verbosity(verbosity);
-     leximax_enc->set_opt_solver_cmd(opt_solver_cmd);
+     leximax_enc->set_ext_solver_cmd(opt_solver_cmd);
      leximax_enc->set_opt_mode(opt_mode);
      leximax_enc->set_multiplication_string(multiplication_string);
-     leximax_enc->set_leave_temporary_files(leave_temporary_files);
+     leximax_enc->set_leave_tmp_files(leave_temporary_files);
      leximax_enc->set_formalism(formalism);
      leximax_enc->set_lp_solver(lp_solver); 
-     if (leximax_enc->set_problem(input_constraints, obj_functions) != 0) {
-         model.clear();
-         return false;
+     leximax_enc->set_problem(input_constraints, obj_functions); 
+     leximax_enc->solve();
+     char status (leximax_enc->get_status());
+     if (status == 's') {
+        const std::vector<int> &sol (leximax_enc->get_solution());
+        model.assign(sol.begin(), sol.end());
+        print_leximax_info();
      }
-     // solve() returns 0 if all went well, and -1 otherwise. 
-     if (leximax_enc->solve() == -1) {
+     else
          model.clear();
-         return false;
-     }
-     const std::vector<int> &sol (leximax_enc->get_solution());
-     model.assign(sol.begin(), sol.end());
-     print_leximax_info();
-     // return satisfiable or not?
-     return leximax_enc->get_sat();
+     // return did I find a solution? 
+     return status == 's';
  }
  

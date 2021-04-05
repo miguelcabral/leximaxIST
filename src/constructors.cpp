@@ -13,30 +13,26 @@ namespace leximaxIST {
         Clause *clptr (new Clause(cl)); // copy constructor
         m_hard_clauses.push_back(clptr);
         m_sat_solver->addClause(clptr);
+        if (m_verbosity == 2)
+            print_clause(std::cout, clptr, "c ");
     }
 
-    const Clause* Encoder::add_hard_clause(int l)
+    void Encoder::add_hard_clause(int l)
     {
-        Clause *clptr (new Clause({l}));
-        m_hard_clauses.push_back(clptr);
-        m_sat_solver->addClause(l);
-        return clptr;
+        const Clause cl {l};
+        add_hard_clause(cl);
     }
     
-    const Clause* Encoder::add_hard_clause(int l1, int l2)
+    void Encoder::add_hard_clause(int l1, int l2)
     {
-        Clause *clptr (new Clause({l1, l2}));
-        m_hard_clauses.push_back(clptr);
-        m_sat_solver->addClause(l1, l2);
-        return clptr;
+        const Clause cl {l1, l2};
+        add_hard_clause(cl);
     }
     
-    const Clause* Encoder::add_hard_clause(int l1, int l2, int l3)
+    void Encoder::add_hard_clause(int l1, int l2, int l3)
     {
-        Clause *clptr (new Clause({l1, l2, l3}));
-        m_hard_clauses.push_back(clptr);
-        m_sat_solver->addClause(l1, l2, l3);
-        return clptr;
+        const Clause cl {l1, l2, l3};
+        add_hard_clause(cl);
     }
         
     Encoder::Encoder() : 

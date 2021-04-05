@@ -3,6 +3,7 @@
 #include <ipasir.h>
 #include <cstdlib>
 #include <cmath>
+#include <iostream>
 
 namespace leximaxIST {
     
@@ -33,7 +34,7 @@ namespace leximaxIST {
     bool IpasirWrap::is_ok_lit(int l) { return is_ok_var(std::abs(l)); }
     
     // return a non-const reference to be able to steal _model's data with move semantics
-    std::vector<int>& IpasirWrap::model() { return _model; }
+    std::vector<int>& IpasirWrap::model() {return _model; }
     
     const std::vector<int>& IpasirWrap::conflict() const { return _conflict; }
 
@@ -71,7 +72,7 @@ namespace leximaxIST {
     
     void IpasirWrap::add(int p) {
          if (std::abs(p) > _nvars)
-             _nvars = p;
+             _nvars = std::abs(p);
         ipasir_add(_s, p);
     }
 

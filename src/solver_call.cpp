@@ -15,12 +15,14 @@
 #include <cstring> // for strerror()
 #include <iostream>
 #include <vector>
-#include <algorithm> // std::max_element
+#include <algorithm> // std::max_element, std::sort
 #include <sstream>
 #include <cctype>
 
 namespace leximaxIST {
 
+    bool descending_order (int i, int j);
+    
     void Encoder::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         while (*r != EOF) {
@@ -631,7 +633,7 @@ namespace leximaxIST {
     
     inline void print_bounds(int lb, int ub)
     {
-        std::cout << "\tlb = " << lb << "\tub = " << ub << '\n';
+        std::cout << "c lb = " << lb << " ub = " << ub << '\n';
     }
     
     inline void print_nb_sat_calls(int nb_calls)
@@ -639,61 +641,66 @@ namespace leximaxIST {
         std::cout << "c Number of SAT calls: " << nb_calls << std::endl;
     }
     
-    // if possible, reduces ub and returns last satisfied soft clause
-    // if all soft clauses are falsified, returns 0
-    int Encoder::lucky_ub_reduce(int &ub)
+    void Encoder::get_sol_and_bound(int i, int &ub)
     {
+        m_solution = std::move(m_sat_solver->model());
+        m_sat_solver->model().clear();
+        std::vector<int> obj_vec (get_objective_vector());
+        if (m_verbosity >= 1)
+            print_obj_vector(obj_vec);
+        // check if obj value is, by chance, better than ub
+        std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
+        int obj_val = obj_vec.at(i);
+        std::cout << "ub antes = " << ub << '\n';
+        if (ub > obj_val)
+            ub = obj_val;
         int size (m_soft_clauses.size());
-        int sc (0);
-        if (ub != size)
-            sc = m_soft_clauses.at(size - ub - 1);
-        for (int pos (size - ub); pos < size; ++pos) {
-            if (m_solution.at(-sc) < 0) {
-                sc = m_soft_clauses.at(pos);
-                --ub;
-            }
-            else
-                break;
+        if (ub != size) { // bound only if upper bound is not trivial
+            int sc = m_soft_clauses.at(size - ub - 1);
+            std::cout << "size: " << size << std::endl;
+            std::cout << "sc = " << sc << std::endl;
+            std::cout << "ub = " << ub << std::endl;
+            //m_sat_solver->addClause(sc); // sum of soft vars <= ub
         }
-        return sc;
     }
     
-    void Encoder::binary_search(int lb, int ub)
+    void Encoder::binary_search(int i, int lb, int ub)
     {
+        // get solution with obj value <= ub
+        if (!m_sat_solver->solve()) {
+            m_status = 'u'; // this may only happen in the first iteration without presolve
+            if (m_verbosity == 2) {
+                std::cout << "c UNSAT! Conflict:\n";
+                const Clause c (m_sat_solver->conflict());
+                print_clause(std::cout, &c, "c ");
+            }
+            return;
+        }
+        m_status = 's';
+        // get solution and refine upper bound
+        get_sol_and_bound(i, ub);
         if (m_verbosity == 2)
             print_bounds(lb, ub);
         int size (m_soft_clauses.size());
-        int nb_calls (0);
+        int nb_calls (1);
         while (ub != lb) {
-            int half ((ub - lb)/2); // floor
+            int half (lb + (ub - lb)/2); // floor
             std::vector<int> assumps;
             // y <= k means size - k zeros
             // last position = size - k - 1
             int sc (m_soft_clauses.at(size - half - 1));
             assumps.push_back(sc);
             if (m_sat_solver->solve(assumps)) { // y <= half ?
-                // get solution
-                m_solution = std::move(m_sat_solver->model());
-                m_sat_solver->model().clear();
-                if (m_verbosity >= 1)
-                    print_obj_vector();
+                // get solution and refine upper bound
                 ub = half;
-                // check if the obj value is, by chance, better than half
-                for (int pos (size - half); pos < size; ++pos) {
-                    sc = m_soft_clauses.at(pos);
-                    if (m_solution.at(-sc) < 0)
-                        --ub;
-                    else
-                        break;
-                }
-                m_sat_solver->addClause(sc);
+                get_sol_and_bound(i, ub);
             }
             else {
                 lb = half + 1;
                 // y >= k means at least k ones
                 // size - 1 means 1 one, size - 2 means 2 ones, ...
                 sc = m_soft_clauses.at(size - lb);
-                m_sat_solver->addClause(-sc); // (-sc > 0)
+                //m_sat_solver->addClause(-sc); // (-sc > 0); sum of soft vars >= lb
             }
             ++nb_calls;
             if (m_verbosity == 2)
@@ -708,26 +715,10 @@ namespace leximaxIST {
         double initial_time;
         if (m_verbosity >= 1) {
             initial_time = read_cpu_time();
-            std::cout << "c Solving internally with IPASIR..." << std::endl;
-        }
-        if (m_ub_presolve == 0 && i == 0) { // no presolve, first check if problem is sat
-            if (!m_sat_solver->solve()) {
-                m_status = 'u';
-                return;
-            }
-            m_status = 's';
-            // get solution
-            m_solution = std::move(m_sat_solver->model());
-            m_sat_solver->model().clear();
-            if (m_verbosity >= 1)
-                print_obj_vector();
-            // check if obj value is, by chance, better than the trivial ub
-            int sc (lucky_ub_reduce(ub));
-            if (sc != 0)
-                m_sat_solver->addClause(sc);
+            std::cout << "c Solving internally with incremental SAT solver..." << std::endl;
         }
         if (m_opt_mode == "bin")
-            binary_search(0, ub);
+            binary_search(i, 0, ub);
         if (m_verbosity >= 1) {
             std::cout << "c Minimisation CPU time: " << read_cpu_time() - initial_time;
             std::cout << 's' << std::endl;
