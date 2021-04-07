@@ -651,16 +651,12 @@ namespace leximaxIST {
         // check if obj value is, by chance, better than ub
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
         int obj_val = obj_vec.at(i);
-        std::cout << "ub antes = " << ub << '\n';
         if (ub > obj_val)
             ub = obj_val;
         int size (m_soft_clauses.size());
         if (ub != size) { // bound only if upper bound is not trivial
             int sc = m_soft_clauses.at(size - ub - 1);
-            std::cout << "size: " << size << std::endl;
-            std::cout << "sc = " << sc << std::endl;
-            std::cout << "ub = " << ub << std::endl;
-            //m_sat_solver->addClause(sc); // sum of soft vars <= ub
+            m_sat_solver->addClause(sc); // sum of soft vars <= ub
         }
     }
     
@@ -679,7 +675,7 @@ namespace leximaxIST {
         m_status = 's';
         // get solution and refine upper bound
         get_sol_and_bound(i, ub);
-        if (m_verbosity == 2)
+        if (m_verbosity >= 1)
             print_bounds(lb, ub);
         int size (m_soft_clauses.size());
         int nb_calls (1);
@@ -700,10 +696,10 @@ namespace leximaxIST {
                 // y >= k means at least k ones
                 // size - 1 means 1 one, size - 2 means 2 ones, ...
                 sc = m_soft_clauses.at(size - lb);
-                //m_sat_solver->addClause(-sc); // (-sc > 0); sum of soft vars >= lb
+                m_sat_solver->addClause(-sc); // (-sc > 0); sum of soft vars >= lb
             }
             ++nb_calls;
-            if (m_verbosity == 2)
+            if (m_verbosity >= 1)
                 print_bounds(lb, ub);
         }
         if (m_verbosity >= 1)

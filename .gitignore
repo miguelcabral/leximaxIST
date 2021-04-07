@@ -3,4 +3,4 @@ examples/*
 *.gcda
 *.gcno
 gmon.out
-*.a
+lib/*
