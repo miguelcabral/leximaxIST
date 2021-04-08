@@ -23,6 +23,8 @@ namespace leximaxIST {
             i_str += "nd";
         else if (i_str.back() == '3')
             i_str += "rd";
+        else
+            i_str += "th";
         return i_str;
     }
     

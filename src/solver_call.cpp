@@ -663,18 +663,20 @@ namespace leximaxIST {
     void Encoder::binary_search(int i, int lb, int ub)
     {
         // get solution with obj value <= ub
-        if (!m_sat_solver->solve()) {
-            m_status = 'u'; // this may only happen in the first iteration without presolve
-            if (m_verbosity == 2) {
-                std::cout << "c UNSAT! Conflict:\n";
-                const Clause c (m_sat_solver->conflict());
-                print_clause(std::cout, &c, "c ");
+        if (i == 0 && m_ub_presolve == 0) {
+            if (!m_sat_solver->solve()) {
+                m_status = 'u'; // this may only happen in the first iteration without presolve
+                if (m_verbosity == 2) {
+                    std::cout << "c UNSAT! Conflict:\n";
+                    const Clause c (m_sat_solver->conflict());
+                    print_clause(std::cout, &c, "c ");
+                }
+                return;
             }
-            return;
+            m_status = 's';
+            // get solution and refine upper bound
+            get_sol_and_bound(i, ub);
         }
-        m_status = 's';
-        // get solution and refine upper bound
-        get_sol_and_bound(i, ub);
         if (m_verbosity >= 1)
             print_bounds(lb, ub);
         int size (m_soft_clauses.size());
