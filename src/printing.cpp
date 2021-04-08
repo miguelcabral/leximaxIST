@@ -8,7 +8,7 @@ namespace leximaxIST {
 
     void print_error_msg(const std::string &msg)
     {
-        std::cerr << "Error leximaxIST: " << msg << std::endl;
+        std::cerr << "Error leximaxIST: " << msg << '\n';
     }
     
     std::string ordinal (int i);
@@ -20,7 +20,7 @@ namespace leximaxIST {
             std::cout << "o ";
             for (int v : obj_vec)
                 std::cout << v << ' ';
-            std::cout << std::endl;
+            std::cout << '\n';
         }
     }
     
@@ -32,7 +32,7 @@ namespace leximaxIST {
             std::cout << "o ";
             for (int v : obj_vec)
                 std::cout << v << ' ';
-            std::cout << std::endl;
+            std::cout << '\n';
         }
     }
     

@@ -109,14 +109,14 @@ namespace leximaxIST {
         std::cout << "c leximaxIST\n";
         std::cout << "c C++ library for leximax optimisation in a Boolean Satisfaction setting\n";
         std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
-        std::cout << "c ----------------------------------------------------------------------" << std::endl;
+        std::cout << "c ----------------------------------------------------------------------" << '\n';
     }
     
     void Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
     {
         if (m_verbosity > 0 && m_verbosity <= 2) {
             print_header();
-            std::cout << "c Reading problem..." << std::endl;
+            std::cout << "c Reading problem..." << '\n';
         }
         // restart object: if it has not been cleared from a previous problem
         clear();
@@ -152,7 +152,7 @@ namespace leximaxIST {
         if (m_verbosity > 0 && m_verbosity <= 2) {
             std::cout << "c Number of input variables: " << m_id_count << '\n';
             std::cout << "c Number of input hard clauses: " << m_hard_clauses.size() << '\n';
-            std::cout << "c Number of objective functions: " << m_num_objectives << std::endl;
+            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
         if (m_verbosity == 2)

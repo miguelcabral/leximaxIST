@@ -206,7 +206,7 @@ namespace leximaxIST {
     void Encoder::call_ext_solver()
     {
         if (m_verbosity >= 1)
-            std::cout << "c Calling external solver..." << std::endl;
+            std::cout << "c Calling external solver..." << '\n';
         std::string output_filename = m_file_name + ".sol";
         const std::string error_filename = m_file_name + ".err";
         std::string command;
@@ -404,7 +404,7 @@ namespace leximaxIST {
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             final_time = read_cpu_time();
             std::cout << "c Minimisation CPU time: " << final_time - initial_time;
-            std::cout << 's' << std::endl;
+            std::cout << 's' << '\n';
         }
         // read output of solver
         std::vector<int> model;
@@ -475,8 +475,6 @@ namespace leximaxIST {
     
     void Encoder::sat_solve()
     {
-        if (m_verbosity > 0 && m_verbosity <= 2)
-            std::cout << "c Calling SAT solver..." << std::endl;
         if (m_sat_solver->solve()) {
             m_status = 's';
             m_solution = std::move(m_sat_solver->model());
@@ -564,8 +562,6 @@ namespace leximaxIST {
     // stop if the upper bound can't be improved
     void Encoder::mss_solve()
     {
-        if (m_verbosity > 0 && m_verbosity <= 2)
-            std::cout << "c Finding MSS..." << std::endl;
         // must use a different ipasir solver, because we add unit clauses of MSS
         IpasirWrap solver;
         for (const Clause *hard_cl : m_hard_clauses)
@@ -587,8 +583,6 @@ namespace leximaxIST {
         std::vector<int> assumps;
         int obj_index (0);
         mss_add_falsified (solver, todo_vec, obj_vector);
-        if (m_verbosity > 0 && m_verbosity <= 2)
-            print_obj_vector(obj_vector);
         while (true /*stops when next_var == -1*/) {
             if (m_verbosity == 2)
                 print_mss_todo(todo_vec);
@@ -598,15 +592,13 @@ namespace leximaxIST {
              * obj_index is set to the objective that contains var */
             int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
             if (next_var == -1)
-                return;
+                break;
             assumps.push_back (-next_var);
             if (solver.solve(assumps)) {
                 m_solution = std::move(solver.model());
                 solver.model().clear();
                 solver.addClause(-next_var);
                 mss_add_falsified (solver, todo_vec, obj_vector);
-                if (m_verbosity > 0 && m_verbosity <= 2)
-                    print_obj_vector(obj_vector);
             }
             else {
                 solver.addClause(next_var);
@@ -614,20 +606,32 @@ namespace leximaxIST {
             }
             assumps.clear();
         }
+        if (m_verbosity >= 1)
+            print_obj_vector(obj_vector);
     }
     
     void Encoder::calculate_upper_bound()
     {   
         if (m_verbosity > 0 && m_verbosity <= 2)
-            std::cout << "c Presolving to obtain upper bound on optimal 1st maximum..." << std::endl;
+            std::cout << "c Presolving to obtain upper bound on optimal 1st maximum...\n";
         double initial_time (read_cpu_time());
-        if (m_ub_presolve == 1)// call sat solver once
+        if (m_ub_presolve == 1) {
+            if (m_verbosity >= 1)
+                std::cout << "c Calling SAT solver...\n";
             sat_solve();
-        else if (m_ub_presolve == 2 || m_ub_presolve == 3)
+        }
+        else if (m_ub_presolve == 2 || m_ub_presolve == 3) {
+            if (m_verbosity >= 1) {
+                if (m_ub_presolve == 2)
+                    std::cout << "c Greedy sequential minimisation...\n";
+                if (m_ub_presolve == 3)
+                    std::cout << "c Greedy maximum minimisation...\n";
+            }
             mss_solve();
+        }
         if (m_verbosity > 0 && m_verbosity <= 2) {
             std::cout << "c Upper Bound Presolving CPU time: " << read_cpu_time() - initial_time;
-            std::cout << 's' << std::endl;
+            std::cout << "s\n";
         }
     }
     
@@ -638,7 +642,7 @@ namespace leximaxIST {
     
     inline void print_nb_sat_calls(int nb_calls)
     {
-        std::cout << "c Number of SAT calls: " << nb_calls << std::endl;
+        std::cout << "c Number of SAT calls: " << nb_calls << '\n';
     }
     
     void Encoder::get_sol_and_bound(int i, int &ub)
@@ -660,12 +664,22 @@ namespace leximaxIST {
         }
     }
     
+    void print_sat_call_time(double t)
+    {
+        std::cout << "c SAT call CPU time: " << t << "s\n";
+    }
+    
     void Encoder::binary_search(int i, int lb, int ub)
     {
-        // get solution with obj value <= ub
-        if (i == 0 && m_ub_presolve == 0) {
-            if (!m_sat_solver->solve()) {
-                m_status = 'u'; // this may only happen in the first iteration without presolve
+        int nb_calls (0);
+        if (i == 0 && m_ub_presolve == 0) { // get solution with obj value <= ub
+            if (m_verbosity >= 1)
+                std::cout << "c Calling SAT solver...\n";
+            double initial_time (read_cpu_time());
+            m_status = m_sat_solver->solve() ? 's' : 'u';
+            if (m_verbosity >= 1)
+                print_sat_call_time(read_cpu_time() - initial_time);
+            if (m_status == 'u') {
                 if (m_verbosity == 2) {
                     std::cout << "c UNSAT! Conflict:\n";
                     const Clause c (m_sat_solver->conflict());
@@ -673,32 +687,36 @@ namespace leximaxIST {
                 }
                 return;
             }
-            m_status = 's';
             // get solution and refine upper bound
             get_sol_and_bound(i, ub);
+            ++nb_calls;
         }
         if (m_verbosity >= 1)
             print_bounds(lb, ub);
         int size (m_soft_clauses.size());
-        int nb_calls (1);
         while (ub != lb) {
             int half (lb + (ub - lb)/2); // floor
-            std::vector<int> assumps;
             // y <= k means size - k zeros
             // last position = size - k - 1
             int sc (m_soft_clauses.at(size - half - 1));
-            assumps.push_back(sc);
-            if (m_sat_solver->solve(assumps)) { // y <= half ?
-                // get solution and refine upper bound
+            std::vector<int> assumps {sc};
+            if (m_verbosity >= 1)
+                std::cout << "c Calling SAT solver...\n";
+            double initial_time (read_cpu_time());
+            bool is_sat (m_sat_solver->solve(assumps));
+            if (m_verbosity >= 1)
+                print_sat_call_time(read_cpu_time() - initial_time);
+            if (is_sat) { // sum of soft vars <= half
                 ub = half;
+                // get solution and refine upper bound
                 get_sol_and_bound(i, ub);
             }
-            else {
+            else { // sum of soft vars >= half + 1
                 lb = half + 1;
                 // y >= k means at least k ones
                 // size - 1 means 1 one, size - 2 means 2 ones, ...
                 sc = m_soft_clauses.at(size - lb);
-                m_sat_solver->addClause(-sc); // (-sc > 0); sum of soft vars >= lb
+                m_sat_solver->addClause(-sc);
             }
             ++nb_calls;
             if (m_verbosity >= 1)
@@ -711,15 +729,15 @@ namespace leximaxIST {
     void Encoder::internal_solve(int i, int ub)
     {
         double initial_time;
-        if (m_verbosity >= 1) {
+        if (m_verbosity >= 1)
             initial_time = read_cpu_time();
-            std::cout << "c Solving internally with incremental SAT solver..." << std::endl;
-        }
         if (m_opt_mode == "bin")
             binary_search(i, 0, ub);
+        else if (m_opt_mode == "linear-su")
+            // TODO
         if (m_verbosity >= 1) {
             std::cout << "c Minimisation CPU time: " << read_cpu_time() - initial_time;
-            std::cout << 's' << std::endl;
+            std::cout << "s\n";
         }
     }
     

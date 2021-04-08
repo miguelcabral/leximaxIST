@@ -303,10 +303,10 @@ namespace leximaxIST {
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             if (i == 0) {
                 std::cout << "c Trival upper bound (size of largest objective): ";
-                std::cout << m_soft_clauses.size() << std::endl;
+                std::cout << m_soft_clauses.size() << '\n';
             }
-            std::cout << "c Upper bound of current optimal maximum: ";
-            std::cout << obj_vec.at(i) << std::endl;
+            std::cout << "c Upper bound of optimum: ";
+            std::cout << obj_vec.at(i) << '\n';
         }
         if (i == 0 || i == 1)
             encode_ub_sorted(obj_vec.at(0)); // ub on all obj funcs
@@ -424,7 +424,7 @@ namespace leximaxIST {
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
         for (int i = 0; i < m_num_objectives; ++i) {
             if (m_verbosity >= 1 && m_verbosity <= 2)
-                std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << std::endl;
+                std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << '\n';
             clear_soft_clauses();
             generate_soft_clauses(i);
             if (i != 0) // in the first iteration i == 0 there is no relaxation
@@ -450,7 +450,7 @@ namespace leximaxIST {
             print_sorted_true();
         if (m_verbosity > 0 && m_verbosity < 3) { // print total solving time
             std::cout << "c Total solving CPU time: ";
-            std::cout << read_cpu_time() - initial_time << 's' << std::endl;
+            std::cout << read_cpu_time() - initial_time << 's' << '\n';
         }
     }
 
