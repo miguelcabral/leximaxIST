@@ -55,6 +55,7 @@ namespace leximaxIST {
         m_solution.clear();
         //m_num_opts = 0;
         m_id_count = 0;
+        m_input_nb_vars = 0;
         m_num_objectives = 0;
         m_child_pid = 0;
         m_status = '?';

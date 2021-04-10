@@ -25,7 +25,7 @@ namespace leximaxIST {
     
     void Encoder::set_ub_presolve(int val)
     {
-        if (val < 0 || val > 3) {
+        if (val < 0 || val > 2) {
             print_error_msg("Invalid value '" + std::to_string(val) + "' for ub_presolve parameter");
             exit(EXIT_FAILURE);
         }
@@ -35,7 +35,7 @@ namespace leximaxIST {
     // Possible values: external, bin. TODO: linear-su, linear-us
     void Encoder::set_opt_mode(const std::string &mode)
     {
-        if (mode != "external" && mode != "bin") {
+        if (mode != "external" && mode != "bin" && mode != "linear-su") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
@@ -132,6 +132,10 @@ namespace leximaxIST {
             exit(EXIT_FAILURE);
         }
         m_num_objectives = objective_functions.size();
+        if (m_num_objectives == 1) {
+            print_error_msg("The problem is single-objective");
+            exit(EXIT_FAILURE);
+        }
         m_objectives.resize(m_num_objectives, nullptr);
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         m_sat_solver = new IpasirWrap();
@@ -149,8 +153,9 @@ namespace leximaxIST {
             for (const std::vector<int> &soft_clause : obj)
                 update_id_count(soft_clause);
         }
+        m_input_nb_vars = m_id_count;
         if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Number of input variables: " << m_id_count << '\n';
+            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
             std::cout << "c Number of input hard clauses: " << m_hard_clauses.size() << '\n';
             std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
         }

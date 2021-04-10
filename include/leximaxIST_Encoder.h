@@ -27,6 +27,7 @@ namespace leximaxIST
 
         int m_verbosity; // 0: nothing, 1: solving phases, time + obj vector, 2: everything including encoding
         int m_id_count;
+        int m_input_nb_vars; // number of vars of input problem - useful to return assignment of only these variables
         std::vector<Clause*> m_hard_clauses; // TODO: remove pointers?
         std::vector<int> m_soft_clauses; // unit clauses
         std::vector<std::vector<int>*> m_objectives; // TODO: remove pointers?
@@ -39,13 +40,13 @@ namespace leximaxIST
         std::string m_lp_solver;
         std::string m_valid_lp_solvers[6];
         std::string m_file_name;
-        std::string m_opt_mode; // internal (e.g. binary search using only a SAT solver), or external
+        std::string m_opt_mode; // internal (binary, linear-su), or external (MaxSAT solver)
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_tmp_files;
         bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
-        int m_ub_presolve; // 0: do nothing, 1: sat call, 2: MSS - sequential choice, 3: MSS - maximum choice
+        int m_ub_presolve; // 0: sat call, 1: MSS - sequential choice, 2: MSS - maximum choice
         // the next one is usefull if computation is stoped and you get an intermediate solution
         // you want to know which values of the objective vector are in theory guaranteed to be optimal
         //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
@@ -72,7 +73,7 @@ namespace leximaxIST
         /* if the problem is satisfiable, then m_solution is a satisfying assignment;
         * each entry i of m_solution is +i if variable i is true and -i otherwise;
         * if the problem is not satisfiable, m_solution is empty.*/
-        const std::vector<int>& get_solution() const;
+        std::vector<int> get_solution() const;
         
         // empty if unsat; not a const reference because it is not a member variable
         std::vector<int> get_objective_vector() const;
@@ -185,7 +186,7 @@ namespace leximaxIST
         
         void internal_solve(int i, int ub);
         
-        void binary_search(int i, int lb, int ub);
+        void search(int i, int lb, int ub);
         
         void get_sol_and_bound(int i, int &ub);
         

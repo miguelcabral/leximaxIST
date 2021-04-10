@@ -289,8 +289,6 @@ namespace leximaxIST {
     // returns the upper bound of the optimal i-th max
     int Encoder::encode_upper_bound(int i)
     {
-        if (i == 0 && m_ub_presolve == 0)
-            return m_soft_clauses.size();
         std::vector<int> obj_vec (get_objective_vector());
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
         if (m_verbosity == 2) {
@@ -396,6 +394,11 @@ namespace leximaxIST {
     void Encoder::solve()
     {
         double initial_time (read_cpu_time());
+        if (m_status != '?') {
+            print_error_msg("Called solve() twice. You must call set_problem() before calling solve()");
+            exit(EXIT_FAILURE);
+        }
+        // check if solve() is called without a problem
         if (m_num_objectives == 0) {
             print_error_msg("Can not solve - no objective function");
             exit(EXIT_FAILURE);
@@ -404,21 +407,14 @@ namespace leximaxIST {
             print_error_msg("Can not solve - no hard clauses");
             exit(EXIT_FAILURE);
         }
-        // if there is only one objective function then it is a simple single objective problem
         if (m_num_objectives == 1) {
-            if (m_opt_mode != "external") {
-                print_error_msg("Can't use internal optimisation in single-objective problems");
-                exit(EXIT_FAILURE);
-            }
-            generate_soft_clauses(0);
-            external_solve(0);
+            print_error_msg("Can not solve - single-objective problem");
+            exit(EXIT_FAILURE);
+        }
+        // check if problem is satisfiable and compute upper bound of first optimum
+        calculate_upper_bound();
+        if (m_status == 'u')
             return;
-        }
-        if (m_ub_presolve != 0) { // call sat solver (once or MSS) to get upper bound of optimum
-            calculate_upper_bound();
-            if (m_status == 'u')
-                return;
-        }
         // encode sorted vectors with sorting network
         encode_sorted();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
@@ -439,9 +435,6 @@ namespace leximaxIST {
                 external_solve(i);
             else
                 internal_solve(i, ub); // can't use with simplify_last since it depends on order
-            // if unsat end computation
-            if (m_status == 'u')
-                return;
             // fix value of current maximum; in the end of last iteration there is no need for this
             if (i != m_num_objectives - 1)
                 fix_soft_vars(i);

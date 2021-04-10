@@ -38,6 +38,7 @@ namespace leximaxIST {
     Encoder::Encoder() : 
         m_verbosity(0),
         m_id_count(0),
+        m_input_nb_vars(0),
         m_num_objectives(0),
         m_formalism("wcnf"),
         m_lp_solver("gurobi"),
@@ -47,7 +48,7 @@ namespace leximaxIST {
         m_leave_tmp_files(false),
         m_simplify_last(false),
         m_status('?'),
-        m_ub_presolve(0), // 0 - don't presolve; 1 - sat solver; 2 - MSS-seq; 3 - MSS-max
+        m_ub_presolve(0), // 0 - sat solver; 1 - MSS-seq; 2 - MSS-max
         //m_num_opts(0),
         m_multiplication_string(" "),
         m_sorting_net_size(0),

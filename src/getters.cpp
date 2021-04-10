@@ -1,5 +1,6 @@
 #include <leximaxIST_Encoder.h>
 #include <vector>
+#include <iostream>
 
 namespace leximaxIST {
 
@@ -15,9 +16,16 @@ namespace leximaxIST {
         return m_status; 
     }
 
-    const std::vector<int>& Encoder::get_solution() const 
-    { 
-        return m_solution;
+    std::vector<int> Encoder::get_solution() const 
+    {
+        std::vector<int> assignment;
+        if (m_status != 's')
+            return assignment;
+        assignment.resize(m_input_nb_vars + 1);
+        for (int j (0); j <= m_input_nb_vars; ++j) {
+            assignment.at(j) = m_solution.at(j);
+        }
+        return assignment;
     }
 
     // if unsat return empty vector

@@ -481,7 +481,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->solve();
      char status (leximax_enc->get_status());
      if (status == 's') {
-        const std::vector<int> &sol (leximax_enc->get_solution());
+        std::vector<int> sol (leximax_enc->get_solution());
         model.assign(sol.begin(), sol.end());
         print_leximax_info();
      }

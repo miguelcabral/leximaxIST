@@ -118,10 +118,9 @@ void print_usage(ostream &output) {
     output << "\t 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
     output << "\t 'bin' - Use internal incremental SAT solver with binary search (default)"<< endl;
     output << "--ub-enc <int>\t\t upper bound presolve"<< endl;
-    output << "\t 0 - do not presolve (default)"<< endl;
-    output << "\t 1 - presolve using one call to SAT solver"<< endl;
-    output << "\t 2 - presolve using greedy sequential minimisation"<< endl;
-    output << "\t 3 - presolve using greedy maximum minimisation"<< endl;
+    output << "\t 0 - presolve using one call to SAT solver (default)"<< endl;
+    output << "\t 1 - presolve using greedy sequential minimisation"<< endl;
+    output << "\t 2 - presolve using greedy maximum minimisation"<< endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
