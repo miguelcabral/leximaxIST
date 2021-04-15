@@ -551,8 +551,13 @@ namespace leximaxIST {
         }    
     }
     
-    // Compute an MSS of the problem with sum of obj funcs 
-    // stop if the upper bound can't be improved
+    /* Compute an MSS of the problem with sum of obj funcs 
+     * stop if the upper bound can't be improved
+     */
+    /* TODO: see how this behaves without add falsified
+     * without add falsified the obj_vector is not correct
+     * Fix this - use get_objective_vector() <- probably not be too heavys
+     */
     void Encoder::mss_solve()
     {
         // must use a different ipasir solver, because we add unit clauses of MSS
@@ -617,6 +622,10 @@ namespace leximaxIST {
         return lb;
     }
     
+    /* Calls external MaxSAT solver on the problem of the sum of all objectives
+     * Updates m_solution if the new solution is leximax better
+     * Returns the (optimum) value of the sum of all objectives
+     */
     int Encoder::maxsat_presolve()
     {
         if (m_maxsat_psol_cmd.empty()) {
@@ -649,15 +658,18 @@ namespace leximaxIST {
         // choose the best solution in terms of the leximax order
         std::vector<int> model (m_id_count + 1, 0);
         read_sat_output(model, sat, r);
-        const int lb (get_lower_bound(model));
+        const std::vector<int> &obj_vec (get_objective_vector(model));
+        int sum (0);
+        for (int obj_value : obj_vec)
+            sum += obj_value;
         set_solution(model);
         if (!m_leave_tmp_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
         if (m_verbosity >= 1 && m_verbosity <= 2)
-            print_obj_vector();
-        return lb;
+            print_obj_vector(obj_vec);
+        return sum;
     }
     
     /* Presolve: Find solutions to get bounds on the optimal first maximum

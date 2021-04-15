@@ -297,7 +297,16 @@ namespace leximaxIST {
         return bounds;
     }
     
-    // computes lower bounds of all objective functions and of the 
+    /* Computes lower bounds of (1) all objective functions and (2) of the cost
+     * of the soft clauses of iteration i (the optimal ith maximum), based on
+     * the minimum value of the sum of all objective functions
+     * NOTE: in the last iteration (i == m_num_objectives - 1) lb_all = lb_soft,
+     * since f >= minimum >= lb_soft, for each objective f
+     * lb_all can not be improved (increased) with the existing information,
+     * because otherwise we could improve (increase) lb_soft,
+     * and it can not be improved with just the minimum value of the sum,
+     * because this information can not exclude the scenario with all objectives equal
+     */
     int Encoder::encode_lower_bound(int i, int sum)
     {
         const std::vector<int> &obj_vec (get_objective_vector());
@@ -308,17 +317,13 @@ namespace leximaxIST {
             sum_fixed += obj_vec.at(j);
         int sum_not_fixed (sum - sum_fixed);
         int nb_components (m_num_objectives - i);
-        // ceiling of the division
-        int lb_soft (sum_not_fixed / nb_components);
-        if (sum % nb_components != 0)
-            ++lb_soft;
-        // lower bound on all objective functions
-        // in the last iteration (i == m_num_objectives - 1) lb_all = lb_soft, since
-        // f >= minimum >= lb_soft, for each objective f
-        // lb_all can not be improved (increased) with the existing information, because
-        // otherwise we could improve (increase) lb_soft,
-        // and it can not be improved with just the minimum value of the sum,
-        // because this information can not exclude the scenario with all objectives equal
+        int lb_soft (0);
+        if (sum_not_fixed > 0) {
+            // ceiling of the division
+            int lb_soft (sum_not_fixed / nb_components);
+            if (sum % nb_components != 0)
+                ++lb_soft;
+        }
         int lb_all (0);
         int ub (obj_vec.at(i));
         if (i == m_num_objectives - 1)
@@ -331,11 +336,10 @@ namespace leximaxIST {
             std::cout << "c Lower bound of optimum: " << lb_soft << '\n';
             std::cout << "c Lower bound on all objectives: " << lb_all << '\n';
         }
-        // TODO: constraint on the soft clauses + constraint on all obj funcs (through snet outputs)
-        // I know that (sum - fi)/(n-1) <= ub, which means we have a lower bound on all obj funcs
         // limit the cost of the soft clauses
-
-        encode_lb_soft(lb_soft);
+        if (!m_simplify_last || i != m_num_objectives - 1)
+            encode_lb_soft(lb_soft);
+        // limit the value of all objective functions
         encode_lb_sorted(lb_all);
         return lb_soft;
     }
@@ -515,7 +519,7 @@ namespace leximaxIST {
                 external_solve(i);
             else
                 internal_solve(i, bounds.first, bounds.second); // can't use with simplify_last since it depends on order
-            // fix value of current maximum; in the end of last iteration there is no need for this
+            // fix value of current maximum (in the end of last iteration there is no need)
             if (i != m_num_objectives - 1)
                 fix_soft_vars(i);
         }

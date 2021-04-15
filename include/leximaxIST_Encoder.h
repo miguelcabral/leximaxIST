@@ -178,6 +178,14 @@ namespace leximaxIST
         
         void componentwise_OR(int i);
         
+        std::pair<int, int> encode_bounds(int i, int sum);
+        
+        int encode_lower_bound(int i, int sum);
+        
+        void encode_lb_soft(int lb);
+        
+        void encode_lb_sorted(int lb);
+        
         int encode_upper_bound(int i);
         
         void encode_ub_sorted(int first_max);
