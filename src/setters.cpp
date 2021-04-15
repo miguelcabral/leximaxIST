@@ -7,6 +7,8 @@
 #include <unistd.h>
 
 namespace leximaxIST {
+    
+    bool descending_order (int i, int j);
 
     int Encoder::fresh()
     {
@@ -93,6 +95,42 @@ namespace leximaxIST {
     void Encoder::set_leave_tmp_files(bool val) { m_leave_tmp_files = val; }
 
     void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
+    
+    void Encoder::set_maxsat_presolve(bool v)
+    {
+        m_maxsat_presolve = v;
+    }
+    
+    void Encoder::set_maxsat_psol_cmd(const std::string &cmd)
+    {
+        if (cmd.empty()) {
+            print_error_msg("Empty MaxSAT presolve command");
+            exit(EXIT_FAILURE);
+        }
+        m_maxsat_psol_cmd = cmd;
+    }
+    
+    // set m_solution if model is better in the leximax order
+    // in the case the external solver is killed and outputs a suboptimal solution
+    void Encoder::set_solution(std::vector<int> &model)
+    {
+        if (m_solution.empty())
+            m_solution.swap(model);
+        else {
+            std::vector<int> new_obj_vec (get_objective_vector(model));
+            std::vector<int> old_obj_vec (get_objective_vector(m_solution));
+            std::sort(new_obj_vec.begin(), new_obj_vec.end(), descending_order);
+            std::sort(old_obj_vec.begin(), old_obj_vec.end(), descending_order);
+            for (size_t j (0); j < new_obj_vec.size(); ++j) {
+                if (new_obj_vec[j] < old_obj_vec[j]) { // model is better
+                    m_solution.swap(model);
+                    break;
+                }
+                else if (new_obj_vec[j] > old_obj_vec[j]) // m_solution is better
+                    break; 
+            }
+        }
+    }
     
     void Encoder::update_id_count(const Clause &clause)
     {

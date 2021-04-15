@@ -47,6 +47,8 @@ namespace leximaxIST
         bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
         int m_ub_presolve; // 0: sat call, 1: MSS - sequential choice, 2: MSS - maximum choice
+        bool m_maxsat_presolve; // to get lower bound (and upper bound) of optimum
+        std::string m_maxsat_psol_cmd;
         // the next one is usefull if computation is stoped and you get an intermediate solution
         // you want to know which values of the objective vector are in theory guaranteed to be optimal
         //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
@@ -54,7 +56,7 @@ namespace leximaxIST
         std::vector<int> m_solution;
         size_t m_sorting_net_size; // size of largest sorting network
         //std::vector<double> m_times; // time of each step of solving (only external solver times)
-        IpasirWrap *m_sat_solver; // TODO: maybe change to pointer - to control lifetime of IpasirWrap
+        IpasirWrap *m_sat_solver;
         
     public:    
 
@@ -100,6 +102,10 @@ namespace leximaxIST
         
         void set_multiplication_string(const std::string &str);
         
+        void set_maxsat_presolve(bool v);
+        
+        void set_maxsat_psol_cmd(const std::string &cmd);
+        
         int terminate(); // kill external solver and read approximate solution
         
         void clear(); // frees memory, and sets internal parameters to their initial value
@@ -113,6 +119,8 @@ namespace leximaxIST
         void reset_file_name();
         
         void update_id_count(const Clause &clause);
+        
+        void set_solution(std::vector<int> &model);
         
         // getters.cpp
         
@@ -184,7 +192,7 @@ namespace leximaxIST
         
         // solver_call.cpp
         
-        void internal_solve(int i, int ub);
+        void internal_solve(int i, int lb, int ub);
         
         void search(int i, int lb, int ub);
         
@@ -198,7 +206,11 @@ namespace leximaxIST
         
         void sat_solve();
         
-        void calculate_upper_bound();
+        int get_lower_bound(const std::vector<int> &model);
+        
+        int maxsat_presolve();
+        
+        int presolve();
         
         void remove_tmp_files() const;
 

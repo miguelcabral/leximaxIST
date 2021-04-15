@@ -286,6 +286,86 @@ namespace leximaxIST {
             print_soft_clauses();
     }
     
+    // returns bounds of the optimal i-th max (lower bound, upper bound)
+    std::pair<int, int> Encoder::encode_bounds(int i, int sum)
+    {
+        int lb (0);
+        if (m_maxsat_presolve)
+            lb = encode_lower_bound(i, sum);
+        int ub (encode_upper_bound(i));
+        std::pair<int, int> bounds (lb, ub);
+        return bounds;
+    }
+    
+    // computes lower bounds of all objective functions and of the 
+    int Encoder::encode_lower_bound(int i, int sum)
+    {
+        const std::vector<int> &obj_vec (get_objective_vector());
+        std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
+        // components 0 to i-1 have been minimised and are fixed
+        int sum_fixed (0);
+        for (int j (0); j <= i - 1; ++j)
+            sum_fixed += obj_vec.at(j);
+        int sum_not_fixed (sum - sum_fixed);
+        int nb_components (m_num_objectives - i);
+        // ceiling of the division
+        int lb_soft (sum_not_fixed / nb_components);
+        if (sum % nb_components != 0)
+            ++lb_soft;
+        // lower bound on all objective functions
+        // in the last iteration (i == m_num_objectives - 1) lb_all = lb_soft, since
+        // f >= minimum >= lb_soft, for each objective f
+        // lb_all can not be improved (increased) with the existing information, because
+        // otherwise we could improve (increase) lb_soft,
+        // and it can not be improved with just the minimum value of the sum,
+        // because this information can not exclude the scenario with all objectives equal
+        int lb_all (0);
+        int ub (obj_vec.at(i));
+        if (i == m_num_objectives - 1)
+            lb_all = lb_soft;
+        else 
+            lb_all = sum_not_fixed - ub * (m_num_objectives - i - 1);
+        if (m_verbosity == 2)
+            std::cout << "c ------------ Lower bound encoding ------------\n";
+        if (m_verbosity >= 1) {
+            std::cout << "c Lower bound of optimum: " << lb_soft << '\n';
+            std::cout << "c Lower bound on all objectives: " << lb_all << '\n';
+        }
+        // TODO: constraint on the soft clauses + constraint on all obj funcs (through snet outputs)
+        // I know that (sum - fi)/(n-1) <= ub, which means we have a lower bound on all obj funcs
+        // limit the cost of the soft clauses
+
+        encode_lb_soft(lb_soft);
+        encode_lb_sorted(lb_all);
+        return lb_soft;
+    }
+    
+    void Encoder::encode_lb_soft(int lb)
+    {
+        if (lb > 0) {
+            int size (m_soft_clauses.size());
+            int sc (m_soft_clauses.at(size - lb));
+            add_hard_clause(-sc); // positive literal
+        }
+    }
+    
+    void Encoder::encode_lb_sorted(int lb)
+    {
+        if (m_verbosity == 2)
+            std::cout << "c ------------ Lower bound on Sorted Vecs ------------\n";
+        for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
+            int size (sorted_vec->size());
+            if (lb > 0) {
+                if (m_verbosity == 2) {
+                    std::cout << "c ----- Sorted Vec -----\n";
+                    std::cout << "c size: " << size << '\n';
+                    std::cout << "c lower bound: " << lb << '\n';
+                }
+                add_hard_clause(sorted_vec->at(size - lb)); // positive literal
+            }
+        }
+    }
+    
     // returns the upper bound of the optimal i-th max
     int Encoder::encode_upper_bound(int i)
     {
@@ -411,8 +491,8 @@ namespace leximaxIST {
             print_error_msg("Can not solve - single-objective problem");
             exit(EXIT_FAILURE);
         }
-        // check if problem is satisfiable and compute upper bound of first optimum
-        calculate_upper_bound();
+        // check if problem is satisfiable and compute bounds on first optimum
+        const int sum (presolve()); // sum is used to compute lower bounds
         if (m_status == 'u')
             return;
         // encode sorted vectors with sorting network
@@ -428,13 +508,13 @@ namespace leximaxIST {
             // encode the componentwise OR between sorted_relax vectors (except maybe in the last iteration)
             if (!m_simplify_last || i != m_num_objectives - 1)
                 componentwise_OR(i);
-            // encode upper bound obtained from presolving or previous iteration
-            int ub (encode_upper_bound(i));
+            // encode bounds obtained from presolving or previous iteration
+            const std::pair<int, int> &bounds (encode_bounds(i, sum));
             // call optimisation solver (external solver or internal optimisation with SAT solver)
             if (m_opt_mode == "external" || (i == m_num_objectives - 1 && m_simplify_last))
                 external_solve(i);
             else
-                internal_solve(i, ub); // can't use with simplify_last since it depends on order
+                internal_solve(i, bounds.first, bounds.second); // can't use with simplify_last since it depends on order
             // fix value of current maximum; in the end of last iteration there is no need for this
             if (i != m_num_objectives - 1)
                 fix_soft_vars(i);

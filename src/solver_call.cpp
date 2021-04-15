@@ -158,8 +158,9 @@ namespace leximaxIST {
             else if (m_lp_solver == "lpsolve")
                 read_lpsolve_output(model, sat, r);*/
         }
-        if (!sat) model.clear();
-            gzclose(of);
+        if (!sat)
+            model.clear();
+        gzclose(of);
     }
 
     void Encoder::split_command(const std::string &command, std::vector<std::string> &command_split)
@@ -203,36 +204,11 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::call_ext_solver()
+    // TODO: move the part of setting the command to the caller
+    void Encoder::call_ext_solver(const std::string &command)
     {
         if (m_verbosity >= 1)
             std::cout << "c Calling external solver..." << '\n';
-        std::string output_filename = m_file_name + ".sol";
-        const std::string error_filename = m_file_name + ".err";
-        std::string command;
-        if (m_ext_solver_cmd.empty()) {
-            print_error_msg("Empty external solver command");
-            if (!m_leave_tmp_files)
-                remove_tmp_files();
-            exit(EXIT_FAILURE);
-        }
-        command = m_ext_solver_cmd + " ";
-        if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
-            if (m_lp_solver == "cplex")
-                command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
-            if (m_lp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
-                command += m_file_name + " solve solution $";
-            if (m_lp_solver == "scip")
-                command += "-f " + m_file_name;
-            if (m_lp_solver == "gurobi") {
-                command = "gurobi_cl";
-                command += " Threads=1 ResultFile=" + output_filename;
-                command += " LogFile=\"\" LogToConsole=0 "; // disable logging
-                command += m_file_name;
-            }
-        }
-        else
-            command += m_file_name;
        /* pid_t pid (fork()); // TODO: maybe change this part to m_child_pid
         if (pid == -1) {
             std::string errmsg (strerror(errno));
@@ -319,9 +295,6 @@ namespace leximaxIST {
             print_error_msg("The external solver finished with non-zero error status: " + errmsg);
             return -1;
         }*/
-        if (m_formalism != "lp" || m_lp_solver != "gurobi")
-            command += " > " + output_filename;
-        command += " 2> " + error_filename;
         system(command.c_str());
         // set to zero, i.e. no external solver is currently running
         m_child_pid = 0;
@@ -395,12 +368,38 @@ namespace leximaxIST {
 
     void Encoder::external_solve(int i)
     {
-        write_solver_input(i);
+        write_solver_input(i+1);
         // call the solver
+        if (m_ext_solver_cmd.empty()) {
+            print_error_msg("Empty external solver command");
+            if (!m_leave_tmp_files)
+                remove_tmp_files();
+            exit(EXIT_FAILURE);
+        }
+        std::string command (m_ext_solver_cmd + " ");
+        if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
+            if (m_lp_solver == "cplex")
+                command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
+            if (m_lp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
+                command += m_file_name + " solve solution $";
+            if (m_lp_solver == "scip")
+                command += "-f " + m_file_name;
+            if (m_lp_solver == "gurobi") {
+                command = "gurobi_cl";
+                command += " Threads=1 ResultFile=" + m_file_name + ".sol";
+                command += " LogFile=\"\" LogToConsole=0 "; // disable logging
+                command += m_file_name;
+            }
+        }
+        else
+            command += m_file_name;
+        if (m_formalism != "lp" || m_lp_solver != "gurobi")
+            command += " > " + m_file_name + ".sol";
+        command += " 2> " + m_file_name + ".err";
         double initial_time, final_time;
         if (m_verbosity >= 1 && m_verbosity <= 2)
             initial_time = read_cpu_time();
-        call_ext_solver();
+        call_ext_solver(command);
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             final_time = read_cpu_time();
             std::cout << "c Minimisation CPU time: " << final_time - initial_time;
@@ -409,19 +408,13 @@ namespace leximaxIST {
         // read output of solver
         std::vector<int> model;
         read_solver_output(model);
-        // check if there is already a solution (from a previous iteration for example)
         // if ext solver is killed before it finds a sol, the problem might not be unsat
-        if (m_status == '?') {
-            m_solution = std::move(model);
-            m_status = (m_solution.empty()) ? 'u' : 's';
-        }
-        else if (!model.empty()) // if it is empty then something went wrong with ext solver
-            m_solution = std::move(model);
+        set_solution(model); // update solution if model is better in the leximax order
         if (!m_leave_tmp_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
-        if (m_status == 's' && m_verbosity >= 1 && m_verbosity <= 2)
+        if (m_verbosity >= 1 && m_verbosity <= 2)
             print_obj_vector();
     }
 
@@ -580,7 +573,6 @@ namespace leximaxIST {
             todo_vec[i] = *objective; // copy assignment
             obj_vector[i] = objective->size();
         }
-        std::vector<int> assumps;
         int obj_index (0);
         mss_add_falsified (solver, todo_vec, obj_vector);
         while (true /*stops when next_var == -1*/) {
@@ -593,7 +585,7 @@ namespace leximaxIST {
             int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
             if (next_var == -1)
                 break;
-            assumps.push_back (-next_var);
+            std::vector<int> assumps {-next_var};
             if (solver.solve(assumps)) {
                 m_solution = std::move(solver.model());
                 solver.model().clear();
@@ -604,17 +596,83 @@ namespace leximaxIST {
                 solver.addClause(next_var);
                 ++obj_vector[obj_index]; // correct obj value (it was decremented before)
             }
-            assumps.clear();
         }
         if (m_verbosity >= 1)
             print_obj_vector(obj_vector);
     }
     
-    void Encoder::calculate_upper_bound()
+    /* model is an optimal solution of the sum of objective functions problem
+     * The ceiling of the sum divided by the nb of obj functions is a lower bound
+     */
+    int Encoder::get_lower_bound(const std::vector<int> &model)
+    {
+        const std::vector<int> &obj_vec (get_objective_vector(model));
+        int sum (0);
+        for (int obj_value : obj_vec)
+            sum += obj_value;
+        // ceiling of the sum divided by m_num_objectives
+        int lb (sum / m_num_objectives);
+        if (sum % m_num_objectives != 0)
+            ++lb;
+        return lb;
+    }
+    
+    int Encoder::maxsat_presolve()
+    {
+        if (m_maxsat_psol_cmd.empty()) {
+            print_error_msg("Empty MaxSAT presolve command");
+            exit(EXIT_FAILURE);
+        }
+        // soft clauses are negations of all objective variables
+        m_soft_clauses.clear();
+        for (const std::vector<int> *obj : m_objectives) {
+            for (int x : *obj)
+                m_soft_clauses.push_back(-x);
+        }
+        write_wcnf_file(0);
+        std::string command (m_maxsat_psol_cmd);
+        std::string output_filename (m_file_name + ".sol");
+        command += " " + m_file_name;
+        command += " > " + output_filename;
+        command += " 2> " m_file_name + ".err";
+        call_ext_solver(command);
+        // read output
+        gzFile of = gzopen(output_filename.c_str(), "rb");
+        if (of == Z_NULL) {
+            print_error_msg("Can't open file '" + output_filename + "' for reading");
+            if (!m_leave_tmp_files)
+                remove_tmp_files();
+            exit(EXIT_FAILURE);
+        }
+        StreamBuffer r(of);
+        bool sat = false;
+        // choose the best solution in terms of the leximax order
+        std::vector<int> model (m_id_count + 1, 0);
+        read_sat_output(model, sat, r);
+        const int lb (get_lower_bound(model));
+        set_solution(model);
+        if (!m_leave_tmp_files)
+            remove_tmp_files();
+        // set m_file_name back to pid
+        reset_file_name();
+        if (m_verbosity >= 1 && m_verbosity <= 2)
+            print_obj_vector();
+        return lb;
+    }
+    
+    /* Presolve: Find solutions to get bounds on the optimal first maximum
+     * Returns the minimum value of the sum of the obj functions, if m_maxsat_presolve
+     * Otherwise returns 0
+     * Sets m_solution which can be used to retrieve the upper bound
+     */
+    int Encoder::presolve()
     {   
-        if (m_verbosity > 0 && m_verbosity <= 2)
-            std::cout << "c Presolving to obtain upper bound on optimal 1st maximum...\n";
-        double initial_time (read_cpu_time());
+        int sum (0);
+        double initial_time;
+        if (m_verbosity >= 1) {
+            std::cout << "c Presolving...\n";
+            initial_time = read_cpu_time();
+        }
         if (m_ub_presolve == 0) {
             if (m_verbosity >= 1)
                 std::cout << "c Calling SAT solver...\n";
@@ -629,10 +687,18 @@ namespace leximaxIST {
             }
             mss_solve();
         }
-        if (m_verbosity > 0 && m_verbosity <= 2) {
+        if (m_verbosity >= 1) {
             std::cout << "c Upper Bound Presolving CPU time: " << read_cpu_time() - initial_time;
             std::cout << "s\n";
         }
+        if (m_status == 's' && m_maxsat_presolve) {
+            if (m_verbosity >= 1) {
+                initial_time = read_cpu_time();
+                std::cout << "c Minimising sum of objective functions...\n";
+            }
+            sum = maxsat_presolve();
+        }
+        return sum;
     }
     
     inline void print_bounds(int lb, int ub)
@@ -711,12 +777,12 @@ namespace leximaxIST {
             print_nb_sat_calls(nb_calls);
     }
     
-    void Encoder::internal_solve(int i, int ub)
+    void Encoder::internal_solve(int i, int lb, int ub)
     {
         double initial_time;
         if (m_verbosity >= 1)
             initial_time = read_cpu_time();
-        search(i, 0, ub);
+        search(i, lb, ub);
         if (m_verbosity >= 1) {
             std::cout << "c Minimisation CPU time: " << read_cpu_time() - initial_time;
             std::cout << "s\n";

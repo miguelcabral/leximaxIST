@@ -49,6 +49,7 @@ namespace leximaxIST {
         m_simplify_last(false),
         m_status('?'),
         m_ub_presolve(0), // 0 - sat solver; 1 - MSS-seq; 2 - MSS-max
+        m_maxsat_presolve(false),
         //m_num_opts(0),
         m_multiplication_string(" "),
         m_sorting_net_size(0),
