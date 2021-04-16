@@ -51,9 +51,11 @@ public:
     const string&    get_formalism()   const { return formalism; }
     const string&    get_lp_solver()   const { return lp_solver; }
     const string&    get_opt_mode()   const { return opt_mode; }
+    const string&    get_maxsat_psol_cmd()   const { return maxsat_presolve; }
     int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }
+    int    get_maxsat_presolve() const { return maxsat_presolve; }
     int    get_simplify_last() const { return simplify_last; }
     
     
@@ -75,9 +77,11 @@ private:
     string temporary_directory;
     string formalism;
     int    leximax;
+    int    maxsat_presolve;
     int    simplify_last;
     string lp_solver;
     string opt_mode;
+    string maxsat_psol_cmd;
 };
 
 #endif	/* OPTIONS_HH */

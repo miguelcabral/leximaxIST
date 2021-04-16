@@ -643,7 +643,7 @@ namespace leximaxIST {
         std::string output_filename (m_file_name + ".sol");
         command += " " + m_file_name;
         command += " > " + output_filename;
-        command += " 2> " m_file_name + ".err";
+        command += " 2> " + m_file_name + ".err";
         call_ext_solver(command);
         // read output
         gzFile of = gzopen(output_filename.c_str(), "rb");

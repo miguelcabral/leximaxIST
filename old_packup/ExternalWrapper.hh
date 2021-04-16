@@ -106,7 +106,7 @@ private:
     string formalism;
     string lp_solver;
     string opt_mode;
-    
+    // TODO: add maxsat presolve
 
     vector< vector<LINT> > constraints;
     void   split();

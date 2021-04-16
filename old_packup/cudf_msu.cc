@@ -89,7 +89,7 @@ void print_usage(ostream &output) {
     output << "\t[OPTIONS] instance_file_name [output_file_name]"  << endl;
     output << "General Options:" << endl;
     output << "--help | -h \t print this message" << endl;
-    output << "--external-solver\t\t command for the external solver" << endl;
+    output << "--external-solver <string>\t\t command for the external solver" << endl;
     output << "\t\t\t\t\t default 'minisat+ -ansi -cs'"<< endl;
     output << "-f wcnf|opb|lp\t\t external solver formalism" << endl;
     output << "\t\t\t\t\t default 'wcnf'"<< endl;
@@ -122,6 +122,9 @@ void print_usage(ostream &output) {
     output << "\t 0 - presolve using one call to SAT solver (default)"<< endl;
     output << "\t 1 - presolve using greedy sequential minimisation"<< endl;
     output << "\t 2 - presolve using greedy maximum minimisation"<< endl;
+    output << "--maxsat-presolve\t\t upper bound AND lower bound presolve" << endl;
+    output << "\t\t\t\t\t default off"<< endl;
+    output << "--maxsat-psol-cmd <string>\t\t external MaxSAT solver command in presolve" << endl;
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;

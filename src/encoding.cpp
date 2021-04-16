@@ -309,7 +309,7 @@ namespace leximaxIST {
      */
     int Encoder::encode_lower_bound(int i, int sum)
     {
-        const std::vector<int> &obj_vec (get_objective_vector());
+        std::vector<int> obj_vec (get_objective_vector());
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
         // components 0 to i-1 have been minimised and are fixed
         int sum_fixed (0);

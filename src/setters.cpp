@@ -1,6 +1,7 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_error.h>
 #include <string>
+#include <algorithm> // std::sort
 #include <climits>
 #include <cstdlib>
 #include <sys/types.h>

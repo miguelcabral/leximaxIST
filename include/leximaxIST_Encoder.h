@@ -224,7 +224,7 @@ namespace leximaxIST
 
         void split_command(const std::string &command, std::vector<std::string> &command_split);
         
-        void call_ext_solver();
+        void call_ext_solver(const std::string &cmd);
         
         void read_solver_output(std::vector<int> &model);
         

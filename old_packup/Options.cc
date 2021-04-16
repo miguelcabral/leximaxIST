@@ -39,6 +39,7 @@ Options::Options()
 , trendy(0)
 , leave_temporary_files(0)
 , leximax(0)
+, maxsat_presolve(0)
 , simplify_last(0)
 , ub_encoding(0)
 , verbosity(0)
@@ -87,8 +88,10 @@ bool Options::parse(int argc,char **argv) {
        ,{"lpsol",    required_argument,  0, 506}
        ,{"ub-enc", required_argument,  0, 507}
        ,{"opt-mode", required_argument,  0, 508}
+       ,{"maxsat-psol-cmd", required_argument,  0, 509}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
+       ,{"maxsat-presolve",  no_argument,  &maxsat_presolve, 1}
        ,{"leximax", no_argument,  &leximax, 1}
        ,{"simplify-last", no_argument,  &simplify_last, 1}
        ,{0, 0, 0, 0}
@@ -141,6 +144,7 @@ bool Options::parse(int argc,char **argv) {
                     }
                     break;
             case 508: opt_mode = optarg; break;
+            case 509: maxsat_psol_cmd = optarg; break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);

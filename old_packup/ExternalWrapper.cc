@@ -477,6 +477,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_leave_tmp_files(leave_temporary_files);
      leximax_enc->set_formalism(formalism);
      leximax_enc->set_lp_solver(lp_solver); 
+     leximax_enc->set_maxsat_presolve(maxsat_presolve);
+     leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
      leximax_enc->set_problem(input_constraints, obj_functions); 
      leximax_enc->solve();
      char status (leximax_enc->get_status());
