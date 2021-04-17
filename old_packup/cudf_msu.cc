@@ -114,7 +114,7 @@ void print_usage(ostream &output) {
     output << "\t 2 - debug"<< endl;
     output << "--simplify-last\t\t use a simplified encoding in last iteration"<< endl;
     output << "\t\t\t\t\t default off"<< endl;
-    output << "--opt-mode external|bin\t\t optimisation mode"<< endl;
+    output << "--opt-mode external|bin|linear-su\t\t optimisation mode"<< endl;
     output << "\t 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
     output << "\t 'bin' - binary search with incremental SAT solver (default)"<< endl;
     output << "\t 'linear-su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;

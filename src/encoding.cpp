@@ -320,8 +320,8 @@ namespace leximaxIST {
         int lb_soft (0);
         if (sum_not_fixed > 0) {
             // ceiling of the division
-            int lb_soft (sum_not_fixed / nb_components);
-            if (sum % nb_components != 0)
+            lb_soft = sum_not_fixed / nb_components;
+            if (sum_not_fixed % nb_components != 0)
                 ++lb_soft;
         }
         int lb_all (0);
@@ -330,8 +330,12 @@ namespace leximaxIST {
             lb_all = lb_soft;
         else 
             lb_all = sum_not_fixed - ub * (m_num_objectives - i - 1);
-        if (m_verbosity == 2)
+        if (m_verbosity == 2) {
             std::cout << "c ------------ Lower bound encoding ------------\n";
+            std::cout << "c nb_components: " << nb_components << '\n';
+            std::cout << "c sum_fixed: " << sum_fixed << '\n';
+            std::cout << "c sum_not_fixed: " << sum_not_fixed << '\n';
+        }
         if (m_verbosity >= 1) {
             std::cout << "c Lower bound of optimum: " << lb_soft << '\n';
             std::cout << "c Lower bound on all objectives: " << lb_all << '\n';
@@ -346,6 +350,8 @@ namespace leximaxIST {
     
     void Encoder::encode_lb_soft(int lb)
     {
+        if (m_verbosity == 2 && lb > 0)
+            std::cout << "c ------------ Lower bound on soft clauses ------------\n";
         if (lb > 0) {
             int size (m_soft_clauses.size());
             int sc (m_soft_clauses.at(size - lb));
@@ -355,7 +361,7 @@ namespace leximaxIST {
     
     void Encoder::encode_lb_sorted(int lb)
     {
-        if (m_verbosity == 2)
+        if (m_verbosity == 2 && lb > 0)
             std::cout << "c ------------ Lower bound on Sorted Vecs ------------\n";
         for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
             int size (sorted_vec->size());

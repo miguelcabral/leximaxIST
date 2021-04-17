@@ -787,6 +787,13 @@ namespace leximaxIST {
     
     void Encoder::internal_solve(int i, int lb, int ub)
     {
+        if (m_verbosity >= 1) {
+            if (m_opt_mode == "bin")
+                std::cout << "c Binary ";
+            else if (m_opt_mode == "linear-su")
+                std::cout << "c Linear SAT-UNSAT ";
+            std::cout << " search of optimum with incremental SAT solver...\n";
+        }
         double initial_time;
         if (m_verbosity >= 1)
             initial_time = read_cpu_time();
