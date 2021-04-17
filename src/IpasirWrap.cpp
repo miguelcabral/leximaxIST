@@ -1,4 +1,4 @@
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <IpasirWrap.h>
 #include <ipasir.h>
 #include <cstdlib>

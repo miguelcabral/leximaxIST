@@ -1,7 +1,7 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_rusage.h>
 #include <leximaxIST_parsing_utils.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <IpasirWrap.h>
 #include <zlib.h>
 #include <sys/wait.h>
@@ -402,8 +402,7 @@ namespace leximaxIST {
         call_ext_solver(command);
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             final_time = read_cpu_time();
-            std::cout << "c Minimisation CPU time: " << final_time - initial_time;
-            std::cout << 's' << '\n';
+            print_time(final_time - initial_time, "c Minimisation CPU time: ");
         }
         // read output of solver
         std::vector<int> model;
@@ -699,16 +698,18 @@ namespace leximaxIST {
             }
             mss_solve();
         }
-        if (m_verbosity >= 1) {
-            std::cout << "c Upper Bound Presolving CPU time: " << read_cpu_time() - initial_time;
-            std::cout << "s\n";
-        }
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c Upper Bound Presolving CPU time: ");
         if (m_status == 's' && m_maxsat_presolve) {
             if (m_verbosity >= 1) {
-                initial_time = read_cpu_time();
                 std::cout << "c Minimising sum of objective functions...\n";
+                initial_time = read_cpu_time();
             }
             sum = maxsat_presolve();
+            if (m_verbosity >= 1) {
+                print_time(read_cpu_time() - initial_time, "c MaxSAT Presolving CPU time: ");
+                std::cout << "c Minimum value of the sum: " << sum << '\n';
+            }
         }
         return sum;
     }
@@ -742,11 +743,6 @@ namespace leximaxIST {
         }
     }
     
-    void print_sat_call_time(double t)
-    {
-        std::cout << "c SAT call CPU time: " << t << "s\n";
-    }
-    
     void Encoder::search(int i, int lb, int ub)
     {
         int nb_calls (0);
@@ -768,7 +764,7 @@ namespace leximaxIST {
             double initial_time (read_cpu_time());
             bool is_sat (m_sat_solver->solve(assumps));
             if (m_verbosity >= 1)
-                print_sat_call_time(read_cpu_time() - initial_time);
+                print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
             if (is_sat) { // sum of soft vars <= k
                 ub = k;
                 // get solution and refine upper bound
@@ -795,10 +791,8 @@ namespace leximaxIST {
         if (m_verbosity >= 1)
             initial_time = read_cpu_time();
         search(i, lb, ub);
-        if (m_verbosity >= 1) {
-            std::cout << "c Minimisation CPU time: " << read_cpu_time() - initial_time;
-            std::cout << "s\n";
-        }
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c Minimisation CPU time: ");
     }
     
     double read_cpu_time()

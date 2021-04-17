@@ -60,9 +60,11 @@ public:
     inline void set_leave_temporary_files(bool value=true);
     inline void set_leximax(bool value=true);
     inline void set_simplify_last(bool value=true);
+    inline void set_maxsat_presolve(bool value = true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
     inline void set_opt_mode (const string &mode);
+    inline void set_maxsat_psol_cmd (const string &cmd);
     inline void set_ub_encoding (int val);
     inline void set_verbosity (int val);
     void print_leximax_info();
@@ -102,11 +104,12 @@ private:
     bool   leave_temporary_files;
     bool   leximax;
     bool   simplify_last;
+    bool   maxsat_presolve;
     int verbosity;
     string formalism;
     string lp_solver;
     string opt_mode;
-    // TODO: add maxsat presolve
+    string maxsat_psol_cmd;
 
     vector< vector<LINT> > constraints;
     void   split();
@@ -141,12 +144,16 @@ inline void ExternalWrapper::set_leximax(bool value) {
     leximax = value; }
 inline void ExternalWrapper::set_simplify_last(bool value) {
     simplify_last = value; }
+inline void ExternalWrapper::set_maxsat_presolve(bool value) {
+    maxsat_presolve = value; }
 inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {
     formalism = format; }
 inline void ExternalWrapper::set_opt_mode (const string &mode) {
     opt_mode = mode; }
+inline void ExternalWrapper::set_maxsat_psol_cmd (const string &cmd) {
+    maxsat_psol_cmd = cmd; }
 inline void ExternalWrapper::set_verbosity (int val) {
     verbosity = val; }
 inline void ExternalWrapper::set_ub_encoding (int val) {

@@ -216,10 +216,12 @@ int main(int argc, char** argv) {
     solver.set_ub_encoding(options.get_ub_encoding());
     solver.set_verbosity(options.get_verbosity());
     solver.set_opt_mode(options.get_opt_mode());
+    solver.set_maxsat_psol_cmd(options.get_maxsat_psol_cmd());
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
     if (options.get_leximax())                         solver.set_leximax();
     if (options.get_simplify_last())                   solver.set_simplify_last();
+    if (options.get_maxsat_presolve())                 solver.set_maxsat_presolve();
     if (!options.get_lp_solver().empty())              solver.set_lp_solver(options.get_lp_solver());
     if (!options.get_formalism().empty())              solver.set_formalism(options.get_formalism());
     if (!options.get_temporary_directory().empty()) {

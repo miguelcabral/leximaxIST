@@ -1,6 +1,6 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_rusage.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <stdlib.h>
 #include <vector>
 #include <string>
@@ -525,10 +525,8 @@ namespace leximaxIST {
         }
         if (m_verbosity == 2)
             print_sorted_true();
-        if (m_verbosity > 0 && m_verbosity < 3) { // print total solving time
-            std::cout << "c Total solving CPU time: ";
-            std::cout << read_cpu_time() - initial_time << 's' << '\n';
-        }
+        if (m_verbosity >= 1) // print total solving time
+            print_time(read_cpu_time() - initial_time, "c Total solving CPU time: ");
     }
 
 }/* namespace leximaxIST */

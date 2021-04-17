@@ -51,7 +51,7 @@ public:
     const string&    get_formalism()   const { return formalism; }
     const string&    get_lp_solver()   const { return lp_solver; }
     const string&    get_opt_mode()   const { return opt_mode; }
-    const string&    get_maxsat_psol_cmd()   const { return maxsat_presolve; }
+    const string&    get_maxsat_psol_cmd()   const { return maxsat_psol_cmd; }
     int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
     int    get_leximax() const { return leximax; }

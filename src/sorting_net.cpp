@@ -1,5 +1,5 @@
 #include <leximaxIST_Encoder.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <leximaxIST_types.h>
 #include <utility>
 #include <vector>

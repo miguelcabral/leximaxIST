@@ -1,5 +1,6 @@
 #include <leximaxIST_Encoder.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
+#include <iostream>
 
 namespace leximaxIST {
 
@@ -55,6 +56,8 @@ namespace leximaxIST {
         m_sorting_net_size(0),
         m_opt_mode("bin"),
         m_sat_solver(nullptr)
-    {}
+    {
+        // Format decimal precision of std::cout
+    }
 
 }/* namespace leximaxIST */

@@ -1,6 +1,7 @@
 #include <leximaxIST_Encoder.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <string>
+#include <iostream>
 #include <algorithm> // std::sort
 #include <climits>
 #include <cstdlib>
@@ -10,7 +11,7 @@
 namespace leximaxIST {
     
     bool descending_order (int i, int j);
-
+    
     int Encoder::fresh()
     {
         // check for overflow

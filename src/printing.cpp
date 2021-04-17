@@ -1,5 +1,5 @@
 #include <leximaxIST_Encoder.h>
-#include <leximaxIST_error.h>
+#include <leximaxIST_printing.h>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -12,6 +12,17 @@ namespace leximaxIST {
     }
     
     std::string ordinal (int i);
+    
+    void print_time(double t, const std::string &s)
+    {
+        const std::ios_base::fmtflags old_f (std::cout.flags());
+        const std::streamsize old_p (std::cout.precision());
+        std::cout << std::fixed;
+        std::cout.precision(2);
+        std::cout << s << t << "s\n";
+        std::cout.flags(old_f);
+        std::cout.precision(old_p);
+    }
     
     // in this case we already have computed obj_vec
     void Encoder::print_obj_vector(const std::vector<int> &obj_vec) const
