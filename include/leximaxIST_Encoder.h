@@ -273,6 +273,8 @@ namespace leximaxIST
         
         void print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const;
         
+        void print_mss_info(int nb_calls) const;
+        
         void print_obj_vector(const std::vector<int> &obj_vec) const;
         
         void print_obj_vector() const; // this one computes the obj_vector

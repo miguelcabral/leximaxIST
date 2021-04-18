@@ -13,15 +13,46 @@ namespace leximaxIST {
     
     std::string ordinal (int i);
     
-    void print_time(double t, const std::string &s)
+    stream_config set_cout()
     {
-        const std::ios_base::fmtflags old_f (std::cout.flags());
-        const std::streamsize old_p (std::cout.precision());
+        stream_config old_config;
+        old_config.flags = std::cout.flags();
+        old_config.prec = std::cout.precision();
         std::cout << std::fixed;
         std::cout.precision(2);
+        return old_config;
+    }
+    
+    void set_cout(const stream_config &config)
+    {
+        std::cout.flags(config.flags);
+        std::cout.precision(config.prec);
+    }
+    
+    void print_time(double t, const std::string &s)
+    {
+        const stream_config &old_config (set_cout());
         std::cout << s << t << "s\n";
-        std::cout.flags(old_f);
-        std::cout.precision(old_p);
+        set_cout(old_config);
+    }
+    
+    /* print percentage of falsified objective variables by chance
+     * print number of calls to SAT solver
+     */
+    void Encoder::print_mss_info(int nb_calls) const
+    {
+        int total_nb_vars (0);
+        for (const std::vector<int> *obj : m_objectives)
+            total_nb_vars += obj->size();
+        const int nb_tested_vars (nb_calls - 1);
+        const int nb_lucky_vars (total_nb_vars - nb_tested_vars);
+        double percentage (static_cast<double>(nb_lucky_vars) / total_nb_vars);
+        percentage *= 100;
+        std::cout << "c Number of SAT calls: " << nb_calls << '\n';
+        std::cout << "c Automatically falsified variables: ";
+        const stream_config &old_config (set_cout());
+        std::cout << percentage << "% \n";
+        set_cout(old_config);
     }
     
     // in this case we already have computed obj_vec

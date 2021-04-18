@@ -555,11 +555,11 @@ namespace leximaxIST {
      */
     /* TODO: see how this behaves without add falsified
      * without add falsified the obj_vector is not correct
-     * Fix this - use get_objective_vector() <- probably not be too heavys
+     * Fix this - use get_objective_vector() <- probably not too heavy
      */
     void Encoder::mss_solve()
     {
-        // must use a different ipasir solver, because we add unit clauses of MSS
+        // Can not use m_sat_solver, because we add the unit clauses of the MSS
         IpasirWrap solver;
         for (const Clause *hard_cl : m_hard_clauses)
             solver.addClause(hard_cl);
@@ -579,6 +579,7 @@ namespace leximaxIST {
         }
         int obj_index (0);
         mss_add_falsified (solver, todo_vec, obj_vector);
+        int nb_calls (1);
         while (true /*stops when next_var == -1*/) {
             if (m_verbosity == 2)
                 print_mss_todo(todo_vec);
@@ -600,9 +601,12 @@ namespace leximaxIST {
                 solver.addClause(next_var);
                 ++obj_vector[obj_index]; // correct obj value (it was decremented before)
             }
+            ++nb_calls;
         }
-        if (m_verbosity >= 1)
+        if (m_verbosity >= 1) {
+            print_mss_info(nb_calls);
             print_obj_vector(obj_vector);
+        }
     }
     
     /* model is an optimal solution of the sum of objective functions problem

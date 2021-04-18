@@ -113,6 +113,7 @@ void print_usage(ostream &output) {
     output << "\t 1 - print general info"<< endl;
     output << "\t 2 - debug"<< endl;
     output << "--simplify-last\t\t use a simplified encoding in last iteration"<< endl;
+    output << "\t\t\t (Can not use with internal optimisation)" << endl;
     output << "\t\t\t\t\t default off"<< endl;
     output << "--opt-mode external|bin|linear-su\t\t optimisation mode"<< endl;
     output << "\t 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
