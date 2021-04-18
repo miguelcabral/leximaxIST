@@ -796,7 +796,7 @@ namespace leximaxIST {
                 std::cout << "c Binary ";
             else if (m_opt_mode == "linear-su")
                 std::cout << "c Linear SAT-UNSAT ";
-            std::cout << " search of optimum with incremental SAT solver...\n";
+            std::cout << "search of optimum with incremental SAT solver...\n";
         }
         double initial_time;
         if (m_verbosity >= 1)
