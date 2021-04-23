@@ -1429,11 +1429,13 @@ void Encoder::print_solution() {
         solution_file << "# beginning of solution from packup" << endl;
         CONSTANT IntVector& solution = solver.get_model();
         OUT(cerr << "solution:"; printer.print_solution(solution, cerr, true); cerr << endl;)
-        if (valuation) {
+        /*if (valuation) {
             print_valuation(cerr, solver.get_model());
             cerr << endl;
             cerr << "MSUNCore min unsat: " << solver.get_min_unsat_cost() << endl;
-        }
+        }*/
+        print_valuation(cerr, solver.get_model());
+        cerr << endl;
 
         FOR_EACH(PackageUnits::const_iterator, i, needed_units) {
             CONSTANT UnitVector &vs = *(i->second);
@@ -1970,7 +1972,7 @@ int Encoder::removed_score(IntVector& model)
             if (unit->installed) was_any_installed = true;
             if (is_installed) is_any_installed = true;
         }
-        if (was_any_installed && !is_any_installed) --removed_packages;
+        if (was_any_installed && !is_any_installed) ++removed_packages;
     }
     return removed_packages;
 }
@@ -1994,7 +1996,7 @@ int Encoder::notuptodate_score(IntVector& model)
             }
             if (installed) is_any_installed = true;
         }
-        if (is_any_installed && !latest_installed) { OUT(cerr << "nu: " << index->first << endl;) --violated; }
+        if (is_any_installed && !latest_installed) { OUT(cerr << "nu: " << index->first << endl;) ++violated; }
     }
     return violated;
 }
@@ -2012,7 +2014,7 @@ int Encoder::changed_score(IntVector& model)
             CONSTANT bool is_installed = (unit->needed && (model[unit->variable]>0));
             if ((unit->installed) != is_installed) version_set_changed=true;
         }
-        if (version_set_changed) --changed_version_sets;
+        if (version_set_changed) ++changed_version_sets;
     }
     return changed_version_sets;
 }
@@ -2040,7 +2042,7 @@ int Encoder::recommends_score(IntVector& model)
                 if (!sat) {
                     OUT (cerr << "unsatisfied recommends: ["<< unit->name  <<":" << unit->version<<"]";
                          collection_printing::print(clause,cerr); cerr<<endl;)
-                    --score;
+                    ++score;
                 }
             }
         }
@@ -2124,11 +2126,11 @@ void Encoder::paranoid_score(IntVector& model)
 
 void Encoder::print_valuation(ostream& output,IntVector& model)
 {
-    output <<"removed(" << removed_score(model) << ")," 
-           <<"not up-to-date (" << notuptodate_score(model) << ")," 
-           <<"recommends (" << recommends_score(model)  << ")," 
-           <<"new (" << new_score(model) <<")";
-
+    output <<"# removed: " << removed_score(model) << '\n'
+           <<"# not up-to-date: " << notuptodate_score(model) << '\n'
+           <<"# recommends: " << recommends_score(model)  << '\n' 
+           <<"# new: " << new_score(model) <<'\n'
+           <<"# changed: " << changed_score(model);
 }
 
 void Encoder::check_solution() {

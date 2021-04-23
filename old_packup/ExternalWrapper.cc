@@ -466,7 +466,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     leximax_enc = new leximaxIST::Encoder(); // WARNING: memory leak
+     leximax_enc = new leximaxIST::Encoder();
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_presolve(ub_encoding);
@@ -478,7 +478,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_formalism(formalism);
      leximax_enc->set_lp_solver(lp_solver); 
      leximax_enc->set_maxsat_presolve(maxsat_presolve);
-     leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
+     if (!maxsat_psol_cmd.empty())
+        leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
      leximax_enc->set_problem(input_constraints, obj_functions); 
      leximax_enc->solve();
      char status (leximax_enc->get_status());
