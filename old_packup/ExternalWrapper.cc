@@ -423,8 +423,9 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      	std::cerr << '\n';
      }
      std::vector<int> obj_vec_dbg;
-     // count number of falsified clauses
+     // count number of falsified clauses and print them
      for (BasicClauseVector &soft_cls: clause_split) {
+         //std::cerr << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
          int obj_val (0);
          for (BasicClause *clause : soft_cls) {
             bool falsified (true);
@@ -436,12 +437,18 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
                 if ((is_var && v > 0) || (!is_var && v < 0))
                     falsified = false;
             }
-            if (falsified)
+            if (falsified) {
                 ++obj_val;
+                // print clause
+                /*std::cerr << "FALSIFIED: ";
+                for (LINT lit : *clause)
+                    std::cerr << lit << ' ';
+                std::cerr << '\n';*/
+            }
          }
          obj_vec_dbg.push_back(obj_val);
      }
-     std::cerr << "# Objective vector DEBUG: ";
+     std::cerr << "# Number of falsified soft clauses (by objective): ";
      for (int o : obj_vec_dbg)
          std::cerr << o << ' ';
      std::cerr << '\n';

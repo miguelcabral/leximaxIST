@@ -786,7 +786,7 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
     FOR_EACH(PackageUnits::const_iterator,index,needed_units)
     {
         CONSTANT UnitVector& units=*(index->second);
-        if (units.size() <= 1) continue; //If only one version of the package exists, the criterion  is  satisfied automatically
+        if (units.size() <= 1) continue; // If only one version of the package exists, the criterion  is  satisfied automatically
         CONSTANT InstallableUnit*  latest_version = units[units.size()-1];
         CONSTANT Variable v_latest = latest_version->variable;
         if (opt_not_removed && not_removed.is_not_removed(index->first))
@@ -800,6 +800,8 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
         else {
             CONSTANT Variable any_will_be_installed = new_variable();
             vector<LINT> literals;
+            // Mikolas' encoding:
+            /*
             if (maximize) literals.push_back(neg(any_will_be_installed));
             for (UINT vi=0;vi<units.size()-1;++vi)
             {
@@ -815,7 +817,30 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
                  solver.output_unary_weighted_clause(auxiliary, up_to_date_weight);
              } else { //if any version is installed, then the latest one should be installed as well
                  solver.output_binary_weighted_clause(neg(any_will_be_installed), v_latest, up_to_date_weight);
-             }
+             }*/
+             // Miguel's encoding:
+             // encode any_will_be_installed (it is equivalent to the disjunction of versions)
+             vector<LINT> implication1;
+            implication1.push_back(neg(any_will_be_installed));
+            for (UINT vi=0;vi<units.size();++vi)
+            {
+                CONSTANT Variable vv=units[vi]->variable;
+                implication1.push_back(vv);
+                vector<LINT> implication2 {any_will_be_installed, neg(vv)};
+                solver.output_clause(implication2);
+            }
+            solver.output_clause(implication1);
+            // encode package is notuptodate (any_will_be_installed and neg(last version))
+            const Variable notuptodate = new_variable();
+            {
+                vector<LINT> implication1 {notuptodate, neg(any_will_be_installed), v_latest};
+                solver.output_clause(implication1);
+            }
+            // other implication
+            solver.output_binary_clause(neg(notuptodate), any_will_be_installed);
+            solver.output_binary_clause(neg(notuptodate), neg(v_latest));
+            if (maximize) solver.output_unary_weighted_clause(notuptodate, up_to_date_weight);
+            else solver.output_unary_weighted_clause(neg(notuptodate), up_to_date_weight);
         }
         total_weight+=up_to_date_weight;
     }
