@@ -786,7 +786,7 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
     FOR_EACH(PackageUnits::const_iterator,index,needed_units)
     {
         CONSTANT UnitVector& units=*(index->second);
-        if (units.size() <= 1) continue; //If only one version of the package exists, the criterion  is  satisfied automatically
+        if (units.size() <= 1) continue; // If only one version of the package exists, the criterion  is  satisfied automatically
         CONSTANT InstallableUnit*  latest_version = units[units.size()-1];
         CONSTANT Variable v_latest = latest_version->variable;
         if (opt_not_removed && not_removed.is_not_removed(index->first))
@@ -800,6 +800,8 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
         else {
             CONSTANT Variable any_will_be_installed = new_variable();
             vector<LINT> literals;
+            // Mikolas' encoding:
+            /*
             if (maximize) literals.push_back(neg(any_will_be_installed));
             for (UINT vi=0;vi<units.size()-1;++vi)
             {
@@ -815,7 +817,30 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
                  solver.output_unary_weighted_clause(auxiliary, up_to_date_weight);
              } else { //if any version is installed, then the latest one should be installed as well
                  solver.output_binary_weighted_clause(neg(any_will_be_installed), v_latest, up_to_date_weight);
-             }
+             }*/
+             // Miguel's encoding:
+             // encode any_will_be_installed (it is equivalent to the disjunction of versions)
+             vector<LINT> implication1;
+            implication1.push_back(neg(any_will_be_installed));
+            for (UINT vi=0;vi<units.size();++vi)
+            {
+                CONSTANT Variable vv=units[vi]->variable;
+                implication1.push_back(vv);
+                vector<LINT> implication2 {any_will_be_installed, neg(vv)};
+                solver.output_clause(implication2);
+            }
+            solver.output_clause(implication1);
+            // encode package is notuptodate (any_will_be_installed and neg(last version))
+            const Variable notuptodate = new_variable();
+            {
+                vector<LINT> implication1 {notuptodate, neg(any_will_be_installed), v_latest};
+                solver.output_clause(implication1);
+            }
+            // other implication
+            solver.output_binary_clause(neg(notuptodate), any_will_be_installed);
+            solver.output_binary_clause(neg(notuptodate), neg(v_latest));
+            if (maximize) solver.output_unary_weighted_clause(notuptodate, up_to_date_weight);
+            else solver.output_unary_weighted_clause(neg(notuptodate), up_to_date_weight);
         }
         total_weight+=up_to_date_weight;
     }
@@ -1429,11 +1454,13 @@ void Encoder::print_solution() {
         solution_file << "# beginning of solution from packup" << endl;
         CONSTANT IntVector& solution = solver.get_model();
         OUT(cerr << "solution:"; printer.print_solution(solution, cerr, true); cerr << endl;)
-        if (valuation) {
+        /*if (valuation) {
             print_valuation(cerr, solver.get_model());
             cerr << endl;
             cerr << "MSUNCore min unsat: " << solver.get_min_unsat_cost() << endl;
-        }
+        }*/
+        print_valuation(cerr, solver.get_model());
+        cerr << endl;
 
         FOR_EACH(PackageUnits::const_iterator, i, needed_units) {
             CONSTANT UnitVector &vs = *(i->second);
@@ -1970,7 +1997,7 @@ int Encoder::removed_score(IntVector& model)
             if (unit->installed) was_any_installed = true;
             if (is_installed) is_any_installed = true;
         }
-        if (was_any_installed && !is_any_installed) --removed_packages;
+        if (was_any_installed && !is_any_installed) ++removed_packages;
     }
     return removed_packages;
 }
@@ -1994,7 +2021,7 @@ int Encoder::notuptodate_score(IntVector& model)
             }
             if (installed) is_any_installed = true;
         }
-        if (is_any_installed && !latest_installed) { OUT(cerr << "nu: " << index->first << endl;) --violated; }
+        if (is_any_installed && !latest_installed) { OUT(cerr << "nu: " << index->first << endl;) ++violated; }
     }
     return violated;
 }
@@ -2012,7 +2039,7 @@ int Encoder::changed_score(IntVector& model)
             CONSTANT bool is_installed = (unit->needed && (model[unit->variable]>0));
             if ((unit->installed) != is_installed) version_set_changed=true;
         }
-        if (version_set_changed) --changed_version_sets;
+        if (version_set_changed) ++changed_version_sets;
     }
     return changed_version_sets;
 }
@@ -2040,7 +2067,7 @@ int Encoder::recommends_score(IntVector& model)
                 if (!sat) {
                     OUT (cerr << "unsatisfied recommends: ["<< unit->name  <<":" << unit->version<<"]";
                          collection_printing::print(clause,cerr); cerr<<endl;)
-                    --score;
+                    ++score;
                 }
             }
         }
@@ -2124,11 +2151,11 @@ void Encoder::paranoid_score(IntVector& model)
 
 void Encoder::print_valuation(ostream& output,IntVector& model)
 {
-    output <<"removed(" << removed_score(model) << ")," 
-           <<"not up-to-date (" << notuptodate_score(model) << ")," 
-           <<"recommends (" << recommends_score(model)  << ")," 
-           <<"new (" << new_score(model) <<")";
-
+    output <<"# removed: " << removed_score(model) << '\n'
+           <<"# not up-to-date: " << notuptodate_score(model) << '\n'
+           <<"# recommends: " << recommends_score(model)  << '\n' 
+           <<"# new: " << new_score(model) <<'\n'
+           <<"# changed: " << changed_score(model);
 }
 
 void Encoder::check_solution() {

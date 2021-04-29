@@ -39,8 +39,8 @@ LIBS += -lcadical
 LIBD += -L $(IPASIRDIR)/build
 
 # comment out if arbitrary precision not needed
-# LIBS+=-lgmpxx -lgmp
-# CFLAGS+=-DGMPDEF
+#LIBS+=-lgmpxx -lgmp
+#CFLAGS+=-DGMPDEF
 # CFLAGS+=-DCONV_DBG
 
 .PHONY: build release objs debug
@@ -56,6 +56,9 @@ LNFLAGS+=-pg
 LNFLAGS+=-g
 endif
 
+ifdef MAPPING
+CFLAGS += -DMAPPING
+endif
 
 # Miguel: should we put LNFLAGS += -O3 as well?
 #release : LNFLAGS += -O3

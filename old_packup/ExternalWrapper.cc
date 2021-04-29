@@ -422,15 +422,36 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
             std::cerr << o << ' ';
      	std::cerr << '\n';
      }
-     /*std::cerr << "# Number of guaranteed optimal values found: ";
-     std::cerr << leximax_enc->get_num_opts() << '\n';*/
-     /*if (ub_encoding != 0) {
-        std::cerr << "# Upper bound: " << leximax_enc->get_ub_vec().at(0) << '\n';
-        int largest (0);
-        for (const BasicClauseVector &soft_cls: clause_split)
-            largest = (soft_cls.size() > largest) ? soft_cls.size() : largest;
-        std::cerr << "# Trivial upper bound (size of largest objective): " << largest << '\n';
-     }*/
+     std::vector<int> obj_vec_dbg;
+     // count number of falsified clauses and print them
+     for (BasicClauseVector &soft_cls: clause_split) {
+         //std::cerr << "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n";
+         int obj_val (0);
+         for (BasicClause *clause : soft_cls) {
+            bool falsified (true);
+            // assume all are falsified
+            // If one literal is satisfied set falsified to false, otherwise the assumption holds
+            for (LINT lit : *clause) {
+                bool is_var (lit > 0);
+                int v (model.at(std::abs(lit)));
+                if ((is_var && v > 0) || (!is_var && v < 0))
+                    falsified = false;
+            }
+            if (falsified) {
+                ++obj_val;
+                // print clause
+                /*std::cerr << "FALSIFIED: ";
+                for (LINT lit : *clause)
+                    std::cerr << lit << ' ';
+                std::cerr << '\n';*/
+            }
+         }
+         obj_vec_dbg.push_back(obj_val);
+     }
+     std::cerr << "# Number of falsified soft clauses (by objective): ";
+     for (int o : obj_vec_dbg)
+         std::cerr << o << ' ';
+     std::cerr << '\n';
  }
  
  bool ExternalWrapper::solve_leximax() {
@@ -466,7 +487,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          ++j;
      }
      // create Leximax_encoder object
-     leximax_enc = new leximaxIST::Encoder(); // WARNING: memory leak
+     leximax_enc = new leximaxIST::Encoder();
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
      leximax_enc->set_ub_presolve(ub_encoding);
@@ -478,7 +499,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc->set_formalism(formalism);
      leximax_enc->set_lp_solver(lp_solver); 
      leximax_enc->set_maxsat_presolve(maxsat_presolve);
-     leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
+     if (!maxsat_psol_cmd.empty())
+        leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
      leximax_enc->set_problem(input_constraints, obj_functions); 
      leximax_enc->solve();
      char status (leximax_enc->get_status());
