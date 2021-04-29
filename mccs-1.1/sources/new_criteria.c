@@ -7,6 +7,7 @@
 
 
 #include <new_criteria.h>
+#include <iostream>
 
 // Criteria initialization
 void new_criteria::initialize(CUDFproblem *problem, abstract_solver *solver) {
@@ -83,6 +84,9 @@ CUDFcoefficient new_criteria::bound_range() { return CUDFabs(lambda_crit) * all_
 
 // Compute the criteria upper bound
 CUDFcoefficient new_criteria::upper_bound() { 
+  if (lambda_crit >= 0) {
+	std::cout << "# New UB: " << lambda_crit * all_uninstalled_versioned_virtual_packages.size() << std::endl;
+  }
   if (lambda_crit >= 0)
     return lambda_crit * all_uninstalled_versioned_virtual_packages.size(); 
   else

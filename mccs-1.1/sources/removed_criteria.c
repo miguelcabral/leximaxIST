@@ -8,6 +8,7 @@
 
 #include <removed_criteria.h>
 #include <constraint_generation.h>
+#include <iostream>
 
 // Criteria initialization
 void removed_criteria::initialize(CUDFproblem *problem, abstract_solver *solver) {
@@ -22,6 +23,7 @@ void removed_criteria::initialize(CUDFproblem *problem, abstract_solver *solver)
       else
 	ub++;
     }
+	std::cout << "# Removed UB: " << ub << std::endl;
 }
 
 // Computing the number of columns required to handle the criteria

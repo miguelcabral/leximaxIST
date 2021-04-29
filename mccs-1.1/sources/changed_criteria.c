@@ -7,7 +7,7 @@
 
 
 #include <changed_criteria.h>
-
+#include <iostream>
 // Criteria initialization
 void changed_criteria::initialize(CUDFproblem *problem, abstract_solver *solver) {
   this->problem = problem;
@@ -16,17 +16,19 @@ void changed_criteria::initialize(CUDFproblem *problem, abstract_solver *solver)
   for (CUDFVirtualPackageListIterator ivpkg = problem->all_virtual_packages->begin(); ivpkg != problem->all_virtual_packages->end(); ivpkg++) {
     int size = (*ivpkg)->all_versions.size();
     if (size > 0) {
+		ub++;
       all_versioned_virtual_packages.push_back((*ivpkg));
       if (size == 1) {
 	CUDFVersionedPackage *pkg = *((*ivpkg)->all_versions.begin());
 	if (pkg->installed) {
 	  if (criteria_opt_var) lb--; else range++;
-	} else
-	  ub++;
+	} //else
+	  //ub++;
       } else
 	range++;
     }
   }
+  std::cout << "# Changed UB: " << ub << std::endl;
 }
 
 // Computing the number of columns required to handle the criteria

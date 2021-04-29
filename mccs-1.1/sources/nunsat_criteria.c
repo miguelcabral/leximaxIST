@@ -8,6 +8,7 @@
 
 #include <nunsat_criteria.h>
 #include <cudf_reductions.h>
+#include <iostream>
 
 // Check property availability
 void nunsat_criteria::check_property(CUDFproblem *problem) {
@@ -103,6 +104,7 @@ void nunsat_criteria::initialize(CUDFproblem *problem, abstract_solver *solver) 
 	} // is propval
     }
   }
+  std::cout << "# Recommends UB: " << range << std::endl;
 }
 
 // Computing the number of columns required to handle the criteria

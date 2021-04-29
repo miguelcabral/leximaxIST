@@ -7,7 +7,7 @@
 
 
 #include <notuptodate_criteria.h>
-
+#include <iostream>
 
 // Implementation of the not up to date criteria
 // 
@@ -22,6 +22,8 @@ void notuptodate_criteria::initialize(CUDFproblem *problem, abstract_solver *sol
   for (CUDFVirtualPackageListIterator ivpkg = problem->all_virtual_packages->begin(); 
        ivpkg != problem->all_virtual_packages->end(); ivpkg++)
     if ((*ivpkg)->all_versions.size() > 1) ub++;
+
+  std::cout << "# Notuptodate UB: " << ub << std::endl;
 }
 
 // Computing the number of columns required to handle the criteria
