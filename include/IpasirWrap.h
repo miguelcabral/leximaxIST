@@ -27,10 +27,19 @@ namespace leximaxIST {
         std::vector<int>& model();
         const std::vector<int>& conflict() const;
 
+        void set_timeout(double t);
+        
+        bool timeout_reached() const;
+        
         int nVars() const;
 
-        bool solve(const std::vector<int>& assumps);
-        bool solve();
+        /* Returns the return value of the ipasir function:
+         * 10 if SAT
+         * 20 if UNSAT
+         * 0 if interrupted
+         */
+        int solve(const std::vector<int>& assumps);
+        int solve();
         
     private:
         //const int           _verb = 1;
@@ -38,6 +47,8 @@ namespace leximaxIST {
         void*              _s;
         std::vector<int> _model;
         std::vector<int> _conflict;
+        struct Timeout;
+        Timeout _timeout;
 
         void add(int p);
 

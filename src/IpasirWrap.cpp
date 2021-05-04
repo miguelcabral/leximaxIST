@@ -1,4 +1,5 @@
 #include <leximaxIST_printing.h>
+#include <leximaxIST_rusage.h>
 #include <IpasirWrap.h>
 #include <ipasir.h>
 #include <cstdlib>
@@ -7,9 +8,55 @@
 
 namespace leximaxIST {
     
-    IpasirWrap::IpasirWrap() : _nvars(0) { _s = ipasir_init(); }
+    struct IpasirWrap::Timeout {
+        double value;
+        bool was_reached;
+    };
+    
+    IpasirWrap::IpasirWrap() :
+    _nvars(0)
+    {
+        _s = ipasir_init();  
+        _timeout.was_reached = false;
+    }
     
     IpasirWrap::~IpasirWrap() { ipasir_release(_s); }
+    
+    // From the ipasir.h file:
+    /**
+    * The callback function is of the form "int terminate(void * state)"
+    *   - it returns a non-zero value if the solver should terminate.
+    *   - the solver calls the callback function with the parameter "state"
+    *     having the value passed in the ipasir_set_terminate function (2nd parameter).
+    */
+    int terminate(Timeout *timeout)
+    {
+        // getrusage; if cpu time is greater than timeout, return 1, otherwise return 0
+        if (read_cpu_time() > timeout->value) {
+            timeout->was_reached = true;
+            return 1;
+        }
+        else
+            return 0;
+    }
+    
+    /* Set _timeout and call ipasir_set_terminate
+     * if _timeout is <= 0, exit with an error
+     */
+    void IpasirWrap::set_timeout(double t)
+    {
+        if (t <= 0) {
+            print_error_msg("IpasirWrap::set_timeout's argument is not positive!");
+            exit(EXIT_FAILURE);
+        }
+        _timeout = t;
+        ipasir_set_terminate (_s, &_timeout, terminate);
+    }
+    
+    bool IpasirWrap::timeout_reached() const
+    {
+        return _timeout->was_reached;
+    }
     
     void IpasirWrap::addClause(const Clause *clause)  {
         if (clause == nullptr) {
@@ -40,17 +87,17 @@ namespace leximaxIST {
 
     int IpasirWrap::nVars() const {return _nvars;}
     
-    bool IpasirWrap::solve() {
+    int IpasirWrap::solve() {
         std::vector<int> assumps;
         return solve(assumps);
     }
 
-    bool IpasirWrap::solve(const std::vector<int>& assumps) {
+    int IpasirWrap::solve(const std::vector<int>& assumps) {
         for (auto l : assumps)
             ipasir_assume(_s, l);
 
         const int r = ipasir_solve(_s);
-        if (r != 10 && r != 20) {
+        if (r != 10 && r != 20 && r != 0) {
             print_error_msg("Something went wrong with ipasir_solve call, retv: " + r);
             exit(EXIT_FAILURE);
         }
@@ -61,13 +108,13 @@ namespace leximaxIST {
             for (int v = _nvars; v; v--) {
             _model[v] = ipasir_val(_s, v);
             }
-        } else {
+        } else if (r == 20) {
             for (auto l : assumps) {
                 if (ipasir_failed(_s, l))
                     _conflict.push_back(-l);
             }
         }
-        return r == 10;
+        return r;
     }
     
     void IpasirWrap::add(int p) {

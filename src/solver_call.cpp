@@ -550,6 +550,13 @@ namespace leximaxIST {
         }    
     }
     
+    void Encoder::enumerate_mss()
+    {
+        // TODO
+        // setup of timeout: terminate function SAT solver 
+        // find mss, add blocking clause and repeat, until I get unsat or I reach timeout
+    }
+    
     /* Compute an MSS of the problem with sum of obj funcs 
      * stop if the upper bound can't be improved
      */
@@ -557,7 +564,7 @@ namespace leximaxIST {
      * without add falsified the obj_vector is not correct
      * Fix this - use get_objective_vector() <- probably not too heavy
      */
-    void Encoder::mss_solve()
+    void Encoder::find_mss(const std::vector<Clause> &blocking_cls)
     {
         // Can not use m_sat_solver, because we add the unit clauses of the MSS
         IpasirWrap solver;
