@@ -29,8 +29,6 @@ namespace leximaxIST {
 
         void set_timeout(double t);
         
-        bool timeout_reached() const;
-        
         int nVars() const;
 
         /* Returns the return value of the ipasir function:
@@ -47,8 +45,7 @@ namespace leximaxIST {
         void*              _s;
         std::vector<int> _model;
         std::vector<int> _conflict;
-        struct Timeout;
-        Timeout _timeout;
+        double _timeout;
 
         void add(int p);
 

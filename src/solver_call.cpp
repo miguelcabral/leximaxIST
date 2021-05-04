@@ -553,8 +553,20 @@ namespace leximaxIST {
     void Encoder::enumerate_mss()
     {
         // TODO
-        // setup of timeout: terminate function SAT solver 
+        // setup of timeout: terminate function SAT solver
         // find mss, add blocking clause and repeat, until I get unsat or I reach timeout
+        // sat solve to determine if problem is satisfiable
+        int nb_msses (0);
+        std::vector<Clause> blocking_cls;
+        while (true) {
+            if (m_mss_nb_limit > 0 && nb_msses >= m_mss_nb_limit)
+                break;
+            int rv (find_mss(model, blocking_cls));
+            if (rv == 0)
+                break; // SAT solver call was interrupted
+            ++nb_msses;
+        }
+        for (int nb_msses (0); m_mss_nb_limit > 0  nb_msses < m_mss_nb_limit; ++nb_msses)
     }
     
     /* Compute an MSS of the problem with sum of obj funcs 
@@ -568,6 +580,7 @@ namespace leximaxIST {
     {
         // Can not use m_sat_solver, because we add the unit clauses of the MSS
         IpasirWrap solver;
+        // add timeout if m_mss_timeout > 0 (if it is enabled)
         for (const Clause *hard_cl : m_hard_clauses)
             solver.addClause(hard_cl);
         m_status = solver.solve() ? 's' : 'u';

@@ -8,16 +8,10 @@
 
 namespace leximaxIST {
     
-    struct IpasirWrap::Timeout {
-        double value;
-        bool was_reached;
-    };
-    
     IpasirWrap::IpasirWrap() :
     _nvars(0)
     {
         _s = ipasir_init();  
-        _timeout.was_reached = false;
     }
     
     IpasirWrap::~IpasirWrap() { ipasir_release(_s); }
@@ -29,13 +23,11 @@ namespace leximaxIST {
     *   - the solver calls the callback function with the parameter "state"
     *     having the value passed in the ipasir_set_terminate function (2nd parameter).
     */
-    int terminate(Timeout *timeout)
+    int terminate(double *timeout)
     {
         // getrusage; if cpu time is greater than timeout, return 1, otherwise return 0
-        if (read_cpu_time() > timeout->value) {
-            timeout->was_reached = true;
+        if (read_cpu_time() > timeout)
             return 1;
-        }
         else
             return 0;
     }
@@ -51,11 +43,6 @@ namespace leximaxIST {
         }
         _timeout = t;
         ipasir_set_terminate (_s, &_timeout, terminate);
-    }
-    
-    bool IpasirWrap::timeout_reached() const
-    {
-        return _timeout->was_reached;
     }
     
     void IpasirWrap::addClause(const Clause *clause)  {

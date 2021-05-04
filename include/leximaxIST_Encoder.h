@@ -48,9 +48,10 @@ namespace leximaxIST
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
         bool m_pareto_presolve; // enable finding pareto-optimal solutions with a maximum improvement search
         double m_pareto_timeout;
-        bool m_mss_presolve; // false: disable - one sat call, true: enable MSS enumeration with timeout
+        bool m_mss_presolve; // false: disable - one sat call, true: enable MSS enumeration with timeout/limit on the nb of MSSes
         bool m_mss_add_cls; // whether to use the models returned by the SAT solver in the construction of the MSS
-        double m_mss_timeout; // stop the MSS enumeration when this timeout is reached
+        double m_mss_timeout; // stop the MSS enumeration if this timeout is reached
+        int m_mss_nb_limit; // Do not enumerate, find this number of MSSes instead
         int m_mss_tolerance; // tolerance for choosing the next clause from a maximum objective
         bool m_maxsat_presolve; // to get lower bound (and upper bound) of optimum
         std::string m_maxsat_psol_cmd;
