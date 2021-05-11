@@ -416,8 +416,9 @@ namespace leximaxIST {
     }
     
     // upper bound on all objective functions (first and second iterations)
-    void Encoder::encode_ub_sorted(int first_max)
+    std::vector<Clause*> Encoder::encode_ub_sorted(int first_max)
     {
+        std::vector<Clause*> clauses;
         // refine upper bound on all obj functions (sorted vecs)
         if (m_verbosity == 2)
             std::cout << "c ------------ Upper bound on Sorted Vecs ------------\n";
@@ -429,9 +430,12 @@ namespace leximaxIST {
                 std::cout << "c size: " << size << '\n';
                 std::cout << "c upper bound: " << first_max << '\n';
             }
-            if (pos >= 0)
-                add_hard_clause(-sorted_vec->at(pos)); // neg sorted vec
+            if (pos >= 0) {
+                const Clause *c (add_hard_clause(-sorted_vec->at(pos))); // neg sorted vec
+                clauses.push_back(c);
+            }
         }
+        return clauses;
     }
     
     void Encoder::fix_only_some()

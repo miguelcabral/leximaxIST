@@ -5,7 +5,7 @@
 namespace leximaxIST {
 
     // this uses copy constructor
-    void Encoder::add_hard_clause(const Clause &cl)
+    const Clause* Encoder::add_hard_clause(const Clause &cl)
     {
         if (cl.empty()) {
             print_error_msg("Empty hard clause");
@@ -16,24 +16,25 @@ namespace leximaxIST {
         m_sat_solver->addClause(clptr);
         if (m_verbosity == 2)
             print_clause(std::cout, clptr, "c ");
+        return clptr;
     }
 
-    void Encoder::add_hard_clause(int l)
+    const Clause* Encoder::add_hard_clause(int l)
     {
         const Clause cl {l};
-        add_hard_clause(cl);
+        return add_hard_clause(cl);
     }
     
-    void Encoder::add_hard_clause(int l1, int l2)
+    const Clause* Encoder::add_hard_clause(int l1, int l2)
     {
         const Clause cl {l1, l2};
-        add_hard_clause(cl);
+        return add_hard_clause(cl);
     }
     
-    void Encoder::add_hard_clause(int l1, int l2, int l3)
+    const Clause* Encoder::add_hard_clause(int l1, int l2, int l3)
     {
         const Clause cl {l1, l2, l3};
-        add_hard_clause(cl);
+        return add_hard_clause(cl);
     }
         
     Encoder::Encoder() : 

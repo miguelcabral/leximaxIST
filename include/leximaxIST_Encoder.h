@@ -48,6 +48,8 @@ namespace leximaxIST
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
         bool m_pareto_presolve; // enable finding pareto-optimal solutions with a maximum improvement search
         double m_pareto_timeout;
+        bool m_pareto_incremental; // whether to use the same SAT solver in every Pareto-optimal solution search
+        bool m_truly_pareto; // whether to continue to minimise to Pareto optimality, even though the maximum can not be improved
         bool m_mss_presolve; // false: disable - one sat call, true: enable MSS enumeration with timeout/limit on the nb of MSSes
         int m_mss_add_cls; // how to use the models returned by the SAT solver in the construction of the MSS
         bool m_mss_incremental; // (truly incremental enumeration) - whether to use the same SAT solver in every MSS search
@@ -135,13 +137,13 @@ namespace leximaxIST
         
         // constructors.cpp
         
-        void add_hard_clause(const Clause &c);
+        const Clause* add_hard_clause(const Clause &c);
         
-        void add_hard_clause(int l);
+        const Clause* add_hard_clause(int l);
         
-        void add_hard_clause(int l1, int l2);
+        const Clause* add_hard_clause(int l1, int l2);
         
-        void add_hard_clause(int l1, int l2, int l3);
+        const Clause* add_hard_clause(int l1, int l2, int l3);
         
         // destructor.cpp
         
@@ -287,6 +289,8 @@ namespace leximaxIST
         void print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const;
         
         void print_mss_info(int nb_calls) const;
+        
+        void print_mss_enum_info() const;
         
         void print_obj_vector(const std::vector<int> &obj_vec) const;
         
