@@ -14,6 +14,7 @@
 #include <fstream>
 #include <cstring> // for strerror()
 #include <iostream>
+#include <limits> // std::numeric_limits<double>::max()
 #include <vector>
 #include <algorithm> // std::max_element, std::sort
 #include <sstream>
@@ -408,13 +409,11 @@ namespace leximaxIST {
         std::vector<int> model;
         read_solver_output(model);
         // if ext solver is killed before it finds a sol, the problem might not be unsat
-        set_solution(model); // update solution if model is better in the leximax order
+        set_solution(model, true); // update solution and print obj vector
         if (!m_leave_tmp_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
-        if (m_verbosity >= 1 && m_verbosity <= 2)
-            print_obj_vector();
     }
 
     void Encoder::write_lp_file(int i)
@@ -478,8 +477,9 @@ namespace leximaxIST {
             m_status = 'u';
     }
     
-    void mss_choose_obj_seq (std::vector<std::vector<int>> &todo_vec, int &obj_index)
+    int mss_choose_obj_seq (std::vector<std::vector<int>> &todo_vec)
     {
+        int obj_index;
         // obj_index points to the first objective whose todo is not empty
         for (obj_index = 0; obj_index < todo_vec.size(); ++obj_index) {
             if (!todo_vec.at(obj_index).empty())
@@ -487,6 +487,7 @@ namespace leximaxIST {
         }
         if (obj_index == todo_vec.size())
             obj_index = -1;
+        return obj_index;
     }
     
     void erase_and_decrement (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
@@ -498,135 +499,217 @@ namespace leximaxIST {
         --obj_vector[obj_index];
     }
     
-    void mss_choose_obj_max (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index)
+    int mss_choose_obj_max (std::vector<std::vector<int>> &todo_vec, std::vector<int> &upper_bounds)
     {
-        std::vector<int> max_index_set;
-        int max (*(std::max_element(obj_vector.begin(), obj_vector.end())));
+        int max (*std::max_element(upper_bounds.begin(), upper_bounds.end()));
         for (int i (0); i < todo_vec.size(); ++i) {
-            if (obj_vector.at(i) == max)
-                max_index_set.push_back(i);
-        }
-        // select a todo set with an index in max_index_set
-        obj_index = max_index_set.at(0);
-        // if one of the todos corresponding to max is empty, the ub can't be improved
-        for (int i : max_index_set) {
-            if (todo_vec.at(i).empty()) {
-                obj_index = -1;
-                break;
-            }
+            if (upper_bounds.at(i) == max)
+                return i;
         }
     }
     
-    int Encoder::mss_choose_var (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index) const
+    /* choose next obj in todo using an heuristic - choose the maximum if
+     * the ratio between the min and the max of upper_bounds is greater than m_mss_tolerance
+     * returns the index of the objective that we will try to minimise next
+     * if the maximum can not be improved, then stop, that is, return -1
+     * check how much each objective can decrease: check todo and upper_bounds
+     * if there is an objective that can not, in the best case, be less than best_max
+     * then stop - return -1
+     */
+    int Encoder::mss_choose_obj (std::vector<std::vector<int>> &todo_vec, const std::vector<int> &upper_bounds, const int best_max) const
     {
-        if (m_ub_presolve == 1)
-            mss_choose_obj_seq (todo_vec, obj_index);
-        else if (m_ub_presolve == 2)
-            mss_choose_obj_max (todo_vec, obj_vector, obj_index);
-        // -1 means stop computing mss - possibly because the upper bound can't be improved
-        if (obj_index == -1)
-            return -1;
-        int next_var (todo_vec.at(obj_index).at(0));
-        erase_and_decrement (todo_vec, obj_vector, obj_index);
-        return next_var;
+        // first check if the maximum can not be improved
+        for (int j (0); j < m_num_objectives; ++j) {
+            const int ub (upper_bounds.at(j));
+            const int todo_size (todo_vec.at(j).size());
+            if (ub - todo_size >= best_max)
+                return -1;
+        }
+        const int max (*std::max_element(upper_bounds.begin(), upper_bounds.end()));
+        const int min (*std::min_element(upper_bounds.begin(), upper_bounds.end()));
+        const int ratio ((max - min) * 100 / max);
+        if (ratio >= m_mss_tolerance)
+            return mss_choose_obj_max (todo_vec, upper_bounds);
+        else
+            return mss_choose_obj_seq (todo_vec);
     }
     
-    // add falsified variables in todo to hard clauses of sat solver; decrement obj_vector accordingly
-    void Encoder::mss_add_falsified (IpasirWrap &solver, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const
+    /* Add satisfied soft clauses (or falsified variables) to the mss
+     * Which clauses are added to the mss is defined by parameter m_mss_add_cls
+     * remove those variables from todo_vec
+     * update assumps
+     * update upper_bounds
+     */
+    void Encoder::mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<int> &upper_bounds, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps)
     {
+        std::vector<std::vector<int>> vars_to_add (m_num_objectives); // by objective
+        // find all satisfied soft clauses
         for (int j (0); j < m_num_objectives; ++j) {
             std::vector<int> &todo (todo_vec[j]);
             for (size_t i (0); i < todo.size(); ++i) {
                 int var (todo.at(i));
-                if (m_solution[var] < 0) {
-                    solver.addClause(-var);
-                    // decrement objective value
-                    --obj_vector[j];
+                if (model[var] < 0)
+                    vars_to_add.at(j).push_back(i);
+            }
+        }
+        // add the clauses to the mss according to m_mss_add_cls
+        if (m_mss_add_cls == 0 || m_mss_add_cls == 1) { // 0 - add all; 1 - add only some
+            int min_size (vars_to_add.at(0).size());
+            for (int j (1); j < m_num_objectives; ++j) {
+                const int new_size (vars_to_add.at(j).size());
+                if (new_size < min_size)
+                    min_size = new_size;
+            }
+            for (int j (0); j < m_num_objectives; ++j) {
+                const std::vector<int> add (vars_to_add.at(j));
+                std::vector<int> &todo (todo_vec[j]);
+                const int limit_to_add (m_mss_add_cls == 0 ? add.size() : min_size);
+                for (const int k (0); k < limit_to_add; ++k) {
+                    const int i (add.at(k));
+                    int var (todo.at(i));
+                    // add clause to the mss
+                    if (m_mss_incremental)
+                        assumps.push_back(-var);
+                    else
+                        solver->addClause(-var);
                     // erase element in todo by moving last element to current position
                     todo.at(i) = todo.back();
                     todo.pop_back();
+                    // update upper bounds
+                    --upper_bounds.at(j);
                 }
             }
-        }    
+        }
+        else if (m_mss_add_cls == 2) { // do not add
+            // nothing to do here
+        }
     }
     
-    void Encoder::enumerate_mss()
+    
+    /* MSS enumeration, using basic/extended linear search
+     * MSS search: if the maximum can not be improved, stop
+     * Thus, we will actually get subsets of the MSSes
+     * Enumeration stops if a limit of time or number of MSSes is reached
+     * Returns the number of MSSes found
+     */
+    int Encoder::mss_enumerate()
     {
-        // TODO
-        // setup of timeout: terminate function SAT solver
-        // find mss, add blocking clause and repeat, until I get unsat or I reach timeout
-        // sat solve to determine if problem is satisfiable
+        if (m_verbosity >= 1)
+            print_mss_enum_info();
         int nb_msses (0);
+        std::vector<int> obj_vec (get_objective_vector());
+        int best_max (*std::max_element(obj_vec.begin(), obj_vec.end()));
         std::vector<Clause> blocking_cls;
+        IpasirWrap *solver (nullptr);
         while (true) {
             if (m_mss_nb_limit > 0 && nb_msses >= m_mss_nb_limit)
                 break;
-            int rv (find_mss(model, blocking_cls));
-            if (rv == 0)
-                break; // SAT solver call was interrupted
+            IpasirWrap new_solver;
+            if (m_mss_incremental)
+                solver = m_sat_solver;
+            else {
+                solver = &new_solver;
+                for (const Clause *hard_cl : m_hard_clauses)
+                    solver->addClause(hard_cl);
+                for (const Clause &c : blocking_cls)
+                    solver->addClause(c);
+            }
+            std::vector<int> model;
+            double initial_time (solver->set_timeout(m_mss_timeout));
+            int rv (mss_linear_search(model, solver, best_max));
+            // remove timeout
+            solver->set_timeout(std::numeric_limits<double>::max());
+            if (rv != 10)
+                break; // SAT call was interrupted or UNSAT (all msses were found)
+            // generate blocking clause
+            // since we only have unit soft clauses, we can use both MCS or MSS
+            // so I will use the set that produces the smallest blocking clause
+            Clause block_mcs; // at least one clause of the MCS must be true
+            Clause block_mss; // at least one clause of the MSS must be false
+            for (const std::vector<int> *obj : m_objectives) {
+                for (int var : *obj) {
+                    if (model.at(var) > 0) // var is true -> part of MCS
+                        block_mcs.push_back(-var);
+                    else
+                        block_mss.push_back(var);
+                }
+            }
+            const bool mcs_is_smaller (block_mcs.size() < block_mss.size());
+            if (m_mss_incremental)
+                add_hard_clause(mcs_is_smaller ? block_mcs : block_mss);
+            else
+                blocking_cls.push_back(mcs_is_smaller ? block_mcs : block_mss);
             ++nb_msses;
+            if (m_verbosity >= 1)
+                print_time(read_cpu_time() - initial_time, "c Single MSS CPU time: ");
         }
-        for (int nb_msses (0); m_mss_nb_limit > 0  nb_msses < m_mss_nb_limit; ++nb_msses)
+        if (m_verbosity >= 1)
+            std::cout << "c Number of MSS subsets found: " << nb_msses << '\n';
     }
     
     /* Compute an MSS of the problem with sum of obj funcs 
-     * stop if the upper bound can't be improved
+     * Stop if the upper bound can't be improved
+     * returns the return value of the sat solver
      */
-    /* TODO: see how this behaves without add falsified
-     * without add falsified the obj_vector is not correct
-     * Fix this - use get_objective_vector() <- probably not too heavy
-     */
-    void Encoder::find_mss(const std::vector<Clause> &blocking_cls)
+    int Encoder::mss_linear_search(std::vector<int> &model, IpasirWrap *solver, int &best_max)
     {
-        // Can not use m_sat_solver, because we add the unit clauses of the MSS
-        IpasirWrap solver;
-        // add timeout if m_mss_timeout > 0 (if it is enabled)
-        for (const Clause *hard_cl : m_hard_clauses)
-            solver.addClause(hard_cl);
-        m_status = solver.solve() ? 's' : 'u';
-        if (m_status == 'u')
-            return;
-        m_solution = std::move(solver.model());
-        // solver.model() is in a valid but unspecified state - so clear it
-        solver.model().clear();
-        // obj_vector starts as if all variables are true and is decremented along the way
-        std::vector<int> obj_vector (m_num_objectives);
-        std::vector<std::vector<int>> todo_vec (m_num_objectives); // fill constructor
+        // is there another MSS?
+        std::vector<int> assumps;
+        int rv (solver->solve());
+        if (rv != 10)
+            return rv; // UNSAT or interrupted
+        model = solver->model();
+        const std::vector<int> &obj_vec (set_solution(model, false));
+        best_max = *std::max_element(obj_vec.begin(), obj_vec.end()); 
+        std::vector<std::vector<int>> todo_vec (m_num_objectives);
+        std::vector<int> upper_bounds (m_num_objectives);
         for (int i (0); i < m_num_objectives; ++i) {
             const std::vector<int> *objective (m_objectives[i]);
             todo_vec[i] = *objective; // copy assignment
-            obj_vector[i] = objective->size();
+            obj_vector.at(i) = objective->size();
         }
-        int obj_index (0);
-        mss_add_falsified (solver, todo_vec, obj_vector);
+        mss_add_falsified (solver, model, upper_bounds, todo_vec, assumps);
         int nb_calls (1);
-        while (true /*stops when next_var == -1*/) {
+        while (true /*stops when obj_index == -1 or if SAT call is interrupted*/) {
             if (m_verbosity == 2)
                 print_mss_todo(todo_vec);
-            /* choose var in todo using an heuristic
-             * var is removed from todo
-             * The obj value in obj_vector is decremented
-             * obj_index is set to the objective that contains var */
-            int next_var (mss_choose_var (todo_vec, obj_vector, obj_index));
-            if (next_var == -1)
+            int obj_index (mss_choose_obj (todo_vec, upper_bounds, best_max));
+            if (obj_index == -1)
                 break;
-            std::vector<int> assumps {-next_var};
-            if (solver.solve(assumps)) {
-                m_solution = std::move(solver.model());
-                solver.model().clear();
-                solver.addClause(-next_var);
-                mss_add_falsified (solver, todo_vec, obj_vector);
+            const int next_var (todo_vec.at(obj_index).at(0));
+            std::vector<int> assumps.push_back(-next_var);
+            rv = solver->solve(assumps);
+            if (rv == 0)
+                break;
+            if (rv == 10) { // SAT
+                model = solver->model();
+                const std::vector<int> &obj_vec (set_solution(model, false));
+                best_max = *std::max_element(obj_vec.begin(), obj_vec.end());
+                // add clause to the mss
+                if (!m_mss_incremental) {
+                    assumps.pop_back();
+                    solver->addClause(-next_var);
+                }
+                // update upper bounds
+                --upper_bounds.at(j);
+                mss_add_falsified (solver, model, upper_bounds, todo_vec, assumps);
             }
-            else {
-                solver.addClause(next_var);
-                ++obj_vector[obj_index]; // correct obj value (it was decremented before)
+            else { // UNSAT
+                // add clause to the mcs (backbone literals)
+                assumps.pop_back();
+                if (!m_mss_incremental)
+                    solver->addClause(next_var);
             }
+            // erase element in todo by moving last element to current position
+            todo_vec.at(obj_index).at(0) = todo_vec.at(obj_index).back();
+            todo_vec.at(obj_index).pop_back();
             ++nb_calls;
         }
         if (m_verbosity >= 1) {
             print_mss_info(nb_calls);
-            print_obj_vector(obj_vector);
+            print_obj_vector(get_objective_vector(model));
         }
+        return rv;
     }
     
     /* model is an optimal solution of the sum of objective functions problem
@@ -685,14 +768,75 @@ namespace leximaxIST {
         int sum (0);
         for (int obj_value : obj_vec)
             sum += obj_value;
-        set_solution(model);
+        set_solution(model, true); // update m_solution if this model is better and print obj_vec
         if (!m_leave_tmp_files)
             remove_tmp_files();
         // set m_file_name back to pid
         reset_file_name();
-        if (m_verbosity >= 1 && m_verbosity <= 2)
-            print_obj_vector(obj_vec);
         return sum;
+    }
+    
+    void Encoder::pareto_presolve()
+    {
+        if (m_verbosity >= 1)
+            std::cout << "c Searching for Pareto optimal solutions...\n";
+        double initial_time (m_sat_solver->set_timeout(m_pareto_timeout));
+        while (true) {
+            int rv (pareto_search());
+            if (rv == 0)
+                break;
+            // check if the maximum can be improved
+            rv = m_sat_solver->solve();
+            if (rv != 10)
+                break;
+            set_solution(m_sat_solver->model(), false);
+        }
+        // unset timeout
+        double final_time (m_sat_solver->set_timeout(std::numeric_limits<double>::max()));
+        if (m_verbosity >= 1)
+            print_time(final_time - initial_time, "c Pareto Presolving CPU time: ");
+    }
+    
+    // explanation in here
+    int Encoder::pareto_search()
+    {
+        double initial_time (read_cpu_time());
+        std::vector<int> assumps;
+        int nb_calls (0);
+        while (true/* ends when unsat or interrupted */) {
+            obj_vec = get_objective_vector();
+            max = *std::max_element(obj_vec.begin(), obj_vec.end());
+            if (max == 0)
+                return 0; // as if it was interrupted - stop right away
+            // try to get a pareto-better solution by trying to decrease the maximum
+            // all objs less than or equal to max-1 (hard)
+            encode_ub_sorted(max - 1);
+            // fix values of other objectives in assumps
+            // each obj less than or equal to its current value (assumps)
+            for (int i (0); i < m_num_objectives; ++i) {
+                const std::vector<int> *sorted_vec (m_sorted_vecs.at(i));
+                const int obj_val (obj_vec.at(i));
+                int size (sorted_vec->size());
+                int pos (size - 1 - obj_val); // pos might be < 0
+                if (m_verbosity == 2) {
+                    std::cout << "c ----- Sorted Vec " << i << " -----\n";
+                    std::cout << "c size: " << size << '\n';
+                    std::cout << "c upper bound: " << obj_val << '\n';
+                }
+                if (pos >= 0)
+                    assumps.push_back(-sorted_vec->at(pos)); // neg sorted vec
+            }
+            int rv (m_sat_solver->solve(assumps));
+            ++nb_calls;
+            if (rv != 10)
+                return rv;
+            set_solution(m_sat_solver->model, false);
+        }
+        if (m_verbosity >= 1) {
+            print_obj_vector();
+            print_time(read_cpu_time() - initial_time, "c Single Pareto Optimal Solution CPU time: ");
+            std::cout << "c Number of SAT calls: " << nb_calls << '\n';
+        }
     }
     
     /* Presolve: Find solutions to get bounds on the optimal first maximum
@@ -703,31 +847,19 @@ namespace leximaxIST {
     int Encoder::presolve()
     {   
         int sum (0);
-        double initial_time;
         if (m_verbosity >= 1) {
             std::cout << "c Presolving...\n";
-            initial_time = read_cpu_time();
+            std::cout << "c Checking satisfiability - calling SAT solver...\n";
         }
-        if (m_ub_presolve == 0) {
-            if (m_verbosity >= 1)
-                std::cout << "c Calling SAT solver...\n";
-            sat_solve();
-        }
-        else if (m_ub_presolve == 1 || m_ub_presolve == 2) {
-            if (m_verbosity >= 1) {
-                if (m_ub_presolve == 1)
-                    std::cout << "c Greedy sequential minimisation...\n";
-                if (m_ub_presolve == 2)
-                    std::cout << "c Greedy maximum minimisation...\n";
-            }
-            mss_solve();
-        }
-        if (m_verbosity >= 1)
-            print_time(read_cpu_time() - initial_time, "c Upper Bound Presolving CPU time: ");
-        if (m_status == 's' && m_maxsat_presolve) {
+        sat_solve();
+        if (m_status == 'u')
+            return 0;
+        if (m_mss_presolve)
+            mss_enumerate();
+        if (m_maxsat_presolve) {
             if (m_verbosity >= 1) {
                 std::cout << "c Minimising sum of objective functions...\n";
-                initial_time = read_cpu_time();
+                double initial_time = read_cpu_time();
             }
             sum = maxsat_presolve();
             if (m_verbosity >= 1) {

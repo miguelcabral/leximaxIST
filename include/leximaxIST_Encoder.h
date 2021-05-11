@@ -49,9 +49,10 @@ namespace leximaxIST
         bool m_pareto_presolve; // enable finding pareto-optimal solutions with a maximum improvement search
         double m_pareto_timeout;
         bool m_mss_presolve; // false: disable - one sat call, true: enable MSS enumeration with timeout/limit on the nb of MSSes
-        bool m_mss_add_cls; // whether to use the models returned by the SAT solver in the construction of the MSS
+        int m_mss_add_cls; // how to use the models returned by the SAT solver in the construction of the MSS
+        bool m_mss_incremental; // (truly incremental enumeration) - whether to use the same SAT solver in every MSS search
         double m_mss_timeout; // stop the MSS enumeration if this timeout is reached
-        int m_mss_nb_limit; // Do not enumerate, find this number of MSSes instead
+        int m_mss_nb_limit; // stop the enumeration when this number of MSSes is reached
         int m_mss_tolerance; // tolerance for choosing the next clause from a maximum objective
         bool m_maxsat_presolve; // to get lower bound (and upper bound) of optimum
         std::string m_maxsat_psol_cmd;
@@ -206,17 +207,23 @@ namespace leximaxIST
         
         // solver_call.cpp
         
+        void pareto_presolve();
+        
+        int pareto_search();
+        
         void internal_solve(int i, int lb, int ub);
         
         void search(int i, int lb, int ub);
         
         void get_sol_and_bound(int i, int &ub);
         
-        void mss_add_falsified (IpasirWrap &solver, std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector) const;
+        void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<int> &upper_bounds, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
         
-        int mss_choose_var (std::vector<std::vector<int>> &todo_vec, std::vector<int> &obj_vector, int &obj_index) const;
+        int mss_choose_obj (std::vector<std::vector<int>> &todo_vec, const std::vector<int> &upper_bounds, const int best_max) const;
         
-        void mss_solve();
+        int mss_linear_search(std::vector<int> &model, IpasirWrap *solver, int &best_max);
+        
+        int mss_enumerate();
         
         void sat_solve();
         

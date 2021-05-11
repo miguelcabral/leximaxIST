@@ -27,6 +27,9 @@ namespace leximaxIST {
         std::vector<int>& model();
         const std::vector<int>& conflict() const;
 
+        /* set a timeout (in seconds) counting from when this function is called
+         * set also the time at which this function is called
+         */
         void set_timeout(double t);
         
         int nVars() const;
@@ -45,7 +48,7 @@ namespace leximaxIST {
         void*              _s;
         std::vector<int> _model;
         std::vector<int> _conflict;
-        double _timeout;
+        struct TimeParams _time_params;
 
         void add(int p);
 

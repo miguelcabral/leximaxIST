@@ -112,26 +112,38 @@ namespace leximaxIST {
         m_maxsat_psol_cmd = cmd;
     }
     
-    // set m_solution if model is better in the leximax order
-    // in the case the external solver is killed and outputs a suboptimal solution
-    void Encoder::set_solution(std::vector<int> &model)
+    // set m_solution if the model is leximax-better than the current solution
+    // e.g. in the case the external solver is killed and outputs a suboptimal solution
+    // or if I get an MSS that is worse than the solution that I already have
+    // returns the objective vector of the leximax-best assignment
+    // model is cleared
+    // if print_obj is set and if verbose, then the new obj vec is printed
+    // NOTE: this assumes the problem has been checked for satisfiability
+    // hence we know m_solution is not empty when this function is called
+    std::vector<int> Encoder::set_solution(std::vector<int> &model, bool print_obj)
     {
-        if (m_solution.empty())
-            m_solution.swap(model);
-        else {
-            std::vector<int> new_obj_vec (get_objective_vector(model));
-            std::vector<int> old_obj_vec (get_objective_vector(m_solution));
-            std::sort(new_obj_vec.begin(), new_obj_vec.end(), descending_order);
-            std::sort(old_obj_vec.begin(), old_obj_vec.end(), descending_order);
-            for (size_t j (0); j < new_obj_vec.size(); ++j) {
-                if (new_obj_vec[j] < old_obj_vec[j]) { // model is better
-                    m_solution.swap(model);
-                    break;
-                }
-                else if (new_obj_vec[j] > old_obj_vec[j]) // m_solution is better
-                    break; 
+        const std::vector<int> &new_obj_vec (get_objective_vector(model));
+        const std::vector<int> &old_obj_vec (get_objective_vector(m_solution));
+        if (model.empty())
+            return old_obj_vec;
+        if (m_verbosity >= 1 && print_obj || m_verbosity == 2)
+            print_obj_vector(new_obj_vec);
+        std::vector<int> s_new_obj_vec (new_obj_vec);
+        std::vector<int> s_old_obj_vec (old_obj_vec);
+        std::sort(s_new_obj_vec.begin(), s_new_obj_vec.end(), descending_order);
+        std::sort(s_old_obj_vec.begin(), s_old_obj_vec.end(), descending_order);
+        for (size_t j (0); j < s_new_obj_vec.size(); ++j) {
+            if (s_new_obj_vec.at(j) < s_old_obj_vec.at(j)) { // model is better
+                m_solution.swap(model);
+                model.clear();
+                return new_obj_vec;
+            }
+            else if (s_new_obj_vec.at(j) > s_old_obj_vec.at(j)) { // m_solution is better
+                model.clear();
+                return old_obj_vec;
             }
         }
+        return old_obj_vec; // the obj vecs are leximax-equal
     }
     
     void Encoder::update_id_count(const Clause &clause)

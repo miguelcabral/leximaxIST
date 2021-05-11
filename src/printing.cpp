@@ -49,10 +49,26 @@ namespace leximaxIST {
         double percentage (static_cast<double>(nb_lucky_vars) / total_nb_vars);
         percentage *= 100;
         std::cout << "c Number of SAT calls: " << nb_calls << '\n';
-        std::cout << "c Automatically falsified variables: ";
+        std::cout << "c Automatically satisfied soft clauses: ";
         const stream_config &old_config (set_cout());
         std::cout << percentage << "% \n";
         set_cout(old_config);
+    }
+    
+    void Encoder::print_mss_enum_info() const
+    {
+        std::cout << "c MSS enumeration...\n";
+        std::cout << "c Parameters: \n";
+        std::cout << "c \tAdd all satisfied clauses to the MSS in construction: ";
+        std::cout << (m_mss_add_cls ? "Yes\n" : "No\n");
+        std::cout << "c \tIncremental enumeration: ";
+        std::cout << (m_mss_incremental ? "Yes\n" : "No\n");
+        std::cout << "c \tTimeout: ";
+        const stream_config &old_config (set_cout());
+        std::cout << m_mss_timeout << '\n';
+        set_cout(old_config);
+        std::cout << "c \tLimit number of MSSes: " << m_mss_nb_limit << '\n';
+        std::cout << "c \tNext clause choice policy: " << m_mss_tolerance << "% \n";
     }
     
     // in this case we already have computed obj_vec

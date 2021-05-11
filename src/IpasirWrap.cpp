@@ -25,24 +25,32 @@ namespace leximaxIST {
     */
     int terminate(double *timeout)
     {
-        // getrusage; if cpu time is greater than timeout, return 1, otherwise return 0
-        if (read_cpu_time() > timeout)
+        // if cpu time is greater than timeout, return 1, otherwise return 0
+        if (read_cpu_time() - _time_params->m_init_time > _time_params->m_timeout)
             return 1;
         else
             return 0;
     }
     
-    /* Set _timeout and call ipasir_set_terminate
-     * if _timeout is <= 0, exit with an error
+    struct TimeParams {
+        double m_timeout;
+        double m_init_time;
+    };
+    
+    /* Set _time_params and call ipasir_set_terminate
+     * if the timeout is <= 0, exit with an error
+     * return the current time
      */
-    void IpasirWrap::set_timeout(double t)
+    double IpasirWrap::set_timeout(double t)
     {
         if (t <= 0) {
             print_error_msg("IpasirWrap::set_timeout's argument is not positive!");
             exit(EXIT_FAILURE);
         }
-        _timeout = t;
-        ipasir_set_terminate (_s, &_timeout, terminate);
+        _time_params.m_timeout = t;
+        _time_params.m_init_time = read_cpu_time();
+        ipasir_set_terminate (_s, &_time_params, terminate);
+        return _time_params.m_init_time;
     }
     
     void IpasirWrap::addClause(const Clause *clause)  {

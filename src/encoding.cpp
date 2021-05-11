@@ -30,42 +30,40 @@ namespace leximaxIST {
     
     void Encoder::encode_sorted()
     {
-        if (m_num_objectives != 1) { // when there is only one objective function there is no need for this
-            for (int i{0}; i < m_num_objectives; ++i) {   
-                const std::vector<int> *objective = m_objectives[i];
-                const size_t num_terms = objective->size();
-                m_sorted_vecs[i] = new std::vector<int>(num_terms, 0);
-                // sorting_network is initialized to a vector of pairs (-1,-1)
-                SNET sorting_network(num_terms, {-1,-1});
-                // elems_to_sort is represented by a pair (first element, number of elements).
-                std::pair<int,int> elems_to_sort(0, num_terms);
-                if (m_verbosity == 2)
-                    print_obj_func(i);
-                m_sorting_net_size = 0; // it is incremented every time a comparator is inserted
-                if (m_verbosity == 2)
-                    std::cout << "c -------- Sorting Network Encoding --------\n";
-                encode_network(elems_to_sort, objective, sorting_network);
-                if (m_verbosity >= 1)
-                    print_snet_size(i);
-                // sorted_vec variables are the outputs of sorting_network
-                if (num_terms == 1) { // in this case the sorting network is empty
-                    std::vector<int> *sorted_vec = m_sorted_vecs[i];
-                    sorted_vec->at(0) = objective->at(0);
-                }
-                else {
-                    for (size_t j{0}; j < num_terms; j++) {
-                        int output_j = sorting_network[j].second;
-                        std::vector<int> *sorted_vec = m_sorted_vecs[i];
-                        sorted_vec->at(j) = output_j;
-                    }
-                }
-                if (m_verbosity == 2)
-                    print_sorted_vec(i);
+        for (int i{0}; i < m_num_objectives; ++i) {   
+            const std::vector<int> *objective = m_objectives[i];
+            const size_t num_terms = objective->size();
+            m_sorted_vecs[i] = new std::vector<int>(num_terms, 0);
+            // sorting_network is initialized to a vector of pairs (-1,-1)
+            SNET sorting_network(num_terms, {-1,-1});
+            // elems_to_sort is represented by a pair (first element, number of elements).
+            std::pair<int,int> elems_to_sort(0, num_terms);
+            if (m_verbosity == 2)
+                print_obj_func(i);
+            m_sorting_net_size = 0; // it is incremented every time a comparator is inserted
+            if (m_verbosity == 2)
+                std::cout << "c -------- Sorting Network Encoding --------\n";
+            encode_network(elems_to_sort, objective, sorting_network);
+            if (m_verbosity >= 1)
+                print_snet_size(i);
+            // sorted_vec variables are the outputs of sorting_network
+            if (num_terms == 1) { // in this case the sorting network is empty
+                std::vector<int> *sorted_vec = m_sorted_vecs[i];
+                sorted_vec->at(0) = objective->at(0);
             }
-            // add order encoding to each sorted vector
-            for (const std::vector<int> *svec : m_sorted_vecs)
-                order_encoding(*svec);
+            else {
+                for (size_t j{0}; j < num_terms; j++) {
+                    int output_j = sorting_network[j].second;
+                    std::vector<int> *sorted_vec = m_sorted_vecs[i];
+                    sorted_vec->at(j) = output_j;
+                }
+            }
+            if (m_verbosity == 2)
+                print_sorted_vec(i);
         }
+        // add order encoding to each sorted vector
+        for (const std::vector<int> *svec : m_sorted_vecs)
+            order_encoding(*svec);
     }
 
     void Encoder::all_subsets(std::list<int> set, int i, Clause &clause)
@@ -513,13 +511,15 @@ namespace leximaxIST {
                 std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << '\n';
             clear_soft_clauses();
             generate_soft_clauses(i);
+            // encode bounds obtained from presolving or previous iteration
+            const std::pair<int, int> &bounds (encode_bounds(i, sum));
+            if (i == 0 && m_pareto_presolve)
+                pareto_presolve();
             if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i);
             // encode the componentwise OR between sorted_relax vectors (except maybe in the last iteration)
             if (!m_simplify_last || i != m_num_objectives - 1)
                 componentwise_OR(i);
-            // encode bounds obtained from presolving or previous iteration
-            const std::pair<int, int> &bounds (encode_bounds(i, sum));
             // call optimisation solver (external solver or internal optimisation with SAT solver)
             if (m_opt_mode == "external" || (i == m_num_objectives - 1 && m_simplify_last))
                 external_solve(i);
