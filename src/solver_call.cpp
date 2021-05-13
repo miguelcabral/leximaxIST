@@ -826,22 +826,15 @@ namespace leximaxIST {
     }
     
     // TODO: possibly add lower bounds if maxsat presolving is enabled
-    // TODO: add option to continue to minimise
     /* Find one Pareto-optimal solution
-     * Assumptions:
-     * Each obj can only decrease with respect to its current value of m_solution
-     * The maximum is decreased by one, that is, each obj is less than or equal to
-     * the current max - 1
-     * Hard Clauses:
-     * Each time we find a solution we turn the previous attempt to decrement the
-     * maximum into a constraint of the problem
      */
-    int Encoder::pareto_search(int max_index, IpasirWrap *solver)
+    int Encoder::pareto_search(int max_index, IpasirWrap *solver, const std::vector<int> )
     {
         double initial_time (read_cpu_time());
         int nb_calls (0);
         int rv;
         while (true/* ends when unsat or interrupted */) {
+            std::vector<int> assumps;
             const std::vector<int> obj_vec = get_objective_vector();
             std::vector<int> s_obj_vec (obj_vec);
             std::sort(s_obj_vec.begin(), s_obj_vec.end(), descending_order);
@@ -850,55 +843,57 @@ namespace leximaxIST {
                 return 0; // optimal
             if (max_index == 0) { // the first maximum bounds all objectives
                 if (m_pareto_incremental)
-                    encode_ub_sorted(max); // bound all objectives
-                else {
-                    /*const std::vector<Clause*> &hard_cls (encode_ub_sorted(max - 1));
-                    for (const Clause *c : hard_cls)
-                        solver->addClause(c);*/
-                }
+                    encode_ub_sorted(max); // bound all objectives permanently
             }
+            std::vector<int> objs_max; // which objectives are the current maximum
             // try to get a pareto-better solution by trying to decrease the maximum
-            // fix values of other objectives in assumps
-            std::vector<int> assumps;
+            for (int i (0); i < m_num_objectives; ++i) {
+                const std::vector<int> *sorted_vec (m_sorted_vecs.at(i));
+                const int obj_val (obj_vec.at(i));
+                if (obj_val != max)
+                    continue;
+                objs_max.push_back(i); // obj value i is the current maximum
+                const int ub (max - 1);
+                int size (sorted_vec->size());
+                int pos (size - 1 - ub); // pos might be < 0
+                if (pos >= 0)
+                        assumps.push_back(-sorted_vec->at(pos));
+            }
+            // bound (permanently if not incremental) all objs with current values
             for (int i (0); i < m_num_objectives; ++i) {
                 const std::vector<int> *sorted_vec (m_sorted_vecs.at(i));
                 const int obj_val (obj_vec.at(i));
                 if (obj_val > max)
                     continue; // the previous maxima are fixed
-                const int ub (obj_val == max ? max - 1 : obj_val);
                 int size (sorted_vec->size());
-                int pos (size - 1 - ub); // pos might be < 0
+                int pos (size - 1 - obj_val); // pos might be < 0
                 if (pos >= 0) {
                     if (m_pareto_incremental)
-                        assumps.push_back(-sorted_vec->at(pos)); // neg sorted vec
+                        assumps.push_back(-sorted_vec->at(pos));
                     else
                         solver->addClause(-sorted_vec->at(pos));
                 }
             }
-            int rv (solver->solve(assumps));
+            rv = solver->solve(assumps);
             ++nb_calls;
-            if (rv == 10) {
+            if (rv == 10)
                 set_solution(solver->model(), false);
-                
-            }
             if (rv == 20) {
                 if (m_truly_pareto) {
                     // continue until a Pareto-optimal solution is obtained
-                    // fix current maximum - in assumps because it might change
-                    // find out which functions are maximum and fix them
-                    for (int i : objs_max) {
-                        const std::vector<int> *s_vec (m_sorted_vecs.at(i));
-                        // v counts the number of ones; 
-                        for (int j (s_vec->size() - 1), v (0); j >= 0; ++v; --j) {
-                            if (v < max)
-                                assumps.push_back(s_vec->at(j)); // one
-                            else
-                                assumps.push_back(-s_vec->at(j)); // zero
-                        }
-                    }
                     ++max_index;
+                    if (max_index == m_num_objectives)
+                        break; // Pareto-optimal solution has been found
+                    // choose the first objective corresponding to the current maximum
+                    // fix its value if not incremental
+                    // the upper bound is fixed, it remains the lower bound
+                    if (!m_pareto_incremental) {
+                        const std::vector<int> *s_vec (m_sorted_vecs.at(objs_max.at(0)));
+                        int pos (size - max); // >= max 
+                        solver->addClause(s_vec->at(pos));
+                    }
                 }
-                else // stop and try to minimise further the maximum
+                else // stop to check if we can minimise further the maximum
                     break;
             }
             if (rv == 0)
@@ -909,6 +904,7 @@ namespace leximaxIST {
             print_time(read_cpu_time() - initial_time, "c Single Pareto Optimal Solution CPU time: ");
             std::cout << "c Number of SAT calls: " << nb_calls << '\n';
         }
+        return rv;
     }
     
     /* Presolve: Find solutions to get bounds on the optimal first maximum

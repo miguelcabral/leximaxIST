@@ -348,12 +348,14 @@ namespace leximaxIST {
     
     void Encoder::encode_lb_soft(int lb)
     {
-        if (m_verbosity == 2 && lb > 0)
-            std::cout << "c ------------ Lower bound on soft clauses ------------\n";
-        if (lb > 0) {
-            int size (m_soft_clauses.size());
-            int sc (m_soft_clauses.at(size - lb));
-            add_hard_clause(-sc); // positive literal
+        if (!m_soft_clauses.empty()) {
+            if (m_verbosity == 2 && lb > 0)
+                std::cout << "c ------------ Lower bound on soft clauses ------------\n";
+            if (lb > 0) {
+                int size (m_soft_clauses.size());
+                int sc (m_soft_clauses.at(size - lb));
+                add_hard_clause(-sc); // positive literal
+            }
         }
     }
     
