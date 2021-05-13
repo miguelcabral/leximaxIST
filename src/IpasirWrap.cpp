@@ -41,16 +41,15 @@ namespace leximaxIST {
      * if the timeout is <= 0, exit with an error
      * return the current time
      */
-    double IpasirWrap::set_timeout(double t)
+    void IpasirWrap::set_timeout(double timeout, double init_time)
     {
         if (t <= 0) {
             print_error_msg("IpasirWrap::set_timeout's argument is not positive!");
             exit(EXIT_FAILURE);
         }
         _time_params.m_timeout = t;
-        _time_params.m_init_time = read_cpu_time();
+        _time_params.m_init_time = init_time;
         ipasir_set_terminate (_s, &_time_params, terminate);
-        return _time_params.m_init_time;
     }
     
     void IpasirWrap::addClause(const Clause *clause)  {

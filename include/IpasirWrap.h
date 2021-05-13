@@ -30,7 +30,7 @@ namespace leximaxIST {
         /* set a timeout (in seconds) counting from when this function is called
          * set also the time at which this function is called
          */
-        void set_timeout(double t);
+        void set_timeout(double timeout, double init_time);
         
         int nVars() const;
 
