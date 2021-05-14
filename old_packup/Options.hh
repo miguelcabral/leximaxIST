@@ -33,13 +33,24 @@ class Options {
 public:
     Options();
     virtual ~Options();
-    int    read_digit(const char *optarg, const std::string &optname, int &member);
+    bool   read_digit(const char *optarg, const std::string &optname, int &member);
+    bool   read_integer(const char *optarg, const std::string &optname, int &member);
+    bool   read_double(const char *optarg, const std::string &optname, double &member);
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
     string get_opt_solver()   const { return opt_solver; }
-    int    get_ub_encoding()     const { return ub_encoding; }
-    int    get_paranoid()          const { return paranoid; }
+    int    get_mss_presolve()     const { return mss_presolve; }
+    int    get_pareto_presolve()     const { return pareto_presolve; }
+    int    get_mss_tolerance()     const { return mss_tolerance; }
+    int    get_mss_nb_limit()     const { return mss_nb_limit; }
+    int    get_mss_add_cls()     const { return mss_add_cls; }
+    int    get_mss_incremental()     const { return mss_incremental; }
+    int    get_pareto_incremental()     const { return pareto_incremental; }
+    int    get_truly_pareto()          const { return truly_pareto; }
+    double get_mss_timeout()     const { return mss_timeout; }
+    double get_pareto_timeout()     const { return pareto_timeout; }
     int    get_trendy()            const { return trendy; }
+    int    get_paranoid()            const { return paranoid; }
     string get_solution_check()    const { return solution_check; }
     string get_mapping_file()      const { return mapping_file; }
     string get_user_criterion()    const { return user_criterion; }
@@ -63,7 +74,6 @@ private:
     int    help;
     int    solving_disabled;
     string opt_solver;
-    int    ub_encoding;
     int    verbosity;
     int    paranoid;
     int    trendy;
@@ -78,6 +88,16 @@ private:
     string formalism;
     int    leximax;
     int    maxsat_presolve;
+    int    mss_presolve;
+    int    pareto_presolve;
+    int    mss_incremental;
+    int    pareto_incremental;
+    int    truly_pareto;
+    int    mss_tolerance;
+    int    mss_add_cls;
+    int    mss_nb_limit;
+    double mss_timeout;
+    double pareto_timeout;
     int    simplify_last;
     string lp_solver;
     string opt_mode;

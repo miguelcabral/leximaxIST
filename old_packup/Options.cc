@@ -40,33 +40,70 @@ Options::Options()
 , leave_temporary_files(0)
 , leximax(0)
 , maxsat_presolve(0)
+, mss_presolve(0)
+, pareto_presolve(0)
+, mss_incremental(0)
+, pareto_incremental(0)
+, truly_pareto(0)
+, mss_tolerance(0) // always choose the maximum
+, mss_add_cls(1) // add equally
+, mss_nb_limit(0) // no limit
+, mss_timeout(86400) // 24 hours
+, pareto_timeout(86400) // 24 hours
 , simplify_last(0)
-, ub_encoding(0)
 , verbosity(0)
 , formalism("wcnf")
 , opt_mode ("bin")
 , lp_solver("gurobi")
 {}
 
-int Options::read_digit(const char *optarg, const std::string &optname, int &member)
+bool Options::read_integer(const char *optarg, const std::string &optname, int &member)
 {
     std::string s (optarg);
     try {
         member = std::stoi(s);
     }
     catch (const std::invalid_argument&) {
-        std::cerr << "Option " << optname << " must be an integer between 0 and 9" << std::endl;
-        return -1;
+        std::cerr << "Option '" << optname << "' must be an integer";
+        std::cerr << std::endl;
+        return false;
     }
     catch (const std::out_of_range&) {
-        std::cerr << "Out of range integer for Option " << optname << std::endl;
-        return -1;
+        std::cerr << "Out of range integer for Option '" << optname << "'";
+        std::cerr << std::endl;
+        return false;
     }
+    return true;
+}
+
+bool Options::read_double(const char *optarg, const std::string &optname, double &member)
+{
+    std::string s (optarg);
+    try {
+        member = std::stod(s);
+    }
+    catch (const std::invalid_argument&) {
+        std::cerr << "Option '" << optname << "' must be a floating-point number";
+        std::cerr << std::endl;
+        return false;
+    }
+    catch (const std::out_of_range&) {
+        std::cerr << "Out of range floating-point number in Option '" << optname << "'";
+        std::cerr << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool Options::read_digit(const char *optarg, const std::string &optname, int &member)
+{
+    if (!read_integer(optarg, optname, member))
+        return false;
     if (member > 9 || member < 0) {
         std::cerr << "Option " << optname << " must be an integer between 0 and 9" << std::endl;
-        return -1;
+        return false;
     }    
-    return 0;
+    return true;
 }
 
 bool Options::parse(int argc,char **argv) {
@@ -86,12 +123,21 @@ bool Options::parse(int argc,char **argv) {
        ,{"formalism",    required_argument,  0, 505}
        ,{"lpsolver",    required_argument,  0, 506}
        ,{"lpsol",    required_argument,  0, 506}
-       ,{"ub-enc", required_argument,  0, 507}
+       ,{"mss-add-cls", required_argument,  0, 507}
        ,{"opt-mode", required_argument,  0, 508}
        ,{"maxsat-psol-cmd", required_argument,  0, 509}
+       ,{"mss-tol", required_argument,  0, 510}
+       ,{"mss-nb-lim", required_argument,  0, 511}
+       ,{"mss-timeout", required_argument,  0, 512}
+       ,{"pareto-timeout", required_argument,  0, 513}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
        ,{"maxsat-presolve",  no_argument,  &maxsat_presolve, 1}
+       ,{"mss-presolve",  no_argument,  &mss_presolve, 1}
+       ,{"pareto-presolve",  no_argument,  &pareto_presolve, 1}
+       ,{"mss-incr",  no_argument,  &mss_incremental, 1}
+       ,{"pareto-incr",  no_argument,  &pareto_incremental, 1}
+       ,{"truly-pareto",  no_argument,  &truly_pareto, 1}
        ,{"leximax", no_argument,  &leximax, 1}
        ,{"simplify-last", no_argument,  &simplify_last, 1}
        ,{0, 0, 0, 0}
@@ -139,12 +185,23 @@ bool Options::parse(int argc,char **argv) {
                     return_value = false;
                 }
                 break;
-            case 507: if (read_digit(optarg, "ub-enc", ub_encoding) == -1) {
+            case 507: if (!read_digit(optarg, "mss-add-cls", mss_add_cls))
                         return_value = false;
-                    }
                     break;
             case 508: opt_mode = optarg; break;
             case 509: maxsat_psol_cmd = optarg; break;
+            case 510: if (!read_integer(optarg, "mss-tol", mss_tolerance))
+                        return_value = false;
+                    break;
+            case 511: if (!read_integer(optarg, "mss-nb-lim", mss_nb_limit))
+                        return_value = false;
+                    break;
+            case 512: if (!read_double(optarg, "mss-timeout", mss_timeout))
+                        return_value = false;
+                    break;
+            case 513: if (!read_double(optarg, "pareto-timeout", pareto_timeout))
+                        return_value = false;
+                    break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);

@@ -27,15 +27,6 @@ namespace leximaxIST {
         m_file_name = std::to_string(getpid());
     }
     
-    void Encoder::set_ub_presolve(int val)
-    {
-        if (val < 0 || val > 2) {
-            print_error_msg("Invalid value '" + std::to_string(val) + "' for ub_presolve parameter");
-            exit(EXIT_FAILURE);
-        }
-        m_ub_presolve = val;
-    }
-    
     // Possible values: external, bin. TODO: linear-su, linear-us
     void Encoder::set_opt_mode(const std::string &mode)
     {
@@ -112,14 +103,6 @@ namespace leximaxIST {
         m_maxsat_psol_cmd = cmd;
     }
     
-    // set m_solution if the model is leximax-better than the current solution
-    // e.g. in the case the external solver is killed and outputs a suboptimal solution
-    // or if I get an MSS that is worse than the solution that I already have
-    // returns the objective vector of the leximax-best assignment
-    // model is cleared
-    // if print_obj is set and if verbose, then the new obj vec is printed
-    // NOTE: this assumes the problem has been checked for satisfiability
-    // hence we know m_solution is not empty when this function is called
     std::vector<int> Encoder::set_solution(std::vector<int> &model, bool print_obj)
     {
         const std::vector<int> &new_obj_vec (get_objective_vector(model));
@@ -235,4 +218,62 @@ namespace leximaxIST {
         }
     }
 
+    void Encoder::set_pareto_presolve(bool v) { m_pareto_presolve = v; }
+        
+    void Encoder::set_pareto_timeout(double t)
+    {
+        if (t <= 0) {
+            std::string msg ("Encoder::set_pareto_timeout - argument '");
+            msg += std::to_string(t) + "' is not positive";
+            print_error_msg(msg);
+            exit(EXIT_FAILURE);
+        }
+        m_pareto_timeout = t;
+    }
+        
+    void Encoder::set_pareto_incremental(bool v) { m_pareto_incremental = v; }
+    
+    void Encoder::set_truly_pareto(bool v) { m_truly_pareto = v; }
+    
+    void Encoder::set_mss_presolve(bool v) { m_mss_presolve = v; }
+    
+    void Encoder::set_mss_add_cls(int v)
+    {
+        if (v < 0 || v > 2) {
+            std::string msg("Encoder::set_mss_add_cls - invalid argument '");
+            msg += std::to_string(v) + "'. The parameter must be in the range 0..2";
+            print_error_msg(msg);
+        }
+        m_mss_add_cls = v;
+    }
+    
+    void Encoder::set_mss_incremental(bool v) { m_mss_incremental = v; }
+    
+    void Encoder::set_mss_timeout(double t)
+    {
+        if (t <= 0) {
+            std::string msg ("Encoder::set_mss_timeout - argument '");
+            msg += std::to_string(t) + "' is not positive";
+            print_error_msg(msg);
+            exit(EXIT_FAILURE);
+        }
+        m_mss_timeout = t;
+    }
+        
+    void Encoder::set_mss_nb_limit(int n) 
+    {
+        m_mss_nb_limit = n; 
+    }
+    
+    void Encoder::set_mss_tolerance(int t)
+    {
+        if (t < 0 || t > 100) {
+            std::string msg ("Encoder::set_mss_tolerance - argument '");
+            msg += std::to_string(t) + "' is not a percentage";
+            print_error_msg(msg);
+            exit(EXIT_FAILURE);
+        }
+        m_mss_tolerance = t; 
+    }
+    
 }/* namespace leximaxIST */

@@ -36,7 +36,6 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,solution_value(-1)
 ,_id_manager(id_manager)
 ,opt_solver_cmd("minisat+ -cs -ansi")
-,ub_encoding(0)
 ,multiplication_string("*")
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
@@ -490,7 +489,19 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc = new leximaxIST::Encoder();
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
-     leximax_enc->set_ub_presolve(ub_encoding);
+     // pareto presolving:
+     leximax_enc->set_pareto_presolve(pareto_presolve);
+     leximax_enc->set_pareto_timeout(pareto_timeout);
+     leximax_enc->set_pareto_incremental(pareto_incremental);
+     leximax_enc->set_truly_pareto(truly_pareto);
+     // mss presolving (enumeration)
+     leximax_enc->set_mss_presolve(mss_presolve);
+     leximax_enc->set_mss_add_cls(mss_add_cls);
+     leximax_enc->set_mss_incremental(mss_incremental);
+     leximax_enc->set_mss_timeout(mss_timeout);
+     leximax_enc->set_mss_nb_limit(mss_nb_limit);
+     leximax_enc->set_mss_tolerance(mss_tolerance);
+     // other
      leximax_enc->set_verbosity(verbosity);
      leximax_enc->set_ext_solver_cmd(opt_solver_cmd);
      leximax_enc->set_opt_mode(opt_mode);

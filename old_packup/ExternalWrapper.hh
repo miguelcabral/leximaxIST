@@ -65,7 +65,16 @@ public:
     inline void set_formalism (const string &format);
     inline void set_opt_mode (const string &mode);
     inline void set_maxsat_psol_cmd (const string &cmd);
-    inline void set_ub_encoding (int val);
+    inline void set_mss_presolve(int v);
+    inline void set_pareto_presolve(int v);
+    inline void set_mss_incremental(int v);
+    inline void set_pareto_incremental(int v);
+    inline void set_mss_add_cls(int v);
+    inline void set_mss_tolerance(int v);
+    inline void set_mss_nb_limit(int v);
+    inline void set_mss_timeout(double t);
+    inline void set_pareto_timeout(double t);
+    inline void set_truly_pareto(int v);
     inline void set_verbosity (int val);
     void print_leximax_info();
     leximaxIST::Encoder* get_leximax_enc() {return leximax_enc;}
@@ -98,7 +107,16 @@ private:
     int    call_counter;
     time_t stamp;
     string opt_solver_cmd;
-    int    ub_encoding;
+    bool    mss_presolve;
+    bool    pareto_presolve;
+    bool    mss_incremental;
+    bool    pareto_incremental;
+    bool    truly_pareto;
+    int    mss_tolerance;
+    int    mss_add_cls;
+    int    mss_nb_limit;
+    double mss_timeout;
+    double pareto_timeout;
     string multiplication_string;
     string temporary_directory;
     bool   leave_temporary_files;
@@ -156,7 +174,15 @@ inline void ExternalWrapper::set_maxsat_psol_cmd (const string &cmd) {
     maxsat_psol_cmd = cmd; }
 inline void ExternalWrapper::set_verbosity (int val) {
     verbosity = val; }
-inline void ExternalWrapper::set_ub_encoding (int val) {
-    ub_encoding = val;}
+inline void ExternalWrapper::set_mss_presolve(int v) { mss_presolve = v; /*conversion from int to bool*/ }
+inline void ExternalWrapper::set_pareto_presolve(int v) { pareto_presolve = v; }
+inline void ExternalWrapper::set_mss_incremental(int v) { mss_incremental = v; }
+inline void ExternalWrapper::set_pareto_incremental(int v) { pareto_incremental = v; }
+inline void ExternalWrapper::set_mss_add_cls(int v) { mss_add_cls = v; }
+inline void ExternalWrapper::set_mss_tolerance(int v) { mss_tolerance = v; }
+inline void ExternalWrapper::set_mss_nb_limit(int v) { mss_nb_limit = v; }
+inline void ExternalWrapper::set_mss_timeout(double t) { mss_timeout = t; }
+inline void ExternalWrapper::set_pareto_timeout(double t) { pareto_timeout = t; }
+inline void ExternalWrapper::set_truly_pareto(int v) { truly_pareto = v; }
 #endif	/* EXTERNALWRAPPER_HH */
 

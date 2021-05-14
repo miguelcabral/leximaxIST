@@ -93,8 +93,6 @@ namespace leximaxIST
         
         void set_simplify_last(bool val);
         
-        void set_ub_presolve(int val);
-        
         void set_timeout(double val); // for terminate function
         
         void set_opt_mode(const std::string &mode);
@@ -115,6 +113,30 @@ namespace leximaxIST
         
         void set_maxsat_psol_cmd(const std::string &cmd);
         
+        void set_pareto_presolve(bool v);
+        
+        void set_pareto_timeout(double t);
+        
+        void set_pareto_incremental(bool v);
+        
+        void set_truly_pareto(bool v);
+        
+        void set_mss_presolve(bool v);
+        
+        /* 0: add all satisfied clauses to the MSS in construction
+         * 1: add the same amount of satisfied clauses per objective
+         * 2: do not add satisfied clauses to the MSS in construction
+         */
+        void set_mss_add_cls(int v);
+        
+        void set_mss_incremental(bool v);
+        
+        void set_mss_timeout(double t);
+        
+        void set_mss_nb_limit(int n);
+        
+        void set_mss_tolerance(int t);
+                
         int terminate(); // kill external solver and read approximate solution
         
         void clear(); // frees memory, and sets internal parameters to their initial value
@@ -129,7 +151,16 @@ namespace leximaxIST
         
         void update_id_count(const Clause &clause);
         
-        void set_solution(std::vector<int> &model);
+        // set m_solution if the model is leximax-better than the current solution
+        // e.g. in the case the external solver is killed and outputs a suboptimal solution
+        // or if I get an MSS that is worse than the solution that I already have
+        // returns the objective vector of the leximax-best assignment
+        // model is cleared
+        // if print_obj is set and if verbose, then the new obj vec is printed
+        // Returns the best objective vector of the two
+        // NOTE: this assumes the problem has been checked for satisfiability
+        // hence we know m_solution is not empty when this function is called
+        std::vector<int> set_solution(std::vector<int> &model, bool print_obj);
         
         // getters.cpp
         
@@ -209,9 +240,13 @@ namespace leximaxIST
         
         // solver_call.cpp
         
+        void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
+        
+        void fix_previous_max(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
+        
         void pareto_presolve();
         
-        int pareto_search();
+        int pareto_search(int max_index, IpasirWrap *solver);
         
         void internal_solve(int i, int lb, int ub);
         

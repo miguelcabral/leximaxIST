@@ -48,7 +48,13 @@ namespace leximaxIST {
         void*              _s;
         std::vector<int> _model;
         std::vector<int> _conflict;
-        struct TimeParams _time_params;
+    public:
+        struct TimeParams {
+            double m_timeout;
+            double m_init_time;
+        };
+    private:
+        TimeParams _time_params;
 
         void add(int p);
 

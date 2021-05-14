@@ -23,19 +23,16 @@ namespace leximaxIST {
     *   - the solver calls the callback function with the parameter "state"
     *     having the value passed in the ipasir_set_terminate function (2nd parameter).
     */
-    int terminate(double *timeout)
+    int terminate(void *time_params)
     {
         // if cpu time is greater than timeout, return 1, otherwise return 0
-        if (read_cpu_time() - _time_params->m_init_time > _time_params->m_timeout)
+        double init_time (static_cast<IpasirWrap::TimeParams*>(time_params)->m_init_time);
+        double timeout (static_cast<IpasirWrap::TimeParams*>(time_params)->m_timeout);
+        if (read_cpu_time() - init_time > timeout)
             return 1;
         else
             return 0;
     }
-    
-    struct TimeParams {
-        double m_timeout;
-        double m_init_time;
-    };
     
     /* Set _time_params and call ipasir_set_terminate
      * if the timeout is <= 0, exit with an error
@@ -43,11 +40,11 @@ namespace leximaxIST {
      */
     void IpasirWrap::set_timeout(double timeout, double init_time)
     {
-        if (t <= 0) {
+        if (timeout <= 0) {
             print_error_msg("IpasirWrap::set_timeout's argument is not positive!");
             exit(EXIT_FAILURE);
         }
-        _time_params.m_timeout = t;
+        _time_params.m_timeout = timeout;
         _time_params.m_init_time = init_time;
         ipasir_set_terminate (_s, &_time_params, terminate);
     }
