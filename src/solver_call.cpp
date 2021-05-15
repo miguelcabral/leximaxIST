@@ -534,6 +534,7 @@ namespace leximaxIST {
             return mss_choose_obj_seq (todo_vec);
     }
     
+    // TODO: Change add equally to add as much as possible while simultaneously trying to even out the upper bounds
     /* Add satisfied soft clauses (or falsified variables) to the mss
      * Which clauses are added to the mss is defined by parameter m_mss_add_cls
      * remove those variables from todo_vec
@@ -629,6 +630,8 @@ namespace leximaxIST {
             Clause block_mss; // at least one clause of the MSS must be false
             for (const std::vector<int> *obj : m_objectives) {
                 for (int var : *obj) {
+                    // FIXME: it is wrong to use the model, as the model might be a superset of the MSSS
+                    // FIXME: We must use the MSSS
                     if (model.at(var) > 0) // var is true -> part of MCS
                         block_mcs.push_back(-var);
                     else
@@ -661,7 +664,7 @@ namespace leximaxIST {
         if (rv != 10)
             return rv; // UNSAT or interrupted
         model = solver->model();
-        const std::vector<int> &obj_vec (set_solution(model, false));
+        const std::vector<int> &obj_vec (set_solution(solver->model(), false));
         best_max = *std::max_element(obj_vec.begin(), obj_vec.end()); 
         std::vector<std::vector<int>> todo_vec (m_num_objectives);
         std::vector<int> upper_bounds (m_num_objectives);
@@ -685,7 +688,7 @@ namespace leximaxIST {
                 break;
             if (rv == 10) { // SAT
                 model = solver->model();
-                const std::vector<int> &obj_vec (set_solution(model, false));
+                const std::vector<int> &obj_vec (set_solution(solver->model(), false));
                 best_max = *std::max_element(obj_vec.begin(), obj_vec.end());
                 // add clause to the mss
                 if (!m_mss_incremental) {

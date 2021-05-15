@@ -59,15 +59,24 @@ namespace leximaxIST {
     {
         std::cout << "c MSS enumeration...\n";
         std::cout << "c Parameters: \n";
-        std::cout << "c \tAdd all satisfied clauses to the MSS in construction: ";
-        std::cout << (m_mss_add_cls ? "Yes\n" : "No\n");
+        std::cout << "c \tAddition of satisfied clauses to the MSS in construction policy: ";
+        if (m_mss_add_cls == 0)
+            std::cout << "Add all\n";
+        else if (m_mss_add_cls == 1)
+            std::cout << "Add some, equally between objectives\n";
+        else if (m_mss_add_cls == 2)
+            std::cout << "Add only one\n";
         std::cout << "c \tIncremental enumeration: ";
         std::cout << (m_mss_incremental ? "Yes\n" : "No\n");
         std::cout << "c \tTimeout: ";
         const stream_config &old_config (set_cout());
         std::cout << m_mss_timeout << '\n';
         set_cout(old_config);
-        std::cout << "c \tLimit number of MSSes: " << m_mss_nb_limit << '\n';
+        std::cout << "c \tLimit number of MSSes: ";
+        if (m_mss_nb_limit <= 0)
+            std::cout << "No limit\n";
+        else
+            std::cout << m_mss_nb_limit << '\n';
         std::cout << "c \tNext clause choice policy: " << m_mss_tolerance << "% \n";
     }
     

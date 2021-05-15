@@ -175,7 +175,7 @@ int main(int argc, char** argv) {
 #else*/
     signal(SIGHUP, SIG_handler);
     signal(SIGTERM, SIG_handler);
-    signal(SIGABRT, SIG_handler);
+    //signal(SIGABRT, SIG_handler);
     signal(SIGUSR1, SIG_handler);
     signal(SIGINT, SIG_handler);
     //signal(SIGALRM,SIG_handler);
