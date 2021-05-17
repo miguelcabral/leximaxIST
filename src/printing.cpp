@@ -39,15 +39,20 @@ namespace leximaxIST {
     /* print percentage of falsified objective variables by chance
      * print number of calls to SAT solver
      */
-    void Encoder::print_mss_info(int nb_calls) const
+    void Encoder::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec) const
     {
         int total_nb_vars (0);
         for (const std::vector<int> *obj : m_objectives)
             total_nb_vars += obj->size();
+        int todo_size (0);
+        for (const std::vector<int> &v : todo_vec)
+            todo_size += v.size();
+        const int nb_fixed_vars (total_nb_vars - todo_size);
         const int nb_tested_vars (nb_calls - 1);
-        const int nb_lucky_vars (total_nb_vars - nb_tested_vars);
-        double percentage (static_cast<double>(nb_lucky_vars) / total_nb_vars);
+        const int nb_lucky_vars (nb_fixed_vars - nb_tested_vars);
+        double percentage (static_cast<double>(nb_lucky_vars) / nb_fixed_vars);
         percentage *= 100;
+        std::cout << "c MSS found\n";
         std::cout << "c Number of SAT calls: " << nb_calls << '\n';
         std::cout << "c Automatically satisfied soft clauses: ";
         const stream_config &old_config (set_cout());
@@ -59,11 +64,11 @@ namespace leximaxIST {
     {
         std::cout << "c MSS enumeration...\n";
         std::cout << "c Parameters: \n";
-        std::cout << "c \tAddition of satisfied clauses to the MSS in construction policy: ";
+        std::cout << "c \tAddition of satisfied clauses to the MSS in construction: ";
         if (m_mss_add_cls == 0)
             std::cout << "Add all\n";
         else if (m_mss_add_cls == 1)
-            std::cout << "Add some, equally between objectives\n";
+            std::cout << "Add some, trying to even out the upper bounds\n";
         else if (m_mss_add_cls == 2)
             std::cout << "Add only one\n";
         std::cout << "c \tIncremental enumeration: ";
@@ -133,12 +138,22 @@ namespace leximaxIST {
         std::cout << " objective: " << m_sorting_net_size << "\n";
     }
     
-    void Encoder::print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const
+    void Encoder::print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
     {
+        std::cout << "c Todo Sizes: ";
+        for (int i(0); i < m_num_objectives; ++i)
+            std::cout << todo_vec.at(i).size() << ' ';
+        std::cout << '\n';
+        std::cout << "c MSS Sizes: ";
+        for (int i(0); i < m_num_objectives; ++i)
+            std::cout << mss.at(i).size() << ' ';
+        std::cout << '\n';
+        std::cout << "c Upper Bounds: ";
         for (int i(0); i < m_num_objectives; ++i) {
-            std::cout << "c Size of Todo of Objective " << i << ": ";
-            std::cout << todo_vec.at(i).size() << '\n';
+            const int obj_size (m_objectives.at(i)->size());
+            std::cout << obj_size - mss.at(i).size() << ' ';
         }
+        std::cout << '\n';
     }
     
     void Encoder::print_waitpid_error(const std::string &errno_str) const

@@ -507,8 +507,6 @@ namespace leximaxIST {
         encode_sorted();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
         for (int i = 0; i < m_num_objectives; ++i) {
-            if (m_verbosity >= 1 && m_verbosity <= 2)
-                std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << '\n';
             clear_soft_clauses();
             generate_soft_clauses(i);
             // encode bounds obtained from presolving or previous iteration
@@ -520,6 +518,8 @@ namespace leximaxIST {
             // encode the componentwise OR between sorted_relax vectors (except maybe in the last iteration)
             if (!m_simplify_last || i != m_num_objectives - 1)
                 componentwise_OR(i);
+            if (m_verbosity >= 1 && m_verbosity <= 2)
+                std::cout << "c Minimising " << ordinal(i+1) << " maximum..." << '\n';
             // call optimisation solver (external solver or internal optimisation with SAT solver)
             if (m_opt_mode == "external" || (i == m_num_objectives - 1 && m_simplify_last))
                 external_solve(i);

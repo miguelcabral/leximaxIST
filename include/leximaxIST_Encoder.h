@@ -151,16 +151,16 @@ namespace leximaxIST
         
         void update_id_count(const Clause &clause);
         
-        // set m_solution if the model is leximax-better than the current solution
+        // update m_solution if the model is leximax-better than the current solution
         // e.g. in the case the external solver is killed and outputs a suboptimal solution
-        // or if I get an MSS that is worse than the solution that I already have
+        // or if I get an MSS and it may be worse than the solution that I already have
         // returns the objective vector of the leximax-best assignment
-        // model is cleared
-        // if print_obj is set and if verbose, then the new obj vec is printed
+        // the model is moved to m_solution and then cleared
+        // if the model is better and if verbode, the obj vec and the time is printed
         // Returns the best objective vector of the two
         // NOTE: this assumes the problem has been checked for satisfiability
         // hence we know m_solution is not empty when this function is called
-        std::vector<int> set_solution(std::vector<int> &model, bool print_obj);
+        std::vector<int> set_solution(std::vector<int> &model);
         
         // getters.cpp
         
@@ -254,13 +254,13 @@ namespace leximaxIST
         
         void get_sol_and_bound(int i, int &ub);
         
-        void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<int> &upper_bounds, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
+        void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
         
-        int mss_choose_obj (std::vector<std::vector<int>> &todo_vec, const std::vector<int> &upper_bounds, const int best_max) const;
+        int mss_choose_obj (const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss, const int best_max) const;
         
-        int mss_linear_search(std::vector<int> &model, IpasirWrap *solver, int &best_max);
+        int mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max);
         
-        int mss_enumerate();
+        void mss_enumerate();
         
         void sat_solve();
         
@@ -321,9 +321,9 @@ namespace leximaxIST
         
         void print_snet_size(int i) const;
         
-        void print_mss_todo(const std::vector<std::vector<int>> &todo_vec) const;
+        void print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const;
         
-        void print_mss_info(int nb_calls) const;
+        void print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec) const;
         
         void print_mss_enum_info() const;
         

@@ -122,7 +122,7 @@ void print_usage(ostream &output) {
     output << "--mss-presolve\t\t\t\t\t approximate the leximax-optimum with MSS enumeration"<< endl;
     output << "--mss-add-cls <int>\t\t\t\t how to add the clauses to the MSS in construction"<< endl;
     output << "\t\t\t\t\t\t 0 - add all satisfied clauses"<< endl;
-    output << "\t\t\t\t\t\t 1 - add the same amount of clauses per objective (default)"<< endl;
+    output << "\t\t\t\t\t\t 1 - add as much as possible while trying to even out the upper bounds (default)"<< endl;
     output << "\t\t\t\t\t\t 2 - add only the satisfied clause used in the SAT test"<< endl;
     output << "--mss-tol <int>\t\t\t\t\t tolerance for the choice of the next clause";
     output << " tested for satisfiability, in the MSS linear search"<< endl;

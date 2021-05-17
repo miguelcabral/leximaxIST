@@ -1,5 +1,6 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_printing.h>
+#include <leximaxIST_rusage.h>
 #include <string>
 #include <iostream>
 #include <algorithm> // std::sort
@@ -103,14 +104,12 @@ namespace leximaxIST {
         m_maxsat_psol_cmd = cmd;
     }
     
-    std::vector<int> Encoder::set_solution(std::vector<int> &model, bool print_obj)
+    std::vector<int> Encoder::set_solution(std::vector<int> &model)
     {
         const std::vector<int> &new_obj_vec (get_objective_vector(model));
         const std::vector<int> &old_obj_vec (get_objective_vector(m_solution));
         if (model.empty())
             return old_obj_vec;
-        if (m_verbosity >= 1 && print_obj || m_verbosity == 2)
-            print_obj_vector(new_obj_vec);
         std::vector<int> s_new_obj_vec (new_obj_vec);
         std::vector<int> s_old_obj_vec (old_obj_vec);
         std::sort(s_new_obj_vec.begin(), s_new_obj_vec.end(), descending_order);
@@ -119,6 +118,10 @@ namespace leximaxIST {
             if (s_new_obj_vec.at(j) < s_old_obj_vec.at(j)) { // model is better
                 m_solution.swap(model);
                 model.clear();
+                if (m_verbosity >= 1) {
+                    print_time(read_cpu_time(), "c Leximax-better solution found: ");
+                    print_obj_vector(new_obj_vec);
+                }
                 return new_obj_vec;
             }
             else if (s_new_obj_vec.at(j) > s_old_obj_vec.at(j)) { // m_solution is better

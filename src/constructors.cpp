@@ -67,7 +67,10 @@ namespace leximaxIST {
         m_opt_mode("bin"),
         m_sat_solver(nullptr)
     {
-        // Format decimal precision of std::cout
+        // debug
+        // /*
+        std::cout << std::unitbuf;
+        // */
     }
 
 }/* namespace leximaxIST */
