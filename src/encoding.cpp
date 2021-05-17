@@ -284,15 +284,16 @@ namespace leximaxIST {
             print_soft_clauses();
     }
     
-    // returns bounds of the optimal i-th max (lower bound, upper bound)
-    std::pair<int, int> Encoder::encode_bounds(int i, int sum)
+    /* returns the lower bound of the optimal i-th max
+     * the upper bound might change and can be computed using get_objective_vector()
+     */
+    int Encoder::encode_bounds(int i, int sum)
     {
         int lb (0);
         if (m_maxsat_presolve)
             lb = encode_lower_bound(i, sum);
-        int ub (encode_upper_bound(i));
-        std::pair<int, int> bounds (lb, ub);
-        return bounds;
+        encode_upper_bound(i);
+        return lb;
     }
     
     /* Computes lower bounds of (1) all objective functions and (2) of the cost
@@ -510,7 +511,7 @@ namespace leximaxIST {
             clear_soft_clauses();
             generate_soft_clauses(i);
             // encode bounds obtained from presolving or previous iteration
-            const std::pair<int, int> &bounds (encode_bounds(i, sum));
+            const int lb (encode_bounds(i, sum));
             if (i == 0 && m_pareto_presolve)
                 pareto_presolve();
             if (i != 0) // in the first iteration i == 0 there is no relaxation
@@ -524,7 +525,7 @@ namespace leximaxIST {
             if (m_opt_mode == "external" || (i == m_num_objectives - 1 && m_simplify_last))
                 external_solve(i);
             else
-                internal_solve(i, bounds.first, bounds.second); // can't use with simplify_last since it depends on order
+                internal_solve(i, lb); // can't use with simplify_last since it depends on order
             // fix value of current maximum (in the end of last iteration there is no need)
             if (i != m_num_objectives - 1)
                 fix_soft_vars(i);

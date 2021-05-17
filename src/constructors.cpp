@@ -68,9 +68,9 @@ namespace leximaxIST {
         m_sat_solver(nullptr)
     {
         // debug
-        // /*
+         /*
         std::cout << std::unitbuf;
-        // */
+         */
     }
 
 }/* namespace leximaxIST */

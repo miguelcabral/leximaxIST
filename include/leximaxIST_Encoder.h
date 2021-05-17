@@ -158,8 +158,6 @@ namespace leximaxIST
         // the model is moved to m_solution and then cleared
         // if the model is better and if verbode, the obj vec and the time is printed
         // Returns the best objective vector of the two
-        // NOTE: this assumes the problem has been checked for satisfiability
-        // hence we know m_solution is not empty when this function is called
         std::vector<int> set_solution(std::vector<int> &model);
         
         // getters.cpp
@@ -218,7 +216,7 @@ namespace leximaxIST
         
         void componentwise_OR(int i);
         
-        std::pair<int, int> encode_bounds(int i, int sum);
+        int encode_bounds(int i, int sum);
         
         int encode_lower_bound(int i, int sum);
         
@@ -242,17 +240,17 @@ namespace leximaxIST
         
         void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
         
-        void fix_previous_max(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
+        void fix_previous_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
+        
+        void decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
         
         void pareto_presolve();
         
-        int pareto_search(int max_index, IpasirWrap *solver);
+        int pareto_search(int &max_index, IpasirWrap *solver);
         
-        void internal_solve(int i, int lb, int ub);
+        void internal_solve(const int i, const int lb);
         
         void search(int i, int lb, int ub);
-        
-        void get_sol_and_bound(int i, int &ub);
         
         void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
         

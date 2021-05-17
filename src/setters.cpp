@@ -110,6 +110,15 @@ namespace leximaxIST {
         const std::vector<int> &old_obj_vec (get_objective_vector(m_solution));
         if (model.empty())
             return old_obj_vec;
+        if (m_solution.empty()) {
+            m_solution.swap(model);
+            model.clear();
+            if (m_verbosity >= 1) {
+                print_time(read_cpu_time(), "c Leximax-better solution found: ");
+                print_obj_vector(new_obj_vec);
+            }
+            return new_obj_vec;
+        }
         std::vector<int> s_new_obj_vec (new_obj_vec);
         std::vector<int> s_old_obj_vec (old_obj_vec);
         std::sort(s_new_obj_vec.begin(), s_new_obj_vec.end(), descending_order);
