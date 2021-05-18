@@ -799,6 +799,7 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
             CONSTANT Variable any_will_be_installed = new_variable();
             vector<LINT> literals;
             // Mikolas' encoding (upper bound of number of notuptodate packages):
+            /*
             if (maximize) literals.push_back(neg(any_will_be_installed));
             for (UINT vi=0;vi<units.size()-1;++vi)
             {
@@ -815,7 +816,7 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
              } else { //if any version is installed, then the latest one should be installed as well
                  solver.output_binary_weighted_clause(neg(any_will_be_installed), v_latest, up_to_date_weight);
              }
-             /*
+             */
              // Miguel's encoding (exactly the number of notuptodate packages):
              // encode any_will_be_installed (it is equivalent to the disjunction of versions)
              vector<LINT> implication1;
@@ -839,7 +840,7 @@ void Encoder::encode_not_up_to_date(XLINT& total_weight,bool maximize)
             solver.output_binary_clause(neg(notuptodate), neg(v_latest));
             if (maximize) solver.output_unary_weighted_clause(notuptodate, up_to_date_weight);
             else solver.output_unary_weighted_clause(neg(notuptodate), up_to_date_weight);
-            */
+            
         }
         total_weight+=up_to_date_weight;
     }
@@ -854,6 +855,7 @@ void Encoder::encode_changed(XLINT& total_weight,bool maximize)
     {
         CONSTANT UnitVector &unit_vector=*(index->second);
         // Mikolas' encoding: the soft clauses are not exactly the quantity we want to optimise
+        /*
         Variable unchanged=-1; // variables that represents that all versions stayed the same, used only for minimization
         if (!maximize) {
            unchanged=id_manager.new_id();
@@ -874,7 +876,7 @@ void Encoder::encode_changed(XLINT& total_weight,bool maximize)
         }
         if (!maximize) solver.output_unary_weighted_clause(unchanged,w);
         else solver.output_weighted_clause(literals,w);
-        /*
+        */
         // Miguel's encoding: The objective function is EXACTLY the number of changed packages
         const Variable unchanged=id_manager.new_id();
 #ifdef CONV_DBG
@@ -898,7 +900,6 @@ void Encoder::encode_changed(XLINT& total_weight,bool maximize)
         solver.output_clause(literals);
         solver.output_unary_weighted_clause( maximize ? neg(unchanged) : unchanged, w);
         total_weight+=w;
-        */
     }
 }
 
