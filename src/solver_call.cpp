@@ -597,7 +597,8 @@ namespace leximaxIST {
         }
     }
     
-    
+    // TODO: what to do if the MSS subset returned is empty? 
+    // No blocking clause! Use the subset of MCS?
     /* MSS enumeration, using basic/extended linear search
      * MSS search: if the maximum can not be improved, stop
      * Thus, we will actually get subsets of the MSSes
@@ -637,6 +638,9 @@ namespace leximaxIST {
             int mss_size (0);
             for (const std::vector<int> &s : mss)
                 mss_size += s.size();
+            // TODO: what to do if mss is empty? - no blocking clause
+            if (mss_size == 0)
+                break;
             Clause block_mss (mss_size);
             { // construct blocking clause
                 int i (0);
@@ -652,6 +656,15 @@ namespace leximaxIST {
             else
                 blocking_cls.push_back(block_mss);
             ++nb_msses;
+        }
+        if (m_verbosity == 2) {
+            std::cout << "c Blocking clauses:\n";
+            for (const Clause &c : blocking_cls) {
+                std::cout << "c ";
+                for (const int lit : c)
+                    std::cout << lit << ' ';
+                std::cout << '\n';
+            }
         }
         if (m_verbosity >= 1) {
             print_time(read_cpu_time() - initial_time, "c MSS Presolving CPU time: ");
