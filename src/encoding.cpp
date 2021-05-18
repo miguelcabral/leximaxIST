@@ -504,6 +504,7 @@ namespace leximaxIST {
         const int sum (presolve()); // sum is used to compute lower bounds
         if (m_status == 'u')
             return;
+        return; // only do mss presolve
         // encode sorted vectors with sorting network
         encode_sorted();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
