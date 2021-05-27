@@ -321,7 +321,7 @@ namespace leximaxIST
         
         void print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const;
         
-        void print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec) const;
+        void print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec,  const std::vector<std::vector<int>> &mss) const;
         
         void print_mss_enum_info() const;
         

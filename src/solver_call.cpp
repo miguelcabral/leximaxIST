@@ -638,7 +638,7 @@ namespace leximaxIST {
             int mss_size (0);
             for (const std::vector<int> &s : mss)
                 mss_size += s.size();
-            // TODO: what to do if mss is empty? - no blocking clause
+            // if mss is empty then all msses were found
             if (mss_size == 0)
                 break;
             Clause block_mss (mss_size);
@@ -682,12 +682,12 @@ namespace leximaxIST {
      */
     int Encoder::mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max)
     {
-        double initial_time (read_cpu_time());
         // is there another MSS?
         std::vector<int> assumps;
         int rv (solver->solve());
         if (rv != 10)
             return rv; // UNSAT or interrupted
+        // SAT, but the MSS may be empty. If so, all MSSes have been found
         std::vector<int> model (solver->model()); // copy
         const std::vector<int> &obj_vec (set_solution(solver->model())); // move
         best_max = *std::max_element(obj_vec.begin(), obj_vec.end()); 
@@ -736,10 +736,8 @@ namespace leximaxIST {
             }
             ++nb_calls;
         }
-        if (m_verbosity >= 1) {
-            print_mss_info(nb_calls, todo_vec);
-            print_time(read_cpu_time() - initial_time, "c Single MSS CPU time: ");
-        }
+        if (m_verbosity >= 1)
+            print_mss_info(nb_calls, todo_vec, mss);
         return rv;
     }
     

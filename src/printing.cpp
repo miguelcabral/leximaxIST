@@ -1,5 +1,6 @@
 #include <leximaxIST_Encoder.h>
 #include <leximaxIST_printing.h>
+#include <leximaxIST_rusage.h>
 #include <fstream>
 #include <iostream>
 #include <list>
@@ -39,7 +40,7 @@ namespace leximaxIST {
     /* print percentage of falsified objective variables by chance
      * print number of calls to SAT solver
      */
-    void Encoder::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec) const
+    void Encoder::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
     {
         int total_nb_vars (0);
         for (const std::vector<int> *obj : m_objectives)
@@ -47,12 +48,18 @@ namespace leximaxIST {
         int todo_size (0);
         for (const std::vector<int> &v : todo_vec)
             todo_size += v.size();
+        int mss_size (0);
+        for (const std::vector<int> &v : mss)
+            mss_size += v.size();
+        if (mss_size == 0)
+            return;
         const int nb_fixed_vars (total_nb_vars - todo_size);
         const int nb_tested_vars (nb_calls - 1);
         const int nb_lucky_vars (nb_fixed_vars - nb_tested_vars);
-        double percentage (static_cast<double>(nb_lucky_vars) / nb_fixed_vars);
+        // denominator can not be zero, that has been tested
+        double percentage (static_cast<double>(nb_lucky_vars) / mss_size);
         percentage *= 100;
-        std::cout << "c MSS found\n";
+        print_time(read_cpu_time(), "c MSS found: ");
         std::cout << "c Number of SAT calls: " << nb_calls << '\n';
         std::cout << "c Automatically satisfied soft clauses: ";
         const stream_config &old_config (set_cout());
