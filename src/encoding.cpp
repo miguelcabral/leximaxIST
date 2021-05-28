@@ -504,7 +504,6 @@ namespace leximaxIST {
         const int sum (presolve()); // sum is used to compute lower bounds
         if (m_status == 'u')
             return;
-        return; // only do mss presolve
         // encode sorted vectors with sorting network
         encode_sorted();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
@@ -526,7 +525,8 @@ namespace leximaxIST {
             if (m_opt_mode == "external" || (i == m_num_objectives - 1 && m_simplify_last))
                 external_solve(i);
             else
-                internal_solve(i, lb); // can't use with simplify_last since it depends on order
+                internal_solve(i, lb); // can't use with simplify_last since internal solving
+                // depends on the soft variables being sorted
             // fix value of current maximum (in the end of last iteration there is no need)
             if (i != m_num_objectives - 1)
                 fix_soft_vars(i);
