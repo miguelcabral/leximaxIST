@@ -250,6 +250,8 @@ namespace leximaxIST
         
         void internal_solve(const int i, const int lb);
         
+        void update_lb(int &lb);
+        
         void search(int i, int lb, int ub);
         
         void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);

@@ -28,10 +28,9 @@ namespace leximaxIST {
         m_file_name = std::to_string(getpid());
     }
     
-    // Possible values: external, bin. TODO: linear-su, linear-us
     void Encoder::set_opt_mode(const std::string &mode)
     {
-        if (mode != "external" && mode != "bin" && mode != "linear-su") {
+        if (mode != "external" && mode != "bin" && mode != "linear-su" && mode != "linear-us") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
@@ -154,7 +153,7 @@ namespace leximaxIST {
     {
         std::cout << "c ----------------------------------------------------------------------\n";
         std::cout << "c leximaxIST\n";
-        std::cout << "c C++ library for leximax optimisation in a Boolean Satisfaction setting\n";
+        std::cout << "c C++ Library for Leximax Boolean Optimisation\n";
         std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
         std::cout << "c ----------------------------------------------------------------------" << '\n';
     }

@@ -17,6 +17,7 @@
 #include <limits> // std::numeric_limits<double>::max()
 #include <vector>
 #include <algorithm> // std::max_element, std::sort
+#include <cmath> // std::abs()
 #include <sstream>
 #include <cctype>
 
@@ -1114,6 +1115,44 @@ namespace leximaxIST {
         std::cout << "c Number of SAT calls: " << nb_calls << '\n';
     }
     
+    void Encoder::update_lb(int &lb)
+    {
+        //std::cout << "AQUI\n";
+        const std::vector<int> &core (m_sat_solver->conflict());
+        // get the position in m_soft_clauses of the var with the greatest id in the core
+        // NOTE: we assume m_soft_clauses is sorted in increasing order
+        for (int pos (m_soft_clauses.size() - 1); pos >= 0; --pos) {
+            const int var (std::abs(m_soft_clauses.at(pos)));
+            // try to find var in core
+            bool found (false);
+            for (int lit : core) {
+                if (std::abs(lit) == var) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) { // update lower bound and return
+                // update the lower bound pos = size - lb, hence, lb = size - pos
+                const int new_lb = m_soft_clauses.size() - pos;
+                if (new_lb <= lb) {
+                    print_error_msg("In Encoder::update_lb(), lb did not increase");
+                    exit(EXIT_FAILURE);
+                }
+                lb = new_lb;
+                return;
+            }
+        }
+        // I don't think we should add the constraint cost >= new lower bound
+        // because the SAT solver learns that when it concludes unsatisfiability
+        // (any solution must have a cost >= lower bound)
+        /* UNCOMMENT TO ADD CONSTRAINT
+        // y >= lb means at least lb ones
+        // size - 1 means 1 one, size - 2 means 2 ones, ...
+        sc = m_soft_clauses.at(size - lb);
+        m_sat_solver->addClause(-sc);
+        */
+    }
+    
     void Encoder::search(int i, int lb, int ub)
     {
         int nb_calls (0);
@@ -1126,33 +1165,34 @@ namespace leximaxIST {
                 k = lb + (ub - lb)/2; // floor of half of the interval
             else if (m_opt_mode == "linear-su")
                 k = ub - 1;
-            // y <= k means size - k zeros
-            // last position = size - k - 1
-            int sc (m_soft_clauses.at(size - k - 1));
-            std::vector<int> assumps {sc};
+            else if (m_opt_mode == "linear-us")
+                k = lb;
+            // y <= k means size - k zeros; last position = size - k - 1
+            // adding all neg vars to assumps may allow lb to increase by more than 1
+            const int limit (size - k - 1);
+            std::vector<int> assumps (limit + 1);
+            for (int j (0); j <= limit; ++j)
+                assumps.at(j) = m_soft_clauses.at(j);
             if (m_verbosity >= 1)
                 std::cout << "c Calling SAT solver...\n";
             double initial_time (read_cpu_time());
-            const int rv (m_sat_solver->solve(assumps)); // FIXME: change to integer
+            const int rv (m_sat_solver->solve(assumps));
             if (m_verbosity >= 1)
                 print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
             if (rv == 0) {
                 print_error_msg("SAT solver interrupted with no timeout!");
                 exit(EXIT_FAILURE);
             }
-            if (rv == 10) { // sum of soft vars <= k
+            if (rv == 10) { // cost <= k
                 // get solution and refine upper bound
                 std::vector<int> s_obj_vec (set_solution(m_sat_solver->model()));
                 std::sort (s_obj_vec.begin(), s_obj_vec.end(), descending_order);
                 ub = s_obj_vec.at(i); // if obj value is, by chance, less than k
-                encode_ub_soft(ub);
+                encode_ub_soft(ub); // bound the cost in hard clauses, not as assumptions
             }
-            else { // sum of soft vars >= k + 1
-                lb = k + 1;
-                // y >= lb means at least lb ones
-                // size - 1 means 1 one, size - 2 means 2 ones, ...
-                sc = m_soft_clauses.at(size - lb);
-                m_sat_solver->addClause(-sc);
+            else { // cost >= k + 1
+                // inspect core and check if lb can be increased by more than 1
+                update_lb(lb);
             }
             ++nb_calls;
             if (m_verbosity >= 1)
@@ -1169,6 +1209,8 @@ namespace leximaxIST {
                 std::cout << "c Binary ";
             else if (m_opt_mode == "linear-su")
                 std::cout << "c Linear SAT-UNSAT ";
+            else if (m_opt_mode == "linear-us")
+                std::cout << "c Linear UNSAT-SAT ";
             std::cout << "search of optimum with incremental SAT solver...\n";
         }
         std::vector<int> s_obj_vec (get_objective_vector());
