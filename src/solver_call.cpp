@@ -1117,7 +1117,6 @@ namespace leximaxIST {
     
     void Encoder::update_lb(int &lb)
     {
-        //std::cout << "AQUI\n";
         const std::vector<int> &core (m_sat_solver->conflict());
         // get the position in m_soft_clauses of the var with the greatest id in the core
         // NOTE: we assume m_soft_clauses is sorted in increasing order
@@ -1139,18 +1138,19 @@ namespace leximaxIST {
                     exit(EXIT_FAILURE);
                 }
                 lb = new_lb;
-                return;
+                break;
             }
         }
-        // I don't think we should add the constraint cost >= new lower bound
-        // because the SAT solver learns that when it concludes unsatisfiability
-        // (any solution must have a cost >= lower bound)
-        /* UNCOMMENT TO ADD CONSTRAINT
-        // y >= lb means at least lb ones
+        // check core size. If core size > 1, get the relevant variable and add it as hard
+        // cost >= lb means at least lb ones
         // size - 1 means 1 one, size - 2 means 2 ones, ...
-        sc = m_soft_clauses.at(size - lb);
-        m_sat_solver->addClause(-sc);
-        */
+        if (m_verbosity >= 1)
+            std::cout << "c core size: " << core.size() << '\n';
+        if (core.size() > 1) {
+            const int size (m_soft_clauses.size());
+            const int sc = m_soft_clauses.at(size - lb);
+            //add_hard_clause(-sc);
+        }
     }
     
     void Encoder::search(int i, int lb, int ub)
