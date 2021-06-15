@@ -14,7 +14,7 @@
 #include <cudf_reductions.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include <rusage.hh>
+#include <rusage.h>
 
 // underlying solver declaration
 // allows using solvers withour having to include the whole solver classes
@@ -673,20 +673,10 @@ int main(int argc, char *argv[]) {
     unalignedc->initialize(problem, solver);
   }
     printf("# solving \n");
-    double st_self = RUSAGE::read_cpu_time_self();
-    double st_children = RUSAGE::read_cpu_time_children();
-    printf("# time before calling the ILP or PBO solver:\n");
-    printf("#\t parent process: %fs\n", st_self);
-    printf("#\t children processes: %fs\n", st_children);
-    printf("#\t total: %fs\n", st_self + st_children);
   // generate the constraints, solve the problem and print out the solutions
   if ((problem->all_packages->size() > 0) && (generate_constraints(problem, *solver, *combiner) == 0) && (! nosolve) && (solver->solve())) {
-    double et_self = RUSAGE::read_cpu_time_self();
-    double et_children = RUSAGE::read_cpu_time_children();
-    printf("# time after calling the ILP or PBO solver:\n");
-    printf("#\t parent process: %fs\n", et_self);
-    printf("#\t children processes: %fs\n", et_children);
-    printf("#\t total: %fs\n", et_self + et_children);
+    double t = rusage::read_cpu_time();
+    printf("#\t solving time: %fs\n", t);
     solver->init_solutions();
 
     double obj = solver->objective_value();

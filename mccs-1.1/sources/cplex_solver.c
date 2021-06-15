@@ -68,7 +68,13 @@ int cplex_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages, 
     exit(-1);
   }*/
   // end of Miguel edit
-
+  // set time limit as CPU time (not as Wall clock time - default)
+  status = CPXsetintparam (env, CPX_PARAM_CLOCKTYPE, 1);
+  if ( status ) {
+    fprintf (stderr, "Failure to set CPX_PARAM_CLOCKTYPE to 1, error %d.\n", status);
+    exit(-1);
+  }
+  
 
   if (verbosity > 1) {
     /* Turn on output to the screen */
