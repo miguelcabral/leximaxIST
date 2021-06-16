@@ -61,7 +61,7 @@ void set_scip_timeout(double tout)
 {
     double cur_time (read_cpu_time());
     double time_left (tout - cur_time);
-    if (time_left <= 0)
+    if (time_left < 0.001)
         time_left = 0.001;
     std::string command ("sed -i \"s/limits\\/time.*/limits\\/time = ");
     command += std::to_string(time_left);

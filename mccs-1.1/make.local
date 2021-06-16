@@ -14,10 +14,10 @@ ifeq ($(USEGLPK),1)
 GLPKDIR=/home/mcabral/solvers/lp/glpk-4.65
 
 # Path to the GPLK include files
-GLPKINC=$(GLPKDIR)/src/
+GLPKINC=$(GLPKDIR)/include
 
 # GPLK library path and options
-GLPKLD=-L${GLPKDIR}/src -lglpk -Wl,-rpath,${GLPKDIR}/src
+GLPKLD=-L${GLPKDIR}/lib -lglpk -Wl,-rpath,${GLPKDIR}/lib
 
 endif
 
@@ -28,7 +28,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
-#USELPSOLVE=1
+USELPSOLVE=1
 
 
 ifeq ($(USELPSOLVE),1)
@@ -51,7 +51,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-USECPLEX=1
+#USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)
