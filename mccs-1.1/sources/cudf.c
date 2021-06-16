@@ -744,7 +744,7 @@ int main(int argc, char *argv[]) {
   } else {
     if (verbosity > 0) fprintf(stdout, "================================================================\n");
     double t = rusage::read_cpu_time();
-    printf("# solving time: %fs\n", t)
+    printf("# solving time: %fs\n", t);
     fprintf(stdout, "No solution found.\n");
     fprintf(output_file, "FAIL\n");
     fprintf(output_file, "No solution found.\n");
