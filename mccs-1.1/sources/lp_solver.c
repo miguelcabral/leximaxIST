@@ -66,6 +66,10 @@ void set_scip_timeout(double tout)
     std::string command ("sed -i \"s/limits\\/time.*/limits\\/time = ");
     command += time_left;
     command += " /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set";
+    if (system(command) == -1) { // execute sed command
+      fprintf(stderr, "mccs: error while changing scip settings.\n");
+      exit(-1);
+    }
 }
 
 // solve the current problem
