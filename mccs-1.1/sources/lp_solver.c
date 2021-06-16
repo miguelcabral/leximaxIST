@@ -59,7 +59,7 @@ int lp_solver::writelp(char *filename) { return 0; }
 // change settings file of scip to set a time limit
 void set_scip_timeout(double tout)
 {
-    double cur_time (rusage::read_cpu_time());
+    double cur_time (read_cpu_time());
     double time_left (tout - cur_time);
     if (time_left <= 0)
         time_left = 0.001;
