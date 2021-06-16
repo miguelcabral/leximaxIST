@@ -10,14 +10,14 @@ include make.local
 
 #----------------------------------------------------------------------------------
 
-OBJS=	$(OBJDIR)/cudf.o \
+OBJS=	$(OBJDIR)/rusage.o $(OBJDIR)/cudf.o \
 	$(OBJDIR)/constraint_generation.o \
         $(OBJDIR)/lp_solver.o $(OBJDIR)/pblib_solver.o \
 	$(OBJDIR)/removed_criteria.o $(OBJDIR)/changed_criteria.o $(OBJDIR)/new_criteria.o $(OBJDIR)/notuptodate_criteria.o $(OBJDIR)/nunsat_criteria.o \
 	$(OBJDIR)/count_criteria.o $(OBJDIR)/unaligned_criteria.o \
 	$(OBJDIR)/lexicographic_combiner.o $(OBJDIR)/lexagregate_combiner.o $(OBJDIR)/agregate_combiner.o $(OBJDIR)/lexsemiagregate_combiner.o \
 	$(OBJDIR)/leximin_combiner.o $(OBJDIR)/leximax_combiner.o $(OBJDIR)/lexleximin_combiner.o $(OBJDIR)/lexleximax_combiner.o \
-	$(OBJDIR)/cudf_reductions.o $(OBJDIR)/rusage.o
+	$(OBJDIR)/cudf_reductions.o
 
 CCC+=
 
