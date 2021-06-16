@@ -17,7 +17,7 @@ OBJS=	$(OBJDIR)/cudf.o \
 	$(OBJDIR)/count_criteria.o $(OBJDIR)/unaligned_criteria.o \
 	$(OBJDIR)/lexicographic_combiner.o $(OBJDIR)/lexagregate_combiner.o $(OBJDIR)/agregate_combiner.o $(OBJDIR)/lexsemiagregate_combiner.o \
 	$(OBJDIR)/leximin_combiner.o $(OBJDIR)/leximax_combiner.o $(OBJDIR)/lexleximin_combiner.o $(OBJDIR)/lexleximax_combiner.o \
-	$(OBJDIR)/cudf_reductions.o
+	$(OBJDIR)/cudf_reductions.o $(OBJDIR)/rusage.o
 
 CCC+=
 
@@ -169,6 +169,9 @@ $(OBJDIR)/lexleximax_combiner.o: $(SRCDIR)/lexleximax_combiner.c $(SRCDIR)/lexle
 
 $(OBJDIR)/cudf_reductions.o: $(SRCDIR)/cudf_reductions.c $(SRCDIR)/cudf_reductions.h $(SRCLIB)/cudf.h
 	$(CCC) -c $(INC) $(SRCDIR)/cudf_reductions.c -o $(OBJDIR)/cudf_reductions.o
+	
+$(OBJDIR)/rusage.o: $(SRCDIR)/rusage.cpp
+	$(CCC) -c $(INC) -o $(OBJDIR)/rusage.o $(SRCDIR)/rusage.cpp
 
 
 

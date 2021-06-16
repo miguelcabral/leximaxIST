@@ -676,7 +676,7 @@ int main(int argc, char *argv[]) {
   // generate the constraints, solve the problem and print out the solutions
   if ((problem->all_packages->size() > 0) && (generate_constraints(problem, *solver, *combiner) == 0) && (! nosolve) && (solver->solve())) {
     double t = rusage::read_cpu_time();
-    printf("#\t solving time: %fs\n", t);
+    printf("# solving time: %fs\n", t);
     solver->init_solutions();
 
     double obj = solver->objective_value();
@@ -743,12 +743,8 @@ int main(int argc, char *argv[]) {
     //if (verbosity > 0) printf(">>>> Objective value = %f.\n", obj);
   } else {
     if (verbosity > 0) fprintf(stdout, "================================================================\n");
-    double et_self = RUSAGE::read_cpu_time_self();
-    double et_children = RUSAGE::read_cpu_time_children();
-    printf("# time after calling the ILP or PBO solver:\n");
-    printf("#\t parent process: %fs\n", et_self);
-    printf("#\t children processes: %fs\n", et_children);
-    printf("#\t total: %fs\n", et_self + et_children);
+    double t = rusage::read_cpu_time();
+    printf("# solving time: %fs\n", t)
     fprintf(stdout, "No solution found.\n");
     fprintf(output_file, "FAIL\n");
     fprintf(output_file, "No solution found.\n");
