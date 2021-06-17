@@ -21,8 +21,8 @@
 #include <unistd.h>
 
 // scip command
-char[80] scip_cmd ("bash /home/mcabral/thesis/mccs-1.1/");
-char[10] pid_str;
+char scip_cmd[80] ("bash /home/mcabral/thesis/mccs-1.1/");
+char pid_str[10];
 const int str_size (snprintf(pid_str, 10, "%d", getpid()));
 if (str_size < 0 || str_size >= 10) {
     fprintf(stderr, "Error converting PID to c-style string - PID is possibly larger than expected\n");
