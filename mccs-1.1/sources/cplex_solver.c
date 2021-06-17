@@ -209,6 +209,7 @@ int cplex_solver::solve() {
   // Presolving the problem
   if (CPXpresolve(env, lp, CPX_ALG_NONE)) return 0;
 
+  bool is_sat (false);
   // Solve the objectives in a lexical order
   for (int i = first_objective; i < nb_objectives; i++) {
       
@@ -225,6 +226,7 @@ int cplex_solver::solve() {
     }
     // get solution
     init_solutions();
+    is_sat = true;
     
       if (i < nb_objectives - 1) {
 	// Get next non empty objective
@@ -288,14 +290,15 @@ int cplex_solver::solve() {
     } 
     else if (mipstat == CPXMIP_TIME_LIM_FEAS) {
         fprintf(stdout, "# CPLEX reached the time limit with a solution\n");
-        std::cout << "AQUI - FEAS!!!!" << std::endl;
         init_solutions();
-        return 0;
+        return 1;
     }
     else if (mipstat == CPXMIP_TIME_LIM_INFEAS) {
         fprintf(stdout, "# CPLEX reached the time limit without a solution\n");
-        std::cout << "AQUI - INFEAS!!!!" << std::endl;
-        return 0;
+        if (is_sat)
+            return 1;
+        else
+            return 0;
     }
     else {
       if (verbosity > 2)
