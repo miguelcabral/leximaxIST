@@ -15,6 +15,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <rusage.h>
+#include <string>
 
 // underlying solver declaration
 // allows using solvers withour having to include the whole solver classes
@@ -556,7 +557,11 @@ int main(int argc, char *argv[]) {
 	    fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver> and %s does not exist.\n", argv[i]);
 	    exit(-1);
 	  } else*/
-	    solver = new_lp_solver(argv[i]);
+        // change to the scip script identified by this pid
+        std::string cmd ("bash ");
+        cmd += "/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.sh";
+        solver = new_lp_solver(filename.c_str());
+	    //solver = new_lp_solver(argv[i]);
 	} else {
 	  fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver>\n");
 	  exit(-1);

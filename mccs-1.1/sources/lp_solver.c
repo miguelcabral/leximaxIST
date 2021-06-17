@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include <rusage.h>
 #include <string>
+#include <fstream>
 
 #define CLEAN_FILES 1
 #define TMP_FILES_PATH "/tmp/"
@@ -56,9 +57,21 @@ int lp_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages, int
 // write the problem into a file
 int lp_solver::writelp(char *filename) { return 0; }
 
+// write the bash script with the command to execute scip
+void write_bash_scip()
+{
+    const std::string settings_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
+    const std::string script_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.sh");
+    std::ofstream ds (script_file.c_str());
+    ds << "#!/bin/sh\n";
+    ds << "/home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/bin/scip -s ";
+    ds << settings_file << " -f $1\n";
+}
+
 // change settings file of scip to set a time limit
 void set_scip_timeout(double tout)
 {
+    // settings file
     double cur_time (read_cpu_time());
     double time_left (tout - cur_time);
     if (time_left < 0.001)
@@ -89,6 +102,8 @@ int lp_solver::solve() {
   CUDFcoefficient objvals[20];
   unsigned int nb_objectives = objectives.size();
 
+  write_bash_scip();
+  
   sprintf(lpfilename, TMP_FILES_PATH "lppbs_%lu_%lu.lp", (long unsigned)getuid(), (long unsigned)getpid()); 
   sprintf(lpoutfilename, TMP_FILES_PATH "lppbs_%lu_%lu.out", (long unsigned)getuid(), (long unsigned)getpid()); 
 
