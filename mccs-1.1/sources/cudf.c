@@ -23,12 +23,6 @@
 // scip command
 char scip_cmd[80] ("bash /home/mcabral/thesis/mccs-1.1/");
 char pid_str[10];
-const int str_size (snprintf(pid_str, 10, "%d", getpid()));
-if (str_size < 0 || str_size >= 10) {
-    fprintf(stderr, "Error converting PID to c-style string - PID is possibly larger than expected\n");
-}
-strcat(scip_cmd, pid_str);
-strcat(scip_cmd, "_scip.sh");
 
 // underlying solver declaration
 // allows using solvers withour having to include the whole solver classes
@@ -429,6 +423,15 @@ CriteriaList *get_criteria(char *crit_descr, bool first_level, vector<abstract_c
 
 // main CUDF function
 int main(int argc, char *argv[]) {
+    
+    // scip command
+    const int str_size (snprintf(pid_str, 10, "%d", getpid()));
+    if (str_size < 0 || str_size >= 10) {
+        fprintf(stderr, "Error converting PID to c-style string - PID is possibly larger than expected\n");
+    }
+    strcat(scip_cmd, pid_str);
+    strcat(scip_cmd, "_scip.sh");
+    
   FILE *output_file = (FILE *)NULL;
   FILE *output_installed = (FILE *)NULL;
   FILE *output_removed = (FILE *)NULL;
