@@ -16,7 +16,19 @@
 #include <errno.h>
 #include <rusage.h>
 #include <string>
+#include <string.h>
+#include <cstdio>
 #include <unistd.h>
+
+// scip command
+char[80] scip_cmd ("bash /home/mcabral/thesis/mccs-1.1/");
+char[10] pid_str;
+const int str_size (snprintf(pid_str, 10, "%d", getpid()));
+if (str_size < 0 || str_size >= 10) {
+    fprintf(stderr, "Error converting PID to c-style string - PID is possibly larger than expected\n");
+}
+strcat(scip_cmd, pid_str);
+strcat(scip_cmd, "_scip.sh");
 
 // underlying solver declaration
 // allows using solvers withour having to include the whole solver classes
@@ -559,9 +571,7 @@ int main(int argc, char *argv[]) {
 	    exit(-1);
 	  } else*/
         // change to the scip script identified by this pid
-        std::string cmd ("bash ");
-        cmd += "/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.sh";
-        solver = new_lp_solver(cmd.c_str());
+        solver = new_lp_solver(scip_cmd);
 	    //solver = new_lp_solver(argv[i]);
 	} else {
 	  fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver>\n");

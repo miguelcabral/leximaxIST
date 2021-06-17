@@ -261,6 +261,8 @@ int lp_solver::solve() {
     remove(lpoutfilename);
     const std::string settings_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
     remove(settings_file.c_str());
+    const std::string script_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.sh");
+    remove(script_file.c_str());
   }
 
   return status;
