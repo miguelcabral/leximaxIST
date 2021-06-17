@@ -222,6 +222,9 @@ int cplex_solver::solve() {
         double obj_val = objective_value();
 	printf("# Objective value %d = %f\n", i, obj_val);
     }
+    // get solution
+    init_solutions();
+    
       if (i < nb_objectives - 1) {
 	// Get next non empty objective
 	// (must be done here to avoid conflicting method calls
@@ -282,9 +285,13 @@ int cplex_solver::solve() {
       } else
 	return 1;
     } 
-    else if (mipstat == CPX_STAT_CONFLICT_ABORT_TIME_LIM ||
-             mipstat == CPX_STAT_ABORT_TIME_LIM) {
-        fprintf(stdout, "# CPLEX reached the time limit\n");
+    else if (mipstat == CPXMIP_TIME_LIM_FEAS) {
+        fprintf(stdout, "# CPLEX reached the time limit with a solution\n");
+        init_solutions();
+        return 0;
+    }
+    else if (mipstat == CPXMIP_TIME_LIM_INFEAS) {
+        fprintf(stdout, "# CPLEX reached the time limit without a solution\n");
         return 0;
     }
     else {

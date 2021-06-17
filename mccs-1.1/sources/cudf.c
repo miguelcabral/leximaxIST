@@ -693,7 +693,9 @@ int main(int argc, char *argv[]) {
   if ((problem->all_packages->size() > 0) && (generate_constraints(problem, *solver, *combiner) == 0) && (! nosolve) && (solver->solve())) {
     double t = read_cpu_time();
     printf("# solving time: %fs\n", t);
-    solver->init_solutions();
+#ifndef CPLEX
+    solver->init_solutions(); // in cplex we store the solution at the end of each iteration
+#endif
 
     double obj = solver->objective_value();
     if (verbosity > 2) {
