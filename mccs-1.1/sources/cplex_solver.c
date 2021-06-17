@@ -8,6 +8,7 @@
 
 #include <cplex_solver.h>
 #include <math.h>
+#include <rusage.h>
 
 #define OUTPUT_MODEL 0
 #define USEXNAME 0
@@ -183,16 +184,35 @@ int cplex_solver::writelp(char *filename) {
   return CPXwriteprob (env, lp, filename, NULL); 
 }
 
+void cplex_solver::set_cplex_timeout(double tout)
+{
+    // set time limit
+    double cur_time (read_cpu_time());
+    double time_left (tout - cur_time);
+    if (time_left < 0.001)
+        time_left = 0.001;
+    const int status = CPXsetdblparam (env, CPX_PARAM_TILIM, time_left);
+    if ( status ) {
+        fprintf (stderr, "Failure to set CPX_PARAM_TILIM, error %d.\n", status);
+        exit(-1);
+    }
+}
+
 // solve the current problem
 int cplex_solver::solve() {
   int nb_objectives = objectives.size();
   int mipstat, status;
 
+  set_cplex_timeout(10.0);
+  
   // Presolving the problem
   if (CPXpresolve(env, lp, CPX_ALG_NONE)) return 0;
 
   // Solve the objectives in a lexical order
   for (int i = first_objective; i < nb_objectives; i++) {
+      
+    set_cplex_timeout();
+      
     // Solve the mip problem
     if (CPXmipopt (env, lp)) return 0;
   
@@ -261,7 +281,13 @@ int cplex_solver::solve() {
 	  return 1;
       } else
 	return 1;
-    } else {
+    } 
+    else if (mipstat == CPX_STAT_CONFLICT_ABORT_TIME_LIM ||
+             mipstat == CPX_STAT_ABORT_TIME_LIM) {
+        fprintf(stdout, "# CPLEX reached the time limit\n");
+        return 0;
+    }
+    else {
       if (verbosity > 2)
 	fprintf(stderr, "CPLEX solution status = %d\n", mipstat);
       return 0;

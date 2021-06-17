@@ -66,6 +66,8 @@ class cplex_solver: public abstract_solver, public scoeff_solver<double, 0, 0> {
   // Write the lp on a file
   int writelp(char *filename);
 
+  void set_cplex_timeout(double tout);
+  
   // Solve the problem
   int solve();
   // Get the objective value (final one)
