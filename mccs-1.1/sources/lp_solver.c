@@ -63,7 +63,15 @@ void set_scip_timeout(double tout)
     double time_left (tout - cur_time);
     if (time_left < 0.001)
         time_left = 0.001;
-    std::string command ("sed -i \"s/limits\\/time.*/limits\\/time = ");
+    // copy the settings file to the mccs directory and identify it with this pid
+    std::string command ("cp /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set ");
+    const std::string filename ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
+    command += filename;
+    if (system(command.c_str()) == -1) { // execute cp command
+      fprintf(stderr, "mccs: error while copying scip settings.\n");
+      exit(-1);
+    }
+    command = "sed -i \"s/limits\\/time.*/limits\\/time = ";
     command += std::to_string(time_left);
     command += "/g\" /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set";
     if (system(command.c_str()) == -1) { // execute sed command
@@ -236,6 +244,8 @@ int lp_solver::solve() {
     remove(ctlpfilename);
     remove(lpfilename);
     remove(lpoutfilename);
+    const std::string settings_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
+    remove(settings_file.c_str());
   }
 
   return status;
