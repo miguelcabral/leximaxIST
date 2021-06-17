@@ -9,6 +9,7 @@
 #include <cplex_solver.h>
 #include <math.h>
 #include <rusage.h>
+#include <iostream>
 
 #define OUTPUT_MODEL 0
 #define USEXNAME 0
@@ -287,11 +288,13 @@ int cplex_solver::solve() {
     } 
     else if (mipstat == CPXMIP_TIME_LIM_FEAS) {
         fprintf(stdout, "# CPLEX reached the time limit with a solution\n");
+        std::cout << "AQUI - FEAS!!!!" << std::endl;
         init_solutions();
         return 0;
     }
     else if (mipstat == CPXMIP_TIME_LIM_INFEAS) {
         fprintf(stdout, "# CPLEX reached the time limit without a solution\n");
+        std::cout << "AQUI - INFEAS!!!!" << std::endl;
         return 0;
     }
     else {
