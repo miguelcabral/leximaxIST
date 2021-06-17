@@ -58,7 +58,7 @@ int lp_solver::init_solver(CUDFVersionedPackageList *all_versioned_packages, int
 int lp_solver::writelp(char *filename) { return 0; }
 
 // write the bash script with the command to execute scip
-void write_bash_scip()
+void write_scip_files()
 {
     const std::string settings_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
     const std::string script_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.sh");
@@ -66,6 +66,13 @@ void write_bash_scip()
     ds << "#!/bin/sh\n";
     ds << "/home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/bin/scip -s ";
     ds << settings_file << " -f $1\n";
+    // copy the settings file to the mccs directory and identify it with this pid
+    std::string command ("cp /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set ");
+    command += settings_file;
+    if (system(command.c_str()) == -1) { // execute cp command
+      fprintf(stderr, "mccs: error while copying scip settings.\n");
+      exit(-1);
+    }
 }
 
 // change settings file of scip to set a time limit
@@ -76,17 +83,10 @@ void set_scip_timeout(double tout)
     double time_left (tout - cur_time);
     if (time_left < 0.001)
         time_left = 0.001;
-    // copy the settings file to the mccs directory and identify it with this pid
-    std::string command ("cp /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set ");
-    const std::string filename ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
-    command += filename;
-    if (system(command.c_str()) == -1) { // execute cp command
-      fprintf(stderr, "mccs: error while copying scip settings.\n");
-      exit(-1);
-    }
-    command = "sed -i \"s/limits\\/time.*/limits\\/time = ";
+    const std::string settings_file ("/home/mcabral/thesis/mccs-1.1/" + std::to_string(getpid()) + "_scip.txt");
+    std::string command ("sed -i \"s/limits\\/time.*/limits\\/time = ");
     command += std::to_string(time_left);
-    command += "/g\" /home/mcabral/solvers/lp/scipoptsuite-7.0.1/scip/scip.set";
+    command += "/g\" " + settings_file;
     if (system(command.c_str()) == -1) { // execute sed command
       fprintf(stderr, "mccs: error while changing scip settings.\n");
       exit(-1);
@@ -102,7 +102,7 @@ int lp_solver::solve() {
   CUDFcoefficient objvals[20];
   unsigned int nb_objectives = objectives.size();
 
-  write_bash_scip();
+  write_scip_files();
   
   sprintf(lpfilename, TMP_FILES_PATH "lppbs_%lu_%lu.lp", (long unsigned)getuid(), (long unsigned)getpid()); 
   sprintf(lpoutfilename, TMP_FILES_PATH "lppbs_%lu_%lu.out", (long unsigned)getuid(), (long unsigned)getpid()); 
