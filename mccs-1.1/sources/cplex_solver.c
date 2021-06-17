@@ -211,7 +211,7 @@ int cplex_solver::solve() {
   // Solve the objectives in a lexical order
   for (int i = first_objective; i < nb_objectives; i++) {
       
-    set_cplex_timeout();
+    set_cplex_timeout(10.0);
       
     // Solve the mip problem
     if (CPXmipopt (env, lp)) return 0;
