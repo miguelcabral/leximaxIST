@@ -11,7 +11,7 @@
 #include <rusage.h>
 #include <iostream>
 
-#define OUTPUT_MODEL 0
+#define OUTPUT_MODEL 1
 #define USEXNAME 0
 
 // solver creation 
@@ -227,6 +227,13 @@ int cplex_solver::solve() {
     // get solution
     init_solutions();
     is_sat = true;
+	  
+	// Output model to file (when requested)
+	  if (OUTPUT_MODEL) {
+	    char buffer[1024];
+	    sprintf(buffer, "cplexpbs%d.lp", i);
+	    CPXwriteprob (env, lp, buffer, NULL);
+	  }
     
       if (i < nb_objectives - 1) {
 	// Get next non empty objective
@@ -277,16 +284,10 @@ int cplex_solver::solve() {
 	    exit(-1);
 	  }
 	  
-	  // Output model to file (when requested)
-	  /*if (OUTPUT_MODEL) {
-	    char buffer[1024];
-	    sprintf(buffer, "cplexpbs%d.lp", i);
-	    CPXwriteprob (env, lp, buffer, NULL);
-	  }*/
 	} else
 	  return 1;
       } else
-	return 1;
+		return 1;
     } 
     else if (mipstat == CPXMIP_TIME_LIM_FEAS) {
         fprintf(stdout, "# CPLEX reached the time limit with a solution\n");
