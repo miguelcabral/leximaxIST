@@ -389,7 +389,7 @@ namespace leximaxIST {
         }
         if (m_verbosity >= 1 && m_verbosity <= 2) {
             if (i == 0) {
-                std::cout << "c Trival upper bound (size of largest objective): ";
+                std::cout << "c Trivial upper bound (size of largest objective): ";
                 std::cout << m_soft_clauses.size() << '\n';
             }
             std::cout << "c Upper bound of optimum: ";
