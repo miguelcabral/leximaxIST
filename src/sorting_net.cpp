@@ -124,7 +124,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::encode_network(std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network)
+    void Encoder::encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network)
     {
         int size = elems_to_sort.second;
         int first_elem = elems_to_sort.first;
@@ -146,4 +146,45 @@ namespace leximaxIST {
         }
     }
     
+    /* Create a sorting network to sort the obj_vars
+     * Merge this sorting network with the old sorting network - the outputs are initially in sorted_vec
+     * sorted_vec is changed and set to the outputs of the new (larger) sorting network.
+     */
+    void Encoder::merge_core_guided(int obj_index, const std::vector<int> &obj_vars)
+    {
+        std::vector<int> *sorted_vec = m_sorted_vecs.at(obj_index);
+        const size_t old_size (sorted_vec->size());
+        SNET sort_new_vars(obj_vars.size(), {-1,-1});
+        // Create a sorting network to sort the obj_vars
+        const std::pair<int,int> elems_to_sort(0, obj_vars.size());
+        encode_network(elems_to_sort, &obj_vars, sort_new_vars);
+        
+        // Merge
+        SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
+        // the first old_size entries are equal to the old sorting network
+        for (size_t i (0); i < old_size; ++i) {
+            /* the first of the pair is the wire that is connected to i, through the last comparator
+             * in this case we don't know, so we put 0.
+             * we can put any value as long as it is different from -1.
+             * -1 is used for the case there is no comparator connecting wire i.
+             */
+            new_sort_net.at(i).first = 0;
+            // the second of the pair is the variable associated with the output of the last comparator of wire i.
+            new_sort_net.at(i).second = sorted_vec->at(i);
+        }
+        // the last obj_vars.size() entries are equal to sort_new_vars
+        for (size_t i (old_size); i < old_size + obj_vars.size(); ++i) {
+            new_sort_net.at(i) = sort_new_vars.at(i - old_size);
+        }
+        const std::pair<int, int> p1 (0, old_size);
+        const std::pair<int, int> p2 (old_size - 1, obj_vars.size());
+        const std::pair<std::pair<int, int>, int> seq1 (p1, 1); // ((first wire, number of elements), offset)
+        const std::pair<std::pair<int, int>, int> seq2 (p2, 1);
+        // Since the sorting network has comparators connecting all wires, hence the nullptr. It is not used.
+        odd_even_merge(seq1, seq2, nullptr, new_sort_net);
+        // set sorted_vec to the outputs of new_sort_net
+        sorted_vec->resize(old_size + obj_vars.size());
+        for (size_t i (0); i < old_size + obj_vars.size(); ++i)
+            sorted_vec->at(i) = new_sort_net.at(i).second;
+    }
 }/* namespace leximaxIST */

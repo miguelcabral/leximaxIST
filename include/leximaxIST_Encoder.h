@@ -194,7 +194,9 @@ namespace leximaxIST
         
         void odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network);
         
-        void encode_network(std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
+        void encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
+        
+        void merge_core_guided(int obj_index, const std::vector<int> &obj_vars);
         
         //void delete_snet(SNET &sorting_network);
         
