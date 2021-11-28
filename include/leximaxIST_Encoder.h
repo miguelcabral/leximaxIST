@@ -238,7 +238,15 @@ namespace leximaxIST
         
         void fix_only_some();
         
+        void solve_first_enc(int sum);
+        
+        void solve_core_guided();
+        
+        void generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec);
+        
         // solver_call.cpp
+        
+        bool call_sat_solver(const std::vector<int> &assumps);
         
         void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
         

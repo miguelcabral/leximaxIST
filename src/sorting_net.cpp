@@ -152,16 +152,15 @@ namespace leximaxIST {
      */
     void Encoder::merge_core_guided(int obj_index, const std::vector<int> &obj_vars)
     {
-        std::vector<int> *sorted_vec = m_sorted_vecs.at(obj_index);
-        const size_t old_size (sorted_vec->size());
-        SNET sort_new_vars(obj_vars.size(), {-1,-1});
         // Create a sorting network to sort the obj_vars
+        SNET sort_new_vars(obj_vars.size(), {-1,-1});
         const std::pair<int,int> elems_to_sort(0, obj_vars.size());
         encode_network(elems_to_sort, &obj_vars, sort_new_vars);
-        
         // Merge
-        SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
         // the first old_size entries are equal to the old sorting network
+        std::vector<int> *sorted_vec = m_sorted_vecs.at(obj_index);
+        const size_t old_size (sorted_vec->size());
+        SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
         for (size_t i (0); i < old_size; ++i) {
             /* the first of the pair is the wire that is connected to i, through the last comparator
              * in this case we don't know, so we put 0.

@@ -1224,6 +1224,28 @@ namespace leximaxIST {
             print_time(read_cpu_time() - initial_time, "c Minimisation CPU time: ");
     }
     
+    // calls sat solver with assumptions and returns true if sat and false if unsat
+    bool Encoder::call_sat_solver(const std::vector<int> &assumps)
+    {
+        if (m_verbosity >= 1)
+            std::cout << "c Calling SAT solver...\n";
+        double initial_time (read_cpu_time());
+        const int rv (m_sat_solver->solve(assumps));
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
+        if (rv == 0) {
+            print_error_msg("SAT Solver Interrupted!");
+            exit(EXIT_FAILURE);
+        }
+        if (rv == 10) {
+            // get solution and return
+            set_solution(m_sat_solver->model());
+            return true;
+        }
+        else
+            return false;
+    }
+    
     double read_cpu_time()
     {
         struct rusage ru;

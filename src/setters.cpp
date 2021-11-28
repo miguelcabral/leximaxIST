@@ -183,7 +183,10 @@ namespace leximaxIST {
             exit(EXIT_FAILURE);
         }
         m_objectives.resize(m_num_objectives, nullptr);
+        // allocate empty sorted vectors in the heap
         m_sorted_vecs.resize(m_num_objectives, nullptr);
+        for (int i (0); i < m_num_objectives ; ++i)
+            m_sorted_vecs.at(i) = new std::vector<int>();
         m_sat_solver = new IpasirWrap();
         // read problem
         if (m_verbosity == 2)
