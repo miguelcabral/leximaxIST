@@ -158,10 +158,7 @@ bool Options::parse(int argc,char **argv) {
             case 't': trendy   = 1; break;
             case 'h': help     = 1; break;
             case 'u': user_criterion  = optarg; break;
-            case 'v': if (read_digit(optarg, "v", verbosity) == -1) {
-                        return_value = false;
-                    }
-                    break;
+            case 'v': return_value = read_digit(optarg, "v", verbosity); break;
             case 'f': formalism = optarg;
                 if (formalism != "wcnf" && formalism != "opb" && formalism != "lp") {
                     fprintf(stderr, "Invalid option! Available formalism options: 'wcnf', 'opb', 'lp'.\n");

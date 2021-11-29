@@ -116,9 +116,12 @@ void print_usage(ostream &output) {
     output << "\t\t\t\t\t\t (Can not use with internal optimisation)" << endl;
     output << "\t\t\t\t\t\t default: off"<< endl;
     output << "--opt-mode <string>\t\t\t\t optimisation mode"<< endl;
-    output << "\t\t\t\t\t\t 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
-    output << "\t\t\t\t\t\t 'bin' - binary search with incremental SAT solver (default)"<< endl;
-    output << "\t\t\t\t\t\t 'linear-su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;
+    output << "\t\t\t\t\t\t 'Original SAT-based Algorithm:"<< endl;
+    output << "\t\t\t\t\t\t -> 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
+    output << "\t\t\t\t\t\t -> 'bin' - binary search with incremental SAT solver (default)"<< endl;
+    output << "\t\t\t\t\t\t -> 'linear-su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;
+    output << "\t\t\t\t\t\t -> 'linear-us' - linear UNSAT-SAT search with incremental SAT solver"<< endl;
+    output << "\t\t\t\t\t\t 'Core-guided SAT-based Algorithm: 'core-guided'"<< endl;
     output << "--mss-presolve\t\t\t\t\t approximate the leximax-optimum with MSS enumeration"<< endl;
     output << "--mss-add-cls <int>\t\t\t\t how to add the clauses to the MSS in construction"<< endl;
     output << "\t\t\t\t\t\t 0 - add all satisfied clauses"<< endl;

@@ -31,8 +31,6 @@ namespace leximaxIST {
     void Encoder::encode_sorted()
     {   
         for (int i (0); i < m_num_objectives; ++i) {
-            if (m_verbosity == 2)
-                print_obj_func(i);
             const std::vector<int> *objective (m_objectives.at(i));
             const size_t nb_wires = objective->size();
             m_sorted_vecs.at(i)->resize(nb_wires, 0);
@@ -518,6 +516,8 @@ namespace leximaxIST {
     // it is used to compute a lower bound of the optimal value of the first maximum
     void Encoder::solve_first_enc(int sum)
     {
+        if (m_verbosity >= 1)
+            std::cout << "c Original SAT-based Algorithm - Solving...\n";
         // encode sorted vectors with sorting network
         encode_sorted();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
@@ -557,10 +557,53 @@ namespace leximaxIST {
         std::cout << '\n';
     }
     
-    void gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
-                     const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps)
+    void Encoder::gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
+                     const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const
     {
-        // TODO
+        if (m_verbosity == 2)
+            std::cout << "c ----------- Assumptions -----------\n";
+        // determine which maximum we are minimising
+        size_t j (0);
+        while (j < max_vars_vec.size() && !max_vars_vec.at(j).empty()) {
+            ++j;
+        }
+        // determine size of assumps
+        size_t new_size (j*max_vars_vec.at(0).size());
+        for (const std::vector<int> &inputs : inputs_not_sorted)
+            new_size += inputs.size();
+        assumps.resize(new_size);
+        size_t pos (0); // position where we insert the literal in assumps
+        for (size_t k (0); k < j; ++k) {
+            if (m_verbosity == 2)
+                std::cout << "c " << k << "th max = " << lower_bounds.at(k) << ": ";
+            // add constraint that the kth max is equal to the kth lower bound
+            for (size_t p (0); p < max_vars_vec.at(k).size(); ++p) {
+                if (p < max_vars_vec.at(k).size() - lower_bounds.at(k)) {
+                    // negation of max var
+                    assumps.at(pos) = -max_vars_vec.at(k).at(p);
+                }
+                else { // max var
+                    assumps.at(pos) = max_vars_vec.at(k).at(p);
+                }
+                ++pos;
+                if (m_verbosity == 2)
+                    std::cout << assumps.at(pos) << ' ';
+            }
+            if (m_verbosity == 2)
+                std::cout << '\n';
+        }
+        for (size_t k (0); k < inputs_not_sorted.size(); ++k) {
+            if (m_verbosity == 2)
+                std::cout << "c negate the " << k << "th obj vars that are not in the sorting network: ";
+            for (int v : inputs_not_sorted.at(k)) {
+                assumps.at(pos) = -v;
+                ++pos;
+                if (m_verbosity == 2)
+                    std::cout << -v << ' ';
+            }
+            if (m_verbosity == 2)
+                std::cout << '\n';
+        }
     }
     
     /* Generate fresh variables corresponding to the variables whose sum is the ith max
@@ -568,9 +611,16 @@ namespace leximaxIST {
      */
     void Encoder::generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec)
     {
+        if (m_verbosity == 2)
+            std::cout << "c " << i << "th maximum variables\n";
         max_vars_vec.at(i).resize(largest_obj());
-        for (int &v : max_vars_vec.at(i))
-            v = fresh();
+        for (size_t j (0); j < max_vars_vec.at(i).size(); ++j) {
+            max_vars_vec.at(i).at(j) = fresh();
+            if (m_verbosity == 2 && j == 0)
+                std::cout << "c " << max_vars_vec.at(i).at(j) << " ... ";
+            if (m_verbosity == 2 && j == max_vars_vec.at(i).size() - 1)
+                std::cout << max_vars_vec.at(i).at(j) << '\n';
+        }
     }
     
     /* Remove the obj vars in inputs_not_sorted that are in core and put them in new_inputs
@@ -578,7 +628,7 @@ namespace leximaxIST {
      */
     bool find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core, std::vector<int> &new_inputs)
     {
-        // TODO
+        // TODO - the core is {l1, l2, ..., ln} and -li is what appears in the assumptions
         return true;
     }
     
@@ -602,6 +652,8 @@ namespace leximaxIST {
             inputs_not_sorted.at(j) = *obj;
         }
         for (int i (0); i < m_num_objectives; ++i) {
+            if (m_verbosity >= 1)
+                std::cout << "c Minimising " << i + 1 << "th maximum...\n";
             if (i > 0) { // check if the ith max can be zero
                 // encode relaxation and componentwise disjunction
                 encode_relaxation(i);

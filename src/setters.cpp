@@ -30,7 +30,7 @@ namespace leximaxIST {
     
     void Encoder::set_opt_mode(const std::string &mode)
     {
-        if (mode != "external" && mode != "bin" && mode != "linear-su" && mode != "linear-us") {
+        if (mode != "external" && mode != "bin" && mode != "linear-su" && mode != "linear-us" && mode != "core-guided") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
@@ -152,8 +152,7 @@ namespace leximaxIST {
     void print_header()
     {
         std::cout << "c ----------------------------------------------------------------------\n";
-        std::cout << "c leximaxIST\n";
-        std::cout << "c C++ Library for Leximax Boolean Optimisation\n";
+        std::cout << "c leximaxIST - C++ Library for Boolean Leximax Optimisation\n";
         std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
         std::cout << "c ----------------------------------------------------------------------" << '\n';
     }
@@ -229,6 +228,10 @@ namespace leximaxIST {
                     add_hard_clause(-soft_lit, -fresh_var);
             }
             ++i;
+        }
+        if (m_verbosity == 2) { // print obj functions
+            for (int k (0); k < m_num_objectives ; ++k)
+                print_obj_func(k);
         }
     }
 

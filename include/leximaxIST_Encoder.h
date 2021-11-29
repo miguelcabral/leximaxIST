@@ -244,6 +244,9 @@ namespace leximaxIST
         
         void generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec);
         
+        void gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
+                     const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const;
+        
         // solver_call.cpp
         
         bool call_sat_solver(const std::vector<int> &assumps);
