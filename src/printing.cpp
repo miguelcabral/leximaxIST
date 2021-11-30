@@ -12,7 +12,19 @@ namespace leximaxIST {
         std::cerr << "Error leximaxIST: " << msg << '\n';
     }
     
-    std::string ordinal (int i);
+    std::string ordinal (int i)
+    {
+        std::string i_str (std::to_string(i));
+        if (i_str.back() == '1')
+            i_str += "st";
+        else if (i_str.back() == '2')
+            i_str += "nd";
+        else if (i_str.back() == '3')
+            i_str += "rd";
+        else
+            i_str += "th";
+        return i_str;
+    }
     
     stream_config set_cout()
     {
@@ -129,6 +141,30 @@ namespace leximaxIST {
             std::cout << "c sorted_vec[" << j << "]: " << m_sorted_vecs.at(i)->at(j) << '\n';
     }
     
+    // print separately the variables of the jth objective that are in the sorting network and those that are not
+    void Encoder::print_objs_sorted(const std::vector<int> &inputs_not_sorted, int j) const
+    {
+        std::cout << "c Variables of the " << ordinal(j+1) << " objective not in the sorting network: ";
+        for (int v : inputs_not_sorted)
+            std::cout << v << ' ';
+        std::cout << '\n';
+        std::cout << "c Variables of the " << ordinal(j+1) << " objective in the sorting network: ";
+        // find which variables are in the jth sorting network
+        for (int v : *(m_objectives.at(j))) {
+            bool found (false);
+            // find v in inputs_not_sorted. If it's there do not print, otherwise print
+            for (int v2 : inputs_not_sorted) {
+                if (v == v2) {
+                    found = true;
+                    break;
+                } 
+            }
+            if (!found)
+                std::cout << v << ' ';
+        }
+        std::cout << '\n';
+    }
+    
     void Encoder::print_obj_func(int i) const
     {
         const std::vector<int> *objective (m_objectives.at(i));
@@ -139,10 +175,10 @@ namespace leximaxIST {
             std::cout << "c " << objective->at(j) << '\n';
     }
     
-    void Encoder::print_snet_size(int i) const
+    void Encoder::print_snet_info(int i) const
     {
-        std::cout << "c Sorting network size (no. of comparators) of the " << ordinal(i + 1);
-        std::cout << " objective: " << m_sorting_net_size << "\n";
+        std::cout << "c " << ordinal(i + 1) << " Sorting Network: ";
+        std::cout << m_snet_info.at(i).first << " wires and " << m_snet_info.at(i).second << " comparators\n";
     }
     
     void Encoder::print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const

@@ -9,6 +9,8 @@ namespace leximaxIST {
     
     void print_time(double t, const std::string &s);
     
+    std::string ordinal(int i);
+    
     struct stream_config {
         std::streamsize prec;
         std::ios_base::fmtflags flags;

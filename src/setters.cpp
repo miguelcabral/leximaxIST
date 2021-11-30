@@ -181,6 +181,8 @@ namespace leximaxIST {
             print_error_msg("The problem is single-objective");
             exit(EXIT_FAILURE);
         }
+        // set m_snet_info to a vector of (0,0) pairs
+        m_snet_info.resize(m_num_objectives, std::pair(0,0));
         m_objectives.resize(m_num_objectives, nullptr);
         // allocate empty sorted vectors in the heap
         m_sorted_vecs.resize(m_num_objectives, nullptr);

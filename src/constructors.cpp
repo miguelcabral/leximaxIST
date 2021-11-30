@@ -63,14 +63,13 @@ namespace leximaxIST {
         m_maxsat_presolve(false), // do not maxsat presolve
         //m_num_opts(0),
         m_multiplication_string(" "),
-        m_sorting_net_size(0),
         m_opt_mode("bin"),
         m_sat_solver(nullptr)
     {
         // debug
-         /*
+         
         std::cout << std::unitbuf;
-         */
+         
     }
 
 }/* namespace leximaxIST */

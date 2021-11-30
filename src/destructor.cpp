@@ -59,7 +59,7 @@ namespace leximaxIST {
         m_num_objectives = 0;
         m_child_pid = 0;
         m_status = '?';
-        m_sorting_net_size = 0;
+        m_snet_info.clear();
         //m_times.clear();
         // clear sat solver
         clear_ipasir();

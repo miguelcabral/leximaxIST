@@ -63,7 +63,7 @@ namespace leximaxIST
         //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
         std::string m_multiplication_string;
         std::vector<int> m_solution;
-        size_t m_sorting_net_size; // size of largest sorting network
+        std::vector<std::pair<int, int>> m_snet_info; // first = nb wires and second = nb comparators 
         //std::vector<double> m_times; // time of each step of solving (only external solver times)
         IpasirWrap *m_sat_solver;
         
@@ -192,9 +192,9 @@ namespace leximaxIST
         
         void insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network);
         
-        void odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network);
+        int odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network);
         
-        void encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
+        int encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
         
         void merge_core_guided(int obj_index, const std::vector<int> &obj_vars);
         
@@ -216,7 +216,7 @@ namespace leximaxIST
         
         void encode_relaxation(int i);
         
-        void componentwise_OR(int i);
+        void componentwise_OR(int i, const std::vector<int> &max_vars);
         
         int encode_bounds(int i, int sum);
         
@@ -330,9 +330,11 @@ namespace leximaxIST
         
         void print_sorted_true() const; // for debugging
         
+        void print_objs_sorted(const std::vector<int> &inputs_not_sorted, int j) const;
+        
         void print_obj_func(int i) const;
         
-        void print_snet_size(int i) const;
+        void print_snet_info(int i) const;
         
         void print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const;
         
