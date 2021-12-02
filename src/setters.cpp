@@ -188,6 +188,10 @@ namespace leximaxIST {
         m_sorted_vecs.resize(m_num_objectives, nullptr);
         for (int i (0); i < m_num_objectives ; ++i)
             m_sorted_vecs.at(i) = new std::vector<int>();
+        // set m_all_relax_vars to a vector of empty lists
+        m_all_relax_vars.resize(m_num_objectives);
+        // set m_sorted_relax_collection to a vector of empty vectors
+        m_sorted_relax_collection.resize(m_num_objectives);
         m_sat_solver = new IpasirWrap();
         // read problem
         if (m_verbosity == 2)

@@ -26,8 +26,8 @@ namespace leximaxIST {
             std::pair<int,int> elems_to_sort(0, nb_wires);
             if (m_verbosity == 2)
                 std::cout << "c -------- Sorting Network Encoding --------\n";
-            m_snet_info.at(i).first = encode_network(elems_to_sort, objective, sorting_network);
-            m_snet_info.at(i).second = nb_wires;
+            m_snet_info.at(i).first = nb_wires;
+            m_snet_info.at(i).second = encode_network(elems_to_sort, objective, sorting_network);
             if (m_verbosity >= 1)
                 print_snet_info(i);
             // sorted_vec variables are the outputs of sorting_network
@@ -102,17 +102,14 @@ namespace leximaxIST {
         std::list<int> relax_vars;
         for (int j = 0; j < m_num_objectives; ++j)
             relax_vars.push_back(fresh());
-        if (m_opt_mode == "core-guided")
-            m_all_relax_vars.at(i) = relax_vars;
-        else
-            m_all_relax_vars.push_back(relax_vars);
+        m_all_relax_vars.at(i) = relax_vars;
         int first_relax_var (relax_vars.front());
         if (m_verbosity == 2) {
-            std::cout << "c ------------ Relaxation variables of " <<  ordinal(i+1) << " maximum ------------\n";
+            std::cout << "c ------------ Relaxation variables of the " <<  ordinal(i+1) << " maximum ------------\n";
             for (int v : relax_vars)
                 std::cout << "c " << v << '\n';
             if (!m_simplify_last || i != m_num_objectives - 1)
-                std::cout << "c ------------ Sorted vecs after relaxation for " << ordinal(i+1) << " maximum ------------\n";
+                std::cout << "c ------------ Sorted vecs after relaxation for the " << ordinal(i+1) << " maximum ------------\n";
         }
         if (!m_simplify_last || i != m_num_objectives - 1 || m_opt_mode == "core-guided") {
             std::vector<std::vector<int>*> sorted_relax_vecs(m_num_objectives, nullptr);
@@ -149,10 +146,7 @@ namespace leximaxIST {
             if (m_verbosity == 2)
                 std::cout << "c ---------------- At most " << i << " Constraint ----------------\n";
             at_most(relax_vars, i);
-            if (m_opt_mode == "core-guided")
-                m_sorted_relax_collection.at(i-1) = sorted_relax_vecs;
-            else
-                m_sorted_relax_collection.push_back(sorted_relax_vecs);
+            m_sorted_relax_collection.at(i-1) = sorted_relax_vecs;
         }
         else { // last iteration
             // choose exactly one obj function to minimise
@@ -693,10 +687,6 @@ namespace leximaxIST {
                         merge_core_guided(j, new_inputs);
                     }
                 }
-                if (m_verbosity >= 1) {
-                    for (int j (0); j < m_num_objectives; ++j)
-                        print_snet_info(j);
-                }
                 if (!intersects) { // increase ith lower bound
                     ++lower_bounds.at(i);
                     // TODO: check if it is possible to increase by more than 1
@@ -707,6 +697,10 @@ namespace leximaxIST {
                     }
                 }
                 else { // if intersects then we need to repeat the encoding with new variables
+                    if (m_verbosity >= 1) {
+                        for (int j (0); j < m_num_objectives; ++j)
+                            print_snet_info(j);
+                    }
                     for (int j (0); j <= i ; ++j) {
                         if (j > 0)
                             encode_relaxation(j);
