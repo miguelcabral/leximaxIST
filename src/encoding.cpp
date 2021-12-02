@@ -588,6 +588,8 @@ namespace leximaxIST {
             if (m_verbosity == 2)
                 std::cout << '\n';
         }
+        if (m_verbosity == 2)
+            std::cout << "c -----------------------------------\n";
     }
     
     /* Generate fresh variables corresponding to the variables whose sum is the ith max
@@ -659,6 +661,7 @@ namespace leximaxIST {
             inputs_not_sorted.at(j) = *obj;
         }
         for (int i (0); i < m_num_objectives; ++i) {
+            // TODO: before calling the sat solver, check if the leximax-best solution's UB is equal to LB
             if (m_verbosity >= 1)
                 std::cout << "c Minimising the " << ordinal(i + 1) << " maximum...\n";
             if (i > 0) { // check if the ith max can be zero
