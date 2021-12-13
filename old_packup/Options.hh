@@ -65,6 +65,7 @@ public:
     const string&    get_maxsat_psol_cmd()   const { return maxsat_psol_cmd; }
     int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
+    int    get_disjoint_cores() const { return disjoint_cores; }
     int    get_leximax() const { return leximax; }
     int    get_maxsat_presolve() const { return maxsat_presolve; }
     int    get_simplify_last() const { return simplify_last; }
@@ -87,6 +88,7 @@ private:
     string temporary_directory;
     string formalism;
     int    leximax;
+    int    disjoint_cores;
     int    maxsat_presolve;
     int    mss_presolve;
     int    pareto_presolve;

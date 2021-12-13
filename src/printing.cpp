@@ -32,7 +32,7 @@ namespace leximaxIST {
         old_config.flags = std::cout.flags();
         old_config.prec = std::cout.precision();
         std::cout << std::fixed;
-        std::cout.precision(2);
+        std::cout.precision(3);
         return old_config;
     }
     

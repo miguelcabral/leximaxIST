@@ -30,7 +30,9 @@ namespace leximaxIST {
     
     void Encoder::set_opt_mode(const std::string &mode)
     {
-        if (mode != "external" && mode != "bin" && mode != "linear-su" && mode != "linear-us" && mode != "core-guided") {
+        if (mode != "external" && mode != "bin" && mode != "linear-su" &&
+            mode != "linear-us" && mode != "core-static" && mode != "core-dynamic"
+            && mode != "core-dynamic-rebuild" && mode != "core-dynamic-rebuild-incr") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
@@ -298,5 +300,7 @@ namespace leximaxIST {
         }
         m_mss_tolerance = t; 
     }
+    
+    void Encoder::set_disjoint_cores(bool v) { m_disjoint_cores = v; }
     
 }/* namespace leximaxIST */

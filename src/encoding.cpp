@@ -484,8 +484,10 @@ namespace leximaxIST {
         const int sum (presolve()); // sum is used to compute lower bounds
         if (m_status == 'u')
             return;   
-        if (m_opt_mode == "core-guided")
-            solve_core_guided();
+        if (m_opt_mode.substr(0, 12) == "core-dynamic")
+            solve_core_dynamic();
+        else if (m_opt_mode == "core-static")
+            solve_core_static();
         else
             solve_first_enc(sum);            
         if (m_verbosity >= 1) // print total solving time
@@ -642,24 +644,104 @@ namespace leximaxIST {
         return intersects;
     }
     
-    void Encoder::solve_core_guided()
+    void print_assumps(const std::vector<int> & assumps)
     {
-        // first try to satisfy all soft clauses/ falsify all obj variables
+        std::cout << "c ----------- Assumptions -----------\n";
+        std::cout << "c ";
+        for (int l : assumps)
+            std::cout << l << ' ';
+        std::cout << '\n';
+    }
+    
+    /* returns true if it is possible to satisfy all soft clauses, and false otherwise
+     * gets disjoint cores and removes the variables from inputs_not_sorted in the cores
+     * the sorting networks are generated with the variables from the cores
+     * the lower bound of the optimum is increased, based on the cores - TODO!!!
+     */
+    bool Encoder::disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &lower_bounds)
+    {
+        bool rv (true);
+        if (m_verbosity >= 1)
+            std::cout << "c Disjoint Cores Presolving...\n";
+        double initial_time (read_cpu_time());
         std::vector<int> assumps;
         for (const std::vector<int> *obj : m_objectives) {
             for (int v : *obj)
                 assumps.push_back(-v);
         }
+        if (m_verbosity == 2)
+            print_assumps(assumps);
+        std::vector<std::vector<int>> inputs_to_sort(m_num_objectives, std::vector<int>());
+        while (!call_sat_solver(assumps)) {
+            rv = false;
+            std::vector<int> core (m_sat_solver->conflict());
+            if (m_verbosity >= 1)
+                std::cout << "c Core size: " << core.size() << '\n';
+            if (m_verbosity == 2)
+                print_core(core);
+            // get the variables in the core
+            for (int j (0); j < m_num_objectives; ++j) {
+                std::vector<int> new_inputs;
+                // if core intersects jth obj function then add the variables to inputs_to_sort
+                if (find_vars_in_core(inputs_not_sorted.at(j), core, new_inputs)) {
+                    size_t old_size (inputs_to_sort.at(j).size());
+                    inputs_to_sort.at(j).resize(old_size + new_inputs.size());
+                    for (size_t k (old_size); k < old_size + new_inputs.size(); ++k)
+                        inputs_to_sort.at(j).at(k) = new_inputs.at(k - old_size);
+                }
+            }
+            // rebuild assumptions
+            assumps.clear();
+            for (const std::vector<int> &obj_vars : inputs_not_sorted) {
+                for (int v : obj_vars)
+                    assumps.push_back(-v);
+            }
+            if (m_verbosity == 2)
+                print_assumps(assumps);
+        }
+        if (!rv) {
+            // TODO - it may be possible to have much better lower bounds, but we have to analyse the cores
+            lower_bounds.at(0) = 1;
+        }
+        // construct the sorting networks
+        for (int j (0); j < m_num_objectives; ++j) {
+            merge_core_guided(j, inputs_to_sort.at(j));
+            if (m_verbosity >= 1)
+                print_snet_info(j);
+        }
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c Disjoint Cores Presolving - total CPU time: ");
+        return rv;
+    }
+    
+    void Encoder::solve_core_dynamic()
+    {
         if (m_verbosity >= 1)
             std::cout << "c Core Guided Algorithm - Solving...\n";
-        // start minimising each maximum using a core-guided search
         std::vector<int> lower_bounds (m_num_objectives, 0);
         std::vector<std::vector<int>> max_vars_vec (m_num_objectives, std::vector<int>());
         std::vector<std::vector<int>> inputs_not_sorted (m_num_objectives, std::vector<int>());
+        std::vector<int> assumps;
         for (int j (0); j < m_num_objectives; ++j) {
             const std::vector<int> *obj (m_objectives.at(j));
             inputs_not_sorted.at(j) = *obj;
         }
+        if (m_disjoint_cores) {
+            if (disjoint_cores(inputs_not_sorted, lower_bounds))
+                return;
+            // create assumps and encoding
+            generate_max_vars(0, max_vars_vec);
+            componentwise_OR(0, max_vars_vec.at(0));
+            gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
+        }
+        else {
+            // first try to satisfy all soft clauses/ falsify all obj variables
+            for (const std::vector<int> *obj : m_objectives) {
+                for (int v : *obj)
+                    assumps.push_back(-v);
+            }
+        }
+        // start minimising each maximum using a core-guided search
         for (int i (0); i < m_num_objectives; ++i) {
             // TODO: before calling the sat solver, check if the leximax-best solution's UB is equal to LB
             if (m_verbosity >= 1)
@@ -714,6 +796,11 @@ namespace leximaxIST {
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }
+    }
+    
+    void Encoder::solve_core_static()
+    {
+        // TODO: the sorting networks are static, with the largest size from the beginning, but we still use the cores
     }
 
 }/* namespace leximaxIST */

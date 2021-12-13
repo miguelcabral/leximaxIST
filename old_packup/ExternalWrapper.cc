@@ -40,6 +40,7 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
 ,leximax(false)
+,disjoint_cores(false)
 ,leximax_enc(nullptr)
 {}
 
@@ -489,6 +490,8 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      leximax_enc = new leximaxIST::Encoder();
      // set external solvers and parameters of Leximax_encoder
      leximax_enc->set_simplify_last(simplify_last);
+     // disjoint cores presolving for the core-guided algorithm
+     leximax_enc->set_disjoint_cores(disjoint_cores);
      // pareto presolving:
      leximax_enc->set_pareto_presolve(pareto_presolve);
      leximax_enc->set_pareto_timeout(pareto_timeout);

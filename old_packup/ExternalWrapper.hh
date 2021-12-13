@@ -61,6 +61,7 @@ public:
     inline void set_leximax(bool value=true);
     inline void set_simplify_last(bool value=true);
     inline void set_maxsat_presolve(bool value = true);
+    inline void set_disjoint_cores(bool value = true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
     inline void set_opt_mode (const string &mode);
@@ -123,6 +124,7 @@ private:
     bool   leximax;
     bool   simplify_last;
     bool   maxsat_presolve;
+    bool   disjoint_cores;
     int verbosity;
     string formalism;
     string lp_solver;
@@ -164,6 +166,8 @@ inline void ExternalWrapper::set_simplify_last(bool value) {
     simplify_last = value; }
 inline void ExternalWrapper::set_maxsat_presolve(bool value) {
     maxsat_presolve = value; }
+inline void ExternalWrapper::set_disjoint_cores(bool value) {
+    disjoint_cores = value; }
 inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
     lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {

@@ -172,6 +172,8 @@ namespace leximaxIST {
      */
     void Encoder::merge_core_guided(int obj_index, const std::vector<int> &obj_vars)
     {
+        if (obj_vars.size() == 0)
+            return;
         if (m_verbosity >= 1)
             std::cout << "c Increasing the " << ordinal(obj_index + 1) << " sorting network...\n";
         // Create a sorting network to sort the obj_vars

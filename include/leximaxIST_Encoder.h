@@ -40,7 +40,8 @@ namespace leximaxIST
         std::string m_lp_solver;
         std::string m_valid_lp_solvers[6];
         std::string m_file_name;
-        std::string m_opt_mode; // internal (binary, linear-su), or external (MaxSAT solver)
+        std::string m_opt_mode; // internal (binary, linear-su, linear-us, core-guided), or external (MaxSAT/PBO/ILP solver)
+        bool m_disjoint_cores; // find disjoint cores before core-guided algorithm
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_tmp_files;
@@ -136,6 +137,8 @@ namespace leximaxIST
         void set_mss_nb_limit(int n);
         
         void set_mss_tolerance(int t);
+        
+        void set_disjoint_cores(bool v);
                 
         int terminate(); // kill external solver and read approximate solution
         
@@ -240,12 +243,16 @@ namespace leximaxIST
         
         void solve_first_enc(int sum);
         
-        void solve_core_guided();
+        void solve_core_dynamic();
+        
+        void solve_core_static();
         
         void generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec);
         
         void gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
                      const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const;
+                     
+        bool disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &lower_bounds);
         
         // solver_call.cpp
         

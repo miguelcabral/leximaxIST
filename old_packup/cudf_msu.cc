@@ -121,7 +121,12 @@ void print_usage(ostream &output) {
     output << "\t\t\t\t\t\t -> 'bin' - binary search with incremental SAT solver (default)"<< endl;
     output << "\t\t\t\t\t\t -> 'linear-su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;
     output << "\t\t\t\t\t\t -> 'linear-us' - linear UNSAT-SAT search with incremental SAT solver"<< endl;
-    output << "\t\t\t\t\t\t 'Core-guided SAT-based Algorithm: 'core-guided'"<< endl;
+    output << "\t\t\t\t\t\t 'Core-guided SAT-based Algorithm:"<< endl;
+    output << "\t\t\t\t\t\t -> 'core-dynamic' - Dynamic sorting networks that grow using sort and merge"<< endl;
+    output << "\t\t\t\t\t\t -> 'core-dynamic-rebuild' - Dynamic sorting networks that grow by rebuild"<< endl;
+    output << "\t\t\t\t\t\t -> 'core-dynamic-rebuild-incr' - Dynamic sorting networks that grow by rebuild - incremental"<< endl;
+    output << "\t\t\t\t\t\t -> 'core-static' - Static sorting networks"<< endl;
+    output << "--disjoint-cores\t\t\t\t find disjoint cores before the core-guided algorithm"<< endl;
     output << "--mss-presolve\t\t\t\t\t approximate the leximax-optimum with MSS enumeration"<< endl;
     output << "--mss-add-cls <int>\t\t\t\t how to add the clauses to the MSS in construction"<< endl;
     output << "\t\t\t\t\t\t 0 - add all satisfied clauses"<< endl;
@@ -249,6 +254,7 @@ int main(int argc, char** argv) {
     if (options.get_leximax())                         solver.set_leximax();
     if (options.get_simplify_last())                   solver.set_simplify_last();
     if (options.get_maxsat_presolve())                 solver.set_maxsat_presolve();
+    if (options.get_disjoint_cores())                  solver.set_disjoint_cores();
     if (!options.get_lp_solver().empty())              solver.set_lp_solver(options.get_lp_solver());
     if (!options.get_formalism().empty())              solver.set_formalism(options.get_formalism());
     if (!options.get_temporary_directory().empty()) {

@@ -39,6 +39,7 @@ Options::Options()
 , trendy(0)
 , leave_temporary_files(0)
 , leximax(0)
+, disjoint_cores(0)
 , maxsat_presolve(0)
 , mss_presolve(0)
 , pareto_presolve(0)
@@ -132,6 +133,7 @@ bool Options::parse(int argc,char **argv) {
        ,{"pareto-timeout", required_argument,  0, 513}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
+       ,{"disjoint-cores",  no_argument,  &disjoint_cores, 1}
        ,{"maxsat-presolve",  no_argument,  &maxsat_presolve, 1}
        ,{"mss-presolve",  no_argument,  &mss_presolve, 1}
        ,{"pareto-presolve",  no_argument,  &pareto_presolve, 1}

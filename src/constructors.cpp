@@ -64,6 +64,7 @@ namespace leximaxIST {
         //m_num_opts(0),
         m_multiplication_string(" "),
         m_opt_mode("bin"),
+        m_disjoint_cores(false),
         m_sat_solver(nullptr)
     {
         // debug
