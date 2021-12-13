@@ -254,6 +254,9 @@ namespace leximaxIST
                      
         bool disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &lower_bounds);
         
+        void increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
+                              const std::vector<std::vector<int>> &max_vars_vec) const;
+        
         // solver_call.cpp
         
         bool call_sat_solver(const std::vector<int> &assumps);

@@ -138,7 +138,7 @@ namespace leximaxIST {
                 }
             }
             // add order encoding to each sorted vector after relaxation
-            if (m_opt_mode != "core-guided") {
+            if (m_opt_mode.substr(0, 4) != "core") {
                 for (const std::vector<int> *srel : sorted_relax_vecs)
                     order_encoding(*srel);
             }
@@ -675,10 +675,10 @@ namespace leximaxIST {
         while (!call_sat_solver(assumps)) {
             rv = false;
             std::vector<int> core (m_sat_solver->conflict());
-            if (m_verbosity >= 1)
+            if (m_verbosity == 2) {
                 std::cout << "c Core size: " << core.size() << '\n';
-            if (m_verbosity == 2)
                 print_core(core);
+            }
             // get the variables in the core
             for (int j (0); j < m_num_objectives; ++j) {
                 std::vector<int> new_inputs;
@@ -714,10 +714,41 @@ namespace leximaxIST {
         return rv;
     }
     
+    /* increase the ith lower bound, based on the core. It may increase by more than 1.
+     */
+    void Encoder::increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
+                              const std::vector<std::vector<int>> &max_vars_vec) const
+    {
+        // determine which maximum we are minimising
+        size_t i (0);
+        while (i < max_vars_vec.size() && !max_vars_vec.at(i).empty()) {
+            ++i;
+        }
+        --i;
+        const std::vector<int> &max_vars_ith (max_vars_vec.at(i));
+        int max_pos (-1);
+        // find the max position in max_vars_ith of the variables in the core
+        for (int v : core) {
+            // find v in max_vars_ith
+            for (int k (0); k < max_vars_ith.size(); ++k) {
+                if (v == max_vars_ith.at(k) && k > max_pos) {
+                    max_pos = k;
+                    break;
+                }
+            }
+        }
+        if (max_pos == -1) {
+            print_error_msg("In function increase_lb: max_pos == -1");
+            exit(EXIT_FAILURE);
+        }
+        // set lower bound
+        lower_bounds.at(i) = max_vars_ith.size() - max_pos;
+    }
+    
     void Encoder::solve_core_dynamic()
     {
         if (m_verbosity >= 1)
-            std::cout << "c Core Guided Algorithm - Solving...\n";
+            std::cout << "c Core-guided Dynamic Algorithm - Solving...\n";
         std::vector<int> lower_bounds (m_num_objectives, 0);
         std::vector<std::vector<int>> max_vars_vec (m_num_objectives, std::vector<int>());
         std::vector<std::vector<int>> inputs_not_sorted (m_num_objectives, std::vector<int>());
@@ -772,12 +803,11 @@ namespace leximaxIST {
                         merge_core_guided(j, new_inputs);
                     }
                 }
-                if (!intersects) { // increase ith lower bound
-                    ++lower_bounds.at(i);
-                    // TODO: check if it is possible to increase by more than 1
+                if (!intersects) { // increase the ith lower bound
+                    increase_lb(lower_bounds, core, max_vars_vec);
                     if (m_verbosity >= 1) {
                         std::cout << "c The core does not intersect the objective functions\n";
-                        std::cout << "c Lower bound of " << ordinal(i + 1) << " maximum is increased to: ";
+                        std::cout << "c Lower bound of the " << ordinal(i + 1) << " maximum: ";
                         std::cout << lower_bounds.at(i) << '\n';
                     }
                 }
