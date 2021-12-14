@@ -243,9 +243,7 @@ namespace leximaxIST
         
         void solve_first_enc(int sum);
         
-        void solve_core_dynamic();
-        
-        void solve_core_static();
+        void solve_core_guided();
         
         void generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec);
         
@@ -256,6 +254,8 @@ namespace leximaxIST
         
         void increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
                               const std::vector<std::vector<int>> &max_vars_vec) const;
+                              
+        void fix_max(int j, const std::vector<std::vector<int>> &max_vars_vec, const std::vector<int> &lower_bounds);
         
         // solver_call.cpp
         
