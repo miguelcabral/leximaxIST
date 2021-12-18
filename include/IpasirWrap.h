@@ -16,7 +16,8 @@ namespace leximaxIST {
     public:
         IpasirWrap();
         virtual ~IpasirWrap();
-        void addClause(const Clause *clause);
+        void addClauses(const std::vector<Clause> &cls);
+        void addClause(const Clause &clause);
         void addClause(int p);
         void addClause(int p, int q);
         void addClause(int p, int q, int r);

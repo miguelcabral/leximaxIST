@@ -16,17 +16,17 @@ namespace leximaxIST {
     void Encoder::encode_max(int var_out_max, int var_in1, int var_in2)
     {
         // encode var_out_max is equivalent to var_in1 OR var_in2
-        add_hard_clause(-var_out_max, var_in1, var_in2);
-        add_hard_clause(var_out_max, -var_in1);
-        add_hard_clause(var_out_max, -var_in2);
+        add_clause(-var_out_max, var_in1, var_in2);
+        add_clause(var_out_max, -var_in1);
+        add_clause(var_out_max, -var_in2);
     }
 
     void Encoder::encode_min(int var_out_min, int var_in1, int var_in2)
     {
         // encode var_out_min is equivalent to var_in1 AND var_in2
-        add_hard_clause(-var_out_min, var_in1);
-        add_hard_clause(-var_out_min, var_in2);
-        add_hard_clause(var_out_min, -var_in1, -var_in2);
+        add_clause(-var_out_min, var_in1);
+        add_clause(-var_out_min, var_in2);
+        add_clause(var_out_min, -var_in1, -var_in2);
     }
 
     void Encoder::insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network)
@@ -186,8 +186,8 @@ namespace leximaxIST {
         m_snet_info.at(obj_index).first += obj_vars.size();
         // Merge
         // the first old_size entries are equal to the old sorting network
-        std::vector<int> *sorted_vec = m_sorted_vecs.at(obj_index);
-        const size_t old_size (sorted_vec->size());
+        std::vector<int> &sorted_vec = m_sorted_vecs.at(obj_index);
+        const size_t old_size (sorted_vec.size());
         SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
         for (size_t i (0); i < old_size; ++i) {
             /* the first of the pair is the wire that is connected to i, through the last comparator
@@ -197,7 +197,7 @@ namespace leximaxIST {
              */
             new_sort_net.at(i).first = 0;
             // the second of the pair is the variable associated with the output of the last comparator of wire i.
-            new_sort_net.at(i).second = sorted_vec->at(i);
+            new_sort_net.at(i).second = sorted_vec.at(i);
         }
         // the last obj_vars.size() entries are equal to sort_new_vars
         for (size_t i (old_size); i < old_size + obj_vars.size(); ++i) {
@@ -212,9 +212,9 @@ namespace leximaxIST {
         // Since the sorting network has comparators connecting all wires, hence the nullptr. It is not used.
         m_snet_info.at(obj_index).second += odd_even_merge(seq1, seq2, nullptr, new_sort_net); // also, update m_snet_info
         // set sorted_vec to the outputs of new_sort_net
-        sorted_vec->resize(old_size + obj_vars.size());
+        sorted_vec.resize(old_size + obj_vars.size());
         for (size_t i (0); i < old_size + obj_vars.size(); ++i)
-            sorted_vec->at(i) = new_sort_net.at(i).second;
+            sorted_vec.at(i) = new_sort_net.at(i).second;
                 
     }
 }/* namespace leximaxIST */

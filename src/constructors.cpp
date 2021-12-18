@@ -3,39 +3,6 @@
 #include <iostream>
 
 namespace leximaxIST {
-
-    // this uses copy constructor
-    const Clause* Encoder::add_hard_clause(const Clause &cl)
-    {
-        if (cl.empty()) {
-            print_error_msg("Empty hard clause");
-            exit(EXIT_FAILURE);
-        }
-        Clause *clptr (new Clause(cl)); // copy constructor
-        m_hard_clauses.push_back(clptr);
-        m_sat_solver->addClause(clptr);
-        if (m_verbosity == 2)
-            print_clause(std::cout, clptr, "c ");
-        return clptr;
-    }
-
-    const Clause* Encoder::add_hard_clause(int l)
-    {
-        const Clause cl {l};
-        return add_hard_clause(cl);
-    }
-    
-    const Clause* Encoder::add_hard_clause(int l1, int l2)
-    {
-        const Clause cl {l1, l2};
-        return add_hard_clause(cl);
-    }
-    
-    const Clause* Encoder::add_hard_clause(int l1, int l2, int l3)
-    {
-        const Clause cl {l1, l2, l3};
-        return add_hard_clause(cl);
-    }
         
     Encoder::Encoder() : 
         m_verbosity(0),
@@ -69,7 +36,7 @@ namespace leximaxIST {
     {
         // debug
          
-        std::cout << std::unitbuf;
+        //std::cout << std::unitbuf;
          
     }
 

@@ -49,12 +49,14 @@ namespace leximaxIST {
         ipasir_set_terminate (_s, &_time_params, terminate);
     }
     
-    void IpasirWrap::addClause(const Clause *clause)  {
-        if (clause == nullptr) {
-            print_error_msg("In IpasirWrap, nullptr in addClause()");
-            exit(EXIT_FAILURE);
-        }
-        for (int literal : *clause)
+    void IpasirWrap::addClauses(const std::vector<Clause> &cls)
+    {
+        for (const Clause &cl : cls)
+            addClause(cl);
+    }
+    
+    void IpasirWrap::addClause(const Clause &clause)  {
+        for (int literal : clause)
             add(literal);
         f();
     }

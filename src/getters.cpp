@@ -33,10 +33,10 @@ namespace leximaxIST {
     {
         std::vector<int> objective_vector;
         if (!assignment.empty()) {
-            for (std::vector<int> *obj_func : m_objectives) {
+            for (const std::vector<int> &obj_func : m_objectives) {
                 int obj_value (0);
-                for (int var : *obj_func) {
-                    if (assignment[var] > 0)
+                for (int var : obj_func) {
+                    if (assignment.at(var) > 0)
                         ++obj_value;
                 }
                 objective_vector.push_back(obj_value);
@@ -49,9 +49,9 @@ namespace leximaxIST {
     {
         std::vector<int> objective_vector;
         if (!m_solution.empty()) {
-            for (std::vector<int> *obj_func : m_objectives) {
+            for (const std::vector<int> &obj_func : m_objectives) {
                 int obj_value (0);
-                for (int var : *obj_func) {
+                for (int var : obj_func) {
                     if (m_solution[var] > 0)
                         ++obj_value;
                 }

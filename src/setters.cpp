@@ -13,6 +13,50 @@ namespace leximaxIST {
     
     bool descending_order (int i, int j);
     
+    // set_of_clauses can be m_input_hard for input hard clauses or m_encoding for encoding hard clauses
+    void Encoder::add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses)
+    {
+        if (cl.empty()) {
+            print_error_msg("Empty hard clause");
+            exit(EXIT_FAILURE);
+        }
+        set_of_clauses.push_back(cl);
+        if (m_verbosity == 2)
+            print_clause(std::cout, cl, "c ");
+    }
+    
+    void Encoder::add_clause_input(const Clause &cl)
+    {
+        add_clause(cl, m_input_hard);
+        m_sat_solver->addClause(cl);
+    }
+    
+    void Encoder::add_clause_enc(const Clause &cl)
+    {
+        add_clause(cl, m_encoding);
+        // In 'core-dynamic-rebuild' we create a new ipasir solver everytime the sorting networks grow
+        if (m_opt_mode != "core-dynamic-rebuild")
+            m_sat_solver->addClause(cl);
+    }
+
+    void Encoder::add_clause(int l)
+    {
+        const Clause cl {l};
+        add_clause_enc(cl);
+    }
+    
+    void Encoder::add_clause(int l1, int l2)
+    {
+        const Clause cl {l1, l2};
+        add_clause_enc(cl);
+    }
+    
+    void Encoder::add_clause(int l1, int l2, int l3)
+    {
+        const Clause cl {l1, l2, l3};
+        add_clause_enc(cl);
+    }
+    
     int Encoder::fresh()
     {
         // check for overflow
@@ -142,6 +186,17 @@ namespace leximaxIST {
         return old_obj_vec; // the obj vecs are leximax-equal
     }
     
+    // set m_id_count to the maximum id without the encoding - m_input_nb_vars + obj vars
+    void Encoder::reset_id_count()
+    {
+        m_id_count = m_input_nb_vars;
+        for (const std::vector<int> &objective : m_objectives) {
+            m_id_count += objective.size();
+        }
+        if (m_verbosity == 2)
+            std::cout << "c Resetting m_id_count... m_id_count = " << m_id_count << '\n';
+    }
+    
     void Encoder::update_id_count(const Clause &clause)
     {
         for (int lit : clause) {
@@ -185,11 +240,8 @@ namespace leximaxIST {
         }
         // set m_snet_info to a vector of (0,0) pairs
         m_snet_info.resize(m_num_objectives, std::pair(0,0));
-        m_objectives.resize(m_num_objectives, nullptr);
-        // allocate empty sorted vectors in the heap
-        m_sorted_vecs.resize(m_num_objectives, nullptr);
-        for (int i (0); i < m_num_objectives ; ++i)
-            m_sorted_vecs.at(i) = new std::vector<int>();
+        m_objectives.resize(m_num_objectives);
+        m_sorted_vecs.resize(m_num_objectives);
         // set m_all_relax_vars to a vector of empty lists
         m_all_relax_vars.resize(m_num_objectives);
         // set m_sorted_relax_collection to a vector of empty vectors
@@ -202,7 +254,7 @@ namespace leximaxIST {
             // determine max id and update m_id_count
             update_id_count(hard_clause);
             // store clause (check if it is empty)
-            add_hard_clause(hard_clause);
+            add_clause_input(hard_clause);
         }
         // update m_id_count if there are new variables in objective_functions
         for (const std::vector<std::vector<int>> &obj : objective_functions) {
@@ -212,7 +264,7 @@ namespace leximaxIST {
         m_input_nb_vars = m_id_count;
         if (m_verbosity > 0 && m_verbosity <= 2) {
             std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
-            std::cout << "c Number of input hard clauses: " << m_hard_clauses.size() << '\n';
+            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
             std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
         }
         // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
@@ -220,20 +272,21 @@ namespace leximaxIST {
             std::cout << "c ---- Input soft clauses conversion to variables ----\n";
         int i(0);
         for (const std::vector<std::vector<int>> &obj : objective_functions) {
-            m_objectives[i] = new std::vector<int>(obj.size(), 0);
+            m_objectives.at(i).resize(obj.size(), 0);
             int j(0);
             for (const std::vector<int> &soft_clause : obj) {
                 // neg fresh_var implies soft_clause
                 int fresh_var (fresh());
                 Clause hard_clause (soft_clause); // copy constructor
-                (m_objectives.at(i))->at(j) = fresh_var;
+                m_objectives.at(i).at(j) = fresh_var;
                 hard_clause.push_back(fresh_var);
-                add_hard_clause(hard_clause);
-                hard_clause.clear();
+                add_clause_input(hard_clause);
                 j++;
                 // other implication: soft_clause implies neg fresh_var
-                for (const int soft_lit : soft_clause)
-                    add_hard_clause(-soft_lit, -fresh_var);
+                for (const int soft_lit : soft_clause) {
+                    Clause cl {-soft_lit, -fresh_var};
+                    add_clause_input(cl);
+                }
             }
             ++i;
         }

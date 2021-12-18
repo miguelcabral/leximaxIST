@@ -28,12 +28,13 @@ namespace leximaxIST
         int m_verbosity; // 0: nothing, 1: solving phases, time + obj vector, 2: everything including encoding
         int m_id_count;
         int m_input_nb_vars; // number of vars of input problem - useful to return assignment of only these variables
-        std::vector<Clause*> m_hard_clauses; // TODO: remove pointers?
+        std::vector<Clause> m_input_hard; // also contains the equivalence between soft clauses and obj variables
+        std::vector<Clause> m_encoding; // encoding clauses
         std::vector<int> m_soft_clauses; // unit clauses
-        std::vector<std::vector<int>*> m_objectives; // TODO: remove pointers?
+        std::vector<std::vector<int>> m_objectives;
         int m_num_objectives;
-        std::vector<std::vector<int>*> m_sorted_vecs; // TODO: remove pointers?
-        std::vector<std::vector<std::vector<int>*>>  m_sorted_relax_collection; // TODO: remove pointers?
+        std::vector<std::vector<int>> m_sorted_vecs;
+        std::vector<std::vector<std::vector<int>>>  m_sorted_relax_collection;
         std::vector<std::list<int>> m_all_relax_vars; // relax_vars of each iteration
         std::string m_ext_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
@@ -152,6 +153,8 @@ namespace leximaxIST
         
         void reset_file_name();
         
+        void reset_id_count();
+        
         void update_id_count(const Clause &clause);
         
         // update m_solution if the model is leximax-better than the current solution
@@ -169,23 +172,17 @@ namespace leximaxIST
         
         // constructors.cpp
         
-        const Clause* add_hard_clause(const Clause &c);
+        void add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses);
         
-        const Clause* add_hard_clause(int l);
+        void add_clause_input(const Clause &cl);
         
-        const Clause* add_hard_clause(int l1, int l2);
+        void add_clause_enc(const Clause &cl);
         
-        const Clause* add_hard_clause(int l1, int l2, int l3);
+        void add_clause(int l);
         
-        // destructor.cpp
+        void add_clause(int l1, int l2);
         
-        void clear_soft_clauses();
-        
-        void clear_sorted_relax();
-        
-        void clear_hard_clauses();
-        
-        void clear_ipasir();
+        void add_clause(int l1, int l2, int l3);
         
         // sorting_net.cpp
         
@@ -205,9 +202,11 @@ namespace leximaxIST
         
         // encoding.cpp
         
+        void encode_sorted(const std::vector<int> &obj_vars, int obj_index);
+        
         void encode_sorted();
         
-        size_t largest_obj();
+        size_t largest_obj() const;
         
         void order_encoding(const std::vector<int>& vars);
         
@@ -259,7 +258,7 @@ namespace leximaxIST
         
         // solver_call.cpp
         
-        bool call_sat_solver(const std::vector<int> &assumps);
+        bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
         
         void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
         
@@ -358,19 +357,19 @@ namespace leximaxIST
         
         void print_waitpid_error(const std::string &errno_str) const;
         
-        void print_clause(std::ostream &output, const Clause *cl, const std::string &leadingStr = "") const;
+        void print_clause(std::ostream &output, const Clause &cl, const std::string &leadingStr = "") const;
         
 //         void print_wcnf_clauses(std::ostream &output, const std::vector<Clause*> &clauses, size_t weight) const;
         
 //         void print_atmost_lp(int i, std::ostream &output) const;
         
-        void print_lp_constraint(const Clause *cl, std::ostream &output) const;
+        void print_lp_constraint(const Clause &cl, std::ostream &output) const;
         
 //         void print_sum_equals_lp(int i, std::ostream &output) const;
         
 //         void print_atmost_pb(int i, std::ostream &output) const;
         
-        void print_pb_constraint(const Clause *cl, std::ostream &output) const;
+        void print_pb_constraint(const Clause &cl, std::ostream &output) const;
         
 //         void print_sum_equals_pb(int i, std::ostream &output) const;
 

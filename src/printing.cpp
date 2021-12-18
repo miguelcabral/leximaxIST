@@ -55,8 +55,8 @@ namespace leximaxIST {
     void Encoder::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
     {
         int total_nb_vars (0);
-        for (const std::vector<int> *obj : m_objectives)
-            total_nb_vars += obj->size();
+        for (const std::vector<int> &obj : m_objectives)
+            total_nb_vars += obj.size();
         int todo_size (0);
         for (const std::vector<int> &v : todo_vec)
             todo_size += v.size();
@@ -137,8 +137,8 @@ namespace leximaxIST {
     void Encoder::print_sorted_vec (int i) const
     {
         std::cout << "c ---------------- m_sorted_vecs[" << i << "] -----------------\n";
-        for(size_t j{0}; j < m_sorted_vecs.at(i)->size(); j++)
-            std::cout << "c sorted_vec[" << j << "]: " << m_sorted_vecs.at(i)->at(j) << '\n';
+        for(size_t j{0}; j < m_sorted_vecs.at(i).size(); j++)
+            std::cout << "c sorted_vec[" << j << "]: " << m_sorted_vecs.at(i).at(j) << '\n';
     }
     
     // print separately the variables of the jth objective that are in the sorting network and those that are not
@@ -150,7 +150,7 @@ namespace leximaxIST {
         std::cout << '\n';
         std::cout << "c Variables of the " << ordinal(j+1) << " objective in the sorting network: ";
         // find which variables are in the jth sorting network
-        for (int v : *(m_objectives.at(j))) {
+        for (int v : m_objectives.at(j)) {
             bool found (false);
             // find v in inputs_not_sorted. If it's there do not print, otherwise print
             for (int v2 : inputs_not_sorted) {
@@ -167,12 +167,12 @@ namespace leximaxIST {
     
     void Encoder::print_obj_func(int i) const
     {
-        const std::vector<int> *objective (m_objectives.at(i));
-        size_t num_terms (objective->size());
+        const std::vector<int> &objective (m_objectives.at(i));
+        size_t num_terms (objective.size());
         std::cout << "c --------------- Objective Function " << i << " (size = ";
         std::cout << num_terms << ") --------------\n";
         for (size_t j = 0; j < num_terms; ++j)
-            std::cout << "c " << objective->at(j) << '\n';
+            std::cout << "c " << objective.at(j) << '\n';
     }
     
     void Encoder::print_snet_info(int i) const
@@ -193,7 +193,7 @@ namespace leximaxIST {
         std::cout << '\n';
         std::cout << "c Upper Bounds: ";
         for (int i(0); i < m_num_objectives; ++i) {
-            const int obj_size (m_objectives.at(i)->size());
+            const int obj_size (m_objectives.at(i).size());
             std::cout << obj_size - mss.at(i).size() << ' ';
         }
         std::cout << '\n';
@@ -208,10 +208,10 @@ namespace leximaxIST {
     }
 
     // leadingStr can be "c ", to print comments, or e.g. "100 " to print weights
-    void Encoder::print_clause(std::ostream &output, const Clause *clause, const std::string &leadingStr) const
+    void Encoder::print_clause(std::ostream &output, const Clause &clause, const std::string &leadingStr) const
     {
         output << leadingStr;
-        for (int lit : *clause)
+        for (int lit : clause)
             output << lit << " "; 
         output << "0\n";
     }
@@ -225,16 +225,20 @@ namespace leximaxIST {
     void Encoder::print_hard_clauses(std::ostream &output) const
     {
         size_t weight (m_soft_clauses.size() + 1);
-        for (const Clause *cl : m_hard_clauses) {
+        for (const Clause &cl : m_input_hard) {
+            output << weight << " ";
+            print_clause(output, cl);
+        }
+        for (const Clause &cl : m_encoding) {
             output << weight << " ";
             print_clause(output, cl);
         }
     }
 
-    void Encoder::print_pb_constraint(const Clause *cl, std::ostream &output) const
+    void Encoder::print_pb_constraint(const Clause &cl, std::ostream &output) const
     {
         int num_negatives(0);
-        for (int literal : *cl) {
+        for (int literal : cl) {
             bool sign = literal > 0;
             if (!sign)
                 ++num_negatives;
@@ -243,12 +247,12 @@ namespace leximaxIST {
         output << " >= " << 1 - num_negatives << ";\n";
     }
 
-    void Encoder::print_lp_constraint(const Clause *cl, std::ostream &output) const
+    void Encoder::print_lp_constraint(const Clause &cl, std::ostream &output) const
     {
         int num_negatives(0);
         size_t nb_vars_in_line (0);
-        for (size_t j (0); j < cl->size(); ++j) {
-            int literal (cl->at(j));
+        for (size_t j (0); j < cl.size(); ++j) {
+            int literal (cl.at(j));
             bool sign = literal > 0;
             if (!sign)
                 ++num_negatives;
@@ -320,29 +324,27 @@ namespace leximaxIST {
         if (!m_solution.empty()){
             std::cout << "c Sorted vecs true variables:" << '\n';
             int j = 0;
-            for (const std::vector<int> *sorted_vec : m_sorted_vecs) {
+            for (const std::vector<int> &sorted_vec : m_sorted_vecs) {
                 std::cout << "c Sorted vec " << j << ": ";
-                for (int var : *sorted_vec) {
-                    if (m_solution[var] > 0)
+                for (int var : sorted_vec) {
+                    if (m_solution.at(var) > 0)
                         std::cout << var << ' ';
                 }
                 std::cout << '\n';
                 ++j;
             }
             j = 1;
-            for (const std::vector<std::vector<int>*> &sorted_relax_vecs : m_sorted_relax_collection) {
+            for (const std::vector<std::vector<int>> &sorted_relax_vecs : m_sorted_relax_collection) {
                 std::cout << "c Sorted Relax Vecs true variables of iteration " << j << ":" << '\n';
                 int k (0);
-                for (const std::vector<int> *sorted_relax : sorted_relax_vecs) {
-                    if (sorted_relax != nullptr) {
-                        std::cout << "c Sorted Relax vec " << k << ": ";
-                        for (int var : *sorted_relax) {
-                            if (m_solution[var] > 0)
-                                std::cout << var << ' ';
-                        }
-                        std::cout << '\n';
-                        ++k;
+                for (const std::vector<int> &sorted_relax : sorted_relax_vecs) {
+                    std::cout << "c Sorted Relax vec " << k << ": ";
+                    for (int var : sorted_relax) {
+                        if (m_solution[var] > 0)
+                            std::cout << var << ' ';
                     }
+                    std::cout << '\n';
+                    ++k;
                 }
                 ++j;
             }

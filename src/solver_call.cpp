@@ -311,7 +311,7 @@ namespace leximaxIST {
             exit(EXIT_FAILURE);
         }
         // print header
-        out << "p cnf " << m_id_count << " " << m_hard_clauses.size() << '\n';
+        out << "p cnf " << m_id_count << " " << m_input_hard.size() << '\n';
         print_hard_clauses(out);
         out.close();
     }
@@ -326,7 +326,7 @@ namespace leximaxIST {
         }
         // prepare input for the solver
         size_t weight = m_soft_clauses.size() + 1;
-        out << "p wcnf " << m_id_count << " " << m_hard_clauses.size() << " " << weight << '\n';
+        out << "p wcnf " << m_id_count << " " << m_input_hard.size() + m_encoding.size() << " " << weight << '\n';
         print_hard_clauses(out);
         print_soft_clauses(out);
         out.close();
@@ -342,14 +342,16 @@ namespace leximaxIST {
         }
         // prepare input for the solver
         out << "* #variable= " << m_id_count;
-        out << " #constraint= " << m_hard_clauses.size() << '\n';
+        out << " #constraint= " << m_input_hard.size() + m_encoding.size() << '\n';
         if (m_soft_clauses.size() > 0) {// print minimization function
             out << "min:";
             for (int neg_var : m_soft_clauses)
                 out << " " << "+1" << m_multiplication_string << "x" << -neg_var;
             out << ";\n";
         }
-        for (const Clause *cl : m_hard_clauses)
+        for (const Clause &cl : m_input_hard)
+            print_pb_constraint(cl, out);
+        for (const Clause &cl : m_encoding)
             print_pb_constraint(cl, out);
         out.close();
     }
@@ -446,7 +448,9 @@ namespace leximaxIST {
         }
         output << "Subject To\n";
         // print constraints
-        for (const Clause *cl : m_hard_clauses)
+        for (const Clause &cl : m_input_hard)
+            print_lp_constraint(cl, output);
+        for (const Clause &cl : m_encoding)
             print_lp_constraint(cl, output);
         // print all variables after Binaries
         output << "Binaries\n";
@@ -519,7 +523,7 @@ namespace leximaxIST {
         // compute the upper bounds
         std::vector<int> upper_bounds (m_num_objectives);
         for (int j (0); j < m_num_objectives; ++j)
-            upper_bounds.at(j) = m_objectives.at(j)->size() - mss.at(j).size();
+            upper_bounds.at(j) = m_objectives.at(j).size() - mss.at(j).size();
         // first check if the maximum can not be improved
         for (int j (0); j < m_num_objectives; ++j) {
             const int todo_size (todo_vec.at(j).size());
@@ -562,7 +566,7 @@ namespace leximaxIST {
             // add clauses for each objective until the upper bound is decreased to max, if possible
             std::vector<int> upper_bounds (m_num_objectives);
             for (int j (0); j < m_num_objectives; ++j)
-                upper_bounds.at(j) = m_objectives.at(j)->size() - mss.at(j).size();
+                upper_bounds.at(j) = m_objectives.at(j).size() - mss.at(j).size();
             int max (upper_bounds.at(0) - vars_to_add.at(0).size());
             for (int j (1); j < m_num_objectives; ++j) {
                 const int best_case_ub (upper_bounds.at(j) - vars_to_add.at(j).size());
@@ -623,10 +627,8 @@ namespace leximaxIST {
                 solver = m_sat_solver;
             else {
                 solver = &new_solver;
-                for (const Clause *hard_cl : m_hard_clauses)
-                    solver->addClause(hard_cl);
-                for (const Clause &c : blocking_cls)
-                    solver->addClause(&c);
+                solver->addClauses(m_input_hard);
+                solver->addClauses(blocking_cls);
             }
             std::vector<std::vector<int>> mss (m_num_objectives);
             solver->set_timeout(m_mss_timeout, initial_time);
@@ -653,7 +655,7 @@ namespace leximaxIST {
                 }
             }
             if (m_mss_incremental)
-                add_hard_clause(block_mss);
+                add_clause_input(block_mss);
             else
                 blocking_cls.push_back(block_mss);
             ++nb_msses;
@@ -694,8 +696,8 @@ namespace leximaxIST {
         best_max = *std::max_element(obj_vec.begin(), obj_vec.end()); 
         std::vector<std::vector<int>> todo_vec (m_num_objectives);
         for (int i (0); i < m_num_objectives; ++i) {
-            const std::vector<int> *objective (m_objectives[i]);
-            todo_vec[i] = *objective; // copy assignment
+            const std::vector<int> &objective (m_objectives.at(i));
+            todo_vec[i] = objective; // copy assignment
         }
         mss_add_falsified (solver, model, mss, todo_vec, assumps);
         int nb_calls (1);
@@ -770,8 +772,8 @@ namespace leximaxIST {
         }
         // soft clauses are negations of all objective variables
         m_soft_clauses.clear();
-        for (const std::vector<int> *obj : m_objectives) {
-            for (int x : *obj)
+        for (const std::vector<int> &obj : m_objectives) {
+            for (int x : obj)
                 m_soft_clauses.push_back(-x);
         }
         write_wcnf_file(0);
@@ -825,8 +827,8 @@ namespace leximaxIST {
             IpasirWrap *solver (nullptr);
             if (!m_pareto_incremental) {
                 solver = &new_solver;
-                for (const Clause *c : m_hard_clauses)
-                    solver->addClause(c);
+                solver->addClauses(m_input_hard);
+                solver->addClauses(m_encoding);
             }
             else
                 solver = m_sat_solver;
@@ -910,13 +912,13 @@ namespace leximaxIST {
             // i is the nb of fixed objs; j is the obj index
             const int obj_val (obj_vec.at(j));
             if (obj_val >= min_prev) {
-                const std::vector<int> *sorted_vec (m_sorted_vecs.at(j));
-                const int size (sorted_vec->size());
+                const std::vector<int> &sorted_vec (m_sorted_vecs.at(j));
+                const int size (sorted_vec.size());
                 const int pos (size - obj_val); // 0 <= pos <= size
                 if (pos < size)
-                    unit_clauses.push_back(sorted_vec->at(pos)); // lower bound
+                    unit_clauses.push_back(sorted_vec.at(pos)); // lower bound
                 if (pos - 1 >= 0)
-                    unit_clauses.push_back(-sorted_vec->at(pos - 1)); // upper bound
+                    unit_clauses.push_back(-sorted_vec.at(pos - 1)); // upper bound
                 if (m_verbosity == 2)
                     std::cout << "c Objective " << j << ": = " << obj_val << '\n';
                 ++i; // one more fixed
@@ -942,24 +944,24 @@ namespace leximaxIST {
             if (obj_val >= min_prev)
                 ++i; // fixed obj
             else {
-                const std::vector<int> *sorted_vec (m_sorted_vecs.at(j));
-                const int size (sorted_vec->size());
+                const std::vector<int> &sorted_vec (m_sorted_vecs.at(j));
+                const int size (sorted_vec.size());
                 const int ub (s_obj_vec.at(max_index) - 1);
                 const int pos (size - ub); // 0 <= pos <= size
                 if (pos - 1 >= 0)
-                    unit_clauses.push_back(-sorted_vec->at(pos - 1)); // upper bound
+                    unit_clauses.push_back(-sorted_vec.at(pos - 1)); // upper bound
                 if (m_verbosity == 2)
                     std::cout << "c Objective " << j << ": <= " << ub << '\n';
             }
         }
         // bound the remaining objs
         for (; j < m_num_objectives; ++j) {
-            const std::vector<int> *sorted_vec (m_sorted_vecs.at(j));
-            const int size (sorted_vec->size());
+            const std::vector<int> &sorted_vec (m_sorted_vecs.at(j));
+            const int size (sorted_vec.size());
             const int ub (s_obj_vec.at(max_index) - 1); // <= max-1
             const int pos (size - ub); // 0 <= pos <= size
             if (pos - 1 >= 0)
-                unit_clauses.push_back(-sorted_vec->at(pos - 1)); // upper bound
+                unit_clauses.push_back(-sorted_vec.at(pos - 1)); // upper bound
             if (m_verbosity == 2)
                 std::cout << "c Objective " << j << ": <= " << ub << '\n';
         }
@@ -970,13 +972,13 @@ namespace leximaxIST {
     void Encoder::bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const
     {
         for (int i (0); i < m_num_objectives; ++i) {
-            const std::vector<int> *sorted_vec (m_sorted_vecs.at(i));
+            const std::vector<int> &sorted_vec (m_sorted_vecs.at(i));
             const int obj_val (obj_vec.at(i));
-            const int size (sorted_vec->size());
+            const int size (sorted_vec.size());
             if (obj_val < max) {
                 const int pos (size - obj_val - 1); // -1 <= pos <= size - 1
                 if (pos >= 0)
-                    unit_clauses.push_back(-sorted_vec->at(pos)); // upper bound
+                    unit_clauses.push_back(-sorted_vec.at(pos)); // upper bound
                 if (m_verbosity == 2)
                     std::cout << "c Objective " << i << ": <= " << obj_val << '\n';
             }
@@ -1149,7 +1151,7 @@ namespace leximaxIST {
         if (core.size() > 1) {
             const int size (m_soft_clauses.size());
             const int sc = m_soft_clauses.at(size - lb);
-            //add_hard_clause(-sc);
+            //add_clause(-sc);
         }
     }
     
@@ -1225,12 +1227,16 @@ namespace leximaxIST {
     }
     
     // calls sat solver with assumptions and returns true if sat and false if unsat
-    bool Encoder::call_sat_solver(const std::vector<int> &assumps)
+    bool Encoder::call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps)
     {
+        if (solver == nullptr) {
+            print_error_msg("In call_sat_solver function: solver is a null pointer!");
+            exit(EXIT_FAILURE);
+        }
         if (m_verbosity >= 1)
             std::cout << "c Calling SAT solver...\n";
         double initial_time (read_cpu_time());
-        const int rv (m_sat_solver->solve(assumps));
+        const int rv (solver->solve(assumps));
         if (m_verbosity >= 1)
             print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
         if (rv == 0) {
@@ -1239,7 +1245,7 @@ namespace leximaxIST {
         }
         if (rv == 10) {
             // get solution and return
-            set_solution(m_sat_solver->model());
+            set_solution(solver->model());
             return true;
         }
         else
