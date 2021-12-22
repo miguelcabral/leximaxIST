@@ -629,7 +629,8 @@ namespace leximaxIST {
     /* Remove the obj vars in inputs_not_sorted that are in core and put them in new_inputs
      * Return true if the core intersects the obj vars and false otherwise
      */
-    bool find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core, std::vector<int> &new_inputs)
+    bool Encoder::find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<int> &new_inputs) const
     {
         new_inputs.clear();
         bool intersects (false);
@@ -646,6 +647,25 @@ namespace leximaxIST {
                 new_inputs.push_back(l);
                 // remove by puting the last element in the position j and erasing the last entry
                 inputs_not_sorted.at(j) = inputs_not_sorted.back();
+                inputs_not_sorted.pop_back();
+            }
+        }
+        return intersects;
+    }
+    
+    /* Calls find_vars_in_core in order to set new_inputs with the obj vars in the core
+     * If m_opt_mode = 'core-dynamic-dup' then we may also add other variables to new_inputs
+     * So that new_inputs has size equal to the nb of wires of the current sorting network
+     */
+    bool Encoder::find_vars_in_core(int i, std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<int> &new_inputs) const
+    {
+        bool intersects (find_vars_in_core(inputs_not_sorted, core, new_inputs));
+        if (m_opt_mode == "core-dynamic-dup" && intersects) {
+            int nb_wires = m_snet_info.at(i).first;
+            while (new_inputs.size() < nb_wires && inputs_not_sorted.size() > 0) {
+                new_inputs.push_back(inputs_not_sorted.at(0));
+                inputs_not_sorted.at(0) = inputs_not_sorted.back();
                 inputs_not_sorted.pop_back();
             }
         }
@@ -808,13 +828,14 @@ namespace leximaxIST {
         std::vector<int> assumps;
         for (int j (0); j < m_num_objectives; ++j)
             inputs_not_sorted.at(j) = m_objectives.at(j);
-        if (m_disjoint_cores && m_opt_mode == "core-dynamic") {
+        if (m_disjoint_cores && (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup")) {
             if (disjoint_cores(inputs_not_sorted, lower_bounds))
                 return;
         }
         if (m_opt_mode == "core-static")
             encode_sorted();
-        if ((m_opt_mode == "core-static") || (m_disjoint_cores && m_opt_mode == "core-dynamic")) {
+        if ((m_opt_mode == "core-static") ||
+            (m_disjoint_cores && (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup"))) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
         }
@@ -843,13 +864,13 @@ namespace leximaxIST {
                 for (int j (0); j < m_num_objectives; ++j) {
                     std::vector<int> new_inputs;
                     // if core intersects input soft clauses change sorting networks
-                    if (find_vars_in_core(inputs_not_sorted.at(j), core, new_inputs)) {
+                    if (find_vars_in_core(j, inputs_not_sorted.at(j), core, new_inputs)) {
                         intersects = true;
                         if (m_verbosity >= 1)
                             std::cout << "c The core intersects the " << ordinal(j+1) << " objective\n";
                         if (m_verbosity == 2)
                             print_objs_sorted(inputs_not_sorted.at(j), j);
-                        if (m_opt_mode == "core-dynamic")
+                        if (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup")
                             merge_core_guided(j, new_inputs);
                     }
                 }

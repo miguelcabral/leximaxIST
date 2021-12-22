@@ -256,6 +256,12 @@ namespace leximaxIST
                               
         void fix_max(int j, const std::vector<std::vector<int>> &max_vars_vec, const std::vector<int> &lower_bounds);
         
+        bool find_vars_in_core(int i, std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<int> &new_inputs) const;
+                                    
+        bool find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<int> &new_inputs) const;
+        
         // solver_call.cpp
         
         bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
