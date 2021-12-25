@@ -849,9 +849,13 @@ namespace leximaxIST {
                 if (m_opt_mode == "core-static")
                     fix_max(i - 1, max_vars_vec, lower_bounds);
                 // encode relaxation and componentwise disjunction
+                if (m_opt_mode == "core-dynamic-rebuild")
+                    m_encoding.clear();
                 encode_relaxation(i);
                 generate_max_vars(i, max_vars_vec);
                 componentwise_OR(i, max_vars_vec.at(i));
+                if (m_opt_mode == "core-dynamic-rebuild")
+                    solver->addClauses(m_encoding);
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
             while (!call_sat_solver(solver, assumps)) {
