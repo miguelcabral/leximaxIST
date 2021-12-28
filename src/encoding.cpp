@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <unordered_map>
 #include <utility>
 #include <algorithm>
 #include <list>
@@ -918,6 +919,8 @@ namespace leximaxIST {
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }
+        if (m_opt_mode == "core-dynamic-rebuild")
+            delete solver;
     }
 
 }/* namespace leximaxIST */
