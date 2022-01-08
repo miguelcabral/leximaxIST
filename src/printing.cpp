@@ -26,6 +26,23 @@ namespace leximaxIST {
         return i_str;
     }
     
+    void print_lb_map(const std::unordered_map<int, int> &lb_map)
+    {
+        std::cout << "c -------------- lb_map --------------\n";
+        for (const std::pair<int, int> &p : lb_map)
+            std::cout << "c " << p.first << " : " << p.second << '\n';
+        std::cout << "c ------------------------------------\n";
+    }
+    
+    void print_lower_bounds(const std::vector<int> &lower_bounds)
+    {
+        std::cout << "c Lower bounds of the maxima: ";
+        std::cout << lower_bounds.at(0);
+        for (int j (1); j < lower_bounds.size(); ++j)
+            std::cout << ", " << lower_bounds.at(j);
+        std::cout << '\n';
+    }
+    
     stream_config set_cout()
     {
         stream_config old_config;
@@ -142,27 +159,29 @@ namespace leximaxIST {
     }
     
     // print separately the variables of the jth objective that are in the sorting network and those that are not
-    void Encoder::print_objs_sorted(const std::vector<int> &inputs_not_sorted, int j) const
+    void Encoder::print_objs_sorted(const std::vector<std::vector<int>> &inputs_not_sorted) const
     {
-        std::cout << "c Variables of the " << ordinal(j+1) << " objective not in the sorting network: ";
-        for (int v : inputs_not_sorted)
-            std::cout << v << ' ';
-        std::cout << '\n';
-        std::cout << "c Variables of the " << ordinal(j+1) << " objective in the sorting network: ";
-        // find which variables are in the jth sorting network
-        for (int v : m_objectives.at(j)) {
-            bool found (false);
-            // find v in inputs_not_sorted. If it's there do not print, otherwise print
-            for (int v2 : inputs_not_sorted) {
-                if (v == v2) {
-                    found = true;
-                    break;
-                } 
-            }
-            if (!found)
+        for (int j (0); j < m_num_objectives; ++j) {
+            std::cout << "c Variables of the " << ordinal(j+1) << " objective not in the sorting network: ";
+            for (int v : inputs_not_sorted.at(j))
                 std::cout << v << ' ';
+            std::cout << '\n';
+            std::cout << "c Variables of the " << ordinal(j+1) << " objective in the sorting network: ";
+            // find which variables are in the jth sorting network
+            for (int v : m_objectives.at(j)) {
+                bool found (false);
+                // find v in inputs_not_sorted. If it's there do not print, otherwise print
+                for (int v2 : inputs_not_sorted.at(j)) {
+                    if (v == v2) {
+                        found = true;
+                        break;
+                    } 
+                }
+                if (!found)
+                    std::cout << v << ' ';
+            }
+            std::cout << '\n';
         }
-        std::cout << '\n';
     }
     
     void Encoder::print_obj_func(int i) const

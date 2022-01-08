@@ -15,44 +15,41 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
     
-    void Encoder::encode_sorted(const std::vector<int> &obj_vars, int obj_index)
+    void Encoder::encode_sorted(const std::vector<std::vector<int>> &inputs_to_sort)
     {
-        if (obj_vars.empty())
-            return;
-        const size_t nb_wires = obj_vars.size();
-        m_sorted_vecs.at(obj_index).resize(nb_wires, 0);
-        // sorting_network is initialized to a vector of pairs (-1,-1)
-        SNET sorting_network(nb_wires, {-1,-1});
-        // elems_to_sort is represented by a pair (first element, number of elements).
-        std::pair<int,int> elems_to_sort(0, nb_wires);
-        if (m_verbosity == 2)
-            std::cout << "c -------- Sorting Network Encoding --------\n";
-        m_snet_info.at(obj_index).first = nb_wires;
-        m_snet_info.at(obj_index).second = encode_network(elems_to_sort, &obj_vars, sorting_network);
-        // sorted_vec variables are the outputs of sorting_network
-        if (nb_wires == 1) { // in this case the sorting network is empty
-            std::vector<int> &sorted_vec = m_sorted_vecs.at(obj_index);
-            sorted_vec.at(0) = obj_vars.at(0);
-        }
-        else {
-            for (size_t j{0}; j < nb_wires; j++) {
-                int output_j = sorting_network.at(j).second;
-                std::vector<int> &sorted_vec = m_sorted_vecs.at(obj_index);
-                sorted_vec.at(j) = output_j;
+        for (size_t i (0); i < inputs_to_sort.size(); ++i) {
+            const std::vector<int> &obj_vars (inputs_to_sort.at(i));
+            if (!obj_vars.empty()) {
+                const size_t nb_wires = obj_vars.size();
+                m_sorted_vecs.at(i).resize(nb_wires, 0);
+                // sorting_network is initialized to a vector of pairs (-1,-1)
+                SNET sorting_network(nb_wires, {-1,-1});
+                // elems_to_sort is represented by a pair (first element, number of elements).
+                std::pair<int,int> elems_to_sort(0, nb_wires);
+                if (m_verbosity == 2)
+                    std::cout << "c -------- Sorting Network Encoding --------\n";
+                m_snet_info.at(i).first = nb_wires;
+                m_snet_info.at(i).second = encode_network(elems_to_sort, &obj_vars, sorting_network);
+                // sorted_vec variables are the outputs of sorting_network
+                if (nb_wires == 1) { // in this case the sorting network is empty
+                    std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
+                    sorted_vec.at(0) = obj_vars.at(0);
+                }
+                else {
+                    for (size_t j{0}; j < nb_wires; j++) {
+                        int output_j = sorting_network.at(j).second;
+                        std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
+                        sorted_vec.at(j) = output_j;
+                    }
+                }
+                if (m_verbosity == 2)
+                    print_sorted_vec(i);
             }
         }
-        if (m_verbosity == 2)
-            print_sorted_vec(obj_index);
-    }
-    
-    void Encoder::encode_sorted()
-    {   
-        for (int i (0); i < m_num_objectives; ++i) {
-            const std::vector<int> &objective (m_objectives.at(i));
-            encode_sorted(objective, i);
+        if (m_verbosity >= 1) {
+            for (int i (0); i < m_num_objectives; ++i)
+                print_snet_info(i);
         }
-        for (int i (0); i < m_num_objectives; ++i)
-            print_snet_info(i);
         // add order encoding to each sorted vector
         /*for (int i (0); i < m_num_objectives; ++i)
             order_encoding(*(m_sorted_vecs.at(i)));*/
@@ -80,12 +77,12 @@ namespace leximaxIST {
             }
         }
         else {
-        // Step of recursion: the combinations that include the first element of set + those that don't include it
-        int first_el = set.front();
-        set.pop_front();
-        clause[size - i] = -first_el;
-        all_subsets(set, i-1, clause); // combinations that include first_el
-        all_subsets(set, i, clause); // combinations that don't include first_el
+            // Step of recursion: the combinations that include the first element of set + those that don't include it
+            int first_el = set.front();
+            set.pop_front();
+            clause[size - i] = -first_el;
+            all_subsets(set, i-1, clause); // combinations that include first_el
+            all_subsets(set, i, clause); // combinations that don't include first_el
         }
     }
 
@@ -502,7 +499,7 @@ namespace leximaxIST {
         if (m_verbosity >= 1)
             std::cout << "c Original SAT-based Algorithm - Solving...\n";
         // encode sorted vectors with sorting network
-        encode_sorted();
+        encode_sorted(m_objectives);
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
         for (int i = 0; i < m_num_objectives; ++i) {
             m_soft_clauses.clear();
@@ -610,19 +607,18 @@ namespace leximaxIST {
     {
         if (m_verbosity == 2)
             std::cout << "c " << ordinal(i + 1) << " maximum variables\n";
-        // the number of max_vars is equal to the maximum number of wires of the sorting networks
-        int max_nb_wires (0);
-        for (const std::pair<int, int> &info : m_snet_info) {
-            const int nb_wires (info.first);
-            if (nb_wires > max_nb_wires)
-                max_nb_wires = nb_wires;
+        // the number of max_vars is equal to the maximum size of the sorted vectors
+        size_t max_size (0);
+        for (const std::vector<int> & sorted_vec : m_sorted_vecs) {
+            if (sorted_vec.size() > max_size)
+                max_size = sorted_vec.size();
         }
-        max_vars_vec.at(i).resize(max_nb_wires);
-        for (int j (0); j < max_nb_wires; ++j) {
+        max_vars_vec.at(i).resize(max_size);
+        for (int j (0); j < max_size; ++j) {
             max_vars_vec.at(i).at(j) = fresh();
             if (m_verbosity == 2 && j == 0)
                 std::cout << "c " << max_vars_vec.at(i).at(j) << " ... ";
-            if (m_verbosity == 2 && j == max_nb_wires - 1)
+            if (m_verbosity == 2 && j == max_size - 1)
                 std::cout << max_vars_vec.at(i).at(j) << '\n';
         }
     }
@@ -630,45 +626,40 @@ namespace leximaxIST {
     /* Remove the obj vars in inputs_not_sorted that are in core and put them in new_inputs
      * Return true if the core intersects the obj vars and false otherwise
      */
-    bool Encoder::find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
-                                    std::vector<int> &new_inputs) const
+    bool Encoder::find_vars_in_core(std::vector<std::vector<int>> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<std::vector<int>> &new_inputs) const
     {
-        new_inputs.clear();
+        for (std::vector<int> &v : new_inputs)
+            v.clear();
         bool intersects (false);
         // the core is {l1, l2, ..., ln} and -li is what appears in the assumptions
         for (int l : core) {
             // find l in inputs_not_sorted
-            size_t j (0);
-            while (j < inputs_not_sorted.size() && inputs_not_sorted.at(j) != l) {
-                ++j;
-            }
-            if (j < inputs_not_sorted.size()) { // found
-                intersects = true;
-                // remove from inputs_not_sorted and put in new_inputs
-                new_inputs.push_back(l);
-                // remove by puting the last element in the position j and erasing the last entry
-                inputs_not_sorted.at(j) = inputs_not_sorted.back();
-                inputs_not_sorted.pop_back();
+            bool found (false);
+            size_t i (0);
+            while (!found && i < inputs_not_sorted.size()) {
+                size_t j (0);
+                while (j < inputs_not_sorted.at(i).size() && inputs_not_sorted.at(i).at(j) != l)
+                    ++j;
+                if (j < inputs_not_sorted.at(i).size()) { // found
+                    found = true;
+                    intersects = true;
+                    // remove from inputs_not_sorted and put in new_inputs
+                    new_inputs.at(i).push_back(l);
+                    // remove by puting the last element in the position j and erasing the last entry
+                    inputs_not_sorted.at(i).at(j) = inputs_not_sorted.at(i).back();
+                    inputs_not_sorted.at(i).pop_back();
+                }
+                ++i;
             }
         }
-        return intersects;
-    }
-    
-    /* Calls find_vars_in_core in order to set new_inputs with the obj vars in the core
-     * If m_opt_mode = 'core-dynamic-dup' then we may also add other variables to new_inputs
-     * So that new_inputs has size equal to the nb of wires of the current sorting network
-     */
-    bool Encoder::find_vars_in_core(int i, std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
-                                    std::vector<int> &new_inputs) const
-    {
-        bool intersects (find_vars_in_core(inputs_not_sorted, core, new_inputs));
-        if (m_opt_mode == "core-dynamic-dup" && intersects) {
-            int nb_wires = m_snet_info.at(i).first;
-            while (new_inputs.size() < nb_wires && inputs_not_sorted.size() > 0) {
-                new_inputs.push_back(inputs_not_sorted.at(0));
-                inputs_not_sorted.at(0) = inputs_not_sorted.back();
-                inputs_not_sorted.pop_back();
+        if (m_verbosity >= 1) {
+            std::cout << "c The core intersects the following objectives: ";
+            for (int j (0); j < m_num_objectives; ++j) {
+                if (!new_inputs.at(j).empty())
+                    std::cout << j + 1 << " ";
             }
+            std::cout << "\n";
         }
         return intersects;
     }
@@ -682,62 +673,245 @@ namespace leximaxIST {
         std::cout << '\n';
     }
     
+    /* generates all subsets of size n of the main set, stored in set_of_combs
+     */
+    template <typename T>
+    void combinations(std::vector<std::vector<T>> &set_of_combs, std::vector<T> main_set, std::vector<T> comb, int n)
+    {
+        if (n == 1) {
+            for (const T &e : main_set) {
+                comb.push_back(e);
+                set_of_combs.push_back(comb);
+                comb.pop_back();
+            }
+        }
+        else if (main_set.size() == n) {
+            for (const T &e : main_set)
+                comb.push_back(e);
+            set_of_combs.push_back(comb);
+        }
+        else {
+            T first_el = main_set.at(0);
+            // remove first_el from main_set
+            main_set.erase(main_set.begin());
+            combinations(set_of_combs, main_set, comb, n); // combinations that don't include first_el
+            comb.push_back(first_el);
+            combinations(set_of_combs, main_set, comb, n - 1); // combinations that include first_el
+        }
+    }
+    
+    /* check if no variables of max_vars_vec appear in the core
+     * in this case, we can increase some lower bound of lb_map, depending on which obj funcs it intersects
+     * and this may allow an increase in the lower bound of the ith maximum
+     * min_index : the maximum we are minimising
+     */
+    void Encoder::change_lb_map(int min_index, std::vector<int> &lower_bounds, const std::vector<int> &core,
+                      const std::vector<std::vector<int>> &max_vars_vec, std::unordered_map<int, int> &lb_map) const
+    {
+        std::vector<bool> intersect (m_num_objectives, false); // does the core intersect each obj
+        for (int lit : core) {
+            // check if it is in max_vars_vec
+            for (const std::vector<int> &max_vars : max_vars_vec) {
+                for (int m : max_vars) {
+                    if (m == std::abs(lit))
+                        return; // if a max variable appears in the core we cannot increase the lower bounds
+                }
+            }
+            // check which obj c belongs to
+            bool found (false);
+            int i (-1);
+            while (!found) {
+                ++i;
+                const std::vector<int> &obj (m_objectives.at(i));
+                for (int v : obj) {
+                    if (v == lit) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            intersect.at(i) = true;
+        }
+        // update lb_map
+        int key (0);
+        for (int j (0); j < m_num_objectives; ++j) {
+            if (intersect.at(j))
+                key = key * 10 + j + 1;
+        }
+        ++lb_map.at(key);
+        if (m_verbosity == 2)
+            print_lb_map(lb_map);
+        // update lower_bounds if possible
+        // Right now I only use all combinations for the 1st and 2nd maxima
+        // For the remaining maxima I only use the individual bounds and the bound for the sum of all objs
+        // individual bounds
+        std::vector<int> indiv_lbs (m_num_objectives, 0);
+        for (int j (1); j <= m_num_objectives; ++j)
+            indiv_lbs.at(j - 1) = lb_map.at(j);
+        std::sort (indiv_lbs.begin(), indiv_lbs.end(), descending_order);
+        for (int j (0); j < m_num_objectives; ++j) {
+            if (lower_bounds.at(j) < indiv_lbs.at(j))
+                lower_bounds.at(j) = indiv_lbs.at(j);
+        }
+        if (m_verbosity == 2) {
+            std::cout << "c LB given by keys ";
+            for (int j (1); j <= m_num_objectives; ++j)
+                std::cout << j << ' ';
+            std::cout << ": ";
+            std::cout << indiv_lbs.at(0);
+            for (int j (1); j < m_num_objectives; ++j)
+                std::cout << ", " << indiv_lbs.at(j);
+            std::cout << '\n';
+        }
+        // sum of all objs bound
+        key = 0;
+        for (int j (1); j <= m_num_objectives; ++j)
+            key = key * 10 + j;
+        int sum (lb_map.at(key)); // key = 123...m_num_objectives
+        for (int j (0); j < min_index; ++j)
+            sum -= lower_bounds.at(j);
+        int k (sum / (m_num_objectives - min_index));
+        if (sum % m_num_objectives != 0) // ceiling
+            ++k;
+        if (m_verbosity == 2)
+            std::cout << "c LB given by key " << key << " : " << k << '\n';
+        if (lower_bounds.at(min_index) < k)
+            lower_bounds.at(min_index) = k;
+        if (min_index == 0 || min_index == 1) {
+            // remaining combinations
+            std::vector<int> objs;
+            for (int j (1); j <= m_num_objectives; ++j)
+                objs.push_back(j);
+            for (int j (2); j < m_num_objectives; ++j) {
+                std::vector<std::vector<int>> set_of_combs;
+                std::vector<int> c;
+                combinations(set_of_combs, objs, c, j);
+                for (const std::vector<int> &comb : set_of_combs) {
+                    key = 0;
+                    for (int p (0); p < comb.size(); ++p)
+                        key = key * 10 + comb.at(p);
+                    sum = lb_map.at(key);
+                    if (min_index == 0) {
+                        k = sum / comb.size();
+                        if (sum % comb.size() != 0) // ceiling
+                            ++k;
+                    }
+                    else {
+                        int k_out (sum / comb.size()); // the 1st max is not one of the objs in comb
+                        if (sum % comb.size() != 0) // ceiling
+                            ++k_out;
+                        int k_in (sum); // the 1st max is one of the objs in comb
+                        k_in -= lower_bounds.at(0);
+                        if (k_in > 0) {
+                            k_in = k_in / (comb.size() - 1);
+                            if (k_in % (comb.size() - 1) != 0) // ceiling
+                                ++k_in;
+                        }
+                        k = std::min(k_in, k_out);
+                    }
+                    if (m_verbosity == 2)
+                        std::cout << "c LB given by key " << key << " : " << k << '\n';
+                    if (lower_bounds.at(min_index) < k)
+                        lower_bounds.at(min_index) = k;
+                }
+            }
+        }
+    }
+    
+    void Encoder::add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars)
+    {
+        for (int j (0); j < m_num_objectives; ++j) {
+            // add unit_core_vars to the sorted vector
+            for (int v : unit_core_vars.at(j))
+                m_sorted_vecs.at(j).push_back(v);
+            if (m_verbosity == 2)
+                print_sorted_vec(j);
+        }
+    }
+    
     /* returns true if it is possible to satisfy all soft clauses, and false otherwise
      * gets disjoint cores and removes the variables from inputs_not_sorted in the cores
      * the sorting networks are generated with the variables from the cores
-     * the lower bound of the optimum is increased, based on the cores - TODO!!!
+     * the lower bound of the optimum is increased, based on the cores
      */
-    bool Encoder::disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &lower_bounds)
+    bool Encoder::disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted,
+                                 std::vector<std::vector<int>> &unit_core_vars,
+                                 std::vector<int> &lower_bounds, std::unordered_map<int, int> &lb_map)
     {
         bool rv (true);
         if (m_verbosity >= 1)
             std::cout << "c Disjoint Cores Presolving...\n";
         double initial_time (read_cpu_time());
-        std::vector<int> assumps;
-        for (const std::vector<int> &obj : m_objectives) {
-            for (int v : obj)
-                assumps.push_back(-v);
-        }
-        if (m_verbosity == 2)
-            print_assumps(assumps);
+        /* the first m_num_objectives iterations are for finding cores in each obj separately
+         * the last iteration is for finding the remaining cores intersecting 
+         */
         std::vector<std::vector<int>> inputs_to_sort(m_num_objectives, std::vector<int>());
-        while (!call_sat_solver(m_sat_solver, assumps)) {
-            rv = false;
-            std::vector<int> core (m_sat_solver->conflict());
-            if (m_verbosity == 2) {
-                std::cout << "c Core size: " << core.size() << '\n';
-                print_core(core);
-            }
-            // get the variables in the core
-            for (int j (0); j < m_num_objectives; ++j) {
-                std::vector<int> new_inputs;
-                // if core intersects jth obj function then add the variables to inputs_to_sort
-                if (find_vars_in_core(inputs_not_sorted.at(j), core, new_inputs)) {
-                    size_t old_size (inputs_to_sort.at(j).size());
-                    inputs_to_sort.at(j).resize(old_size + new_inputs.size());
-                    for (size_t k (old_size); k < old_size + new_inputs.size(); ++k)
-                        inputs_to_sort.at(j).at(k) = new_inputs.at(k - old_size);
+        for (int i (0); i <= m_num_objectives; ++i) {
+            std::vector<int> assumps;
+            if (i == m_num_objectives) {
+                for (const std::vector<int> &obj_vars : inputs_not_sorted) {
+                    for (int v : obj_vars)
+                        assumps.push_back(-v);
                 }
             }
-            // rebuild assumptions
-            assumps.clear();
-            for (const std::vector<int> &obj_vars : inputs_not_sorted) {
-                for (int v : obj_vars)
+            else {
+                for (int v : m_objectives.at(i))
                     assumps.push_back(-v);
             }
             if (m_verbosity == 2)
                 print_assumps(assumps);
+            while (!call_sat_solver(m_sat_solver, assumps)) {
+                rv = false;
+                std::vector<int> core (m_sat_solver->conflict());
+                if (m_verbosity == 2) {
+                    std::cout << "c Core size: " << core.size() << '\n';
+                    print_core(core);
+                }
+                const std::vector<std::vector<int>> max_vars_vec; // this is empty
+                change_lb_map(0, lower_bounds, core, max_vars_vec, lb_map); // change lb_map and possibly lower_bounds
+                // get the variables in the core
+                std::vector<std::vector<int>> new_inputs(m_num_objectives, std::vector<int>());
+                find_vars_in_core(inputs_not_sorted, core, new_inputs);
+                if (core.size() == 1) {
+                    int j (0); // index of the objective function in this core
+                    while (new_inputs.at(j).empty())
+                        ++j;
+                    unit_core_vars.at(j).push_back(core.at(0));
+                }
+                else {
+                    // add to inputs_to_sort
+                    for (int j (0); j < m_num_objectives; ++j) {
+                        size_t old_size (inputs_to_sort.at(j).size());
+                        inputs_to_sort.at(j).resize(old_size + new_inputs.at(j).size());
+                        for (size_t k (old_size); k < old_size + new_inputs.at(j).size(); ++k)
+                            inputs_to_sort.at(j).at(k) = new_inputs.at(j).at(k - old_size);
+                    }
+                }
+                if (m_verbosity == 2)
+                    print_lower_bounds(lower_bounds);
+                // rebuild assumptions
+                assumps.clear();
+                if (i == m_num_objectives) {
+                    for (const std::vector<int> &obj_vars : inputs_not_sorted) {
+                        for (int v : obj_vars)
+                            assumps.push_back(-v);
+                    }
+                }
+                else {
+                    for (int v : inputs_not_sorted.at(i))
+                        assumps.push_back(-v);
+                }
+                if (m_verbosity == 2)
+                    print_assumps(assumps);
+            }
         }
         if (!rv) {
-            // TODO - it may be possible to have much better lower bounds, but we have to analyse the cores
-            lower_bounds.at(0) = 1;
+            if (m_verbosity == 1)
+                print_lower_bounds(lower_bounds);
         }
         // construct the sorting networks
-        for (int j (0); j < m_num_objectives; ++j) {
-            encode_sorted(inputs_to_sort.at(j), j);
-            if (m_verbosity >= 1)
-                print_snet_info(j);
-        }
+        encode_sorted(inputs_to_sort);
+        add_unit_core_vars(unit_core_vars);
         if (m_verbosity >= 1)
             print_time(read_cpu_time() - initial_time, "c Disjoint Cores Presolving - total CPU time: ");
         return rv;
@@ -789,25 +963,69 @@ namespace leximaxIST {
         }
     }
     
-    void set_inputs_sorted(std::vector<int> &inputs_sorted, const std::vector<int> &objective, 
-                                    const std::vector<int> &inputs_not_sorted)
+    void set_inputs_sorted(std::vector<std::vector<int>> &inputs_sorted,
+                           const std::vector<std::vector<int>> &objectives,
+                           const std::vector<std::vector<int>> &inputs_not_sorted,
+                           const std::vector<std::vector<int>> &unit_core_vars)
     {
-        inputs_sorted.resize(objective.size() - inputs_not_sorted.size(), 0);
-        if (inputs_sorted.size() == 0)
-            return;
-        size_t pos (0);
-        for (int v : objective) {
-            bool found (false);
-            // find v in inputs_not_sorted. Add to inputs_sorted if it is not there.
-            for (int v2 : inputs_not_sorted) {
-                if (v == v2) {
-                    found = true;
-                    break;
-                } 
+        for (size_t i (0); i < objectives.size(); ++i) {
+            inputs_sorted.at(i).resize(objectives.at(i).size() - inputs_not_sorted.at(i).size() - unit_core_vars.at(i).size(), 0);
+            if (inputs_sorted.at(i).size() > 0) {
+                size_t pos (0);
+                for (int v : objectives.at(i)) {
+                    bool found (false);
+                    // find v in inputs_not_sorted. Add to inputs_sorted if it is not there and it is not in unit_core_vars.
+                    for (int v2 : inputs_not_sorted.at(i)) {
+                        if (v == v2) {
+                            found = true;
+                            break;
+                        } 
+                    }
+                    // find v in unit_core_vars
+                    for (int v2 : unit_core_vars.at(i)) {
+                        if (v == v2) {
+                            found = true;
+                            break;
+                        } 
+                    }
+                    // Add v to inputs_sorted if v is not in inputs_not_sorted and v is not in unit_core_vars
+                    if (!found) {
+                        inputs_sorted.at(i).at(pos) = v;
+                        ++pos;
+                    }
+                }
             }
-            if (!found) {
-                inputs_sorted.at(pos) = v;
-                ++pos;
+        }
+    }
+    
+    /* set lb_map with all the keys and set the lower bounds to 0
+     * for example, the lower bound of f1 + f2 corresponds to the key 12
+     * the lower bound of f1 corresponds to the key 1
+     * the lower bound of f2 + f3 corresponds to the key 23
+     */
+    void Encoder::initialise_lb_map(std::unordered_map<int, int> &lb_map, int nb_objs) const
+    {
+        std::vector<int> main_set;
+        for (int j (1); j <= nb_objs; ++j)
+            main_set.push_back(j);
+        if (m_verbosity == 2)
+            std::cout << "c Initialise lb_map - Combinations:\n";
+        for (int j (1); j <= nb_objs; ++j) { // combinations of 1, 2, ..., nb_objs objectives
+            std::vector<std::vector<int>> set_of_combs;
+            std::vector<int> comb;
+            combinations(set_of_combs, main_set, comb, j);
+            for (const std::vector<int> &c : set_of_combs) {
+                if (m_verbosity == 2)
+                    std::cout << "c ";
+                int key (0);
+                for (int k : c) {
+                    key = key * 10 + k;
+                    if (m_verbosity == 2)
+                        std::cout << k << ' ';
+                }
+                if (m_verbosity == 2)
+                    std::cout << '\n';
+                lb_map.insert(std::make_pair(key, 0));
             }
         }
     }
@@ -824,19 +1042,21 @@ namespace leximaxIST {
         else
             solver = m_sat_solver;
         std::vector<int> lower_bounds (m_num_objectives, 0);
+        std::unordered_map<int, int> lb_map; // map for the lower bounds of the obj funcs
+        initialise_lb_map(lb_map, m_num_objectives);
+        std::vector<std::vector<int>> unit_core_vars (m_num_objectives, std::vector<int>());
         std::vector<std::vector<int>> max_vars_vec (m_num_objectives, std::vector<int>());
         std::vector<std::vector<int>> inputs_not_sorted (m_num_objectives, std::vector<int>());
         std::vector<int> assumps;
         for (int j (0); j < m_num_objectives; ++j)
             inputs_not_sorted.at(j) = m_objectives.at(j);
-        if (m_disjoint_cores && (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup")) {
-            if (disjoint_cores(inputs_not_sorted, lower_bounds))
+        if (m_disjoint_cores && (m_opt_mode != "core-static")) {
+            if (disjoint_cores(inputs_not_sorted, unit_core_vars, lower_bounds, lb_map))
                 return;
         }
         if (m_opt_mode == "core-static")
-            encode_sorted();
-        if ((m_opt_mode == "core-static") ||
-            (m_disjoint_cores && (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup"))) {
+            encode_sorted(m_objectives);
+        if ((m_opt_mode == "core-static") || m_disjoint_cores) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
         }
@@ -865,57 +1085,67 @@ namespace leximaxIST {
                     std::cout << "c Core size: " << core.size() << '\n';
                 if (m_verbosity == 2)
                     print_core(core);
-                bool intersects (false);
-                for (int j (0); j < m_num_objectives; ++j) {
-                    std::vector<int> new_inputs;
-                    // if core intersects input soft clauses change sorting networks
-                    if (find_vars_in_core(j, inputs_not_sorted.at(j), core, new_inputs)) {
-                        intersects = true;
-                        if (m_verbosity >= 1)
-                            std::cout << "c The core intersects the " << ordinal(j+1) << " objective\n";
-                        if (m_verbosity == 2)
-                            print_objs_sorted(inputs_not_sorted.at(j), j);
-                        if (m_opt_mode == "core-dynamic" || m_opt_mode == "core-dynamic-dup")
-                            merge_core_guided(j, new_inputs);
-                    }
-                }
-                if (!intersects) { // increase the ith lower bound
+                std::vector<std::vector<int>> new_inputs (m_num_objectives, std::vector<int>());
+                if (!find_vars_in_core(inputs_not_sorted, core, new_inputs)) // increase the ith lower bound
                     increase_lb(lower_bounds, core, max_vars_vec);
-                    if (m_verbosity >= 1) {
-                        std::cout << "c The core does not intersect the objective functions\n";
-                        std::cout << "c Lower bound of the " << ordinal(i + 1) << " maximum: ";
-                        std::cout << lower_bounds.at(i) << '\n';
+                else {
+                    change_lb_map(i, lower_bounds, core, max_vars_vec, lb_map); // possibly increase lower bounds
+                    // add to inputs_to_sort
+                    std::vector<std::vector<int>> inputs_to_sort (new_inputs);
+                    gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
+                    while (!call_sat_solver(solver, assumps)) {
+                        std::vector<int> core (solver->conflict());
+                        if (m_verbosity >= 1)
+                            std::cout << "c Core size: " << core.size() << '\n';
+                        if (m_verbosity == 2)
+                            print_core(core);
+                        if (!find_vars_in_core(inputs_not_sorted, core, new_inputs)) // increase the ith lower bound
+                            increase_lb(lower_bounds, core, max_vars_vec);
+                        else {
+                            change_lb_map(i, lower_bounds, core, max_vars_vec, lb_map); // possibly increase lower bounds
+                            // add new_inputs to inputs_to_sort
+                            for (int j (0); j < m_num_objectives; ++j) {
+                                size_t old_size (inputs_to_sort.at(j).size());
+                                inputs_to_sort.at(j).resize(old_size + new_inputs.at(j).size());
+                                for (size_t k (old_size); k < old_size + new_inputs.at(j).size(); ++k)
+                                    inputs_to_sort.at(j).at(k) = new_inputs.at(j).at(k - old_size);
+                            }
+                        }
+                        gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
                     }
-                }
-                else if (m_opt_mode != "core-static") {
-                    // if intersects then we need to repeat the encoding with new variables
-                    if (m_opt_mode.substr(0, 20) == "core-dynamic-rebuild") {
-                        m_encoding.clear();
-                        if (m_opt_mode == "core-dynamic-rebuild")
+                    // increase sorting networks and repeat encoding
+                    if (m_opt_mode != "core-static") {
+                        if (m_verbosity == 2)
+                            print_objs_sorted(inputs_not_sorted);
+                        if (m_opt_mode == "core-dynamic")
+                            merge_core_guided(inputs_to_sort, unit_core_vars);
+                        if (m_opt_mode == "core-dynamic-rebuild") {
+                            m_encoding.clear();
                             reset_id_count(); // since some variables have been deleted
-                        for (int j (0); j < m_num_objectives; ++j) { // rebuild sorting networks
-                            std::vector<int> inputs_sorted;
-                            set_inputs_sorted(inputs_sorted, m_objectives.at(j), inputs_not_sorted.at(j));
-                            encode_sorted(inputs_sorted, j);
+                        }
+                        if (m_opt_mode == "core-dynamic-rebuild" || m_opt_mode == "core-dynamic-rebuild-incr") {
+                            // rebuild the sorting network
+                            std::vector<std::vector<int>> inputs_sorted (m_num_objectives, std::vector<int>());
+                            set_inputs_sorted(inputs_sorted, m_objectives, inputs_not_sorted, unit_core_vars);
+                            encode_sorted(inputs_sorted);
+                            add_unit_core_vars(unit_core_vars);
+                        }
+                        for (int j (0); j <= i ; ++j) {
+                            if (j > 0)
+                                encode_relaxation(j);
+                            generate_max_vars(j, max_vars_vec);
+                            componentwise_OR(j, max_vars_vec.at(j));
+                        }
+                        if (m_opt_mode == "core-dynamic-rebuild") { // create a new sat solver and add clauses
+                            delete solver;
+                            solver = new IpasirWrap();
+                            solver->addClauses(m_input_hard);
+                            solver->addClauses(m_encoding);
                         }
                     }
-                    for (int j (0); j <= i ; ++j) {
-                        if (j > 0)
-                            encode_relaxation(j);
-                        generate_max_vars(j, max_vars_vec);
-                        componentwise_OR(j, max_vars_vec.at(j));
-                    }
-                    if (m_verbosity >= 1) {
-                        for (int j (0); j < m_num_objectives; ++j)
-                            print_snet_info(j);
-                    }
-                    if (m_opt_mode == "core-dynamic-rebuild") { // create a new sat solver and add clauses
-                        delete solver;
-                        solver = new IpasirWrap();
-                        solver->addClauses(m_input_hard);
-                        solver->addClauses(m_encoding);
-                    }
                 }
+                if (m_verbosity >= 1)
+                    print_lower_bounds(lower_bounds);
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }

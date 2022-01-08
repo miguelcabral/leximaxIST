@@ -36,7 +36,7 @@ namespace leximaxIST {
     {
         // debug
          
-        //std::cout << std::unitbuf;
+        std::cout << std::unitbuf;
          
     }
 

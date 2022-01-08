@@ -170,51 +170,61 @@ namespace leximaxIST {
      * Merge this sorting network with the old sorting network - the outputs are initially in sorted_vec
      * sorted_vec is changed and set to the outputs of the new (larger) sorting network.
      */
-    void Encoder::merge_core_guided(int obj_index, const std::vector<int> &obj_vars)
+    void Encoder::merge_core_guided(const std::vector<std::vector<int>> &inputs_to_sort, const std::vector<std::vector<int>> &unit_core_vars)
     {
-        if (obj_vars.size() == 0)
-            return;
-        if (m_verbosity >= 1)
-            std::cout << "c Increasing the " << ordinal(obj_index + 1) << " sorting network...\n";
-        // Create a sorting network to sort the obj_vars
-        SNET sort_new_vars(obj_vars.size(), {-1,-1});
-        const std::pair<int,int> elems_to_sort(0, obj_vars.size());
-        if (m_verbosity == 2)
-            std::cout << "c Sorting the new variables\n";
-        // update sorting network info - nb wires and comparators
-        m_snet_info.at(obj_index).second += encode_network(elems_to_sort, &obj_vars, sort_new_vars);
-        m_snet_info.at(obj_index).first += obj_vars.size();
-        // Merge
-        // the first old_size entries are equal to the old sorting network
-        std::vector<int> &sorted_vec = m_sorted_vecs.at(obj_index);
-        const size_t old_size (sorted_vec.size());
-        SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
-        for (size_t i (0); i < old_size; ++i) {
-            /* the first of the pair is the wire that is connected to i, through the last comparator
-             * in this case we don't know, so we put 0.
-             * we can put any value as long as it is different from -1.
-             * -1 is used for the case there is no comparator connecting wire i.
-             */
-            new_sort_net.at(i).first = 0;
-            // the second of the pair is the variable associated with the output of the last comparator of wire i.
-            new_sort_net.at(i).second = sorted_vec.at(i);
+        for (size_t obj_index (0); obj_index < inputs_to_sort.size(); ++obj_index) {
+            const std::vector<int> &obj_vars (inputs_to_sort.at(obj_index));
+            if (obj_vars.size() > 0) {
+                if (m_verbosity >= 1)
+                    std::cout << "c Increasing the " << ordinal(obj_index + 1) << " sorting network...\n";
+                // Create a sorting network to sort the obj_vars
+                SNET sort_new_vars(obj_vars.size(), {-1,-1});
+                const std::pair<int,int> elems_to_sort(0, obj_vars.size());
+                if (m_verbosity == 2)
+                    std::cout << "c Sorting the new variables\n";
+                // update sorting network info - nb wires and comparators
+                m_snet_info.at(obj_index).second += encode_network(elems_to_sort, &obj_vars, sort_new_vars);
+                m_snet_info.at(obj_index).first += obj_vars.size();
+                // Merge
+                // the first old_size entries are equal to the old sorting network
+                std::vector<int> &sorted_vec = m_sorted_vecs.at(obj_index);
+                // remove unit_core_vars from the end of sorted_vec
+                for (size_t k (0); k < unit_core_vars.at(obj_index).size(); ++k)
+                    sorted_vec.pop_back();
+                const size_t old_size (sorted_vec.size());
+                SNET new_sort_net(old_size + obj_vars.size(), {-1,-1});
+                for (size_t i (0); i < old_size; ++i) {
+                    /* the first of the pair is the wire that is connected to i, through the last comparator
+                    * in this case we don't know, so we put 0.
+                    * we can put any value as long as it is different from -1.
+                    * -1 is used for the case there is no comparator connecting wire i.
+                    */
+                    new_sort_net.at(i).first = 0;
+                    // the second of the pair is the variable associated with the output of the last comparator of wire i.
+                    new_sort_net.at(i).second = sorted_vec.at(i);
+                }
+                // the last obj_vars.size() entries are equal to sort_new_vars
+                for (size_t i (old_size); i < old_size + obj_vars.size(); ++i) {
+                    new_sort_net.at(i) = sort_new_vars.at(i - old_size);
+                }
+                const std::pair<int, int> p1 (0, old_size);
+                const std::pair<int, int> p2 (old_size, obj_vars.size());
+                const std::pair<std::pair<int, int>, int> seq1 (p1, 1); // ((first wire, number of elements), offset)
+                const std::pair<std::pair<int, int>, int> seq2 (p2, 1);
+                if (m_verbosity == 2)
+                    std::cout << "c Merging the sorting networks\n";
+                // Since the sorting network has comparators connecting all wires, hence the nullptr. It is not used.
+                m_snet_info.at(obj_index).second += odd_even_merge(seq1, seq2, nullptr, new_sort_net); // also, update m_snet_info
+                // set sorted_vec to the outputs of new_sort_net
+                sorted_vec.resize(old_size + obj_vars.size());
+                for (size_t i (0); i < old_size + obj_vars.size(); ++i)
+                    sorted_vec.at(i) = new_sort_net.at(i).second;
+            }
         }
-        // the last obj_vars.size() entries are equal to sort_new_vars
-        for (size_t i (old_size); i < old_size + obj_vars.size(); ++i) {
-            new_sort_net.at(i) = sort_new_vars.at(i - old_size);
+        if (m_verbosity >= 1) {
+            for (int j (0); j < m_num_objectives; ++j)
+                print_snet_info(j);
         }
-        const std::pair<int, int> p1 (0, old_size);
-        const std::pair<int, int> p2 (old_size, obj_vars.size());
-        const std::pair<std::pair<int, int>, int> seq1 (p1, 1); // ((first wire, number of elements), offset)
-        const std::pair<std::pair<int, int>, int> seq2 (p2, 1);
-        if (m_verbosity == 2)
-            std::cout << "c Merging the sorting networks\n";
-        // Since the sorting network has comparators connecting all wires, hence the nullptr. It is not used.
-        m_snet_info.at(obj_index).second += odd_even_merge(seq1, seq2, nullptr, new_sort_net); // also, update m_snet_info
-        // set sorted_vec to the outputs of new_sort_net
-        sorted_vec.resize(old_size + obj_vars.size());
-        for (size_t i (0); i < old_size + obj_vars.size(); ++i)
-            sorted_vec.at(i) = new_sort_net.at(i).second;
-                
+        add_unit_core_vars(unit_core_vars);
     }
 }/* namespace leximaxIST */

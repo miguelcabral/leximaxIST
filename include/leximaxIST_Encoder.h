@@ -5,6 +5,7 @@
 #include <leximaxIST_parsing_utils.h>
 #include <string> // std::string
 #include <vector> // std::vector
+#include <unordered_map> // std::unordered_map
 #include <utility> // std::pair
 #include <list> // std::list
 #include <sys/types.h> // pid_t
@@ -196,15 +197,13 @@ namespace leximaxIST
         
         int encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network);
         
-        void merge_core_guided(int obj_index, const std::vector<int> &obj_vars);
+        void merge_core_guided(const std::vector<std::vector<int>> &inputs_to_sort, const std::vector<std::vector<int>> &unit_core_vars);
         
         //void delete_snet(SNET &sorting_network);
         
         // encoding.cpp
         
-        void encode_sorted(const std::vector<int> &obj_vars, int obj_index);
-        
-        void encode_sorted();
+        void encode_sorted(const std::vector<std::vector<int>> &inputs_to_sort);
         
         size_t largest_obj() const;
         
@@ -249,18 +248,24 @@ namespace leximaxIST
         void gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
                      const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const;
                      
-        bool disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &lower_bounds);
+        bool disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted,
+                                 std::vector<std::vector<int>> &unit_core_vars,
+                                 std::vector<int> &lower_bounds, std::unordered_map<int, int> &lb_map);
         
         void increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
                               const std::vector<std::vector<int>> &max_vars_vec) const;
                               
         void fix_max(int j, const std::vector<std::vector<int>> &max_vars_vec, const std::vector<int> &lower_bounds);
-        
-        bool find_vars_in_core(int i, std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
-                                    std::vector<int> &new_inputs) const;
                                     
-        bool find_vars_in_core(std::vector<int> &inputs_not_sorted, const std::vector<int> &core,
-                                    std::vector<int> &new_inputs) const;
+        bool find_vars_in_core(std::vector<std::vector<int>> &inputs_not_sorted, const std::vector<int> &core,
+                                    std::vector<std::vector<int>> &new_inputs) const;
+                                    
+        void initialise_lb_map(std::unordered_map<int, int> &lb_map, int nb_objs) const;
+        
+        void change_lb_map(int min_index, std::vector<int> &lower_bounds, const std::vector<int> &core,
+                      const std::vector<std::vector<int>> &max_vars_vec, std::unordered_map<int, int> &lb_map) const;
+                      
+        void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars);
         
         // solver_call.cpp
         
@@ -345,7 +350,7 @@ namespace leximaxIST
         
         void print_sorted_true() const; // for debugging
         
-        void print_objs_sorted(const std::vector<int> &inputs_not_sorted, int j) const;
+        void print_objs_sorted(const std::vector<std::vector<int>> &inputs_not_sorted) const;
         
         void print_obj_func(int i) const;
         
