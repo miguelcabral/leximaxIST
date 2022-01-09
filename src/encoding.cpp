@@ -1034,13 +1034,11 @@ namespace leximaxIST {
     {
         if (m_verbosity >= 1)
             std::cout << "c Core-guided Algorithm - Solving...\n";
-        IpasirWrap *solver (nullptr);
+        IpasirWrap *solver (m_sat_solver);
         if (m_opt_mode == "core-dynamic-rebuild") {
             solver = new IpasirWrap();
             solver->addClauses(m_input_hard);
         }
-        else
-            solver = m_sat_solver;
         std::vector<int> lower_bounds (m_num_objectives, 0);
         std::unordered_map<int, int> lb_map; // map for the lower bounds of the obj funcs
         initialise_lb_map(lb_map, m_num_objectives);
@@ -1059,6 +1057,8 @@ namespace leximaxIST {
         if ((m_opt_mode == "core-static") || m_disjoint_cores) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
+            if (m_opt_mode == "core-dynamic-rebuild")
+                solver->addClauses(m_encoding); // add the encoding to the solver
         }
         gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
         // start minimising each maximum using a core-guided search
