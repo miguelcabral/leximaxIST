@@ -76,8 +76,7 @@ namespace leximaxIST {
     {
         if (mode != "external" && mode != "bin" && mode != "linear-su" &&
             mode != "linear-us" && mode != "core-static" && mode != "core-dynamic"
-            && mode != "core-dynamic-rebuild" && mode != "core-dynamic-rebuild-incr" 
-            && mode != "core-dynamic-dup") {
+            && mode != "core-dynamic-rebuild" && mode != "core-dynamic-rebuild-incr") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
