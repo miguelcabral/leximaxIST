@@ -818,15 +818,13 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars)
+    void Encoder::add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j)
     {
-        for (int j (0); j < m_num_objectives; ++j) {
-            // add unit_core_vars to the sorted vector
-            for (int v : unit_core_vars.at(j))
-                m_sorted_vecs.at(j).push_back(v);
-            if (m_verbosity == 2)
-                print_sorted_vec(j);
-        }
+        // add unit_core_vars to the sorted vector
+        for (int v : unit_core_vars.at(j))
+            m_sorted_vecs.at(j).push_back(v);
+        if (m_verbosity == 2)
+            print_sorted_vec(j);
     }
     
     /* returns true if it is possible to satisfy all soft clauses, and false otherwise
@@ -911,7 +909,8 @@ namespace leximaxIST {
         }
         // construct the sorting networks
         encode_sorted(inputs_to_sort);
-        add_unit_core_vars(unit_core_vars);
+        for (int j (0); j < m_num_objectives; ++j)
+            add_unit_core_vars(unit_core_vars, j);
         if (m_verbosity >= 1)
             print_time(read_cpu_time() - initial_time, "c Disjoint Cores Presolving - total CPU time: ");
         return rv;
@@ -934,7 +933,7 @@ namespace leximaxIST {
         for (int v : core) {
             // find v in max_vars_ith
             for (int k (0); k < max_vars_ith.size(); ++k) {
-                if (v == max_vars_ith.at(k) && k > max_pos) {
+                if (v == max_vars_ith.at(k)) {
                     max_pos = k;
                     break;
                 }
@@ -1124,11 +1123,13 @@ namespace leximaxIST {
                             reset_id_count(); // since some variables have been deleted
                         }
                         if (m_opt_mode == "core-dynamic-rebuild" || m_opt_mode == "core-dynamic-rebuild-incr") {
+                            // TODO: In the core-dynamic-rebuild-incr, we should only rebuild the sorting networks that grow
                             // rebuild the sorting network
                             std::vector<std::vector<int>> inputs_sorted (m_num_objectives, std::vector<int>());
                             set_inputs_sorted(inputs_sorted, m_objectives, inputs_not_sorted, unit_core_vars);
                             encode_sorted(inputs_sorted);
-                            add_unit_core_vars(unit_core_vars);
+                            for (int j (0); j < m_num_objectives; ++j)
+                                add_unit_core_vars(unit_core_vars, j);
                         }
                         for (int j (0); j <= i ; ++j) {
                             if (j > 0)

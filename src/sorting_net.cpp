@@ -219,12 +219,12 @@ namespace leximaxIST {
                 sorted_vec.resize(old_size + obj_vars.size());
                 for (size_t i (0); i < old_size + obj_vars.size(); ++i)
                     sorted_vec.at(i) = new_sort_net.at(i).second;
+                add_unit_core_vars(unit_core_vars, obj_index);
             }
         }
         if (m_verbosity >= 1) {
             for (int j (0); j < m_num_objectives; ++j)
                 print_snet_info(j);
         }
-        add_unit_core_vars(unit_core_vars);
     }
 }/* namespace leximaxIST */

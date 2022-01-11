@@ -265,7 +265,7 @@ namespace leximaxIST
         void change_lb_map(int min_index, std::vector<int> &lower_bounds, const std::vector<int> &core,
                       const std::vector<std::vector<int>> &max_vars_vec, std::unordered_map<int, int> &lb_map) const;
                       
-        void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars);
+        void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j);
         
         // solver_call.cpp
         
