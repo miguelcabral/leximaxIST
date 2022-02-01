@@ -124,12 +124,14 @@ namespace leximaxIST {
                     // create sorted_relax variables
                     sorted_relax.at(k) = fresh();
                     // encoding:
-                    // relax_j implies not sorted_relax_j_k
+                    // relax_j implies not sorted_relax_j_k <- this part is not needed!
+                    /*
                     if (m_verbosity == 2) {
                         std::cout << "c sorted_relax[" << k << "]: " << sorted_relax.at(k) << "\n";
                         std::cout << "c -------------- relax_var implies not sorted_relax["<< k << "] ------\n";
                     }
                     add_clause(-(first_relax_var + j), -sorted_relax.at(k));
+                    */
                     if (m_verbosity == 2)
                         std::cout << "c ------- not relax_var implies sorted_relax["<< k << "] equals sorted[" << k << "] ------\n";
                     // not relax_j implies sorted_relax_j_k equals sorted_j_k
@@ -1091,26 +1093,31 @@ namespace leximaxIST {
                     change_lb_map(i, lower_bounds, core, max_vars_vec, lb_map); // possibly increase lower bounds
                     // add to inputs_to_sort
                     std::vector<std::vector<int>> inputs_to_sort (new_inputs);
-                    gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
-                    while (!call_sat_solver(solver, assumps)) {
-                        std::vector<int> core (solver->conflict());
-                        if (m_verbosity >= 1)
-                            std::cout << "c Core size: " << core.size() << '\n';
-                        if (m_verbosity == 2)
-                            print_core(core);
-                        if (!find_vars_in_core(inputs_not_sorted, core, new_inputs)) // increase the ith lower bound
-                            increase_lb(lower_bounds, core, max_vars_vec);
-                        else {
-                            change_lb_map(i, lower_bounds, core, max_vars_vec, lb_map); // possibly increase lower bounds
-                            // add new_inputs to inputs_to_sort
-                            for (int j (0); j < m_num_objectives; ++j) {
-                                size_t old_size (inputs_to_sort.at(j).size());
-                                inputs_to_sort.at(j).resize(old_size + new_inputs.at(j).size());
-                                for (size_t k (old_size); k < old_size + new_inputs.at(j).size(); ++k)
-                                    inputs_to_sort.at(j).at(k) = new_inputs.at(j).at(k - old_size);
-                            }
-                        }
+                    if (m_disjoint_cores) {
                         gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
+                        while (!call_sat_solver(solver, assumps)) {
+                            std::vector<int> core (solver->conflict());
+                            if (m_verbosity >= 1)
+                                std::cout << "c Core size: " << core.size() << '\n';
+                            if (m_verbosity == 2)
+                                print_core(core);
+                            if (!find_vars_in_core(inputs_not_sorted, core, new_inputs)) { // increase the ith lower bound
+                                increase_lb(lower_bounds, core, max_vars_vec);
+                                if (m_verbosity >= 1)
+                                    print_lower_bounds(lower_bounds);
+                            }
+                            else {
+                                change_lb_map(i, lower_bounds, core, max_vars_vec, lb_map); // possibly increase lower bounds
+                                // add new_inputs to inputs_to_sort
+                                for (int j (0); j < m_num_objectives; ++j) {
+                                    size_t old_size (inputs_to_sort.at(j).size());
+                                    inputs_to_sort.at(j).resize(old_size + new_inputs.at(j).size());
+                                    for (size_t k (old_size); k < old_size + new_inputs.at(j).size(); ++k)
+                                        inputs_to_sort.at(j).at(k) = new_inputs.at(j).at(k - old_size);
+                                }
+                            }
+                            gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
+                        }
                     }
                     // increase sorting networks and repeat encoding
                     if (m_opt_mode != "core-static") {
