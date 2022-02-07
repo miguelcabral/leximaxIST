@@ -1151,7 +1151,7 @@ namespace leximaxIST {
         if (core.size() > 1) {
             const int size (m_soft_clauses.size());
             const int sc = m_soft_clauses.at(size - lb);
-            //add_clause(-sc);
+            add_clause(-sc);
         }
     }
     

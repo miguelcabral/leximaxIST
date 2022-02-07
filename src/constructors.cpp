@@ -30,8 +30,8 @@ namespace leximaxIST {
         m_maxsat_presolve(false), // do not maxsat presolve
         //m_num_opts(0),
         m_multiplication_string(" "),
-        m_opt_mode("core-dynamic"),
-        m_disjoint_cores(false),
+        m_opt_mode("core-merge"),
+        m_disjoint_cores(true),
         m_sat_solver(nullptr)
     {
         // debug

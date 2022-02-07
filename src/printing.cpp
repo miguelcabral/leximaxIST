@@ -194,10 +194,12 @@ namespace leximaxIST {
             std::cout << "c " << objective.at(j) << '\n';
     }
     
-    void Encoder::print_snet_info(int i) const
+    void Encoder::print_snet_info() const
     {
-        std::cout << "c " << ordinal(i + 1) << " Sorting Network: ";
-        std::cout << m_snet_info.at(i).first << " wires and " << m_snet_info.at(i).second << " comparators\n";
+        for (int i (0); i < m_num_objectives; ++i) {
+            std::cout << "c " << ordinal(i + 1) << " Sorting Network: ";
+            std::cout << m_snet_info.at(i).first << " wires and " << m_snet_info.at(i).second << " comparators\n";
+        }
     }
     
     void Encoder::print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const

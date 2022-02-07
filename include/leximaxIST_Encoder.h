@@ -203,7 +203,7 @@ namespace leximaxIST
         
         // encoding.cpp
         
-        void encode_sorted(const std::vector<std::vector<int>> &inputs_to_sort);
+        void encode_sorted(const std::vector<int> &inputs_to_sort, int i);
         
         size_t largest_obj() const;
         
@@ -354,7 +354,7 @@ namespace leximaxIST
         
         void print_obj_func(int i) const;
         
-        void print_snet_info(int i) const;
+        void print_snet_info() const;
         
         void print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const;
         

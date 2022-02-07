@@ -34,8 +34,8 @@ namespace leximaxIST {
     void Encoder::add_clause_enc(const Clause &cl)
     {
         add_clause(cl, m_encoding);
-        // In 'core-dynamic-rebuild' we create a new ipasir solver everytime the sorting networks grow
-        if (m_opt_mode != "core-dynamic-rebuild")
+        // In 'core-rebuild' we create a new ipasir solver everytime the sorting networks grow
+        if (m_opt_mode != "core-rebuild")
             m_sat_solver->addClause(cl);
     }
 
@@ -75,8 +75,8 @@ namespace leximaxIST {
     void Encoder::set_opt_mode(const std::string &mode)
     {
         if (mode != "external" && mode != "bin" && mode != "linear-su" &&
-            mode != "linear-us" && mode != "core-static" && mode != "core-dynamic"
-            && mode != "core-dynamic-rebuild" && mode != "core-dynamic-rebuild-incr") {
+            mode != "linear-us" && mode != "core-static" && mode != "core-merge"
+            && mode != "core-rebuild" && mode != "core-rebuild-incr") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }

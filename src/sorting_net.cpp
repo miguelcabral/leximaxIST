@@ -222,9 +222,5 @@ namespace leximaxIST {
                 add_unit_core_vars(unit_core_vars, obj_index);
             }
         }
-        if (m_verbosity >= 1) {
-            for (int j (0); j < m_num_objectives; ++j)
-                print_snet_info(j);
-        }
     }
 }/* namespace leximaxIST */

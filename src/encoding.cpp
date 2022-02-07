@@ -15,40 +15,33 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
     
-    void Encoder::encode_sorted(const std::vector<std::vector<int>> &inputs_to_sort)
+    void Encoder::encode_sorted(const std::vector<int> &obj_vars, int i)
     {
-        for (size_t i (0); i < inputs_to_sort.size(); ++i) {
-            const std::vector<int> &obj_vars (inputs_to_sort.at(i));
-            if (!obj_vars.empty()) {
-                const size_t nb_wires = obj_vars.size();
-                m_sorted_vecs.at(i).resize(nb_wires, 0);
-                // sorting_network is initialized to a vector of pairs (-1,-1)
-                SNET sorting_network(nb_wires, {-1,-1});
-                // elems_to_sort is represented by a pair (first element, number of elements).
-                std::pair<int,int> elems_to_sort(0, nb_wires);
-                if (m_verbosity == 2)
-                    std::cout << "c -------- Sorting Network Encoding --------\n";
-                m_snet_info.at(i).first = nb_wires;
-                m_snet_info.at(i).second = encode_network(elems_to_sort, &obj_vars, sorting_network);
-                // sorted_vec variables are the outputs of sorting_network
-                if (nb_wires == 1) { // in this case the sorting network is empty
-                    std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
-                    sorted_vec.at(0) = obj_vars.at(0);
-                }
-                else {
-                    for (size_t j{0}; j < nb_wires; j++) {
-                        int output_j = sorting_network.at(j).second;
-                        std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
-                        sorted_vec.at(j) = output_j;
-                    }
-                }
-                if (m_verbosity == 2)
-                    print_sorted_vec(i);
+        if (!obj_vars.empty()) {
+            const size_t nb_wires = obj_vars.size();
+            m_sorted_vecs.at(i).resize(nb_wires, 0);
+            // sorting_network is initialized to a vector of pairs (-1,-1)
+            SNET sorting_network(nb_wires, {-1,-1});
+            // elems_to_sort is represented by a pair (first element, number of elements).
+            std::pair<int,int> elems_to_sort(0, nb_wires);
+            if (m_verbosity == 2)
+                std::cout << "c -------- Sorting Network Encoding --------\n";
+            m_snet_info.at(i).first = nb_wires;
+            m_snet_info.at(i).second = encode_network(elems_to_sort, &obj_vars, sorting_network);
+            // sorted_vec variables are the outputs of sorting_network
+            if (nb_wires == 1) { // in this case the sorting network is empty
+                std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
+                sorted_vec.at(0) = obj_vars.at(0);
             }
-        }
-        if (m_verbosity >= 1) {
-            for (int i (0); i < m_num_objectives; ++i)
-                print_snet_info(i);
+            else {
+                for (size_t j{0}; j < nb_wires; j++) {
+                    int output_j = sorting_network.at(j).second;
+                    std::vector<int> &sorted_vec = m_sorted_vecs.at(i);
+                    sorted_vec.at(j) = output_j;
+                }
+            }
+            if (m_verbosity == 2)
+                print_sorted_vec(i);
         }
         // add order encoding to each sorted vector
         /*for (int i (0); i < m_num_objectives; ++i)
@@ -110,7 +103,7 @@ namespace leximaxIST {
             if (!m_simplify_last || i != m_num_objectives - 1)
                 std::cout << "c ------------ Sorted vecs after relaxation for the " << ordinal(i+1) << " maximum ------------\n";
         }
-        if (!m_simplify_last || i != m_num_objectives - 1 || m_opt_mode == "core-guided") {
+        if (!m_simplify_last || i != m_num_objectives - 1 || m_opt_mode.substr(0, 4) == "core") {
             std::vector<std::vector<int>> &sorted_relax_vecs (m_sorted_relax_collection.at(i-1));
             sorted_relax_vecs.resize(m_num_objectives, std::vector<int>());
             for (int j = 0; j < m_num_objectives; ++j) {
@@ -501,7 +494,10 @@ namespace leximaxIST {
         if (m_verbosity >= 1)
             std::cout << "c Original SAT-based Algorithm - Solving...\n";
         // encode sorted vectors with sorting network
-        encode_sorted(m_objectives);
+        for (int j (0); j < m_num_objectives; ++j)
+            encode_sorted(m_objectives.at(j), j);
+        if (m_verbosity >= 1)
+            print_snet_info();
         // iteratively call (SAT/MaxSAT/PBO/ILP) solver
         for (int i = 0; i < m_num_objectives; ++i) {
             m_soft_clauses.clear();
@@ -910,9 +906,10 @@ namespace leximaxIST {
                 print_lower_bounds(lower_bounds);
         }
         // construct the sorting networks
-        encode_sorted(inputs_to_sort);
-        for (int j (0); j < m_num_objectives; ++j)
+        for (int j (0); j < m_num_objectives; ++j) {
+            encode_sorted(inputs_to_sort.at(j), j);
             add_unit_core_vars(unit_core_vars, j);
+        }
         if (m_verbosity >= 1)
             print_time(read_cpu_time() - initial_time, "c Disjoint Cores Presolving - total CPU time: ");
         return rv;
@@ -1036,7 +1033,7 @@ namespace leximaxIST {
         if (m_verbosity >= 1)
             std::cout << "c Core-guided Algorithm - Solving...\n";
         IpasirWrap *solver (m_sat_solver);
-        if (m_opt_mode == "core-dynamic-rebuild") {
+        if (m_opt_mode == "core-rebuild") {
             solver = new IpasirWrap();
             solver->addClauses(m_input_hard);
         }
@@ -1053,14 +1050,18 @@ namespace leximaxIST {
             if (disjoint_cores(inputs_not_sorted, unit_core_vars, lower_bounds, lb_map))
                 return;
         }
-        if (m_opt_mode == "core-static")
-            encode_sorted(m_objectives);
+        if (m_opt_mode == "core-static") {
+            for (int j (0); j < m_num_objectives; ++j)
+                encode_sorted(m_objectives.at(j), j);
+        }
         if ((m_opt_mode == "core-static") || m_disjoint_cores) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
-            if (m_opt_mode == "core-dynamic-rebuild")
+            if (m_opt_mode == "core-rebuild")
                 solver->addClauses(m_encoding); // add the encoding to the solver
         }
+        if (m_verbosity >= 1)
+            print_snet_info();
         gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
         // start minimising each maximum using a core-guided search
         for (int i (0); i < m_num_objectives; ++i) {
@@ -1071,12 +1072,12 @@ namespace leximaxIST {
                 if (m_opt_mode == "core-static")
                     fix_max(i - 1, max_vars_vec, lower_bounds);
                 // encode relaxation and componentwise disjunction
-                if (m_opt_mode == "core-dynamic-rebuild")
+                if (m_opt_mode == "core-rebuild")
                     m_encoding.clear();
                 encode_relaxation(i);
                 generate_max_vars(i, max_vars_vec);
                 componentwise_OR(i, max_vars_vec.at(i));
-                if (m_opt_mode == "core-dynamic-rebuild")
+                if (m_opt_mode == "core-rebuild")
                     solver->addClauses(m_encoding);
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
@@ -1123,20 +1124,23 @@ namespace leximaxIST {
                     if (m_opt_mode != "core-static") {
                         if (m_verbosity == 2)
                             print_objs_sorted(inputs_not_sorted);
-                        if (m_opt_mode == "core-dynamic")
+                        if (m_opt_mode == "core-merge")
                             merge_core_guided(inputs_to_sort, unit_core_vars);
-                        if (m_opt_mode == "core-dynamic-rebuild") {
+                        if (m_opt_mode == "core-rebuild") {
                             m_encoding.clear();
                             reset_id_count(); // since some variables have been deleted
                         }
-                        if (m_opt_mode == "core-dynamic-rebuild" || m_opt_mode == "core-dynamic-rebuild-incr") {
-                            // TODO: In the core-dynamic-rebuild-incr, we should only rebuild the sorting networks that grow
-                            // rebuild the sorting network
+                        if (m_opt_mode == "core-rebuild" || m_opt_mode == "core-rebuild-incr") {
+                            // rebuild the sorting networks
                             std::vector<std::vector<int>> inputs_sorted (m_num_objectives, std::vector<int>());
                             set_inputs_sorted(inputs_sorted, m_objectives, inputs_not_sorted, unit_core_vars);
-                            encode_sorted(inputs_sorted);
-                            for (int j (0); j < m_num_objectives; ++j)
-                                add_unit_core_vars(unit_core_vars, j);
+                            for (int j (0); j < m_num_objectives; ++j) {
+                                if (m_opt_mode == "core-rebuild" || !inputs_to_sort.at(j).empty()) {
+                                    // do not rebuild only if incremental and there are no new variables to add
+                                    encode_sorted(inputs_sorted.at(j), j);
+                                    add_unit_core_vars(unit_core_vars, j);
+                                }
+                            }
                         }
                         for (int j (0); j <= i ; ++j) {
                             if (j > 0)
@@ -1144,12 +1148,14 @@ namespace leximaxIST {
                             generate_max_vars(j, max_vars_vec);
                             componentwise_OR(j, max_vars_vec.at(j));
                         }
-                        if (m_opt_mode == "core-dynamic-rebuild") { // create a new sat solver and add clauses
+                        if (m_opt_mode == "core-rebuild") { // create a new sat solver and add clauses
                             delete solver;
                             solver = new IpasirWrap();
                             solver->addClauses(m_input_hard);
                             solver->addClauses(m_encoding);
                         }
+                        if (m_verbosity >= 1)
+                            print_snet_info();
                     }
                 }
                 if (m_verbosity >= 1)
@@ -1157,7 +1163,7 @@ namespace leximaxIST {
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }
-        if (m_opt_mode == "core-dynamic-rebuild")
+        if (m_opt_mode == "core-rebuild")
             delete solver;
     }
 
