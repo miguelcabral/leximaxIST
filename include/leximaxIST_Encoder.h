@@ -295,8 +295,6 @@ namespace leximaxIST
         
         void mss_enumerate();
         
-        void sat_solve();
-        
         int get_lower_bound(const std::vector<int> &model);
         
         int maxsat_presolve();

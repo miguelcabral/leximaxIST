@@ -469,17 +469,6 @@ namespace leximaxIST {
         remove(error_filename.c_str());
     }
     
-    void Encoder::sat_solve()
-    {
-        const int rv (m_sat_solver->solve());
-        if (rv == 10) {
-            m_status = 's';
-            set_solution(m_sat_solver->model());
-        }
-        else if (rv == 20)
-            m_status = 'u';
-    }
-    
     int mss_choose_obj_seq (const std::vector<std::vector<int>> &todo_vec)
     {
         int obj_index;
