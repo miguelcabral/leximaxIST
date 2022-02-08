@@ -1085,11 +1085,13 @@ namespace leximaxIST {
         int sum (0);
         if (m_verbosity >= 1) {
             std::cout << "c Presolving...\n";
-            std::cout << "c Checking satisfiability - calling SAT solver...\n";
+            std::cout << "c Checking satisfiability...\n";
         }
-        sat_solve();
-        if (m_status == 'u')
+        if (!call_sat_solver(m_sat_solver, {})) {
+            m_status = 'u';
             return 0;
+        }
+        m_status = 's';
         if (m_mss_presolve)
             mss_enumerate();
         if (m_maxsat_presolve) {
@@ -1233,8 +1235,11 @@ namespace leximaxIST {
             print_error_msg("In call_sat_solver function: solver is a null pointer!");
             exit(EXIT_FAILURE);
         }
-        if (m_verbosity >= 1)
-            std::cout << "c Calling SAT solver...\n";
+        if (m_verbosity >= 1) {
+            std::cout << "c Calling SAT solver... ";
+            std::cout << '(' <<  m_id_count << " variables and ";
+            std::cout << m_encoding.size() + m_input_hard.size() << " clauses)\n";
+        }
         double initial_time (read_cpu_time());
         const int rv (solver->solve(assumps));
         if (m_verbosity >= 1)
