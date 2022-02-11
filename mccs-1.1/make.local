@@ -28,7 +28,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USELPSOLVE=1 as make parameter) 
-USELPSOLVE=1
+#USELPSOLVE=1
 
 
 ifeq ($(USELPSOLVE),1)
@@ -51,7 +51,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-#USECPLEX=1
+USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)
