@@ -9,7 +9,7 @@ We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cp
 Run `bash install.sh` to set up and install the C++ library, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc).
 This command may take some time.
 
-### Dependencies
+#### Dependencies
 zlib library must be installed.
 
 ## Examples
