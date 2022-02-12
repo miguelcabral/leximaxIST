@@ -27,4 +27,4 @@ To run mccs with Cbc to minimise the objective functions removed, notuptodate an
 ```
 ./mccs -v1 -i <instance> -lp './cbclp' -leximax[-removed,-notuptodate,-new] &> solution.txt
 ```
-where `<instance>` is the input file (e.g. examples/rand477.cudf).
+where `<instance>` is the input file (e.g. ../old_packup/examples/rand477.cudf).
