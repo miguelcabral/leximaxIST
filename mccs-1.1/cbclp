@@ -3,5 +3,5 @@
   echo "threads 1"
   echo "import $1"
   echo "solve"
-  echo "solution \$" ) | /home/mcabral/solvers/lp/cbc/dist/bin/cbc 
+  echo "solution \$" ) | ../cbc/dist/bin/cbc 
 

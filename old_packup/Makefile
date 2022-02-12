@@ -28,13 +28,13 @@ CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
 LIBS +=-lz
 
 # change LEXIMAXDIR to the root directory of the leximax library
-LEXIMAXDIR = ~/thesis
+LEXIMAXDIR = ../
 INCD += -I $(LEXIMAXDIR)/include
 LIBD += -L $(LEXIMAXDIR)/lib
 LIBS += -lleximaxIST
 
 # library of sat solver that implements ipasir (e.g. cadical)
-IPASIRDIR = ~/solvers/sat/cadical
+IPASIRDIR = ../cadical
 LIBS += -lcadical
 LIBD += -L $(IPASIRDIR)/build
 

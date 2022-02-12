@@ -51,7 +51,7 @@ endif
 #======================================================
 
 # if you want to use cplex uncomment next line (or use USECPLEX=1 as make parameter) 
-USECPLEX=1
+#USECPLEX=1
 
 
 ifeq ($(USECPLEX),1)
