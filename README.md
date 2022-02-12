@@ -9,7 +9,7 @@ We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cp
 Run `bash install.sh` to set up and install the C++ library, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc).
 This command may take some time.
 
-Dependencies: zlib library must be installed.
+Dependencies: zlib library must be installed (if the packup compilation fails, this may be a reason why).
 
 ## Examples
 In old_packup/examples there are a few package upgradeability benchmarks, from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html). These benchmarks are stored in files with extension .cudf, meaning Common Upgradeability Description Format.
