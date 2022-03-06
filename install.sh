@@ -4,7 +4,9 @@ git clone https://github.com/arminbiere/cadical.git
 cd cadical && ./configure --competition && make
 # Compile leximaxIST library
 echo "Compiling leximaxIST library..."
-cd ../src/ && make clean release
+cd ..
+mkdir -v lib
+cd src && make clean release
 # Compile packup
 echo "Compiling packup..."
 cd ../old_packup/ && make clean release
