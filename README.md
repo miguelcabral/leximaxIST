@@ -1,9 +1,9 @@
 # LeximaxIST
 ## Description
 C++ library for solving leximax optimisation using iterative SAT solving.
-To use the library and test it on some examples, the library can be linked to the package upgradeability solver [packup](https://sat.inesc-id.pt/~mikolas/sw/packup/), located in the folder old_packup.
+To use the library and test it on some examples, the library can be linked to the package upgradeability solver [packup](https://sat.inesc-id.pt/~mikolas/sw/packup/) [1], located in the folder old_packup.
 By default, packup uses the SAT solver [CaDiCaL](https://github.com/arminbiere/cadical).
-We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html)~[1], another package upgradeability solver based on Integer Linear Programming solving.
+We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html) [2], another package upgradeability solver based on Integer Linear Programming solving.
 
 ## Build
 Run `bash install.sh` to set up and install the C++ library, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc).
@@ -29,4 +29,6 @@ To run mccs with Cbc to minimise the objective functions removed, notuptodate an
 ```
 where `<instance>` is the input file (e.g. `../old_packup/examples/rand477.cudf`).
 
-[1] Claude Michel, Michel Rueher. Handling software upgradeability problems with MILP solvers. In Inês Lynce and Ralf Treinen, editors, *Proceedings First International Workshop on Logics for Component Configuration, LoCoCo 2010, Edinburgh, UK, 10th July 2010,* volume 29 of EPTCS, pages 1–10, 2010.
+[1] Mikolás Janota, Inês Lynce, Vasco M. Manquinho, and João Marques-Silva. Packup: Tools for package upgradability solving. J. Satisf. Boolean Model. Comput., 8(1/2):89–94, 2012.
+
+[2] Claude Michel and Michel Rueher. Handling software upgradeability problems with MILP solvers. In Inês Lynce and Ralf Treinen, editors, *Proceedings First International Workshop on Logics for Component Configuration, LoCoCo 2010, Edinburgh, UK, 10th July 2010,* volume 29 of EPTCS, pages 1–10, 2010.
