@@ -20,5 +20,6 @@ chmod u+x coinbrew
 ./coinbrew fetch Cbc@master
 ./coinbrew build Cbc
 echo "Compiling mccs..."
+mkdir -v ../mccs-1.1/objs
 cd ../mccs-1.1 && make clean mccs-static
 echo "All Done"
