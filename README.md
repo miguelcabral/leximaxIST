@@ -29,6 +29,6 @@ To run mccs with Cbc to minimise the objective functions removed, notuptodate an
 ```
 where `<instance>` is the input file (e.g. `../old_packup/examples/rand477.cudf`).
 
-[1] Mikolás Janota, Inês Lynce, Vasco M. Manquinho, and João Marques-Silva. Packup: Tools for package upgradability solving. J. Satisf. Boolean Model. Comput., 8(1/2):89–94, 2012.
+[1] Mikolás Janota, Inês Lynce, Vasco M. Manquinho, and João Marques-Silva. Packup: Tools for package upgradability solving. *J. Satisf. Boolean Model. Comput.*, 8(1/2):89–94, 2012.
 
 [2] Claude Michel and Michel Rueher. Handling software upgradeability problems with MILP solvers. In Inês Lynce and Ralf Treinen, editors, *Proceedings First International Workshop on Logics for Component Configuration, LoCoCo 2010, Edinburgh, UK, 10th July 2010,* volume 29 of EPTCS, pages 1–10, 2010.
