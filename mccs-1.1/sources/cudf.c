@@ -571,8 +571,8 @@ int main(int argc, char *argv[]) {
         }
         strcat(scip_cmd, pid_str);
         strcat(scip_cmd, "_scip.sh");
-        solver = new_lp_solver(scip_cmd);
-	    //solver = new_lp_solver(argv[i]);
+        //solver = new_lp_solver(scip_cmd);
+	solver = new_lp_solver(argv[i]);
 	} else {
 	  fprintf(stderr, "ERROR: -lp option require a lp solver: -lp <lpsolver>\n");
 	  exit(-1);
