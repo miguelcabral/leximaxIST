@@ -27,7 +27,7 @@ To run mccs with Cbc to minimise the objective functions removed, notuptodate an
 ```
 ./mccs -v1 -i <instance> -lp './cbclp' -leximax[-removed,-notuptodate,-new] &> solution.txt
 ```
-where `<instance>` is the input file (e.g. `../old_packup/examples/rand477.cudf`).
+where `<instance>` is the input file (e.g. `../old_packup/examples/rand533.cudf`).
 
 [1] Mikolás Janota, Inês Lynce, Vasco M. Manquinho, and João Marques-Silva. Packup: Tools for package upgradability solving. *J. Satisf. Boolean Model. Comput.*, 8(1/2):89–94, 2012.
 
