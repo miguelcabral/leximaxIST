@@ -102,7 +102,8 @@ int lp_solver::solve() {
   CUDFcoefficient objvals[20];
   unsigned int nb_objectives = objectives.size();
 
-  write_scip_files();
+  // when solving with SCIP, with a timeout:
+  //write_scip_files();
   
   sprintf(lpfilename, TMP_FILES_PATH "lppbs_%lu_%lu.lp", (long unsigned)getuid(), (long unsigned)getpid()); 
   sprintf(lpoutfilename, TMP_FILES_PATH "lppbs_%lu_%lu.out", (long unsigned)getuid(), (long unsigned)getpid()); 
@@ -149,7 +150,7 @@ int lp_solver::solve() {
 	      ctlpfilename, lpfilename, lpsolver, lpfilename, lpoutfilename);
 
     // Set timeout for SCIP - change settings file
-    set_scip_timeout(10);
+    //set_scip_timeout(10);
       
     if (system(command) == -1) { // call solver
       fprintf(stderr, "mccs: error while calling solver.\n");
