@@ -28,7 +28,7 @@ CFLAGS += -DCHANGESET='"$(CHANGESET)"' -DRELDATE='"$(RELDATE)"'
 LIBS +=-lz
 
 # change LEXIMAXDIR to the root directory of the leximax library
-LEXIMAXDIR = ../
+LEXIMAXDIR = ..
 INCD += -I $(LEXIMAXDIR)/include
 LIBD += -L $(LEXIMAXDIR)/lib
 LIBS += -lleximaxIST
