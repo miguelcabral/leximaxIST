@@ -3,13 +3,13 @@
 C++ library for solving leximax optimisation using iterative SAT solving.
 To use the library and test it on some examples, the library can be linked to the package upgradeability solver [packup](https://sat.inesc-id.pt/~mikolas/sw/packup/) [1], located in the folder old_packup.
 By default, packup uses the SAT solver [CaDiCaL](https://github.com/arminbiere/cadical).
-We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html) [2], another package upgradeability solver based on Integer Linear Programming solving.
+We also provide a copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html) [2] version 1.1, another package upgradeability solver based on Integer Linear Programming solving.
 
 ## Build
-Run `bash install.sh` to set up and install the C++ library, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc).
-This command may take some time.
+Run `bash install.sh` to set up and install the C++ library, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc) (release 2.10.7).
+This command will take some time.
 
-Dependencies: zlib library must be installed (if the packup compilation fails, this may be a reason why).
+packup and leximaxIST dependencies: zlib library must be installed (if the packup compilation fails, this may be a reason why).
 
 ## Examples
 In old_packup/examples there are a few package upgradeability benchmarks, from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html). These benchmarks are stored in files with extension .cudf, meaning Common Upgradeability Description Format.
