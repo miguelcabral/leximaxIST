@@ -1,6 +1,5 @@
 #!/bin/sh
 (
-  echo "threads 1"
   echo "import $1"
   echo "solve"
   echo "solution \$" ) | ../cbc/dist/bin/cbc 
