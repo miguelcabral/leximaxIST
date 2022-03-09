@@ -17,7 +17,7 @@ mkdir -v cbc
 cd cbc
 wget https://raw.githubusercontent.com/coin-or/coinbrew/master/coinbrew
 chmod u+x coinbrew
-./coinbrew fetch Cbc@master
+./coinbrew fetch Cbc@2.10.7
 ./coinbrew build Cbc
 echo "Compiling mccs..."
 mkdir -v ../mccs-1.1/objs
