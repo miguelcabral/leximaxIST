@@ -18,9 +18,9 @@ Example:
 ./packup -u '-removed,-changed' --leximax -v1 --disjoint-cores --opt-mode 'core-merge' examples/rand692.cudf &> solution.txt
 ```
 The option -v sets the verbosity of the output.
--v1 prints some interesting information about the algorithm, like the CPU time of every SAT call, the values of the objective functions as soon as a leximax-better solution is found,... -v2 is for debugging. -v0 prints nothing.
+-v1 prints some interesting information about the algorithm, like the CPU time of every SAT call, the values of the objective functions as soon as a leximax-better solution is found,... -v2 is for debugging. -v0 only prints the solution.
 The option -u sets the objective functions. The objective functions can be removed, changed, notuptodate, unmet_recommends or new.
-The options --disjoint-cores and --opt-mode refer to the leximax optimisation algorithm.
+The options --disjoint-cores and --opt-mode set the leximax optimisation algorithm.
 Without the option --leximax the solver will solve using the lexicographic criterium, and an external MaxSAT or PBO solver must be provided.
 Run: `./packup -h` for more information.
 To run mccs with Cbc to minimise the objective functions removed, notuptodate and new using the leximax criterium:
