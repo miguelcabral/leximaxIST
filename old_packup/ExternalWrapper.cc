@@ -52,6 +52,97 @@ ExternalWrapper::~ExternalWrapper()
 
 void clause_to_constraint(BasicClause& clause, vector<LINT>& constraint);
 
+void print_pb_constraint(Literator i, Literator end, std::ostream &os)
+{
+    int num_negatives(0);
+    while (i != end) {
+        LINT literal (*i);
+        bool sign = literal > 0;
+        if (!sign)
+            ++num_negatives;
+        os << (sign ? "+1" : "-1") << " x" << (sign ? literal : -literal) << " ";
+        ++i;
+    }
+    os << " >= " << 1 - num_negatives << " ;\n";
+}
+
+void ExternalWrapper::set_pbmo_file_name(const string &cudf_name, const vector<Objective> &crit)
+{
+    m_pbmo_file_name = "/data/benchmarks/pbmo/package_upgradeability/objs_";
+    m_pbmo_file_name += std::to_string(crit.size()); // add number of objectives
+    // find name of folder corresponding to crit
+    /*
+    system(cmd.c_str());
+    // ls /data/benchmarks/pbmo/package_upgradeability/objs_4/ | grep 'notuptodate' | grep 'unmet' | grep 'changed' | grep 'removed'
+    size_t pos_end (cudf_name.find(".cudf"));
+    size_t pos_begin (cudf_name.find_last_of('/') + 1);
+    pbmo_file_name += m_input_file_name.substr(0, m_input_file_name.size() - 5);
+    pbmo_file_name += ".pbmo";
+    */
+}
+
+void ExternalWrapper::write_pbmo_file()
+{
+    /*
+    std::ofstream os (m_pbmo_file_name);
+    if (!os) {
+        cerr << "# " <<  "Error - Could not open " << m_pbmo_file_name << endl;
+        exit(EXIT_FAILURE);
+    }    
+    */
+    // print header
+    const std::string star_sep (79, '*');
+    std::cout << star_sep << '\n';
+    std::cout << "* " << clause_split.size() << "objectives\n";
+    int nb_vars (_id_manager.top_id());
+    for (const BasicClauseVector &soft_cls: clause_split)
+        nb_vars += soft_cls.size();
+    std::cout << "* " << nb_vars << " variables\n";
+    int nb_constraints (hard_clauses.size());
+    // add the constraints for adding a variable equivalent to each soft clause
+    for (const BasicClauseVector &soft_cls: clause_split) {
+        for (BasicClause *cl : soft_cls) {
+            ++nb_constraints; // new var implies cl
+            nb_constraints += cl->size(); // cl imples new var
+        }
+    }
+    std::cout << "* " << nb_constraints << " constraints\n";
+    std::cout << star_sep << '\n';
+    // print objective functions
+    int obj_var (_id_manager.top_id() + 1);
+    std::vector<std::vector<LINT>> obj_clauses;
+    std::ofstream weight_os ("/home/mcabral/scripts-thesis/weights.txt", std::ofstream::app);
+    for (const BasicClauseVector &soft_cls: clause_split) {
+        std::cout << "min: ";
+        for (BasicClause *cl : soft_cls) {
+            weight_os << cl->get_weight() << '\n';
+            // new var implies cl
+            std::vector<LINT> lits;
+            lits.push_back(-obj_var);
+            for (LINT l : *cl)
+                lits.push_back(l);
+            obj_clauses.push_back(lits);
+            // cl imples new var
+            for (LINT l : *cl) {
+                lits.clear();
+                lits.push_back(obj_var);
+                lits.push_back(-l);
+                obj_clauses.push_back(lits);
+            }
+            // print obj_var
+            std::cout << "+1 x" << obj_var << ' ';
+            ++obj_var;
+        }
+        std::cout << ";\n";
+    }
+    weight_os.close();
+    for (BasicClause *cl : hard_clauses)
+        print_pb_constraint(cl->begin(), cl->end(), std::cout);
+    for (std::vector<LINT> &cl : obj_clauses)
+        print_pb_constraint(cl.begin(), cl.end(), std::cout);
+    exit(EXIT_SUCCESS);
+}
+
 bool ExternalWrapper::solve() {
     stamp = time(NULL);
     // set up datastructures
@@ -63,7 +154,9 @@ bool ExternalWrapper::solve() {
     functions.resize(function_count);
     clause_split.resize(function_count);
     split(); // split clauses into the classes according to weight
-    min_cost=get_top(); 
+    min_cost=get_top();
+    // The next line has been used to store a file with the corresponding pbmo instance
+    //write_pbmo_file();
     if (leximax)
         return solve_leximax();
     else {

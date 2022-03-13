@@ -276,7 +276,8 @@ int main(int argc, char** argv) {
         if (!parse_lexicographic_specification(options.get_user_criterion().c_str(), lexicographic)) {
             cerr<<"Failed to parse the user defined criteria (" << options.get_user_criterion() << "). Exiting." << endl;
             exit(1);
-        }        
+        }
+        //solver.set_pbmo_file_name(options.get_input_file_name(), lexicographic);
         parser.get_encoder().set_lexicographic(lexicographic);
     }
 

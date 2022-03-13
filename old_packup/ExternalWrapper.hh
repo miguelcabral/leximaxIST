@@ -54,6 +54,7 @@ public:
         return r.second;
     }
 
+    void set_pbmo_file_name(const string &cudf_name, const vector<Objective> &crit);
     inline void set_opt_solver_cmd(const string& opt_solver_cmd);
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
@@ -130,6 +131,7 @@ private:
     string lp_solver;
     string opt_mode;
     string maxsat_psol_cmd;
+    string m_pbmo_file_name;
 
     vector< vector<LINT> > constraints;
     void   split();
@@ -150,6 +152,7 @@ private:
     }
     ostream& print_constraint(const vector<LINT>& constraint,ostream& output);
     void print_clause(XLINT weight, ostream& out, BasicClause& clause);
+    void write_pbmo_file();
 };
 
 inline void ExternalWrapper::set_opt_solver_cmd(const string& cmd) {

@@ -1,4 +1,6 @@
 *.o
+cadical/*
+cbc/*
 examples/*
 *.gcda
 *.gcno

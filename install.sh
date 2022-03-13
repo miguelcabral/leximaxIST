@@ -1,3 +1,5 @@
+echo "Removing old cadical, libleximax.a and cbc..." && \
+rm -rf cadical && rm -rf lib && rm -rf cbc && rm -rf mccs-1.1/objs \
 echo "Setting up CaDiCaL..." && \
 git clone https://github.com/arminbiere/cadical.git && \
 cd cadical && ./configure --competition && make && \
