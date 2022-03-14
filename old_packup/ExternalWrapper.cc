@@ -56,7 +56,7 @@ void print_pb_constraint(Literator i, Literator end, std::ostream &os)
 {
     int num_negatives(0);
     while (i != end) {
-        LINT literal (*i);
+        int literal (*i);
         bool sign = literal > 0;
         if (!sign)
             ++num_negatives;
@@ -66,34 +66,12 @@ void print_pb_constraint(Literator i, Literator end, std::ostream &os)
     os << " >= " << 1 - num_negatives << " ;\n";
 }
 
-void ExternalWrapper::set_pbmo_file_name(const string &cudf_name, const vector<Objective> &crit)
-{
-    m_pbmo_file_name = "/data/benchmarks/pbmo/package_upgradeability/objs_";
-    m_pbmo_file_name += std::to_string(crit.size()); // add number of objectives
-    // find name of folder corresponding to crit
-    /*
-    system(cmd.c_str());
-    // ls /data/benchmarks/pbmo/package_upgradeability/objs_4/ | grep 'notuptodate' | grep 'unmet' | grep 'changed' | grep 'removed'
-    size_t pos_end (cudf_name.find(".cudf"));
-    size_t pos_begin (cudf_name.find_last_of('/') + 1);
-    pbmo_file_name += m_input_file_name.substr(0, m_input_file_name.size() - 5);
-    pbmo_file_name += ".pbmo";
-    */
-}
-
 void ExternalWrapper::write_pbmo_file()
 {
-    /*
-    std::ofstream os (m_pbmo_file_name);
-    if (!os) {
-        cerr << "# " <<  "Error - Could not open " << m_pbmo_file_name << endl;
-        exit(EXIT_FAILURE);
-    }    
-    */
     // print header
     const std::string star_sep (79, '*');
     std::cout << star_sep << '\n';
-    std::cout << "* " << clause_split.size() << "objectives\n";
+    std::cout << "* " << clause_split.size() << " objectives\n";
     int nb_vars (_id_manager.top_id());
     for (const BasicClauseVector &soft_cls: clause_split)
         nb_vars += soft_cls.size();
@@ -111,11 +89,11 @@ void ExternalWrapper::write_pbmo_file()
     // print objective functions
     int obj_var (_id_manager.top_id() + 1);
     std::vector<std::vector<LINT>> obj_clauses;
-    std::ofstream weight_os ("/home/mcabral/scripts-thesis/weights.txt", std::ofstream::app);
+    //std::ofstream weight_os ("/home/mcabral/scripts-thesis/weights.txt", std::ofstream::app);
     for (const BasicClauseVector &soft_cls: clause_split) {
         std::cout << "min: ";
         for (BasicClause *cl : soft_cls) {
-            weight_os << cl->get_weight() << '\n';
+            //weight_os << cl->get_weight() << '\n';
             // new var implies cl
             std::vector<LINT> lits;
             lits.push_back(-obj_var);
@@ -135,12 +113,24 @@ void ExternalWrapper::write_pbmo_file()
         }
         std::cout << ";\n";
     }
-    weight_os.close();
+    //weight_os.close();
+	/*
+	LINT five_long (-4294967291);
+	int five_normal (-5);
+	std::cout << "LINT: " << five_long << '\n';
+	std::cout << "int: " << five_normal << '\n';
+    for (BasicClause *cl : hard_clauses) {
+		std::cout << "hard clause: ";
+		for (LINT lit : *cl)
+			std::cout << lit << ' ';
+		std::cout << '\n';
+	}
+	*/
     for (BasicClause *cl : hard_clauses)
         print_pb_constraint(cl->begin(), cl->end(), std::cout);
     for (std::vector<LINT> &cl : obj_clauses)
         print_pb_constraint(cl.begin(), cl.end(), std::cout);
-    exit(EXIT_SUCCESS);
+	exit(EXIT_SUCCESS);
 }
 
 bool ExternalWrapper::solve() {
@@ -156,7 +146,7 @@ bool ExternalWrapper::solve() {
     split(); // split clauses into the classes according to weight
     min_cost=get_top();
     // The next line has been used to store a file with the corresponding pbmo instance
-    //write_pbmo_file();
+	//write_pbmo_file();
     if (leximax)
         return solve_leximax();
     else {
