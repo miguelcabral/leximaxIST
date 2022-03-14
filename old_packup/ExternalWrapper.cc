@@ -130,7 +130,7 @@ void ExternalWrapper::write_pbmo_file()
         print_pb_constraint(cl->begin(), cl->end(), std::cout);
     for (std::vector<LINT> &cl : obj_clauses)
         print_pb_constraint(cl.begin(), cl.end(), std::cout);
-	exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 }
 
 bool ExternalWrapper::solve() {
@@ -146,7 +146,7 @@ bool ExternalWrapper::solve() {
     split(); // split clauses into the classes according to weight
     min_cost=get_top();
     // The next line has been used to store a file with the corresponding pbmo instance
-	//write_pbmo_file();
+    //write_pbmo_file();
     if (leximax)
         return solve_leximax();
     else {
