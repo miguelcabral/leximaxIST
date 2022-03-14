@@ -9,7 +9,7 @@ OBJS += $(OBJS2)
 LIBNAME = libleximaxIST.a
 
 # Edit to change the path to sat solver include directory containing ipasir.h
-CFLAGS += -I ~/solvers/sat/cadical/src
+CFLAGS += -I ../cadical/src
 
 ifdef PROF
 	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
