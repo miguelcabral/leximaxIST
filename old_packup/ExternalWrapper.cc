@@ -94,16 +94,16 @@ void ExternalWrapper::write_pbmo_file()
         std::cout << "min: ";
         for (BasicClause *cl : soft_cls) {
             //weight_os << cl->get_weight() << '\n';
-            // new var implies cl
+            //neg of new var implies cl
             std::vector<LINT> lits;
-            lits.push_back(-obj_var);
+            lits.push_back(obj_var);
             for (LINT l : *cl)
                 lits.push_back(l);
             obj_clauses.push_back(lits);
-            // cl imples new var
+            // cl imples neg of new var
             for (LINT l : *cl) {
                 lits.clear();
-                lits.push_back(obj_var);
+                lits.push_back(-obj_var);
                 lits.push_back(-l);
                 obj_clauses.push_back(lits);
             }
