@@ -23,7 +23,7 @@ The option -u sets the objective functions. The objective functions can be remov
 The options --disjoint-cores and --opt-mode set the leximax optimisation algorithm.
 Without the option --leximax the solver will solve using the lexicographic criterion, and an external MaxSAT or PBO solver must be provided.
 Run: `./packup -h` for more information.
-To run mccs with Cbc to minimise the objective functions removed, notuptodate and new using the leximax criterion:
+The next example shows how to run mccs with Cbc to minimise the objective functions removed, notuptodate and new using the leximax criterion:
 ```
 ./mccs -v1 -i <instance> -lp './cbclp' -leximax[-removed,-notuptodate,-new] &> solution.txt
 ```
