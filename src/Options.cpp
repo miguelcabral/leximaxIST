@@ -7,13 +7,22 @@ using std::cerr;
 using std::endl;
 
 Options::Options()
-: m_help(0)
-, m_leave_temporary_files(0)
-, m_pbo(0)
-, m_num_objectives(-1) // starts with -1 to ignore first file (hard clauses)
-, m_multiplication_string("*")
-, m_solver("rc2.py -vv")
-{}
+: m_help (0)
+, m_verbosity (0)
+, m_simplify_last (0)
+, m_solve ("core-merge")
+, m_input_file_name ("")
+, m_disjoint_cores (0)
+, m_approx ("none")
+, m_timeout (86400)
+, m_mss_tol (0)
+, m_mss_add_cls (1)
+, m_mss_incr (0)
+, m_gia_pareto (0)
+, m_gia_incr (0)
+{
+    // TODO: add the descriptions of the Options
+}
 
 bool Options::parse(int argc,char **argv) {
     bool return_value = true;
