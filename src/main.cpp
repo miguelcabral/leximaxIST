@@ -24,6 +24,7 @@ void print_usage(ostream &output) {
     output << "Output is produced to the standard output." << std::endl;
 }
 
+
 int main(int argc, char *argv[])
 {
     /* parse options */
