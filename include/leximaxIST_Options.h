@@ -1,7 +1,6 @@
 #ifndef LEXIMAXIST_OPTIONS
-#define	LEXIMAXIST_OPTIONS
+#define LEXIMAXIST_OPTIONS
 #include <string>
-#include <vector>
 
 namespace leximaxIST {
 
@@ -18,13 +17,7 @@ namespace leximaxIST {
     };
 
     template <typename T>
-    Option<T>::Option(const T &data) : m_data = data {}
-
-    template <typename T>
-    void Option<T>::set_data(const T &data)
-    {
-        m_data = data;
-    }
+    Option<T>::Option(const T &data) : m_data(data) {}
 
     template <typename T>
     T& Option<T>::get_data()
@@ -62,7 +55,24 @@ namespace leximaxIST {
     public:
         Options(); // starts Options with default settings and descriptions
         bool parse(int count, char** arguments); // changes settings based on user input while checking if input is valid
-        void print_usage();
+        void print_usage(std::ostream &os);
+        int get_help() const;
+        int get_verbosity() const;
+        int get_disjoint_cores() const;
+        std::string get_optimise() const;
+        std::string get_approx() const;
+        std::string get_input_file_name() const;
+        double get_timeout() const;
+        int get_mss_tol() const;
+        int get_mss_add_cls() const;
+        int get_mss_incr() const;
+        int get_gia_pareto() const;
+        int get_gia_incr() const;
+        
+    private:
+        void read_integer(const char *optarg, const std::string &optname, int &i);
+        void read_digit(const char *optarg, const std::string &optname, int &digit);
+        void read_double(const char *optarg, const std::string &optname, double &d);
     };
 
 }

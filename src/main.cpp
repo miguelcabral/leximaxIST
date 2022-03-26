@@ -30,22 +30,28 @@ int main(int argc, char *argv[])
     /* parse options */
     Options options;
     if (!options.parse(argc, argv)) {
-        std::cerr << "Error parsing options. Exiting." << std::endl;
-        print_usage(std::cerr);
-        exit(1);
-    }
-    if (options.m_help) {
+        print_leximax_error("Error parsing options. Exiting.");
         print_usage(std::cout);
-        exit(0);
-    }
-    Leximax_encoder enc(options);
-    // read input problem: hard.cnf f_1.cnf f_2.cnf ...
-    int retv = enc.read();
-    if (retv == 1)
         return 1;
-    // encode sorted vectors with sorting network
-    enc.solve();
-    enc.print_solution();
-    //enc.verify();
+    }
+    if (options.m_help.get_data()) {
+        print_usage(std::cout);
+        return 0;
+    }
+    Encoder enc();
+
+    // TODO: set parameters of the encoder, based on options
+    
+    enc.set_verbosity(options.get_verbosity());
+    enc.set_opt_mode(options.get_optimise());
+    
+    // TODO: read pbmo file and encode PB constraints as clauses
+    
+    // TODO: approximate
+    
+    // TODO: optimise
+    
+    // TODO: print solution to standard output
+
     return 0;
 }

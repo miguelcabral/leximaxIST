@@ -146,7 +146,7 @@ bool Options::parse(int argc,char **argv) {
              };
 
     int c;
-    while (1) {
+    while (true) {
        /* getopt_long stores the option index here. */
        int option_index = 0;
        c = getopt_long(argc, argv, "hu:ptf:v:", long_options, &option_index);
