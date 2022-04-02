@@ -1,51 +1,83 @@
+#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Options.h>
+#include <leximaxIST_printing.h>
+#include <MaxSATFormula.h>
+#include <ParserPB.h>
 #include <string>
 #include <iostream> // std::cout, std::cin
-#include <vector> // std::vector
-#include <utility> // std::pair
-#include "Leximax_encoder.h"
 
-void print_usage(ostream &output) {
-    output << "Usage: ./leximax [--help | -h] [--leave-temporary-files] [--pbo] [--multiplication-string str] [--external-solver command] HARD SOFT [SOFT]..." << std::endl;
-    output << "Computes a leximax optimal solution (if one exists) of the problem with constraints HARD and objective functions SOFT."  << std::endl;
-    output << "Example: ./leximax hard.cnf obj1.cnf obj2.cnf" << std::endl;
-    output << "HARD and SOFT must be a file in DIMACS format." << std::endl;
-    output << "Options:" << std::endl;
-    output << "  --help,-h\t\t\t print this message" << std::endl;
-    output << "  --leave-temporary-files\t do not delete temporary files" << std::endl;
-    output << "  --pbo\t\t\t\t external solver is a PBO solver" << std::endl;
-    output << "\t\t\t\t default: MaxSAT solver"<< std::endl;
-    output << "  --multiplication-string\t string between coefficients and variables of PBO solver"<< std::endl;
-    output << "\t\t\t\t default '*'"<< std::endl;
-    output << "  --external-solver\t\t command for the external solver;" << std::endl;
-    output << "\t\t\t\t can be PBO or MaxSAT solver" << std::endl;
-    output << "\t\t\t\t default 'rc2.py -vv'"<< std::endl;
-    output << std::endl;
-    output << "NOTE" << std::endl;
-    output << "Output is produced to the standard output." << std::endl;
+void print_header()
+{
+    std::cout << "c ----------------------------------------------------------------------\n";
+    std::cout << "c leximaxIST - C++ Library for Boolean Leximax Optimisation\n";
+    std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
+    std::cout << "c Contributors:\n";
+    std::cout << "c     * From Open-WBO: João Cortes, Ruben Martins, Inês Lynce,\n";
+    std::cout << "c       Miguel Neves, Norbert Manthey, Saurabh Joshi.\n"
+    std::cout << "c ----------------------------------------------------------------------" << '\n';
 }
-
 
 int main(int argc, char *argv[])
 {
     /* parse options */
-    Options options;
+    leximaxIST::Options options;
     if (!options.parse(argc, argv)) {
-        print_leximax_error("Error parsing options. Exiting.");
-        print_usage(std::cout);
+        leximaxIST::print_error_msg("Error parsing options. Exiting.");
+        options.print_usage(std::cout);
         return 1;
     }
-    if (options.m_help.get_data()) {
-        print_usage(std::cout);
+    if (options.get_help() == 1) {
+        options.print_usage(std::cout);
         return 0;
     }
-    Encoder enc();
+    
+    leximaxIST::Encoder enc;
 
     // TODO: set parameters of the encoder, based on options
     
     enc.set_verbosity(options.get_verbosity());
     enc.set_opt_mode(options.get_optimise());
     
+    if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {
+        print_header();
+        std::cout << "c Reading problem... file: " << options.get_input_file_name() << '\n';
+    }
+    
     // TODO: read pbmo file and encode PB constraints as clauses
+    MaxSATFormula maxsat_formula;
+    ParserPB parser_pb (&maxsat_formula);
+    parser_pb.parsePBFormula(options.get_input_file_name().c_str());
+    
+    
+    
+    std::vector<std::vector<int>> hard_cls;
+    std::vector<std::vector<std::vector<int>>> obj_funcs;
+    
+    hard_cls.resize(maxsat_formula.nHard());
+    
+    // add hard clauses
+    for (size_t pos (0); pos < maxsat_formula.nHard(); ++pos) {
+        std::vector<int> hc (maxsat_formula.getHardClause(pos).clause);
+        enc.add_hard_clause(hc);
+    }
+    // use an encoder to encode the pseudo-boolean constraints to cnf and add the clauses to enc
+    
+    // add objective functions
+    for (int i (0); i < maxsat_formula.nObjFunctions(); ++i) {
+        std::vector<leximaxIST::Clause> soft_clauses;
+        const PBObjFunction *obj (maxsat_formula.getObjFunction(i));
+        for (size_t j (0); j < obj->get_lits().size(); ++j) {
+            // repeat the clause according to its weight (for now this is how we do this)
+            for (int k (1); k <= obj->get_coeffs().at(j); ++k) {
+                leximaxIST::Clause sc;
+                sc.push_back(-(objs->get_lits().at(j)));
+                soft_clauses.push_back(sc);
+            }            
+        }
+        enc.add_soft_clauses(soft_clauses);
+    }
+    
+    
     
     // TODO: approximate
     

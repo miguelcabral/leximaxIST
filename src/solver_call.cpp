@@ -644,7 +644,7 @@ namespace leximaxIST {
                 }
             }
             if (m_mss_incremental)
-                add_clause_input(block_mss);
+                add_hard_clause(block_mss);
             else
                 blocking_cls.push_back(block_mss);
             ++nb_msses;

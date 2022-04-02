@@ -20,13 +20,17 @@ namespace leximaxIST {
             print_error_msg("Empty hard clause");
             exit(EXIT_FAILURE);
         }
+        update_id_count(cl);
         set_of_clauses.push_back(cl);
         if (m_verbosity == 2)
             print_clause(std::cout, cl, "c ");
     }
     
-    void Encoder::add_clause_input(const Clause &cl)
+    // this is public, one can use it to add input hard clauses
+    void Encoder::add_hard_clause(const Clause &cl)
     {
+        if (m_sat_solver == nullptr)
+            m_sat_solver = new IpasirWrap();
         add_clause(cl, m_input_hard);
         m_sat_solver->addClause(cl);
     }
@@ -35,6 +39,7 @@ namespace leximaxIST {
     {
         add_clause(cl, m_encoding);
         // In 'core-rebuild' we create a new ipasir solver everytime the sorting networks grow
+        // is this really necessary ?  maybe I can remove the if
         if (m_opt_mode != "core-rebuild")
             m_sat_solver->addClause(cl);
     }
@@ -206,38 +211,10 @@ namespace leximaxIST {
         }
     }
     
-    void print_header()
+    // add an objective function in the form of a set of soft clauses (so the goal is to minimise clause falsification)
+    void Encoder::add_soft_clauses(const <std::vector<Clause> &soft_clauses)
     {
-        std::cout << "c ----------------------------------------------------------------------\n";
-        std::cout << "c leximaxIST - C++ Library for Boolean Leximax Optimisation\n";
-        std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
-        std::cout << "c ----------------------------------------------------------------------" << '\n';
-    }
-    
-    void Encoder::set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions)
-    {
-        if (m_verbosity > 0 && m_verbosity <= 2) {
-            print_header();
-            std::cout << "c Reading problem..." << '\n';
-        }
-        // restart object: if it has not been cleared from a previous problem
-        clear();
-        // name for temporary files
-        reset_file_name();
-        // check for trivial cases
-        if (objective_functions.empty()) {
-            print_error_msg("The problem does not have an objective function");
-            exit(EXIT_FAILURE);
-        }
-        if (constraints.empty()) {
-            print_error_msg("The problem does not have constraints");
-            exit(EXIT_FAILURE);
-        }
-        m_num_objectives = objective_functions.size();
-        if (m_num_objectives == 1) {
-            print_error_msg("The problem is single-objective");
-            exit(EXIT_FAILURE);
-        }
+        ++m_num_objectives;
         // set m_snet_info to a vector of (0,0) pairs
         m_snet_info.resize(m_num_objectives, std::pair(0,0));
         m_objectives.resize(m_num_objectives);
@@ -246,53 +223,24 @@ namespace leximaxIST {
         m_all_relax_vars.resize(m_num_objectives);
         // set m_sorted_relax_collection to a vector of empty vectors
         m_sorted_relax_collection.resize(m_num_objectives);
-        m_sat_solver = new IpasirWrap();
-        // read problem
-        if (m_verbosity == 2)
-            std::cout << "c ------------- Input hard clauses -------------\n";
-        for (const std::vector<int> &hard_clause : constraints) {
-            // determine max id and update m_id_count
-            update_id_count(hard_clause);
-            // store clause (check if it is empty)
-            add_clause_input(hard_clause);
-        }
-        // update m_id_count if there are new variables in objective_functions
-        for (const std::vector<std::vector<int>> &obj : objective_functions) {
-            for (const std::vector<int> &soft_clause : obj)
-                update_id_count(soft_clause);
-        }
-        m_input_nb_vars = m_id_count;
-        if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
-            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
-            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
-        }
-        // store objective functions - convert clause satisfaction maximisation to minimisation of sum of variables
+        for (const Clause &soft_clause : soft_clauses)
+            update_id_count(soft_clause);
+        // convert clause satisfiaction maximisation to minimisation of sum of variables
         if (m_verbosity == 2)
             std::cout << "c ---- Input soft clauses conversion to variables ----\n";
-        int i(0);
-        for (const std::vector<std::vector<int>> &obj : objective_functions) {
-            m_objectives.at(i).resize(obj.size(), 0);
-            int j(0);
-            for (const std::vector<int> &soft_clause : obj) {
-                // neg fresh_var implies soft_clause
-                int fresh_var (fresh());
-                Clause hard_clause (soft_clause); // copy constructor
-                m_objectives.at(i).at(j) = fresh_var;
-                hard_clause.push_back(fresh_var);
-                add_clause_input(hard_clause);
-                j++;
-                // other implication: soft_clause implies neg fresh_var
-                for (const int soft_lit : soft_clause) {
-                    Clause cl {-soft_lit, -fresh_var};
-                    add_clause_input(cl);
-                }
+        int i (m_num_objectives - 1); // position in m_objectives of the current objective
+        for (const std::vector<int> &soft_clause : soft_clauses) {
+            // neg fresh_var implies soft_clause
+            int fresh_var (fresh());
+            Clause hard_clause (soft_clause); // copy constructor
+            m_objectives.at(i).push_back(fresh_var);
+            hard_clause.push_back(fresh_var);
+            add_hard_clause(hard_clause);
+            // other implication: soft_clause implies neg fresh_var
+            for (const int soft_lit : soft_clause) {
+                Clause cl {-soft_lit, -fresh_var};
+                add_hard_clause(cl);
             }
-            ++i;
-        }
-        if (m_verbosity == 2) { // print obj functions
-            for (int k (0); k < m_num_objectives ; ++k)
-                print_obj_func(k);
         }
     }
 

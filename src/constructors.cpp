@@ -34,6 +34,8 @@ namespace leximaxIST {
         m_disjoint_cores(true),
         m_sat_solver(nullptr)
     {
+        
+        m_sat_solver = new IpasirWrap();
         // debug
          
         //std::cout << std::unitbuf;

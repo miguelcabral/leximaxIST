@@ -76,7 +76,7 @@ namespace leximaxIST
 
         ~Encoder();
         
-        void solve();
+        void optimise();
         
         char get_status() const;
         
@@ -92,7 +92,9 @@ namespace leximaxIST
         // empty if unsat; not a const reference because it is not a member variable
         std::vector<int> get_objective_vector() const;
         
-        void set_problem(const std::vector<std::vector<int>> &constraints, const std::vector<std::vector<std::vector<int>>> &objective_functions);
+        void add_hard_clause(const Clause &cl);
+        
+        void add_soft_clauses(const std::vector<Clause> &soft_clauses);
         
         void set_simplify_last(bool val);
         
@@ -175,8 +177,6 @@ namespace leximaxIST
         
         void add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses);
         
-        void add_clause_input(const Clause &cl);
-        
         void add_clause_enc(const Clause &cl);
         
         void add_clause(int l);
@@ -239,9 +239,9 @@ namespace leximaxIST
         
         void fix_only_some();
         
-        void solve_first_enc(int sum);
+        void optimise_non_core(int sum);
         
-        void solve_core_guided();
+        void optimise_core_guided();
         
         void generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec);
         

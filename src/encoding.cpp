@@ -455,24 +455,35 @@ namespace leximaxIST {
         fix_all(i); // this may allow the sat solver to eliminate the order encoding
     }
     
-    void Encoder::solve()
+    void Encoder::optimise()
     {
+        m_input_nb_vars = m_id_count;
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            std::cout << "c Optimising...\n";
+            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
+            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
+            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
+        }
+        if (m_verbosity == 2) { // print obj functions
+            for (int k (0); k < m_num_objectives ; ++k)
+                print_obj_func(k);
+        }
         double initial_time (read_cpu_time());
         if (m_status != '?') {
-            print_error_msg("Called solve() twice. You must call set_problem() before calling solve()");
+            print_error_msg("Called optimise() twice without changing the formula.");
             exit(EXIT_FAILURE);
         }
         // check if solve() is called without a problem
         if (m_num_objectives == 0) {
-            print_error_msg("Can not solve - no objective function");
+            print_error_msg("The problem does not have an objective function");
             exit(EXIT_FAILURE);
         }
         if (m_input_hard.empty()) {
-            print_error_msg("Can not solve - no hard clauses");
+            print_error_msg("The problem does not have constraints");
             exit(EXIT_FAILURE);
         }
         if (m_num_objectives == 1) {
-            print_error_msg("Can not solve - single-objective problem");
+            print_error_msg("The problem is single-objective");
             exit(EXIT_FAILURE);
         }
         // check if problem is satisfiable and compute bounds on first optimum
@@ -480,16 +491,16 @@ namespace leximaxIST {
         if (m_status == 'u')
             return;   
         if (m_opt_mode.substr(0, 4) == "core")
-            solve_core_guided();
+            optimise_core_guided();
         else
-            solve_first_enc(sum);            
+            optimise_non_core(sum);            
         if (m_verbosity >= 1) // print total solving time
-            print_time(read_cpu_time() - initial_time, "c Total solving CPU time: ");
+            print_time(read_cpu_time() - initial_time, "c Optimisation CPU time: ");
     }
     
     // sum is the minimum value of the sum of the objective functions in case of presolving
     // it is used to compute a lower bound of the optimal value of the first maximum
-    void Encoder::solve_first_enc(int sum)
+    void Encoder::optimise_non_core(int sum)
     {
         if (m_verbosity >= 1)
             std::cout << "c Original SAT-based Algorithm - Solving...\n";
@@ -1028,7 +1039,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::solve_core_guided()
+    void Encoder::optimise_core_guided()
     {
         if (m_verbosity >= 1)
             std::cout << "c Core-guided Algorithm - Solving...\n";
