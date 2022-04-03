@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <leximaxIST_rusage.h>
 #include <fstream>
@@ -69,7 +69,7 @@ namespace leximaxIST {
     /* print percentage of falsified objective variables by chance
      * print number of calls to SAT solver
      */
-    void Encoder::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
+    void Solver::print_mss_info(int nb_calls, const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
     {
         int total_nb_vars (0);
         for (const std::vector<int> &obj : m_objectives)
@@ -96,7 +96,7 @@ namespace leximaxIST {
         set_cout(old_config);
     }
     
-    void Encoder::print_mss_enum_info() const
+    void Solver::print_mss_enum_info() const
     {
         std::cout << "c MSS enumeration...\n";
         std::cout << "c Parameters: \n";
@@ -122,7 +122,7 @@ namespace leximaxIST {
     }
     
     // in this case we already have computed obj_vec
-    void Encoder::print_obj_vector(const std::vector<int> &obj_vec) const
+    void Solver::print_obj_vector(const std::vector<int> &obj_vec) const
     {
         if (!obj_vec.empty()) {
             std::cout << "o ";
@@ -133,7 +133,7 @@ namespace leximaxIST {
     }
     
     // in this case we compute obj_vec
-    void Encoder::print_obj_vector() const
+    void Solver::print_obj_vector() const
     {
         const std::vector<int> &obj_vec (get_objective_vector());
         if (!obj_vec.empty()) {
@@ -144,14 +144,14 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::print_soft_clauses() const
+    void Solver::print_soft_clauses() const
     {
         std::cout << "c -------- Soft Clauses of current iteration --------\n";
         for (int lit : m_soft_clauses)
             std::cout << "c " << lit << " 0\n";
     }
     
-    void Encoder::print_sorted_vec (int i) const
+    void Solver::print_sorted_vec (int i) const
     {
         std::cout << "c ---------------- m_sorted_vecs[" << i << "] -----------------\n";
         for(size_t j{0}; j < m_sorted_vecs.at(i).size(); j++)
@@ -159,7 +159,7 @@ namespace leximaxIST {
     }
     
     // print separately the variables of the jth objective that are in the sorting network and those that are not
-    void Encoder::print_objs_sorted(const std::vector<std::vector<int>> &inputs_not_sorted) const
+    void Solver::print_objs_sorted(const std::vector<std::vector<int>> &inputs_not_sorted) const
     {
         for (int j (0); j < m_num_objectives; ++j) {
             std::cout << "c Variables of the " << ordinal(j+1) << " objective not in the sorting network: ";
@@ -184,7 +184,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::print_obj_func(int i) const
+    void Solver::print_obj_func(int i) const
     {
         const std::vector<int> &objective (m_objectives.at(i));
         size_t num_terms (objective.size());
@@ -194,7 +194,7 @@ namespace leximaxIST {
             std::cout << "c " << objective.at(j) << '\n';
     }
     
-    void Encoder::print_snet_info() const
+    void Solver::print_snet_info() const
     {
         for (int i (0); i < m_num_objectives; ++i) {
             std::cout << "c " << ordinal(i + 1) << " Sorting Network: ";
@@ -202,7 +202,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
+    void Solver::print_mss_debug(const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss) const
     {
         std::cout << "c Todo Sizes: ";
         for (int i(0); i < m_num_objectives; ++i)
@@ -220,7 +220,7 @@ namespace leximaxIST {
         std::cout << '\n';
     }
     
-    void Encoder::print_waitpid_error(const std::string &errno_str) const
+    void Solver::print_waitpid_error(const std::string &errno_str) const
     {
         std::string errmsg ("When calling");
         errmsg += " waitpid() on external solver (pid " + std::to_string(m_child_pid) + "): '";
@@ -229,7 +229,7 @@ namespace leximaxIST {
     }
 
     // leadingStr can be "c ", to print comments, or e.g. "100 " to print weights
-    void Encoder::print_clause(std::ostream &output, const Clause &clause, const std::string &leadingStr) const
+    void Solver::print_clause(std::ostream &output, const Clause &clause, const std::string &leadingStr) const
     {
         output << leadingStr;
         for (int lit : clause)
@@ -237,13 +237,13 @@ namespace leximaxIST {
         output << "0\n";
     }
 
-    void Encoder::print_soft_clauses(std::ostream &output) const
+    void Solver::print_soft_clauses(std::ostream &output) const
     {
         for (int lit : m_soft_clauses)
             output << "1 " << lit << " 0\n";
     }
     
-    void Encoder::print_hard_clauses(std::ostream &output) const
+    void Solver::print_hard_clauses(std::ostream &output) const
     {
         size_t weight (m_soft_clauses.size() + 1);
         for (const Clause &cl : m_input_hard) {
@@ -256,7 +256,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::print_pb_constraint(const Clause &cl, std::ostream &output) const
+    void Solver::print_pb_constraint(const Clause &cl, std::ostream &output) const
     {
         int num_negatives(0);
         for (int literal : cl) {
@@ -268,7 +268,7 @@ namespace leximaxIST {
         output << " >= " << 1 - num_negatives << ";\n";
     }
 
-    void Encoder::print_lp_constraint(const Clause &cl, std::ostream &output) const
+    void Solver::print_lp_constraint(const Clause &cl, std::ostream &output) const
     {
         int num_negatives(0);
         size_t nb_vars_in_line (0);
@@ -290,7 +290,7 @@ namespace leximaxIST {
         output << " >= " << 1 - num_negatives << '\n';
     }
     /*
-    void Encoder::print_atmost_pb(int i, std::ostream &output) const
+    void Solver::print_atmost_pb(int i, std::ostream &output) const
     {
         // i = 1 means position 0, i = 2, means position 1, etc
         const std::list<int> &relax_vars (m_all_relax_vars[i-1]);
@@ -300,7 +300,7 @@ namespace leximaxIST {
         output << " >= " << -i << ";\n";
     }
 
-    void Encoder::print_atmost_lp(int i, std::ostream &output) const
+    void Solver::print_atmost_lp(int i, std::ostream &output) const
     {
         // i = 1 means position 0, i = 2, means position 1, etc
         const std::list<int> &relax_vars (m_all_relax_vars[i-1]);
@@ -316,7 +316,7 @@ namespace leximaxIST {
         output << " <= " << i << '\n';
     }
 
-    void Encoder::print_sum_equals_pb(int i, std::ostream &output) const
+    void Solver::print_sum_equals_pb(int i, std::ostream &output) const
     {
         const std::list<int> &relax_vars (m_all_relax_vars.back());
         for (int var : relax_vars) {
@@ -325,7 +325,7 @@ namespace leximaxIST {
         output << " = " << i << ";\n";
     }
 
-    void Encoder::print_sum_equals_lp(int i, std::ostream &output) const
+    void Solver::print_sum_equals_lp(int i, std::ostream &output) const
     {
         const std::list<int> &relax_vars (m_all_relax_vars.back()); // last relax vars
         bool first_iteration (true);
@@ -340,7 +340,7 @@ namespace leximaxIST {
         output << " = " << i << '\n';
     }*/
     
-    void Encoder::print_sorted_true() const
+    void Solver::print_sorted_true() const
     {
         if (!m_solution.empty()){
             std::cout << "c Sorted vecs true variables:" << '\n';

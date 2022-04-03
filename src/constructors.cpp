@@ -1,10 +1,10 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <iostream>
 
 namespace leximaxIST {
         
-    Encoder::Encoder() : 
+    Solver::Solver() : 
         m_verbosity(0),
         m_id_count(0),
         m_input_nb_vars(0),
@@ -34,12 +34,7 @@ namespace leximaxIST {
         m_disjoint_cores(true),
         m_sat_solver(nullptr)
     {
-        
         m_sat_solver = new IpasirWrap();
-        // debug
-         
-        //std::cout << std::unitbuf;
-         
     }
 
 }/* namespace leximaxIST */

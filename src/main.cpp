@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_Options.h>
 #include <leximaxIST_printing.h>
 #include <MaxSATFormula.h>
@@ -31,12 +31,12 @@ int main(int argc, char *argv[])
         return 0;
     }
     
-    leximaxIST::Encoder enc;
+    leximaxIST::Solver solver;
 
-    // TODO: set parameters of the encoder, based on options
+    // TODO: set parameters of the solver, based on options
     
-    enc.set_verbosity(options.get_verbosity());
-    enc.set_opt_mode(options.get_optimise());
+    solver.set_verbosity(options.get_verbosity());
+    solver.set_opt_mode(options.get_optimise());
     
     if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {
         print_header();
@@ -49,18 +49,12 @@ int main(int argc, char *argv[])
     parser_pb.parsePBFormula(options.get_input_file_name().c_str());
     
     
-    
-    std::vector<std::vector<int>> hard_cls;
-    std::vector<std::vector<std::vector<int>>> obj_funcs;
-    
-    hard_cls.resize(maxsat_formula.nHard());
-    
     // add hard clauses
     for (size_t pos (0); pos < maxsat_formula.nHard(); ++pos) {
         std::vector<int> hc (maxsat_formula.getHardClause(pos).clause);
-        enc.add_hard_clause(hc);
+        solver.add_hard_clause(hc);
     }
-    // use an encoder to encode the pseudo-boolean constraints to cnf and add the clauses to enc
+    // use an encoder to encode the pseudo-boolean constraints to cnf and add the clauses to solver
     
     // add objective functions
     for (int i (0); i < maxsat_formula.nObjFunctions(); ++i) {
@@ -74,7 +68,7 @@ int main(int argc, char *argv[])
                 soft_clauses.push_back(sc);
             }            
         }
-        enc.add_soft_clauses(soft_clauses);
+        solver.add_soft_clauses(soft_clauses);
     }
     
     

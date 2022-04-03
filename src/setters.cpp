@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <leximaxIST_rusage.h>
 #include <string>
@@ -14,7 +14,7 @@ namespace leximaxIST {
     bool descending_order (int i, int j);
     
     // set_of_clauses can be m_input_hard for input hard clauses or m_encoding for encoding hard clauses
-    void Encoder::add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses)
+    void Solver::add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses)
     {
         if (cl.empty()) {
             print_error_msg("Empty hard clause");
@@ -27,7 +27,7 @@ namespace leximaxIST {
     }
     
     // this is public, one can use it to add input hard clauses
-    void Encoder::add_hard_clause(const Clause &cl)
+    void Solver::add_hard_clause(const Clause &cl)
     {
         if (m_sat_solver == nullptr)
             m_sat_solver = new IpasirWrap();
@@ -35,7 +35,7 @@ namespace leximaxIST {
         m_sat_solver->addClause(cl);
     }
     
-    void Encoder::add_clause_enc(const Clause &cl)
+    void Solver::add_clause_enc(const Clause &cl)
     {
         add_clause(cl, m_encoding);
         // In 'core-rebuild' we create a new ipasir solver everytime the sorting networks grow
@@ -44,25 +44,25 @@ namespace leximaxIST {
             m_sat_solver->addClause(cl);
     }
 
-    void Encoder::add_clause(int l)
+    void Solver::add_clause(int l)
     {
         const Clause cl {l};
         add_clause_enc(cl);
     }
     
-    void Encoder::add_clause(int l1, int l2)
+    void Solver::add_clause(int l1, int l2)
     {
         const Clause cl {l1, l2};
         add_clause_enc(cl);
     }
     
-    void Encoder::add_clause(int l1, int l2, int l3)
+    void Solver::add_clause(int l1, int l2, int l3)
     {
         const Clause cl {l1, l2, l3};
         add_clause_enc(cl);
     }
     
-    int Encoder::fresh()
+    int Solver::fresh()
     {
         // check for overflow
         if (m_id_count == INT_MAX) {
@@ -72,12 +72,12 @@ namespace leximaxIST {
         return ++m_id_count; 
     }
     
-    void Encoder::reset_file_name()
+    void Solver::reset_file_name()
     {
         m_file_name = std::to_string(getpid());
     }
     
-    void Encoder::set_opt_mode(const std::string &mode)
+    void Solver::set_opt_mode(const std::string &mode)
     {
         if (mode != "external" && mode != "bin" && mode != "linear-su" &&
             mode != "linear-us" && mode != "core-static" && mode != "core-merge"
@@ -88,12 +88,23 @@ namespace leximaxIST {
         m_opt_mode = mode;
     }
     
-    void Encoder::set_ext_solver_cmd(const std::string &command)
+    void Solver::set_approx(const std::string &algorithm)
+    {
+        if (algorithm != "mss" && algorithm != "gia") {
+            std::string msg ("In function leximaxIST::Solver::set_approx, ");
+            msg += "Invalid approximation algorithm: '" + algorithm + "'";
+            print_error_msg(msg);
+            exit(EXIT_FAILURE);
+        }
+        m_approx = algorithm;
+    }
+    
+    void Solver::set_ext_solver_cmd(const std::string &command)
     {
         m_ext_solver_cmd = command;
     }
     
-    void Encoder::set_formalism(const std::string &format)
+    void Solver::set_formalism(const std::string &format)
     {
         if (format != "wcnf" && format != "opb" && format != "lp") {
             std::string msg ("The external solver formalism entered: '" + format + "' is not valid\n");
@@ -104,9 +115,9 @@ namespace leximaxIST {
         m_formalism = format;  
     }
 
-    void Encoder::set_timeout(double val) { m_timeout = val; }
+    void Solver::set_timeout(double val) { m_timeout = val; }
     
-    void Encoder::set_lp_solver(const std::string &lp_solver)
+    void Solver::set_lp_solver(const std::string &lp_solver)
     {
         bool found (false);
         for (std::string &valid_lp_solver : m_valid_lp_solvers)
@@ -123,9 +134,9 @@ namespace leximaxIST {
         m_lp_solver = lp_solver;
     }
 
-    void Encoder::set_simplify_last(bool val) { m_simplify_last = val; }
+    void Solver::set_simplify_last(bool val) { m_simplify_last = val; }
     
-    void Encoder::set_verbosity(int v)
+    void Solver::set_verbosity(int v)
     {
         if (v < 0 || v > 2) {
             std::string msg ("Invalid value '");
@@ -136,16 +147,16 @@ namespace leximaxIST {
         m_verbosity = v;
     }
     
-    void Encoder::set_leave_tmp_files(bool val) { m_leave_tmp_files = val; }
+    void Solver::set_leave_tmp_files(bool val) { m_leave_tmp_files = val; }
 
-    void Encoder::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
+    void Solver::set_multiplication_string(const std::string &str) { m_multiplication_string = str; }
     
-    void Encoder::set_maxsat_presolve(bool v)
+    void Solver::set_maxsat_presolve(bool v)
     {
         m_maxsat_presolve = v;
     }
     
-    void Encoder::set_maxsat_psol_cmd(const std::string &cmd)
+    void Solver::set_maxsat_psol_cmd(const std::string &cmd)
     {
         if (cmd.empty()) {
             print_error_msg("Empty MaxSAT presolve command");
@@ -154,7 +165,7 @@ namespace leximaxIST {
         m_maxsat_psol_cmd = cmd;
     }
     
-    std::vector<int> Encoder::set_solution(std::vector<int> &model)
+    std::vector<int> Solver::set_solution(std::vector<int> &model)
     {
         const std::vector<int> &new_obj_vec (get_objective_vector(model));
         const std::vector<int> &old_obj_vec (get_objective_vector(m_solution));
@@ -192,7 +203,7 @@ namespace leximaxIST {
     }
     
     // set m_id_count to the maximum id without the encoding - m_input_nb_vars + obj vars
-    void Encoder::reset_id_count()
+    void Solver::reset_id_count()
     {
         m_id_count = m_input_nb_vars;
         for (const std::vector<int> &objective : m_objectives) {
@@ -202,7 +213,7 @@ namespace leximaxIST {
             std::cout << "c Resetting m_id_count... m_id_count = " << m_id_count << '\n';
     }
     
-    void Encoder::update_id_count(const Clause &clause)
+    void Solver::update_id_count(const Clause &clause)
     {
         for (int lit : clause) {
             int var( lit < 0 ? -lit : lit );
@@ -212,8 +223,12 @@ namespace leximaxIST {
     }
     
     // add an objective function in the form of a set of soft clauses (so the goal is to minimise clause falsification)
-    void Encoder::add_soft_clauses(const <std::vector<Clause> &soft_clauses)
+    void Solver::add_soft_clauses(const <std::vector<Clause> &soft_clauses)
     {
+        if (soft_clauses.empty()) {
+            print_error_msg("In function leximaxIST::Solver::add_soft_clauses, empty objective function");
+            exit(EXIT_FAILURE);
+        }
         ++m_num_objectives;
         // set m_snet_info to a vector of (0,0) pairs
         m_snet_info.resize(m_num_objectives, std::pair(0,0));
@@ -243,65 +258,50 @@ namespace leximaxIST {
             }
         }
     }
-
-    void Encoder::set_pareto_presolve(bool v) { m_pareto_presolve = v; }
         
-    void Encoder::set_pareto_timeout(double t)
-    {
-        if (t <= 0) {
-            std::string msg ("Encoder::set_pareto_timeout - argument '");
-            msg += std::to_string(t) + "' is not positive";
-            print_error_msg(msg);
-            exit(EXIT_FAILURE);
-        }
-        m_pareto_timeout = t;
-    }
-        
-    void Encoder::set_pareto_incremental(bool v) { m_pareto_incremental = v; }
+    void Solver::set_gia_incr(bool v) { m_gia_incr = v; }
     
-    void Encoder::set_truly_pareto(bool v) { m_truly_pareto = v; }
+    void Solver::set_gia_pareto(bool v) { m_gia_pareto = v; }
     
-    void Encoder::set_mss_presolve(bool v) { m_mss_presolve = v; }
-    
-    void Encoder::set_mss_add_cls(int v)
+    void Solver::set_mss_add_cls(int v)
     {
         if (v < 0 || v > 2) {
-            std::string msg("Encoder::set_mss_add_cls - invalid argument '");
+            std::string msg("Solver::set_mss_add_cls - invalid argument '");
             msg += std::to_string(v) + "'. The parameter must be in the range 0..2";
             print_error_msg(msg);
         }
         m_mss_add_cls = v;
     }
     
-    void Encoder::set_mss_incremental(bool v) { m_mss_incremental = v; }
+    void Solver::set_mss_incr(bool v) { m_mss_incremental = v; }
     
-    void Encoder::set_mss_timeout(double t)
+    void Solver::set_approx_tout(double t)
     {
         if (t <= 0) {
-            std::string msg ("Encoder::set_mss_timeout - argument '");
+            std::string msg ("Solver::set_approx_tout - argument '");
             msg += std::to_string(t) + "' is not positive";
             print_error_msg(msg);
             exit(EXIT_FAILURE);
         }
-        m_mss_timeout = t;
+        m_approx_tout = t;
     }
         
-    void Encoder::set_mss_nb_limit(int n) 
+    void Solver::set_mss_nb_limit(int n) 
     {
         m_mss_nb_limit = n; 
     }
     
-    void Encoder::set_mss_tolerance(int t)
+    void Solver::set_mss_tolerance(int t)
     {
         if (t < 0 || t > 100) {
-            std::string msg ("Encoder::set_mss_tolerance - argument '");
-            msg += std::to_string(t) + "' is not a percentage";
+            std::string msg ("Solver::set_mss_tolerance - argument '");
+            msg += std::to_string(t) + "' is not an integer between 0 and 100!";
             print_error_msg(msg);
             exit(EXIT_FAILURE);
         }
         m_mss_tolerance = t; 
     }
     
-    void Encoder::set_disjoint_cores(bool v) { m_disjoint_cores = v; }
+    void Solver::set_disjoint_cores(bool v) { m_disjoint_cores = v; }
     
 }/* namespace leximaxIST */

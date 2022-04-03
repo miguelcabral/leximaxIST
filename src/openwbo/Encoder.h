@@ -53,10 +53,6 @@
 
 #include <vector>
 
-using NSPACE::vec;
-using NSPACE::Lit;
-using NSPACE::Solver;
-
 namespace openwbo {
 
 //=================================================================================================
@@ -79,21 +75,21 @@ public:
   ~Encoder() {}
 
   // TEMP
-  vec<Lit> &lits();
-  vec<Lit> &outputs();
+  std::vector<int> &lits();
+  std::vector<int> &outputs();
 
   // At-most-one encodings:
   //
   // Encode exactly-one constraint into CNF.
-  void encodeAMO(Solver *S, vec<Lit> &lits);
+  void encodeAMO(leximaxIST::Solver &solver, std::vector<int> &lits);
 
   // Cardinality encodings:
   //
   // Encode cardinality constraint into CNF.
-  void encodeCardinality(Solver *S, vec<Lit> &lits, int64_t rhs);
+  void encodeCardinality(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
 
   // Update the rhs of an already existent cardinality constraint
-  void updateCardinality(Solver *S, int64_t rhs);
+  void updateCardinality(leximaxIST::Solver &solver, int64_t rhs);
 
   // Incremental cardinality encodings:
   //
@@ -101,48 +97,48 @@ public:
   // No restriction is made on the value of 'rhs'.
   // buildCardinality + updateCardinality is equivalent to encodeCardinality.
   // Useful for incremental encodings.
-  void buildCardinality(Solver *S, vec<Lit> &lits, int64_t rhs);
+  void buildCardinality(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
 
   // Incremental update for cardinality constraints;
-  void incUpdateCardinality(Solver *S, vec<Lit> &join, vec<Lit> &lits,
-                            int64_t rhs, vec<Lit> &assumptions);
-  void incUpdateCardinality(Solver *S, vec<Lit> &lits, int64_t rhs,
-                            vec<Lit> &assumptions) {
+  void incUpdateCardinality(leximaxIST::Solver &solver, std::vector<int> &join, std::vector<int> &lits,
+                            int64_t rhs, std::vector<int> &assumptions);
+  void incUpdateCardinality(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs,
+                            std::vector<int> &assumptions) {
 
-    vec<Lit> empty;
+    std::vector<int> empty;
     incUpdateCardinality(S, empty, lits, rhs, assumptions);
   }
 
   // Add two disjoint cardinality constraints
-  void addCardinality(Solver *S, Encoder &enc, int64_t rhs);
+  void addCardinality(leximaxIST::Solver &solver, Encoder &enc, int64_t rhs);
 
   // PB encodings:
   //
   // Encode pseudo-Boolean constraint into CNF.
-  void encodePB(Solver *S, vec<Lit> &lits, vec<uint64_t> &coeffs, uint64_t rhs);
+  void encodePB(leximaxIST::Solver &solver, std::vector<int> &lits, vec<uint64_t> &coeffs, uint64_t rhs);
   // Update the rhs of an already existent pseudo-Boolean constraint.
-  void updatePB(Solver *S, uint64_t rhs);
+  void updatePB(leximaxIST::Solver &solver, uint64_t rhs);
   // Predicts the number of clauses needed for the encoding
-  int predictPB(Solver *S, vec<Lit> &lits, vec<uint64_t> &coeffs, uint64_t rhs);
+  int predictPB(leximaxIST::Solver &solver, std::vector<int> &lits, vec<uint64_t> &coeffs, uint64_t rhs);
 
   // Incremental PB encodings:
   //
   // Incremental PB encoding.
-  void incEncodePB(Solver *S, vec<Lit> &lits, vec<uint64_t> &coeffs,
-                   int64_t rhs, vec<Lit> &assumptions, int size);
+  void incEncodePB(leximaxIST::Solver &solver, std::vector<int> &lits, vec<uint64_t> &coeffs,
+                   int64_t rhs, std::vector<int> &assumptions, int size);
 
   // Incremental update of PB encodings.
-  void incUpdatePB(Solver *S, vec<Lit> &lits, vec<uint64_t> &coeffs,
-                   int64_t rhs, vec<Lit> &assumptions);
+  void incUpdatePB(leximaxIST::Solver &solver, std::vector<int> &lits, vec<uint64_t> &coeffs,
+                   int64_t rhs, std::vector<int> &assumptions);
 
   // Incremental update of assumptions.
-  void incUpdatePBAssumptions(Solver *S, vec<Lit> &assumptions);
+  void incUpdatePBAssumptions(leximaxIST::Solver &solver, std::vector<int> &assumptions);
 
   // Incremental construction of the totalizer encoding.
   // Joins a set of new literals, x_1 + ... + x_i, to an existing encoding of
   // the type
   // y_1 + ... + y_j <= k. It also updates 'k' to 'rhs'.
-  void joinEncoding(Solver *S, vec<Lit> &lits, int64_t rhs);
+  void joinEncoding(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
 
   // Other:
   //
@@ -161,7 +157,7 @@ public:
   void setAMOEncoding(int enc) { amo_encoding = enc; }
   int getAMOEncoding() { return amo_encoding; }
   
-  void setApproxRatio(Solver *S, double eps) { epsilon = eps; if(pb_encoding == _PB_KP_) kp.setApproxRatio(S, eps);
+  void setApproxRatio(leximaxIST::Solver &solver, double eps) { epsilon = eps; if(pb_encoding == _PB_KP_) kp.setApproxRatio(S, eps);
 }
 
 //   void setBlockingMode(int bm) { blockingMode = bm; igte.setBlockingMode(bm); }

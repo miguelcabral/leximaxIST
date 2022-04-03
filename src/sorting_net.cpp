@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <leximaxIST_types.h>
 #include <utility>
@@ -13,7 +13,7 @@ namespace leximaxIST {
     * the smallest of the outputs, if i < j
     * the greatest of the outputs, if i > j.*/
 
-    void Encoder::encode_max(int var_out_max, int var_in1, int var_in2)
+    void Solver::encode_max(int var_out_max, int var_in1, int var_in2)
     {
         // encode var_out_max is equivalent to var_in1 OR var_in2
         add_clause(-var_out_max, var_in1, var_in2);
@@ -21,7 +21,7 @@ namespace leximaxIST {
         add_clause(var_out_max, -var_in2);
     }
 
-    void Encoder::encode_min(int var_out_min, int var_in1, int var_in2)
+    void Solver::encode_min(int var_out_min, int var_in1, int var_in2)
     {
         // encode var_out_min is equivalent to var_in1 AND var_in2
         add_clause(-var_out_min, var_in1);
@@ -29,7 +29,7 @@ namespace leximaxIST {
         add_clause(var_out_min, -var_in1, -var_in2);
     }
 
-    void Encoder::insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network)
+    void Solver::insert_comparator(int el1, int el2, const std::vector<int> *objective, SNET &sorting_network)
     {
         if (m_verbosity == 2)
             std::cout << "c Inserting comparator between wires " << el1 << " and " << el2 << '\n';
@@ -66,7 +66,7 @@ namespace leximaxIST {
     }
 
     // returns the number of comparators added to the sorting network by this function
-    int Encoder::odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network)
+    int Solver::odd_even_merge(std::pair<std::pair<int,int>,int> seq1, std::pair<std::pair<int,int>,int> seq2, const std::vector<int> *objective, SNET &sorting_network)
     {
         int nb_comparators (0);
         int el1;
@@ -132,7 +132,7 @@ namespace leximaxIST {
     }
 
     // returns the number of comparators of the sorting network
-    int Encoder::encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network)
+    int Solver::encode_network(const std::pair<int,int> elems_to_sort, const std::vector<int> *objective, SNET &sorting_network)
     {
         /* in the case the sorting network only has one element (this is important for the core-guided algorithm)
         * we must set the pair to (0, objective->at(0))
@@ -170,7 +170,7 @@ namespace leximaxIST {
      * Merge this sorting network with the old sorting network - the outputs are initially in sorted_vec
      * sorted_vec is changed and set to the outputs of the new (larger) sorting network.
      */
-    void Encoder::merge_core_guided(const std::vector<std::vector<int>> &inputs_to_sort, const std::vector<std::vector<int>> &unit_core_vars)
+    void Solver::merge_core_guided(const std::vector<std::vector<int>> &inputs_to_sort, const std::vector<std::vector<int>> &unit_core_vars)
     {
         for (size_t obj_index (0); obj_index < inputs_to_sort.size(); ++obj_index) {
             const std::vector<int> &obj_vars (inputs_to_sort.at(obj_index));

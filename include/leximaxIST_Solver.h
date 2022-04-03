@@ -1,5 +1,5 @@
-#ifndef LEXIMAXIST_ENCODER
-#define LEXIMAXIST_ENCODER
+#ifndef LEXIMAXIST_SOLVER
+#define LEXIMAXIST_SOLVER
 #include <leximaxIST_types.h>
 #include <IpasirWrap.h>
 #include <leximaxIST_parsing_utils.h>
@@ -14,7 +14,7 @@
 namespace leximaxIST
 {
 
-    class Encoder {
+    class Solver {
         /* TODO: check if pointers can be removed without affecting performance
          * The problem is reallocation of vector while growing
          * It seems that it is not mandatory that the implementation of the STL
@@ -42,26 +42,24 @@ namespace leximaxIST
         std::string m_lp_solver;
         std::string m_valid_lp_solvers[6];
         std::string m_file_name;
-        std::string m_opt_mode; // internal (binary, linear-su, linear-us, core-guided), or external (MaxSAT/PBO/ILP solver)
-        bool m_disjoint_cores; // find disjoint cores before core-guided algorithm
+        std::string m_opt_mode; // optimisation algorithm : lin-su, lin-us, bin, core-merge, ...
+        std::string m_approx; // approximation algorithm : mss, gia
+        bool m_disjoint_cores; // use disjoint cores strategy in the core-guided algorithm
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_tmp_files;
         bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
-        bool m_pareto_presolve; // enable finding pareto-optimal solutions with a maximum improvement search
-        double m_pareto_timeout;
-        bool m_pareto_incremental; // whether to use the same SAT solver in every Pareto-optimal solution search
-        bool m_truly_pareto; // whether to continue to minimise to Pareto optimality, even though the maximum can not be improved
-        bool m_mss_presolve; // false: disable - one sat call, true: enable MSS enumeration with timeout/limit on the nb of MSSes
+        double m_approx_tout; // timeout for approximation
+        bool m_gia_incr; // whether to use the same SAT solver in every Pareto-optimal solution search
+        bool m_gia_pareto; // whether to continue to minimise to Pareto optimality, even though the maximum can not be improved
         int m_mss_add_cls; // how to use the models returned by the SAT solver in the construction of the MSS
-        bool m_mss_incremental; // (truly incremental enumeration) - whether to use the same SAT solver in every MSS search
-        double m_mss_timeout; // stop the MSS enumeration if this timeout is reached
+        bool m_mss_incr; // (truly incremental enumeration) - whether to use the same SAT solver in every MSS search
         int m_mss_nb_limit; // stop the enumeration when this number of MSSes is reached
         int m_mss_tolerance; // tolerance for choosing the next clause from a maximum objective
         bool m_maxsat_presolve; // to get lower bound (and upper bound) of optimum
         std::string m_maxsat_psol_cmd;
-        // the next one is usefull if computation is stoped and you get an intermediate solution
+        // the next one is usefull if computation is stopped and you get an intermediate solution
         // you want to know which values of the objective vector are in theory guaranteed to be optimal
         //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
         std::string m_multiplication_string;
@@ -72,11 +70,13 @@ namespace leximaxIST
         
     public:    
 
-        Encoder(); 
+        Solver(); 
 
-        ~Encoder();
+        ~Solver();
         
         void optimise();
+        
+        void approximate();
         
         char get_status() const;
         
@@ -118,15 +118,13 @@ namespace leximaxIST
         
         void set_maxsat_psol_cmd(const std::string &cmd);
         
-        void set_pareto_presolve(bool v);
+        void set_approx_tout(double t);
         
-        void set_pareto_timeout(double t);
+        void set_gia_incr(bool v);
         
-        void set_pareto_incremental(bool v);
+        void set_gia_pareto(bool v);
         
-        void set_truly_pareto(bool v);
-        
-        void set_mss_presolve(bool v);
+        void set_approx(const std::string &algorithm);
         
         /* 0: add all satisfied clauses to the MSS in construction
          * 1: add the same amount of satisfied clauses per objective
@@ -134,9 +132,7 @@ namespace leximaxIST
          */
         void set_mss_add_cls(int v);
         
-        void set_mss_incremental(bool v);
-        
-        void set_mss_timeout(double t);
+        void set_mss_incr(bool v);
         
         void set_mss_nb_limit(int n);
         
@@ -384,6 +380,6 @@ namespace leximaxIST
 
     };
 
-}
+} /* namespace leximaxIST */
 
 #endif

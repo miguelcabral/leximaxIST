@@ -28,6 +28,7 @@
 #include <iostream>
 #include "ExternalWrapper.hh"
 #include "fmtutils.hh"
+#include <leximaxIST_types.h>
 
 using std::sort;
 
@@ -41,13 +42,13 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,leave_temporary_files(false)
 ,leximax(false)
 ,disjoint_cores(false)
-,leximax_enc(nullptr)
+,m_leximax_solver(nullptr)
 {}
 
 ExternalWrapper::~ExternalWrapper()
 {
-    delete leximax_enc;
-    leximax_enc = nullptr;
+    delete m_leximax_solver;
+    m_leximax_solver = nullptr;
 }
 
 void clause_to_constraint(BasicClause& clause, vector<LINT>& constraint);
@@ -495,11 +496,11 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
  }
 
  void ExternalWrapper::print_leximax_info() {
-     assert(leximax_enc != nullptr);
-     /*size_t sorting_net_size (leximax_enc->get_sorting_net_size());
+     assert(m_leximax_solver != nullptr);
+     /*size_t sorting_net_size (m_leximax_solver->get_sorting_net_size());
      std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';*/
-     if (leximax_enc->get_status() == 's') {
-     	const std::vector<int> obj_vector (leximax_enc->get_objective_vector());
+     if (m_leximax_solver->get_status() == 's') {
+     	const std::vector<int> obj_vector (m_leximax_solver->get_objective_vector());
      	std::cerr << "# Objective vector: ";
      	for (int o : obj_vector)
             std::cerr << o << ' ';
@@ -537,72 +538,68 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      std::cerr << '\n';
  }
  
+ /* approximate and/or optimise using leximax criterion
+  * returns true if and only if the instance is satisfiable
+  */
  bool ExternalWrapper::solve_leximax() {
-     // create constraints and objective functions as vectors of vectors...
-     std::vector<std::vector<int>> input_constraints(hard_clauses.size());
-     size_t j(0);
-     for (BasicClause *clause : hard_clauses) {
-         std::vector<int> &con(input_constraints[j]);
-         con.resize(clause->size());
-         size_t k(0);
-         for (LINT lit : *clause) {
-             con[k] = lit;
-             ++k;
-         }
-         ++j;
+     // create leximax solver object
+     m_leximax_solver = new leximaxIST::Solver();
+     // add hard clauses to m_leximax_solver
+     for (BasicClause *hc : hard_clauses) {
+         leximaxIST::Clause c;
+         for (LINT lit : *clause)
+             c.push_back(lit);
+         m_leximax_solver->add_hard_clause(c);
      }
-     std::vector<std::vector<std::vector<int>>> obj_functions(clause_split.size());
-     j = 0;
-     for (BasicClauseVector &soft_cls: clause_split) {
-         std::vector<std::vector<int>> &obj = obj_functions[j];
-         obj.resize(soft_cls.size());
-         size_t k(0);
-         for (BasicClause *clause : soft_cls) {
-            std::vector<int> &literals(obj[k]);
-            literals.resize(clause->size());
-            size_t i(0);
-            for (LINT lit : *clause) {
-                literals[i] = lit;
-                ++i;
-            }
-            ++k;
+     // add each objective function
+     for (BasicClauseVector &soft_packup: clause_split) {
+         std::vector<leximaxIST::Clause> soft_leximax;
+         for (BasicClause *sc : soft_cls) {
+            leximaxIST::Clause c;
+            for (LINT lit : *sc)
+                c.push_back(lit);
+            soft_leximax.push_back(c);
          }
-         ++j;
+         m_leximax_solver->add_soft_clauses(soft_leximax);
      }
-     // create Leximax_encoder object
-     leximax_enc = new leximaxIST::Encoder();
-     // set external solvers and parameters of Leximax_encoder
-     leximax_enc->set_simplify_last(simplify_last);
+     // set external solvers and parameters of m_leximax_solver
+     m_leximax_solver->set_simplify_last(m_simplify_last);
      // disjoint cores presolving for the core-guided algorithm
-     leximax_enc->set_disjoint_cores(disjoint_cores);
-     // pareto presolving:
-     leximax_enc->set_pareto_presolve(pareto_presolve);
-     leximax_enc->set_pareto_timeout(pareto_timeout);
-     leximax_enc->set_pareto_incremental(pareto_incremental);
-     leximax_enc->set_truly_pareto(truly_pareto);
-     // mss presolving (enumeration)
-     leximax_enc->set_mss_presolve(mss_presolve);
-     leximax_enc->set_mss_add_cls(mss_add_cls);
-     leximax_enc->set_mss_incremental(mss_incremental);
-     leximax_enc->set_mss_timeout(mss_timeout);
-     leximax_enc->set_mss_nb_limit(mss_nb_limit);
-     leximax_enc->set_mss_tolerance(mss_tolerance);
+     m_leximax_solver->set_disjoint_cores(m_disjoint_cores);
+     // approximation
+     m_leximax_solver->set_approx_tout(m_approx_tout);
+     // approximation with gia
+     m_leximax_solver->set_gia_incr(m_gia_incr);
+     m_leximax_solver->set_gia_pareto(m_gia_pareto);
+     // approximation using msses
+     m_leximax_solver->set_mss_add_cls(m_mss_add_cls);
+     m_leximax_solver->set_mss_incremental(m_mss_incr);
+     m_leximax_solver->set_mss_nb_limit(m_mss_nb_limit);
+     m_leximax_solver->set_mss_tolerance(m_mss_tolerance);
      // other
-     leximax_enc->set_verbosity(verbosity);
-     leximax_enc->set_ext_solver_cmd(opt_solver_cmd);
-     leximax_enc->set_opt_mode(opt_mode);
-     leximax_enc->set_multiplication_string(multiplication_string);
-     leximax_enc->set_leave_tmp_files(leave_temporary_files);
-     leximax_enc->set_formalism(formalism);
-     leximax_enc->set_lp_solver(lp_solver); 
-     leximax_enc->set_maxsat_presolve(maxsat_presolve);
-     if (!maxsat_psol_cmd.empty())
-        leximax_enc->set_maxsat_psol_cmd(maxsat_psol_cmd);
-     leximax_enc->set_problem(input_constraints, obj_functions); 
-     leximax_enc->solve();
-     char status (leximax_enc->get_status());
+     m_leximax_solver->set_verbosity(m_leximax_verbosity);
+     m_leximax_solver->set_ext_solver_cmd(opt_solver_cmd);
+     m_leximax_solver->set_multiplication_string(multiplication_string);
+     m_leximax_solver->set_leave_tmp_files(leave_temporary_files);
+     m_leximax_solver->set_formalism(m_formalism);
+     m_leximax_solver->set_lp_solver(m_lp_solver); 
+     m_leximax_solver->set_maxsat_presolve(m_maxsat_presolve);
+     if (!m_maxsat_psol_cmd.empty())
+        m_leximax_solver->set_maxsat_psol_cmd(m_maxsat_psol_cmd);
+     // solve
+     char status = '?';
+     if (!m_leximax_approx.empty()) { // approximation
+         m_leximax_solver->set_approx(m_leximax_approx);
+         m_leximax_solver->approximate();
+         status = m_leximax_solver->get_status();
+     }
+     if (!m_leximax_opt.empty()) { // optimisation
+         m_leximax_solver->set_opt_mode(m_leximax_opt);
+         m_leximax_solver->optimise();
+         status = m_leximax_solver->get_status();
+     }
      if (status == 's') {
-        std::vector<int> sol (leximax_enc->get_solution());
+        std::vector<int> sol (m_leximax_solver->get_solution());
         model.assign(sol.begin(), sol.end());
         print_leximax_info();
      }

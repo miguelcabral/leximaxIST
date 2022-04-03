@@ -25,7 +25,7 @@
 #include "SolutionReader.hh"
 #include "SolverWrapperTypes.hh"
 #include "Options.hh"
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 using std::ifstream;
 
 static const char* dist_date = ""DISTDATE"";
@@ -60,11 +60,11 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
 //#ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n'; 
-  leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
-  if (leximax_enc != nullptr) {
-      //leximax_enc->terminate(); // terminate is not ready yet
-      if (leximax_enc->get_status() == 's')
-        solver.set_leximax_model(leximax_enc->get_solution());
+  leximaxIST::Solver *leximax_solver (solver.get_leximax_solver());
+  if (leximax_solver != nullptr) {
+      //leximax_solver->terminate(); // terminate is not ready yet
+      if (leximax_solver->get_status() == 's')
+        solver.set_leximax_model(leximax_solver->get_solution());
       else
           solver.set_leximax_model(std::vector<int>());
       solver.print_leximax_info();

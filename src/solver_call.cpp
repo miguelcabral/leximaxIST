@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_rusage.h>
 #include <leximaxIST_parsing_utils.h>
 #include <leximaxIST_printing.h>
@@ -25,7 +25,7 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
     
-    void Encoder::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    void Solver::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         while (*r != EOF) {
             if (*r != 'x')
@@ -54,27 +54,27 @@ namespace leximaxIST {
         }
     }
 /*
-    int Encoder::read_glpk_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    int Solver::read_glpk_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
     }
 
-    int Encoder::read_lpsolve_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    int Solver::read_lpsolve_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
     }
 
-    void Encoder::read_scip_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    void Solver::read_scip_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
     }
 
-    void Encoder::read_cbc_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    void Solver::read_cbc_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // TODO
     }
 */
-    void Encoder::read_cplex_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    void Solver::read_cplex_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // set all variables to false, because we only get the variables that are true
         for (size_t v (1); v < m_id_count + 1; ++v)
@@ -107,7 +107,7 @@ namespace leximaxIST {
     }
 
     // if model.empty() in the end then unsat, else sat
-    void Encoder::read_sat_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
+    void Solver::read_sat_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         while (*r != EOF) {
             if (*r != 'v') {// ignore all the other lines
@@ -131,7 +131,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::read_solver_output(std::vector<int> &model)
+    void Solver::read_solver_output(std::vector<int> &model)
     {
         std::string output_filename (m_file_name + ".sol");
         gzFile of = gzopen(output_filename.c_str(), "rb");
@@ -165,7 +165,7 @@ namespace leximaxIST {
         gzclose(of);
     }
 
-    void Encoder::split_command(const std::string &command, std::vector<std::string> &command_split)
+    void Solver::split_command(const std::string &command, std::vector<std::string> &command_split)
     {
         size_t pos (0);
         while (pos < command.length()) {
@@ -207,7 +207,7 @@ namespace leximaxIST {
     }
 
     // TODO: move the part of setting the command to the caller
-    void Encoder::call_ext_solver(const std::string &command)
+    void Solver::call_ext_solver(const std::string &command)
     {
         if (m_verbosity >= 1)
             std::cout << "c Calling external solver..." << '\n';
@@ -302,7 +302,7 @@ namespace leximaxIST {
         m_child_pid = 0;
     }
 
-    void Encoder::write_cnf_file(int i)
+    void Solver::write_cnf_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".cnf";
         std::ofstream out (m_file_name);
@@ -316,7 +316,7 @@ namespace leximaxIST {
         out.close();
     }
     
-    void Encoder::write_wcnf_file(int i)
+    void Solver::write_wcnf_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".wcnf";
         std::ofstream out (m_file_name);
@@ -332,7 +332,7 @@ namespace leximaxIST {
         out.close();
     }
 
-    void Encoder::write_opb_file(int i)
+    void Solver::write_opb_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".opb";
         std::ofstream out (m_file_name);
@@ -356,7 +356,7 @@ namespace leximaxIST {
         out.close();
     }
 
-    void Encoder::write_solver_input(int i)
+    void Solver::write_solver_input(int i)
     {
         if (m_formalism == "wcnf")
             write_wcnf_file(i);
@@ -370,7 +370,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::external_solve(int i)
+    void Solver::external_solve(int i)
     {
         write_solver_input(i+1);
         // call the solver
@@ -419,7 +419,7 @@ namespace leximaxIST {
         reset_file_name();
     }
 
-    void Encoder::write_lp_file(int i)
+    void Solver::write_lp_file(int i)
     {
         m_file_name += "_" + std::to_string(i) + ".lp";
         std::ofstream output(m_file_name); 
@@ -460,7 +460,7 @@ namespace leximaxIST {
         output.close();
     }
     
-    void Encoder::remove_tmp_files() const
+    void Solver::remove_tmp_files() const
     {
         std::string output_filename (m_file_name + ".sol");
         std::string error_filename (m_file_name + ".err");
@@ -507,7 +507,7 @@ namespace leximaxIST {
      * if there is an objective that can not, in the best case, be less than best_max
      * then stop - return -1
      */
-    int Encoder::mss_choose_obj (const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss, const int best_max) const
+    int Solver::mss_choose_obj (const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss, const int best_max) const
     {
         // compute the upper bounds
         std::vector<int> upper_bounds (m_num_objectives);
@@ -537,7 +537,7 @@ namespace leximaxIST {
      * update assumps
      * update upper_bounds
      */
-    void Encoder::mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps)
+    void Solver::mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps)
     {
         std::vector<std::vector<int>> vars_to_add (m_num_objectives); // by objective
         // find all satisfied soft clauses that haven't been added to the mss
@@ -598,7 +598,7 @@ namespace leximaxIST {
      * Thus, we will actually get subsets of the MSSes
      * Enumeration stops if a limit of time or number of MSSes is reached
      */
-    void Encoder::mss_enumerate()
+    void Solver::mss_enumerate()
     {
         if (m_verbosity >= 1)
             print_mss_enum_info();
@@ -672,7 +672,7 @@ namespace leximaxIST {
      * 0 - interrupted means timeout reached
      * in the end, variable mss is the sets of chosen satisfied soft clauses, by objective
      */
-    int Encoder::mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max)
+    int Solver::mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max)
     {
         // is there another MSS?
         std::vector<int> assumps;
@@ -736,7 +736,7 @@ namespace leximaxIST {
     /* model is an optimal solution of the sum of objective functions problem
      * The ceiling of the sum divided by the nb of obj functions is a lower bound
      */
-    int Encoder::get_lower_bound(const std::vector<int> &model)
+    int Solver::get_lower_bound(const std::vector<int> &model)
     {
         const std::vector<int> &obj_vec (get_objective_vector(model));
         int sum (0);
@@ -753,7 +753,7 @@ namespace leximaxIST {
      * Updates m_solution if the new solution is leximax better
      * Returns the (optimum) value of the sum of all objectives
      */
-    int Encoder::maxsat_presolve()
+    int Solver::maxsat_presolve()
     {
         if (m_maxsat_psol_cmd.empty()) {
             print_error_msg("Empty MaxSAT presolve command");
@@ -804,7 +804,7 @@ namespace leximaxIST {
      * the MCSes are not Pareto-optimal necessarily
      * Disadvantage: finding one Pareto-optimal solution is slower than finding an MCS
      */
-    void Encoder::pareto_presolve()
+    void Solver::pareto_presolve()
     {
         if (m_verbosity >= 1)
             std::cout << "c Searching for Pareto optimal solutions...\n";
@@ -888,7 +888,7 @@ namespace leximaxIST {
      * CONVENTION: if there are previous maxima equal to the current maximum,
      * then fix the objectives equal to the previous maxima with the smallest index
      */
-    void Encoder::fix_previous_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const
+    void Solver::fix_previous_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const
     {
         std::vector<int> s_obj_vec (obj_vec);
         std::sort(s_obj_vec.begin(), s_obj_vec.end(), descending_order);
@@ -918,7 +918,7 @@ namespace leximaxIST {
     /* adds to unit_clauses the clauses that
      * upper bound the remaining not fixed objectives; bound: <= max - 1
      */
-    void Encoder::decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const
+    void Solver::decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const
     {
         std::vector<int> s_obj_vec (obj_vec);
         std::sort(s_obj_vec.begin(), s_obj_vec.end(), descending_order);
@@ -958,7 +958,7 @@ namespace leximaxIST {
     
     /* adds to unit_clauses the clauses that bound the objectives less than or equal to max
      */
-    void Encoder::bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const
+    void Solver::bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const
     {
         for (int i (0); i < m_num_objectives; ++i) {
             const std::vector<int> &sorted_vec (m_sorted_vecs.at(i));
@@ -983,7 +983,7 @@ namespace leximaxIST {
     // how do we know when the current max can't improve?
     // when max_index == max_index_local, we get unsat and the smaller objs
     // differ from the current local max by at most 1
-    int Encoder::pareto_search(int &max_index, IpasirWrap *solver)
+    int Solver::pareto_search(int &max_index, IpasirWrap *solver)
     {
         double initial_time (read_cpu_time());
         int nb_calls (0);
@@ -1069,7 +1069,7 @@ namespace leximaxIST {
      * Otherwise returns 0
      * Sets m_solution which can be used to retrieve the upper bound
      */
-    int Encoder::presolve()
+    int Solver::presolve()
     {   
         int sum (0);
         if (m_verbosity >= 1) {
@@ -1108,7 +1108,7 @@ namespace leximaxIST {
         std::cout << "c Number of SAT calls: " << nb_calls << '\n';
     }
     
-    void Encoder::update_lb(int &lb)
+    void Solver::update_lb(int &lb)
     {
         const std::vector<int> &core (m_sat_solver->conflict());
         // get the position in m_soft_clauses of the var with the greatest id in the core
@@ -1127,7 +1127,7 @@ namespace leximaxIST {
                 // update the lower bound pos = size - lb, hence, lb = size - pos
                 const int new_lb = m_soft_clauses.size() - pos;
                 if (new_lb <= lb) {
-                    print_error_msg("In Encoder::update_lb(), lb did not increase");
+                    print_error_msg("In Solver::update_lb(), lb did not increase");
                     exit(EXIT_FAILURE);
                 }
                 lb = new_lb;
@@ -1146,7 +1146,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::search(int i, int lb, int ub)
+    void Solver::search(int i, int lb, int ub)
     {
         int nb_calls (0);
         if (m_verbosity >= 1)
@@ -1195,7 +1195,7 @@ namespace leximaxIST {
             print_nb_sat_calls(nb_calls);
     }
     
-    void Encoder::internal_solve(const int i, const int lb)
+    void Solver::internal_solve(const int i, const int lb)
     {
         if (m_verbosity >= 1) {
             if (m_opt_mode == "bin")
@@ -1218,7 +1218,7 @@ namespace leximaxIST {
     }
     
     // calls sat solver with assumptions and returns true if sat and false if unsat
-    bool Encoder::call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps)
+    bool Solver::call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps)
     {
         if (solver == nullptr) {
             print_error_msg("In call_sat_solver function: solver is a null pointer!");
@@ -1265,7 +1265,7 @@ namespace leximaxIST {
         return total_time;
     }
     
-    /*void Encoder::add_solving_time(double t)
+    /*void Solver::add_solving_time(double t)
     {
         // set to t the first position of m_times that has 0.0
         for (double &time : m_times) {
