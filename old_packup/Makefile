@@ -61,7 +61,7 @@ CFLAGS += -DMAPPING
 endif
 
 # Miguel: should we put LNFLAGS += -O3 as well?
-#release : LNFLAGS += -O3
+release : LNFLAGS += -O3
 release : CFLAGS += -O3
 release : $(XTRGT)
 

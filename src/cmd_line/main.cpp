@@ -3,6 +3,7 @@
 #include <leximaxIST_printing.h>
 #include <MaxSATFormula.h>
 #include <ParserPB.h>
+#include <Encoder.h>
 #include <string>
 #include <iostream> // std::cout, std::cin
 
@@ -36,7 +37,6 @@ int main(int argc, char *argv[])
     // TODO: set parameters of the solver, based on options
     
     solver.set_verbosity(options.get_verbosity());
-    solver.set_opt_mode(options.get_optimise());
     
     if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {
         print_header();
@@ -56,6 +56,8 @@ int main(int argc, char *argv[])
     }
     // use an encoder to encode the pseudo-boolean constraints to cnf and add the clauses to solver
     
+    
+    
     // add objective functions
     for (int i (0); i < maxsat_formula.nObjFunctions(); ++i) {
         std::vector<leximaxIST::Clause> soft_clauses;
@@ -71,9 +73,31 @@ int main(int argc, char *argv[])
         solver.add_soft_clauses(soft_clauses);
     }
     
-    
+    int Options::get_disjoint_cores() const {return m_disjoint_cores.get_data();}
+    std::string Options::get_optimise() const {return m_optimise.get_data();}
+    std::string Options::get_approx() const {return m_approx.get_data();}
+    std::string Options::get_input_file_name() const {return m_input_file_name.get_data();}
+    double Options::get_timeout() const {return m_timeout.get_data();}
+    int Options::get_mss_tol() const {return m_mss_tol.get_data();}
+    int Options::get_mss_add_cls() const {return m_mss_add_cls.get_data();}
+    int Options::get_mss_incr() const {return m_mss_incr.get_data();}
+    int Options::get_gia_pareto() const {return m_gia_pareto.get_data();}
+    int Options::get_gia_incr() const {return m_gia_incr.get_data();}
     
     // TODO: approximate
+    if (!options.get_approx().empty()) {
+        solver.set_approx(options.get_approx());
+        solver.set_mss_incr(options.get_mss_incr());
+        solver.set_mss_add_cls(options.get_mss_add_cls());
+        solver.set_mss_tol(options.get_mss_tol());
+        solver.set_gia_incr(options.get_gia_incr());
+        solver.set_gia_pareto(options.get_gia_pareto());
+        solver.set_approx_tout(options.get_timeout());
+        solver.approximate();
+    }
+    if (!options.get_optimise().empty() && solver.get_status() != 'u') {
+        
+    }
     
     // TODO: optimise
     

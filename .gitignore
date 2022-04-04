@@ -6,3 +6,4 @@ examples/*
 *.gcno
 gmon.out
 lib/*
+bin/*

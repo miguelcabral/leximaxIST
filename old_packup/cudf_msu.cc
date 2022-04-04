@@ -236,22 +236,19 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_opt_not_removed(true);    
 #ifdef EXTERNAL_SOLVER
     if (!options.get_opt_solver().empty())             solver.set_opt_solver_cmd(options.get_opt_solver ());
-    solver.set_mss_presolve(options.get_mss_presolve());
-    solver.set_pareto_presolve(options.get_pareto_presolve());
-    solver.set_mss_incremental(options.get_mss_incremental());
-    solver.set_pareto_incremental(options.get_pareto_incremental());
+    solver.set_leximax_approx(options.get_leximax_approx());
+    solver.set_mss_incr(options.get_mss_incr());
+    solver.set_gia_incr(options.get_gia_incr());
     solver.set_mss_add_cls(options.get_mss_add_cls());
     solver.set_mss_tolerance(options.get_mss_tolerance());
     solver.set_mss_nb_limit(options.get_mss_nb_limit());
-    solver.set_mss_timeout(options.get_mss_timeout());
-    solver.set_pareto_timeout(options.get_pareto_timeout());
-    solver.set_truly_pareto(options.get_truly_pareto());
+    solver.set_approx_tout(options.get_approx_tout());
+    solver.set_gia_pareto(options.get_gia_pareto());
     solver.set_verbosity(options.get_verbosity());
-    solver.set_opt_mode(options.get_opt_mode());
+    solver.set_leximax_opt(options.get_leximax_opt());
     solver.set_maxsat_psol_cmd(options.get_maxsat_psol_cmd());
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
-    if (options.get_leximax())                         solver.set_leximax();
     if (options.get_simplify_last())                   solver.set_simplify_last();
     if (options.get_maxsat_presolve())                 solver.set_maxsat_presolve();
     if (options.get_disjoint_cores())                  solver.set_disjoint_cores();

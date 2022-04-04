@@ -58,24 +58,21 @@ public:
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
-    inline void set_leximax(bool value=true);
     inline void set_simplify_last(bool value=true);
     inline void set_maxsat_presolve(bool value = true);
     inline void set_disjoint_cores(bool value = true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
-    inline void set_opt_mode (const string &mode);
+    inline void set_leximax_opt (const string &mode);
+    inline void set_leximax_approx (const string &mode);
     inline void set_maxsat_psol_cmd (const string &cmd);
-    inline void set_mss_presolve(int v);
-    inline void set_pareto_presolve(int v);
-    inline void set_mss_incremental(int v);
-    inline void set_pareto_incremental(int v);
+    inline void set_mss_incr(int v);
+    inline void set_gia_incr(int v);
     inline void set_mss_add_cls(int v);
     inline void set_mss_tolerance(int v);
     inline void set_mss_nb_limit(int v);
-    inline void set_mss_timeout(double t);
-    inline void set_pareto_timeout(double t);
-    inline void set_truly_pareto(int v);
+    inline void set_approx_tout(double t);
+    inline void set_gia_pareto(int v);
     inline void set_verbosity (int val);
     void print_leximax_info();
     leximaxIST::Solver* get_leximax_solver() {return m_leximax_solver;}
@@ -124,7 +121,7 @@ private:
     bool   m_maxsat_presolve;
     bool   m_disjoint_cores;
     int m_verbosity;
-    string m_formalism;
+    string formalism;
     string m_lp_solver;
     string m_maxsat_psol_cmd;
 
@@ -158,7 +155,7 @@ inline void ExternalWrapper::set_temporary_directory(const string& value) {
     temporary_directory = value; }
 inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
-inline void ExternalWrapper::set_leximax_opt(string value) {
+inline void ExternalWrapper::set_leximax_opt(const string& value) {
     m_leximax_opt = value; }
 inline void ExternalWrapper::set_simplify_last(bool value) {
     m_simplify_last = value; }
@@ -176,7 +173,6 @@ inline void ExternalWrapper::set_maxsat_psol_cmd (const string &cmd) {
     m_maxsat_psol_cmd = cmd; }
 inline void ExternalWrapper::set_verbosity (int val) {
     m_verbosity = val; }
-inline void ExternalWrapper::set_mss_presolve(int v) {m_mss_presolve = v; /*conversion from int to bool*/ }
 inline void ExternalWrapper::set_mss_incr(int v) { m_mss_incr = v; }
 inline void ExternalWrapper::set_gia_incr(int v) { m_gia_incr = v; }
 inline void ExternalWrapper::set_mss_add_cls(int v) { m_mss_add_cls = v; }

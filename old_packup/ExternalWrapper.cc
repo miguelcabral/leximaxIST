@@ -40,8 +40,7 @@ ExternalWrapper::ExternalWrapper(IDManager& id_manager)
 ,multiplication_string("*")
 ,temporary_directory("/tmp")
 ,leave_temporary_files(false)
-,leximax(false)
-,disjoint_cores(false)
+,m_disjoint_cores(false)
 ,m_leximax_solver(nullptr)
 {}
 
@@ -148,7 +147,7 @@ bool ExternalWrapper::solve() {
     min_cost=get_top();
     // The next line has been used to store a file with the corresponding pbmo instance
     //write_pbmo_file();
-    if (leximax)
+    if ((!m_leximax_approx.empty()) || (!m_leximax_opt.empty()))
         return solve_leximax();
     else {
         if (formalism == "opb")
@@ -547,14 +546,14 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      // add hard clauses to m_leximax_solver
      for (BasicClause *hc : hard_clauses) {
          leximaxIST::Clause c;
-         for (LINT lit : *clause)
+         for (LINT lit : *hc)
              c.push_back(lit);
          m_leximax_solver->add_hard_clause(c);
      }
      // add each objective function
      for (BasicClauseVector &soft_packup: clause_split) {
          std::vector<leximaxIST::Clause> soft_leximax;
-         for (BasicClause *sc : soft_cls) {
+         for (BasicClause *sc : soft_packup) {
             leximaxIST::Clause c;
             for (LINT lit : *sc)
                 c.push_back(lit);
@@ -573,15 +572,15 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      m_leximax_solver->set_gia_pareto(m_gia_pareto);
      // approximation using msses
      m_leximax_solver->set_mss_add_cls(m_mss_add_cls);
-     m_leximax_solver->set_mss_incremental(m_mss_incr);
+     m_leximax_solver->set_mss_incr(m_mss_incr);
      m_leximax_solver->set_mss_nb_limit(m_mss_nb_limit);
      m_leximax_solver->set_mss_tolerance(m_mss_tolerance);
      // other
-     m_leximax_solver->set_verbosity(m_leximax_verbosity);
+     m_leximax_solver->set_verbosity(m_verbosity);
      m_leximax_solver->set_ext_solver_cmd(opt_solver_cmd);
      m_leximax_solver->set_multiplication_string(multiplication_string);
      m_leximax_solver->set_leave_tmp_files(leave_temporary_files);
-     m_leximax_solver->set_formalism(m_formalism);
+     m_leximax_solver->set_formalism(formalism);
      m_leximax_solver->set_lp_solver(m_lp_solver); 
      m_leximax_solver->set_maxsat_presolve(m_maxsat_presolve);
      if (!m_maxsat_psol_cmd.empty())

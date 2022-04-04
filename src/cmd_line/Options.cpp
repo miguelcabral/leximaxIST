@@ -25,10 +25,10 @@ namespace leximaxIST {
     Options::Options()
     : m_help (0)
     , m_verbosity (0)
-    , m_optimise ("none")
+    , m_optimise ("")
     , m_input_file_name ("")
     , m_disjoint_cores (0)
-    , m_approx ("none")
+    , m_approx ("")
     , m_timeout (86400)
     , m_mss_tol (0)
     , m_mss_add_cls (1)
@@ -229,7 +229,7 @@ namespace leximaxIST {
         }
         
         // check if either optimise or approximate are set
-        if (get_optimise() == "none" && get_approx() == "none") {
+        if (get_optimise().empty() && get_approx().empty()) {
             print_error_msg("missing one of the options --optimise or --approx");
             exit(EXIT_FAILURE);
         }
