@@ -371,5 +371,33 @@ namespace leximaxIST {
             }
         }
     }
+    
+    // prints solution to std output in a similar format to the MaxSAT output format
+    void Solver::print_solution() const 
+    {
+        // print solution status
+        std::cout << "s ";
+        if (m_status == 's')
+            std::cout << "SATISFIABLE\n";
+        if (m_status == 'u') {
+            std::cout << "UNSATISFIABLE\n";
+            return;
+        }
+        if (m_status == 'o')
+            std::cout << "OPTIMUM FOUND\n";
+        if (m_status == '?') {
+            std::cout << "UNKNOWN\n";
+            return;
+        }
+        size_t i (0);
+        while (i < m_solution.size()) {
+            std::string line ("v ");
+            while (line.size() < 80 && i < m_solution.size()) {
+                line += std::to_string(m_solution.at(i)) + ' '; // to string ???
+                ++i;
+            }
+            std::cout << line << '\n';
+        }
+    }
 
 }/* namespace leximaxIST */
