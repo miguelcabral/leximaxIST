@@ -49,7 +49,7 @@ namespace leximaxIST
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_tmp_files;
         bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
-        char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, and '?' for UNKNOWN
+        char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, '?' for UNKNOWN, 'o' for OPTIMUM FOUND
         double m_approx_tout; // timeout for approximation
         bool m_gia_incr; // whether to use the same SAT solver in every Pareto-optimal solution search
         bool m_gia_pareto; // whether to continue to minimise to Pareto optimality, even though the maximum can not be improved

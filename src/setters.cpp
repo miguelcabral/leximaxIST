@@ -33,6 +33,9 @@ namespace leximaxIST {
             m_sat_solver = new IpasirWrap();
         add_clause(cl, m_input_hard);
         m_sat_solver->addClause(cl);
+        // update status - if unsat it remains unsat, otherwise set to unknown
+        if (m_status != 'u')
+            m_status = '?';
     }
     
     void Solver::add_clause_enc(const Clause &cl)
@@ -257,6 +260,9 @@ namespace leximaxIST {
                 add_hard_clause(cl);
             }
         }
+        // update status - if optimum found then it becomes sat, otherwise status is not changed
+        if (m_status == 'o')
+            m_status = 's';
     }
         
     void Solver::set_gia_incr(bool v) { m_gia_incr = v; }

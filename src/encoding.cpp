@@ -488,16 +488,19 @@ namespace leximaxIST {
             print_error_msg("The problem is single-objective");
             exit(EXIT_FAILURE);
         }
-        // check if problem is satisfiable and compute bounds on first optimum
-        const int sum (presolve()); // sum is used to compute lower bounds
-        if (m_status == 'u')
-            return;   
+        // check if problem is satisfiable
+        if (!call_sat_solver(m_sat_solver, {})) {
+            m_status = 'u';
+            return;
+        }
+        m_status = 's'; // update status to SATISFIABLE
         if (m_opt_mode.substr(0, 4) == "core")
             optimise_core_guided();
         else
-            optimise_non_core(sum);            
+            optimise_non_core(0);            
         if (m_verbosity >= 1) // print total solving time
             print_time(read_cpu_time() - initial_time, "c Optimisation CPU time: ");
+        m_status = 'o'; // update status to OPTIMUM FOUND
     }
     
     // sum is the minimum value of the sum of the objective functions in case of presolving
