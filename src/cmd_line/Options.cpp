@@ -1,4 +1,5 @@
 #include <leximaxIST_Options.h>
+#include <leximaxIST_types.h>
 #include <leximaxIST_printing.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -35,6 +36,8 @@ namespace leximaxIST {
     , m_mss_incr (0)
     , m_gia_pareto (0)
     , m_gia_incr (0)
+    , m_pb_enc (_PB_GTE_)
+    , m_card_enc (_CARD_MTOTALIZER_)
     {
         // help
         const std::string name_tab (2, ' ');
@@ -114,6 +117,25 @@ namespace leximaxIST {
         description = name_tab + "--gia-incr\n";
         description += exp_tab + "Use the same incremental SAT solver during the entire execution of the GIA algorithm\n";
         m_gia_incr.set_description(description);
+        
+        // pb-enc
+        description = name_tab + "--pb-enc <int>\n";
+        description += exp_tab + "Set the encoding of Pseudo-Boolean non-cardinality constraints to CNF\n";
+        description += exp_tab + "0 - SWC \n";
+        description += exp_tab + "1 (default) - GTE \n";
+        description += exp_tab + "2 - Adder\n";
+        description += exp_tab + "3 - IGTE \n";
+        description += exp_tab + "4 - KP \n";
+        description += exp_tab + "0 - KP_minisat \n";
+        m_pb_enc.set_description(description);
+        
+        // card-enc
+        description = name_tab + "--card-enc <int>\n";
+        description += exp_tab + "Set the encoding of cardinality constraints to CNF\n";
+        description += exp_tab + "0 - cardinality networks\n";
+        description += exp_tab + "1 - totalizer\n";
+        description += exp_tab + "2 (default) - modulo totalizer\n";
+        m_card_enc.set_description(description);
     }
 
     /* converts optarg to a double and stores it in d
@@ -253,6 +275,8 @@ namespace leximaxIST {
         os << m_mss_tol.get_description();
         os << m_gia_incr.get_description();
         os << m_gia_pareto.get_description();
+        os << m_pb_enc.get_description();
+        os << m_card_enc.get_description();
     }
 
 }

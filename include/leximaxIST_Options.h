@@ -51,6 +51,8 @@ namespace leximaxIST {
         Option<int> m_mss_incr;
         Option<int> m_gia_pareto;
         Option<int> m_gia_incr;
+        Option<int> m_pb_enc;
+        Option<int> m_card_enc;
         
     public:
         Options(); // starts Options with default settings and descriptions

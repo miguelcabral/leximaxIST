@@ -1,20 +1,18 @@
 CFLAGS = -std=c++17
-CFLAGS += -I ../include -I ./openwbo
+CFLAGS += -I ../include -I ./cmd_line -I ./cmd_line/encodings
 SRCSLIB = $(wildcard *.cpp)
-SRCSTOOL = $(SRCSLIB) + $(wildcard openwbo/*.cpp)
-SRCSTOOL += $(wildcard openwbo/encodings/*.cpp)
+SRCSTOOL = $(SRCSLIB)
+SRCSTOOL += $(wildcard cmd_line/encodings/*.cpp)
 SRCSTOOL += $(wildcard cmd_line/*.cpp)
 OBJSLIB = $(SRCSLIB:.cpp=.o)
 OBJSTOOL = $(SRCSTOOL:.cpp=.o)
-OBJS := $(OBJSLIB)
-OBJS += $(OBJSTOOL)
 LIBNAME = libleximaxIST.a
 TOOLNAME = leximaxIST
 
 # path to sat solver library and to leximaxIST library
 LIBDIR = -L ../lib -L ../cadical/build
 
-# libraries
+# libraries' names
 LIBS = -lz -lcadical -lleximaxIST
 
 # path to sat solver include directory containing ipasir.h
@@ -43,11 +41,11 @@ $(TOOLNAME) : $(OBJSTOOL) $(LIBNAME)
 	@echo "Linking: $@"
 	g++ $(OBJSTOOL) $(LFLAGS) $(LIBDIR) $(LIBS) -o $@
 
-$(OBJS) : %.o: %.cpp
+$(OBJSTOOL) : %.o: %.cpp
 	@echo "Compiling: $@"
 	g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
 	@echo "Removing: $(LIBNAME) $(OBJS)"
-	rm -f ../lib/$(LIBNAME) ../bin/$(TOOLNAME) $(OBJS)
+	rm -f ../lib/$(LIBNAME) ../bin/$(TOOLNAME) $(OBJSTOOL)
 	

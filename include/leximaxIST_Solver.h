@@ -379,8 +379,21 @@ namespace leximaxIST
         void print_pb_constraint(const Clause &cl, std::ostream &output) const;
         
 //         void print_sum_equals_pb(int i, std::ostream &output) const;
-
-    };
+        
+        /* Friend classes:
+         * openwbo PB encodings so that they can call fresh() to produce new variables
+         * I do not want fresh() to be public
+         */
+        
+        friend class SWC;
+        friend class Totalizer;
+        friend class MTotalizer;
+        friend class Adder;
+        friend class Ladder;
+        friend class KPA;
+        friend class CNetworks;
+        
+    }; /* Solver class declaration */
 
 } /* namespace leximaxIST */
 

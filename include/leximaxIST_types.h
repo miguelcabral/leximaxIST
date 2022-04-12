@@ -1,72 +1,38 @@
-/******************************************************************************\
- *    This file is part of packup.                                            *
- *                                                                            *
- *    packup is free software: you can redistribute it and/or modify          *
- *    it under the terms of the GNU General Public License as published by    *
- *    the Free Software Foundation, either version 3 of the License, or       *
- *    (at your option) any later version.                                     *
- *                                                                            *
- *    packup is distributed in the hope that it will be useful,               *
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of          *
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the           *
- *    GNU General Public License for more details.                            *
- *                                                                            *
- *    You should have received a copy of the GNU General Public License       *
- *    along with packup.  If not, see <http://www.gnu.org/licenses/>.         *            
-\******************************************************************************/           
-//jpms:bc
-/*----------------------------------------------------------------------------*\
- * File:        basic_types.h
- *	--> Edit: Miguel Cabral 2020 - File: leximaxIST_types.h
- * Description: Basic types used by BOLT.
- *	--> Edit: Miguel Cabral 2020 - Descr.: integer types, sorting network
- *	and clauses used in leximax library.
- * Author:      jpms, Miguel Cabral (2020)
- * 
- * Revision:    $Id$.
- *
- *                                     Copyright (c) 2009, Joao Marques-Silva
-\*----------------------------------------------------------------------------*/
-//jpms:ec
-
 #ifndef LEXIMAXIST_TYPES
 #define LEXIMAXIST_TYPES
 #include <vector>
 #include <utility>
 
-/*----------------------------------------------------------------------------*\
- * Values besides 0 and 1
-\*----------------------------------------------------------------------------*/
-
 namespace leximaxIST {
-/*
-    #ifdef __LP64__
-    typedef unsigned long long int ULINT;
-    typedef long long int LINT;
-    #define MAXLINT LLONG_MAX;
-    #define MINLINT LLONG_MIN;
-    #define MAXULINT ULLONG_MAX;
-    #else
-    typedef unsigned long int ULINT;
-    typedef long int LINT;
-    #define MAXLINT LONG_MAX;
-    #define MINLINT LONG_MIN;
-    #define MAXULINT ULONG_MAX;
-    #endif
 
-    #ifdef GMPDEF
-    #include <gmpxx.h>
-    typedef mpz_class XLINT;
-    #define ToLint(x) x.get_si()
-    #else
-    typedef LINT XLINT;
-    #define ToLint(x) (LINT)x
-    #endif
-*/
+    typedef int Lit; // definition of Lit for leximaxIST (encodings from PB to CNF of openwbo)
+    constexpr int lit_Undef (0);
+    constexpr int var_Undef (0);
+    constexpr int lit_Error (0); // all these constants have the same value, I hope this is not an issue
+    constexpr int max_clauses (3000000);    
+    enum { _FORMAT_MAXSAT_ = 0, _FORMAT_PB_ };
+    enum { _UNWEIGHTED_ = 0, _WEIGHTED_ };
+    enum StatusCode {
+    _SATISFIABLE_ = 10,
+    _UNSATISFIABLE_ = 20,
+    _OPTIMUM_ = 30,
+    _UNKNOWN_ = 40,
+    _ERROR_ = 50,
+    _MEMOUT_ = 60
+    };
+    enum {
+    _INCREMENTAL_NONE_ = 0,
+    _INCREMENTAL_BLOCKING_,
+    _INCREMENTAL_WEAKENING_,
+    _INCREMENTAL_ITERATIVE_
+    };
+    enum { _CARD_CNETWORKS_ = 0, _CARD_TOTALIZER_, _CARD_MTOTALIZER_ };
+    enum { _AMO_LADDER_ = 0 };
+    enum { _PB_SWC_ = 0, _PB_GTE_, _PB_ADDER_, _PB_IGTE_, _PB_KP_, _PB_KP_MINISATP_};
+    enum { _PART_SEQUENTIAL_ = 0, _PART_SEQUENTIAL_SORTED_, _PART_BINARY_ };
+    
     // sorting network and clauses:
     typedef std::vector<std::pair<int, int>> SNET;
     typedef std::vector<int> Clause;
 }
 #endif /* LEXIMAXIST_TYPES */
-
-/*----------------------------------------------------------------------------*/
