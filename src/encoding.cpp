@@ -519,9 +519,7 @@ namespace leximaxIST {
             m_soft_clauses.clear();
             generate_soft_clauses(i);
             // encode bounds obtained from presolving or previous iteration
-            const int lb (encode_bounds(i, sum));
-            if (i == 0 && m_pareto_presolve)
-                pareto_presolve();
+            const int lb (encode_bounds(i, 0));
             if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i);
             // encode the componentwise OR between sorted vectors (except maybe in the last iteration)

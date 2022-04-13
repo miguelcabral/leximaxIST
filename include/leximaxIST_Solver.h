@@ -74,6 +74,8 @@ namespace leximaxIST
 
         ~Solver();
         
+        int nVars() const;
+        
         void optimise();
         
         void approximate();
@@ -138,7 +140,7 @@ namespace leximaxIST
         
         void set_mss_nb_limit(int n);
         
-        void set_mss_tolerance(int t);
+        void set_mss_tol(int t);
         
         void set_disjoint_cores(bool v);
                 
@@ -275,7 +277,7 @@ namespace leximaxIST
         
         void decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
         
-        void pareto_presolve();
+        void gia();
         
         int pareto_search(int &max_index, IpasirWrap *solver);
         
@@ -392,6 +394,7 @@ namespace leximaxIST
         friend class Ladder;
         friend class KPA;
         friend class CNetworks;
+        friend class GTE;
         
     }; /* Solver class declaration */
 

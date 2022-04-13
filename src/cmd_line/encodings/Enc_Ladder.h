@@ -41,7 +41,7 @@ public:
   Ladder() {}
   ~Ladder() {}
 
-  void encode(leximaxIST::Solver &S, std::vector<Lit> &lits);
+  void encode(leximaxIST::Solver &S, const std::vector<Lit> &lits);
 };
 } // namespace leximaxIST
 

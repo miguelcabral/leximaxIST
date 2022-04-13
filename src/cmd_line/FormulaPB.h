@@ -63,7 +63,7 @@ public:
     printf("Card: ");
 
     for (int i = 0; i < _lits.size(); i++) {
-      if (sign(_lits[i]))
+      if (_lits[i] < 0)
         printf("~");
       printf("%d ", std::abs(_lits[i]) + 1);
     }
@@ -76,7 +76,7 @@ public:
     printf("Card: ");
 
     for (int i = 0; i < _lits.size(); i++) {
-      if (sign(_lits[i]))
+      if (_lits[i] < 0)
         printf("~");
       if(!original_vars)
         printf("X%d ", std::abs(_lits[i]) + 1);
@@ -187,7 +187,7 @@ public:
 
     for (int i = 0; i < _coeffs.size(); i++) {
       printf("%d ", (int)_coeffs[i]);
-      if (sign(_lits[i]))
+      if (_lits[i] < 0)
         printf("~");
       printf("%d ", std::abs(_lits[i]) + 1);
     }
@@ -208,7 +208,7 @@ public:
 
     for (int i = 0; i < _coeffs.size(); i++) {
       printf("%d ", (int)_coeffs[i]);
-      if (sign(_lits[i]))
+      if (_lits[i] < 0)
         printf("~");
       if(!original_vars)
         printf("y%d ", std::abs(_lits[i]) + 1);
@@ -281,7 +281,7 @@ class PBObjFunction {
 
         for (int i = 0; i < maxsize && i < _coeffs.size(); i++) {
             printf("%lu ", _coeffs[i]);
-            if (sign(_lits[i]))
+            if (_lits[i] < 0)
                 printf("~");
             if(!original_vars)
                 printf("y%d ", std::abs(_lits[i]) + 1);

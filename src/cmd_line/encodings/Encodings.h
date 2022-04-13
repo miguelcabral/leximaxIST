@@ -28,7 +28,6 @@
 #ifndef Encodings_h
 #define Encodings_h
 
-#include <MaxTypes.h>
 #include <leximaxIST_types.h>
 #include <leximaxIST_Solver.h>
 #include <vector>
@@ -63,7 +62,7 @@ protected:
   //void my_iprintClause(const std::vector<Lit>& clause);
   
 private:
-    Lit mkLit(int var_id, bool sign = false);
+    //Lit mkLit(int var_id, bool sign = false);
 };
 } // namespace leximaxIST
 

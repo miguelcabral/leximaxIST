@@ -36,7 +36,7 @@ public:
   }
   ~CNetworks() {}
 
-  void encode(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t rhs);
+  void encode(leximaxIST::Solver &S, const std::vector<Lit> &lits, int64_t rhs);
   void update(leximaxIST::Solver &S, int64_t rhs);
 
   bool hasCreatedEncoding() { return hasEncoding; }

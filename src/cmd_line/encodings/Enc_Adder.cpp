@@ -29,6 +29,7 @@
 #include <Enc_Adder.h>
 #include <algorithm>
 #include <numeric>
+#include <cassert>
 
 using namespace leximaxIST;
 

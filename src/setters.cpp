@@ -226,7 +226,7 @@ namespace leximaxIST {
     }
     
     // add an objective function in the form of a set of soft clauses (so the goal is to minimise clause falsification)
-    void Solver::add_soft_clauses(const <std::vector<Clause> &soft_clauses)
+    void Solver::add_soft_clauses(const std::vector<Clause> &soft_clauses)
     {
         if (soft_clauses.empty()) {
             print_error_msg("In function leximaxIST::Solver::add_soft_clauses, empty objective function");
@@ -279,7 +279,7 @@ namespace leximaxIST {
         m_mss_add_cls = v;
     }
     
-    void Solver::set_mss_incr(bool v) { m_mss_incremental = v; }
+    void Solver::set_mss_incr(bool v) { m_mss_incr = v; }
     
     void Solver::set_approx_tout(double t)
     {
@@ -297,10 +297,10 @@ namespace leximaxIST {
         m_mss_nb_limit = n; 
     }
     
-    void Solver::set_mss_tolerance(int t)
+    void Solver::set_mss_tol(int t)
     {
         if (t < 0 || t > 100) {
-            std::string msg ("Solver::set_mss_tolerance - argument '");
+            std::string msg ("Solver::set_mss_tol - argument '");
             msg += std::to_string(t) + "' is not an integer between 0 and 100!";
             print_error_msg(msg);
             exit(EXIT_FAILURE);

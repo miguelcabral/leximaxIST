@@ -9,18 +9,20 @@
 namespace leximaxIST {
 
     // getters
-    int Options::get_help() const {return m_help.get_data();}
-    int Options::get_verbosity() const {return m_verbosity.get_data();}
-    int Options::get_disjoint_cores() const {return m_disjoint_cores.get_data();}
-    std::string Options::get_optimise() const {return m_optimise.get_data();}
-    std::string Options::get_approx() const {return m_approx.get_data();}
-    std::string Options::get_input_file_name() const {return m_input_file_name.get_data();}
-    double Options::get_timeout() const {return m_timeout.get_data();}
-    int Options::get_mss_tol() const {return m_mss_tol.get_data();}
-    int Options::get_mss_add_cls() const {return m_mss_add_cls.get_data();}
-    int Options::get_mss_incr() const {return m_mss_incr.get_data();}
-    int Options::get_gia_pareto() const {return m_gia_pareto.get_data();}
-    int Options::get_gia_incr() const {return m_gia_incr.get_data();}
+    int Options::get_help() {return m_help.get_data();}
+    int Options::get_verbosity() {return m_verbosity.get_data();}
+    int Options::get_disjoint_cores() {return m_disjoint_cores.get_data();}
+    std::string Options::get_optimise() {return m_optimise.get_data();}
+    std::string Options::get_approx() {return m_approx.get_data();}
+    std::string Options::get_input_file_name() {return m_input_file_name.get_data();}
+    double Options::get_timeout() {return m_timeout.get_data();}
+    int Options::get_mss_tol() {return m_mss_tol.get_data();}
+    int Options::get_mss_add_cls() {return m_mss_add_cls.get_data();}
+    int Options::get_mss_incr() {return m_mss_incr.get_data();}
+    int Options::get_gia_pareto() {return m_gia_pareto.get_data();}
+    int Options::get_gia_incr() {return m_gia_incr.get_data();}
+    int Options::get_pb_enc() {return m_pb_enc.get_data();}
+    int Options::get_card_enc() {return m_card_enc.get_data();}
     
     // constructor
     Options::Options()
@@ -42,6 +44,7 @@ namespace leximaxIST {
         // help
         const std::string name_tab (2, ' ');
         const std::string exp_tab (4, ' ');
+        const std::string values_tab (6, ' ');
         std::string description (name_tab);
         description += "-h, --help\n" + exp_tab;
         description += "print usage with a list of the options\n";
@@ -50,9 +53,9 @@ namespace leximaxIST {
         // verbosity
         description = name_tab + "-v <int>\n" + exp_tab;
         description += "verbosity of output\n";
-        description += exp_tab + "0 (default) - quiet, only prints the solution\n";
-        description += exp_tab + "1 - print general info\n";
-        description += exp_tab + "2 - debug - print encoding\n";
+        description += values_tab + "0 (default) - quiet, only prints the solution\n";
+        description += values_tab + "1 - print general info\n";
+        description += values_tab + "2 - debug - print encoding\n";
         m_verbosity.set_description(description);
         
         // input file
@@ -62,13 +65,13 @@ namespace leximaxIST {
         // optimise
         description = name_tab + "--optimise <string>\n";
         description += exp_tab + "find a leximax-optimal solution using the algorithm specified in <string>:\n";
-        description += exp_tab + "lin_su - static sorting networks with linear search sat-unsat\n";
-        description += exp_tab + "lin_us - static sorting networks with linear search unsat-sat\n";
-        description += exp_tab + "bin - static sorting networks with binary search\n";
-        description += exp_tab + "core_static - static sorting networks with core-guided unsat-sat search\n";
-        description += exp_tab + "core_merge (default) - core-guided unsat-sat search using dynamic sorting networks that grow by sort and merge\n";
-        description += exp_tab + "core_rebuild - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (not incremental)\n";
-        description += exp_tab + "core_rebuild_incr - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (incremental)\n";
+        description += values_tab + "lin_su - static sorting networks with linear search sat-unsat\n";
+        description += values_tab + "lin_us - static sorting networks with linear search unsat-sat\n";
+        description += values_tab + "bin - static sorting networks with binary search\n";
+        description += values_tab + "core_static - static sorting networks with core-guided unsat-sat search\n";
+        description += values_tab + "core_merge (default) - core-guided unsat-sat search using dynamic sorting networks that grow by sort and merge\n";
+        description += values_tab + "core_rebuild - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (not incremental)\n";
+        description += values_tab + "core_rebuild_incr - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (incremental)\n";
         m_optimise.set_description(description);
         
         // disjoint cores strategy
@@ -79,8 +82,8 @@ namespace leximaxIST {
         // approx
         description = name_tab + "--approx <string>\n";
         description += exp_tab + "approximate the leximax-optimum using the approach specified in <string>:\n";
-        description += exp_tab + "mss - Maximal Satisfiable Subset enumeration (using extended linear search)\n";
-        description += exp_tab + "gia - Guided Improvement Algorithm adapted to leximax (conversion to CNF using sorting networks)\n";
+        description += values_tab + "mss - Maximal Satisfiable Subset enumeration (using extended linear search)\n";
+        description += values_tab + "gia - Guided Improvement Algorithm adapted to leximax (conversion to CNF using sorting networks)\n";
         m_approx.set_description(description);
         
         // timeout
@@ -98,9 +101,9 @@ namespace leximaxIST {
         // mss-add-cls
         description = name_tab + "--mss-add-cls <int>\n";
         description += exp_tab + "specify how to add the clauses to the MSS in construction during MSS extended linear search:\n";
-        description += exp_tab + "0 - add all satisfied clauses\n";
-        description += exp_tab + "1 (default) - add as much as possible while trying to even out the upper bound (default)\n";
-        description += exp_tab + "2 - add only the satisfied clause used in the SAT test\n";
+        description += values_tab + "0 - add all satisfied clauses\n";
+        description += values_tab + "1 (default) - add as much as possible while trying to even out the upper bound (default)\n";
+        description += values_tab + "2 - add only the satisfied clause used in the SAT test\n";
         m_mss_add_cls.set_description(description);
         
         // mss-incr
@@ -121,20 +124,18 @@ namespace leximaxIST {
         // pb-enc
         description = name_tab + "--pb-enc <int>\n";
         description += exp_tab + "Set the encoding of Pseudo-Boolean non-cardinality constraints to CNF\n";
-        description += exp_tab + "0 - SWC \n";
-        description += exp_tab + "1 (default) - GTE \n";
-        description += exp_tab + "2 - Adder\n";
-        description += exp_tab + "3 - IGTE \n";
-        description += exp_tab + "4 - KP \n";
-        description += exp_tab + "0 - KP_minisat \n";
+        description += values_tab + "0 - SWC \n";
+        description += values_tab + "1 (default) - GTE \n";
+        description += values_tab + "2 - Adder\n";
+        description += values_tab + "3 - IGTE \n";
         m_pb_enc.set_description(description);
         
         // card-enc
         description = name_tab + "--card-enc <int>\n";
         description += exp_tab + "Set the encoding of cardinality constraints to CNF\n";
-        description += exp_tab + "0 - cardinality networks\n";
-        description += exp_tab + "1 - totalizer\n";
-        description += exp_tab + "2 (default) - modulo totalizer\n";
+        description += values_tab + "0 - cardinality networks\n";
+        description += values_tab + "1 - totalizer\n";
+        description += values_tab + "2 (default) - modulo totalizer\n";
         m_card_enc.set_description(description);
     }
 
@@ -207,6 +208,8 @@ namespace leximaxIST {
             {"mss-tol",  required_argument,  0, 502},
             {"timeout",  required_argument,  0, 503},
             {"mss-add-cls",  required_argument,  0, 504},
+            {"pb-enc",  required_argument,  0, 505},
+            {"card-enc",  required_argument,  0, 506},
             {0, 0, 0, 0}
                 };
         int c;
@@ -227,6 +230,8 @@ namespace leximaxIST {
                 case 502: read_integer(optarg, "--mss-tol", m_mss_tol.get_data()); break;
                 case 503: read_double(optarg, "--timeout", m_timeout.get_data()); break;
                 case 504: read_digit(optarg, "--mss-add-cls", m_mss_add_cls.get_data()); break;
+                case 505: read_digit(optarg, "--pb-enc", m_pb_enc.get_data()); break;
+                case 506: read_digit(optarg, "--card-enc", m_card_enc.get_data()); break;
                 case '?':
                     if (isprint (optopt))
                         fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -251,7 +256,7 @@ namespace leximaxIST {
         }
         
         // check if either optimise or approximate are set
-        if (get_optimise().empty() && get_approx().empty()) {
+        if (get_optimise().empty() && get_approx().empty() && m_help.get_data() == 0) {
             print_error_msg("missing one of the options --optimise or --approx");
             exit(EXIT_FAILURE);
         }

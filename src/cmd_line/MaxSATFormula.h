@@ -42,7 +42,6 @@
 #include <leximaxIST_types.h>
 #include <maxConsts.h>
 #include <FormulaPB.h>
-#include <MaxTypes.h>
 #include <map>
 #include <string>
 #include <set>
@@ -163,19 +162,20 @@ public:
   Hard &getHardClause(int pos);
 
   /*! Add a new cardinality constraint. */
-  void addCardinalityConstraint(const Card &card);
+  //void addCardinalityConstraint(const Card &card);
 
   /*! Return i-card constraint. */
-  const Card& getCardinalityConstraint(int pos) const{
+  Card& getCardinalityConstraint(int pos) {
     return cardinality_constraints.at(pos);
   }
 
   /*! Add a new PB constraint. */
-  void addPBConstraint(const PB &pb);
+  void addPBConstraint(PB &pb);
 
   /*! Return i-PB constraint. */
-  const PB& getPBConstraint(int pos) {
-      return pb_constraints.at(pos); }
+  PB& getPBConstraint(int pos) {
+      return pb_constraints.at(pos);
+  }
 
   int newVarName(char *varName);
   int varID(char *varName);

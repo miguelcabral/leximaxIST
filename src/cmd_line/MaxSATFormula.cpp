@@ -27,8 +27,9 @@
 
 #include <iostream>
 #include <MaxSATFormula.h>
+#include <cassert>
 
-using namespace openwbo;
+using namespace leximaxIST;
 
 MaxSATFormula *MaxSATFormula::copyMaxSATFormula() {
   assert(format == _FORMAT_MAXSAT_);
@@ -146,7 +147,7 @@ Hard &MaxSATFormula::getHardClause(int pos) {
   return hard_clauses[pos];
 }
 
-void MaxSATFormula::addPBConstraint(const PB &p) {
+void MaxSATFormula::addPBConstraint(PB &p) {
 
   // Add constraint to formula data structure.
   if (p.isClause()) {
@@ -247,9 +248,9 @@ void Hard:: my_print(indexMap indexToName){
     for(int i = 0; i < clause.size(); i++)
 //         printf(" %s%d", ((sign(clause[i])) ? "~" : ""), std::abs(clause[i]));
         if(indexToName.find(std::abs(clause[i])) != indexToName.end())
-            printf(" %s%s", ((sign(clause[i])) ? "~" : ""), indexToName.at(std::abs(clause[i])).c_str());
+            printf(" %s%s", (clause[i] < 0) ? "~" : "", indexToName.at(std::abs(clause[i])).c_str());
         else
-            printf(" %s%s", ((sign(clause[i])) ? "~" : ""), "X");
+            printf(" %s%s", (clause[i] < 0) ? "~" : "", "X");
     printf("\n");
 }
 
@@ -259,12 +260,12 @@ void Soft:: my_print(indexMap indexToName){
 //         printf(" %s%d", ((sign(clause[i])) ? "~" : ""), std::abs(clause[i]));
         
         if(indexToName.find(std::abs(clause[i])) != indexToName.end())
-            printf(" %lu %s%s", weight, ((sign(clause[i])) ? "~" : ""), indexToName.at(std::abs(clause[i])).c_str());
+            printf(" %lu %s%s", weight, (clause[i] < 0) ? "~" : "", indexToName.at(std::abs(clause[i])).c_str());
         else
-            printf(" %s%d", ((sign(clause[i])) ? "~" : ""), std::abs(clause[i]));
+            printf(" %s%d", (clause[i] < 0) ? "~" : "", std::abs(clause[i]));
     printf(" [");
     for(int i = 0; i < relaxation_vars.size(); i++)
-        printf(" %s%d", ((sign(relaxation_vars[i])) ? "~" : ""), std::abs(relaxation_vars[i]));
+        printf(" %s%d", (relaxation_vars[i] < 0) ? "~" : "", std::abs(relaxation_vars[i]));
     printf("]");
     printf(" A(%d)\n", std::abs(assumption_var));
 }

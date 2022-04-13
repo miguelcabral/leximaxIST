@@ -26,6 +26,8 @@
  */
 
 #include <Enc_CNetworks.h>
+#include <cassert>
+#include <cmath>
 
 using namespace leximaxIST;
 
@@ -55,7 +57,7 @@ using namespace leximaxIST;
   |    * 'S' is updated with the clauses that encode the cardinality constraint.
   |
   |________________________________________________________________________________________________@*/
-void CNetworks::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t rhs) {
+void CNetworks::encode(leximaxIST::Solver &S, const std::vector<Lit> &lits, int64_t rhs) {
 
   assert(rhs >= 0);
   assert(lits.size() > 0);
@@ -74,9 +76,9 @@ void CNetworks::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t rh
   std::vector<Lit> units;
   int n = lits_copy.size();
   // Find the smallest power of 2 that is larger than rhs.
-  int64_t new_k = pow(2, floor(log2(rhs)) + 1);
+  int64_t new_k = std::pow(2, std::floor(std::log2(rhs)) + 1);
 
-  int64_t m = ceil((double)n / new_k) * new_k - n;
+  int64_t m = std::ceil((double)n / new_k) * new_k - n;
 
   // The size of the input variables must be a multiple of rhs.
   for (int i = 0; i < m; ++i) {

@@ -26,6 +26,8 @@
  */
 
 #include <Enc_MTotalizer.h>
+#include <cassert>
+#include <cmath>
 
 using namespace leximaxIST;
 
@@ -53,7 +55,7 @@ using namespace leximaxIST;
   |    * 'S' is updated with the clauses that encode the cardinality constraint.
   |
   |________________________________________________________________________________________________@*/
-void MTotalizer::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t rhs) {
+void MTotalizer::encode(leximaxIST::Solver &S, const std::vector<Lit> &lits, int64_t rhs) {
   assert(lits.size() > 0);
   hasEncoding = false;
 
@@ -77,13 +79,13 @@ void MTotalizer::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t r
   // Modulo that was used in the original paper.
   // int mod = ceil(sqrt(lits.size()));
   // Slightly better results than using the above modulo.
-  int mod = ceil(sqrt(rhs + 1));
+  int mod = std::ceil(std::sqrt(rhs + 1));
   if (modulo == -1)
     modulo = mod;
   else
     mod = modulo;
 
-  for (int i = 0; i < floor(lits.size() / mod); i++) {
+  for (int i = 0; i < lits.size() / mod; i++) {
     //Lit p = mkLit(S.nVars(), false);
     //newSATVariable(S);
       Lit p = S.fresh();
@@ -159,7 +161,7 @@ void MTotalizer::encode_output(leximaxIST::Solver &S, int64_t rhs) {
 
   int mod = modulo;
 
-  int ulimit = floor((rhs + 1) / mod);
+  int ulimit = (rhs + 1) / mod;
   int llimit = (rhs + 1) - ulimit * mod;
 
   assert(ulimit <= cardinality_upoutlits.size());
@@ -192,7 +194,7 @@ void MTotalizer::toCNF(leximaxIST::Solver &S, int mod, std::vector<Lit> &ublits,
   std::vector<Lit> rlower;
 
   assert(rhs > 1);
-  int split = floor(rhs / 2);
+  int split = rhs / 2;
   int left = 1;
   int right = 1;
 
@@ -202,7 +204,7 @@ void MTotalizer::toCNF(leximaxIST::Solver &S, int mod, std::vector<Lit> &ublits,
     llower.push_back(cardinality_inlits.back());
     cardinality_inlits.pop_back();
   } else {
-    left = floor(split / mod);
+    left = split / mod;
     for (int i = 0; i < left; i++) {
       //Lit p = mkLit(S.nVars(), false);
       //newSATVariable(S);
@@ -228,7 +230,7 @@ void MTotalizer::toCNF(leximaxIST::Solver &S, int mod, std::vector<Lit> &ublits,
     rlower.push_back(cardinality_inlits.back());
     cardinality_inlits.pop_back();
   } else {
-    right = floor((rhs - split) / mod);
+    right = (rhs - split) / mod;
     for (int i = 0; i < right; i++) {
       //Lit p = mkLit(S.nVars(), false);
       //newSATVariable(S);
@@ -242,7 +244,7 @@ void MTotalizer::toCNF(leximaxIST::Solver &S, int mod, std::vector<Lit> &ublits,
     for (int i = 0; i < limit; i++) {
       //Lit p = mkLit(S.nVars(), false);
       //newSATVariable(S);
-        S.fresh();
+      Lit p = S.fresh();
       rlower.push_back(p);
     }
   }
@@ -331,7 +333,7 @@ void MTotalizer::adder(leximaxIST::Solver &S, int mod, std::vector<Lit> &upper, 
         Lit c = lit_Error; // upper(i+j)
         Lit d = lit_Error; // upper(i+j+1)
 
-        int close_mod = floor(current_cardinality_rhs / mod);
+        int close_mod = current_cardinality_rhs / mod;
         if (current_cardinality_rhs % mod != 0)
           close_mod++;
         if (mod * (i + j) > close_mod * mod)
@@ -363,7 +365,7 @@ void MTotalizer::adder(leximaxIST::Solver &S, int mod, std::vector<Lit> &upper, 
           }
         }
 
-        std::vector<Lit> clause;
+        Clause clause;
         clause.push_back(-carry);
         if (a != lit_Undef && a != lit_Error)
           clause.push_back(-a);
@@ -373,7 +375,7 @@ void MTotalizer::adder(leximaxIST::Solver &S, int mod, std::vector<Lit> &upper, 
           clause.push_back(d);
 
         if (clause.size() > 1) {
-          S.addClause(clause);
+          S.add_hard_clause(clause);
         }
       }
     }

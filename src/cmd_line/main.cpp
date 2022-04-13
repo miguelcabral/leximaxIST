@@ -2,6 +2,7 @@
 #include <leximaxIST_Solver.h>
 #include <leximaxIST_Options.h>
 #include <leximaxIST_printing.h>
+#include <FormulaPB.h>
 #include <MaxSATFormula.h>
 #include <ParserPB.h>
 #include <Encoder.h>
@@ -15,7 +16,7 @@ void print_header()
     std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
     std::cout << "c Contributors:\n";
     std::cout << "c     * From Open-WBO: João Cortes, Ruben Martins, Inês Lynce,\n";
-    std::cout << "c       Miguel Neves, Norbert Manthey, Saurabh Joshi, Andreia P. Guerreiro.\n"
+    std::cout << "c       Miguel Neves, Norbert Manthey, Saurabh Joshi, Andreia P. Guerreiro.\n";
     std::cout << "c -------------------------------------------------------------------------\n";
 }
 
@@ -44,7 +45,7 @@ int main(int argc, char *argv[])
     // read pbmo file
     leximaxIST::MaxSATFormula maxsat_formula;
     leximaxIST::ParserPB parser_pb (&maxsat_formula);
-    parser_pb.parsePBFormula(options.get_input_file_name().c_str());
+    parser_pb.parse(options.get_input_file_name().c_str());
     
     // add hard clauses
     for (size_t pos (0); pos < maxsat_formula.nHard(); ++pos) {
@@ -80,12 +81,12 @@ int main(int argc, char *argv[])
     // add objective functions
     for (int i (0); i < maxsat_formula.nObjFunctions(); ++i) {
         std::vector<leximaxIST::Clause> soft_clauses;
-        const PBObjFunction &obj (maxsat_formula.getObjFunction(i));
-        for (size_t j (0); j < obj.get_lits().size(); ++j) {
+        const leximaxIST::PBObjFunction &obj (maxsat_formula.getObjFunction(i));
+        for (size_t j (0); j < obj._lits.size(); ++j) {
             // repeat the clause according to its weight (for now this is how we do this)
-            for (int k (1); k <= obj.get_coeffs().at(j); ++k) {
+            for (int k (1); k <= obj._coeffs.at(j); ++k) {
                 leximaxIST::Clause sc;
-                sc.push_back(-(objs.get_lits().at(j)));
+                sc.push_back(-(obj._lits.at(j)));
                 soft_clauses.push_back(sc);
             }            
         }
@@ -111,6 +112,5 @@ int main(int argc, char *argv[])
     }
     
     solver.print_solution();
-
     return 0;
 }

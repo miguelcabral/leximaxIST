@@ -4,19 +4,21 @@
 
 namespace leximaxIST {
 
-    /* int Solver::: get_num_opts() const
+    /* int Solver::get_num_opts() const
     {
         return m_num_opts;
     }*/
 
-    //const std::vector<double>& Solver:::get_times() const { return m_times; }
+    //const std::vector<double>& Solver::get_times() const { return m_times; }
 
-    char Solver:::get_status() const
+    int Solver::nVars() const { return m_id_count; }
+    
+    char Solver::get_status() const
     {
         return m_status; 
     }
 
-    std::vector<int> Solver:::get_solution() const 
+    std::vector<int> Solver::get_solution() const 
     {
         std::vector<int> assignment;
         if (m_status != 's')
@@ -29,7 +31,7 @@ namespace leximaxIST {
     }
 
     // if unsat return empty vector
-    std::vector<int> Solver:::get_objective_vector(const std::vector<int> &assignment) const
+    std::vector<int> Solver::get_objective_vector(const std::vector<int> &assignment) const
     {
         std::vector<int> objective_vector;
         if (!assignment.empty()) {
@@ -45,7 +47,7 @@ namespace leximaxIST {
         return objective_vector;
     }
 
-    std::vector<int> Solver:::get_objective_vector() const
+    std::vector<int> Solver::get_objective_vector() const
     {
         std::vector<int> objective_vector;
         if (!m_solution.empty()) {

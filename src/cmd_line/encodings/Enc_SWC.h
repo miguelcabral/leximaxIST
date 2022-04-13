@@ -55,10 +55,10 @@ public:
 
   // Update assumptions.
   void updateAssumptions(leximaxIST::Solver &S, std::vector<Lit> &assumptions) {
-    assumptions.push(~current_lit_blocking);
+    assumptions.push_back(-current_lit_blocking);
 
     for (int i = 0; i < unit_lits.size(); i++)
-      assumptions.push(~unit_lits[i]);
+      assumptions.push_back(-unit_lits[i]);
   }
 
   // Join encodings.

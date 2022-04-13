@@ -20,7 +20,7 @@ namespace leximaxIST {
     Option<T>::Option(const T &data) : m_data(data) {}
 
     template <typename T>
-    T& Option<T>::get_data()
+    T& Option<T>::get_data ()
     {
         return m_data;
     }
@@ -58,18 +58,20 @@ namespace leximaxIST {
         Options(); // starts Options with default settings and descriptions
         bool parse(int count, char** arguments); // changes settings based on user input while checking if input is valid
         void print_usage(std::ostream &os);
-        int get_help() const;
-        int get_verbosity() const;
-        int get_disjoint_cores() const;
-        std::string get_optimise() const;
-        std::string get_approx() const;
-        std::string get_input_file_name() const;
-        double get_timeout() const;
-        int get_mss_tol() const;
-        int get_mss_add_cls() const;
-        int get_mss_incr() const;
-        int get_gia_pareto() const;
-        int get_gia_incr() const;
+        int get_help();
+        int get_verbosity();
+        int get_disjoint_cores();
+        std::string get_optimise();
+        std::string get_approx();
+        std::string get_input_file_name();
+        double get_timeout();
+        int get_mss_tol();
+        int get_mss_add_cls();
+        int get_mss_incr();
+        int get_gia_pareto();
+        int get_gia_incr();
+        int get_pb_enc();
+        int get_card_enc();
         
     private:
         void read_integer(const char *optarg, const std::string &optname, int &i);

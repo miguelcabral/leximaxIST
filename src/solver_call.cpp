@@ -576,7 +576,7 @@ namespace leximaxIST {
                     const int i (add.at(k));
                     int var (todo.at(i));
                     // add clause to the mss
-                    if (m_mss_incremental)
+                    if (m_mss_incr)
                         assumps.push_back(-var);
                     else
                         solver->addClause(-var);
@@ -612,7 +612,7 @@ namespace leximaxIST {
             if (m_mss_nb_limit > 0 && nb_msses >= m_mss_nb_limit)
                 break;
             IpasirWrap new_solver;
-            if (m_mss_incremental)
+            if (m_mss_incr)
                 solver = m_sat_solver;
             else {
                 solver = &new_solver;
@@ -620,7 +620,7 @@ namespace leximaxIST {
                 solver->addClauses(blocking_cls);
             }
             std::vector<std::vector<int>> mss (m_num_objectives);
-            solver->set_timeout(m_mss_timeout, initial_time);
+            solver->set_timeout(m_approx_tout, initial_time);
             const int rv (mss_linear_search(mss, solver, best_max));
             // remove timeout
             solver->set_timeout(std::numeric_limits<double>::max(), 0);
@@ -643,7 +643,7 @@ namespace leximaxIST {
                     }
                 }
             }
-            if (m_mss_incremental)
+            if (m_mss_incr)
                 add_hard_clause(block_mss);
             else
                 blocking_cls.push_back(block_mss);
@@ -658,10 +658,8 @@ namespace leximaxIST {
                 std::cout << '\n';
             }
         }
-        if (m_verbosity >= 1) {
-            print_time(read_cpu_time() - initial_time, "c MSS Presolving CPU time: ");
+        if (m_verbosity >= 1)
             std::cout << "c Number of MSS subsets found: " << nb_msses << '\n';
-        }
     }
     
     /* Compute an MSS of the problem with sum of obj funcs 
@@ -708,7 +706,7 @@ namespace leximaxIST {
                 const std::vector<int> &obj_vec (set_solution(solver->model())); // move
                 best_max = *std::max_element(obj_vec.begin(), obj_vec.end());
                 // add clause to the mss
-                if (!m_mss_incremental) {
+                if (!m_mss_incr) {
                     assumps.pop_back();
                     solver->addClause(-next_var);
                 }
@@ -721,7 +719,7 @@ namespace leximaxIST {
             else { // UNSAT
                 // add clause to the mcs (backbone literals)
                 assumps.pop_back();
-                if (!m_mss_incremental)
+                if (!m_mss_incr)
                     solver->addClause(next_var);
                 // remove next_var from todo
                 erase_from_todo(todo_vec, obj_index, 0);
@@ -797,31 +795,61 @@ namespace leximaxIST {
         return sum;
     }
     
+    void Solver::approximate()
+    {
+        double initial_time (read_cpu_time());
+        // check if problem is satisfiable
+        if (!call_sat_solver(m_sat_solver, {})) {
+            m_status = 'u';
+            return;
+        }
+        m_status = 's'; // update status to SATISFIABLE
+        if (m_approx == "gia") {
+            if (m_verbosity >= 1)
+                std::cout << "c Approximating using Guided Improvement Algorithm (GIA)...\n";
+            // encode sorted vectors with sorting network
+            for (int j (0); j < m_num_objectives; ++j)
+                encode_sorted(m_objectives.at(j), j);
+            encode_bounds(0, 0); // upper bound all objs based on the solution given by the SAT solver
+            gia();
+        }
+        else if (m_approx == "mss") {
+            if (m_verbosity >= 1)
+                std::cout << "c Approximating using Maximal Satisfiable Subsets...\n";
+            mss_enumerate();
+        }
+        else {
+            print_error_msg("Invalid approximation algorithm");
+            exit(EXIT_FAILURE);
+        }
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c Approximation CPU time: ");
+    }
+    
     // TODO: Add lower bounds from maxsat presolving
-    /* Approximate the Leximax Optimisation Problem with a greedy technique that is:
-     * 1) less greedy than MCS enumeration
+    /* Approximate the Leximax Optimisation Problem with a "greedy" technique that is:
+     * 1) less "greedy" than MCS enumeration
      * 2) works towards getting intermediate Pareto-optimal solutions
      * the MCSes are not Pareto-optimal necessarily
      * Disadvantage: finding one Pareto-optimal solution is slower than finding an MCS
+     * This is based on the Guided Improvement Algorithm (GIA)
      */
-    void Solver::pareto_presolve()
+    void Solver::gia()
     {
-        if (m_verbosity >= 1)
-            std::cout << "c Searching for Pareto optimal solutions...\n";
-        double initial_time (read_cpu_time());
         int max_index (0);
         bool skip (false);
+        double initial_time (read_cpu_time());
         while (true /*stops when interrupted or last max can not be improved*/) {
             IpasirWrap new_solver;
             IpasirWrap *solver (nullptr);
-            if (!m_pareto_incremental) {
+            if (!m_gia_incr) {
                 solver = &new_solver;
                 solver->addClauses(m_input_hard);
                 solver->addClauses(m_encoding);
             }
             else
                 solver = m_sat_solver;
-            solver->set_timeout(m_pareto_timeout, initial_time);
+            solver->set_timeout(m_approx_tout, initial_time);
             if (!skip) {// skip if we know the solution can not be improved
                 const int rv (pareto_search(max_index, solver));
                 if (rv == 0)
@@ -856,18 +884,18 @@ namespace leximaxIST {
             // set upper bound on all objectives as hard clauses
             if (max_index == 0) 
                 encode_ub_sorted(s_obj_vec.at(max_index));
-            double initial_time;
+            double t (0.0);
             if (m_verbosity >= 1) {
-                initial_time = read_cpu_time();
+                t = read_cpu_time();
                 std::cout << "c Calling SAT solver...\n";
             }
             const int rv (m_sat_solver->solve(assumps));
             if (m_verbosity >= 1)
-                print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
+                print_time(read_cpu_time() - t, "c SAT call CPU time: ");
             if (rv == 0)
                 break;
             if (rv == 20) {// unsat -> move on to next max
-                skip = m_truly_pareto;
+                skip = m_gia_pareto;
                 ++max_index;
                 if (max_index == m_num_objectives)
                     break;
@@ -879,8 +907,6 @@ namespace leximaxIST {
         }
         // unset timeout
         m_sat_solver->set_timeout(std::numeric_limits<double>::max(), 0);
-        if (m_verbosity >= 1)
-            print_time(read_cpu_time() - initial_time, "c Pareto Presolving CPU time: ");
     }
     
     /* adds to unit_clauses the clauses that:
@@ -1008,7 +1034,7 @@ namespace leximaxIST {
             decrease_max(unit_clauses, max_index_local, obj_vec);
             // add clauses to the problem
             for (int lit : unit_clauses) {
-                if (!m_pareto_incremental && !m_truly_pareto)
+                if (!m_gia_incr && !m_gia_pareto)
                     solver->addClause(lit);
                 else
                     assumps.push_back(lit);
@@ -1020,7 +1046,7 @@ namespace leximaxIST {
             bound_objs(unit_clauses, max, obj_vec); // construct clauses
             // add clauses to the problem
             for (int lit : unit_clauses) {
-                if (m_pareto_incremental)
+                if (m_gia_incr)
                     assumps.push_back(lit);
                 else
                     solver->addClause(lit);
@@ -1045,7 +1071,7 @@ namespace leximaxIST {
                 const int min (s_obj_vec.at(m_num_objectives - 1));
                 if (max_index == max_index_local && max - min <= 1)
                     ++max_index;
-                if (m_truly_pareto) {
+                if (m_gia_pareto) {
                     // continue until a Pareto-optimal solution is obtained
                     ++max_index_local;
                     if (max_index_local == m_num_objectives)
@@ -1081,8 +1107,6 @@ namespace leximaxIST {
             return 0;
         }
         m_status = 's';
-        if (m_mss_presolve)
-            mss_enumerate();
         if (m_maxsat_presolve) {
             double initial_time;
             if (m_verbosity >= 1) {

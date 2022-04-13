@@ -39,13 +39,13 @@ using namespace leximaxIST;
 // Constructor/destructor.
 //-------------------------------------------------------------------------
 
-ParserPB::ParserPB() : _highestCoeffSum(0) {}
+ParserPB::ParserPB(MaxSATFormula *m) : _highestCoeffSum(0), maxsat_formula(m) {}
 
 ParserPB::~ParserPB() {}
 
 //! Parse an input file and loads it into the corresponding data structure.
 
-int ParserPB::parse(char *fileName) {
+int ParserPB::parse(const char *fileName) {
 //     printf("ParserPB::parse\n");
   _highestCoeffSum = 0;
 
@@ -168,7 +168,7 @@ int ParserPB::parseCostFunction() {
   char varName[MAX_WORD_LENGTH], c;
   int varNameSize;
   // int64_t coeffSum = 0;
-  PBObjFunction *of = new PBObjFunction();
+  PBObjFunction of;
 
   skip_spaces();
   c = peek_char();
@@ -189,9 +189,9 @@ int ParserPB::parseCostFunction() {
     
     // cout << "c CF Product: " << coeff << " " << varName << " "
     // 	 << varNameSize << " " << varID << endl;
-//     of->addProduct(mkLit(varID), coeff); //original version (from openwbo)
-    //of->addProduct(mkLit(varID, litSign), factor*coeff); //AG version (from openwbo)
-    of->addProduct(litSign ? -varID : varID, factor*coeff); // Miguel Cabral version - literals are just ints
+//     of.addProduct(mkLit(varID), coeff); //original version (from openwbo)
+    //of.addProduct(mkLit(varID, litSign), factor*coeff); //AG version (from openwbo)
+    of.addProduct(litSign ? -varID : varID, factor*coeff); // Miguel Cabral version - literals are just ints
 
     skip_spaces();
     c = peek_char();
@@ -207,8 +207,6 @@ int ParserPB::parseCostFunction() {
   }
 
   maxsat_formula->addObjFunction(of);
-
-  delete of;
 
   return 0;
 }

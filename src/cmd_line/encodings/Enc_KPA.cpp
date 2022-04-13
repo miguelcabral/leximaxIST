@@ -33,10 +33,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <set>
+#include <leximaxIST_printing.h>
 
-#include "../../context.h"
-#include "../../depsLib/sat4jEncoder.h"
-#include "ParserMaxSAT.h"
+//#include "../../context.h"
+//#include "../../depsLib/sat4jEncoder.h"
+//#include <ParserMaxSAT.h>
 
 
 using namespace leximaxIST;
@@ -59,9 +60,8 @@ void KPA::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, std::vector<uint
     // If the rhs is larger than INT32_MAX is not feasible to encode this
     // pseudo-Boolean constraint to CNF.
     if (rhs >= UINT64_MAX) {
-        DPRINTF("c Overflow in the Encoding\n");
-        DPRINTF("s UNKNOWN\n");
-        exit(_ERROR_);
+        print_error_msg("Overflow in the Encoding");
+        exit(EXIT_FAILURE);
     }
   
     uint64_t nb_clauses_prev = nb_clauses;
@@ -87,8 +87,8 @@ void KPA::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, std::vector<uint
                 ntmp_vars = convert_kp_minisatp(S, rhs);
                 break;
             default:
-                printf("ERROR: Wrong encoding type (Enc_KP)");
-                exit(1);
+                print_error_msg("Wrong encoding type (Enc_KP)");
+                exit(EXIT_FAILURE);
         }
     }
     

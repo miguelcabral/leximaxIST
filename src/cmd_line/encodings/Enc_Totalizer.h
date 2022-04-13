@@ -49,13 +49,13 @@ public:
   }
   ~Totalizer() {}
 
-  void build(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
-  void join(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
-  void update(leximaxIST::Solver &solver, int64_t rhs, std::vector<int> &lits, std::vector<int> &assumptions);
+  void build(leximaxIST::Solver &solver, const std::vector<int> &lits, int64_t rhs);
+  void join(leximaxIST::Solver &solver, const std::vector<int> &lits, int64_t rhs);
+  void update(leximaxIST::Solver &solver, int64_t rhs, const std::vector<int> &lits, std::vector<int> &assumptions);
   void update(leximaxIST::Solver &solver, int64_t rhs) {
     std::vector<int> lits;
     std::vector<int> assumptions;
-    update(S, rhs, lits, assumptions);
+    update(solver, rhs, lits, assumptions);
   }
   void add(leximaxIST::Solver &solver, Totalizer &tot, int64_t rhs);
 

@@ -29,6 +29,7 @@
 #include <leximaxIST_printing.h>
 #include <stdlib.h>
 #include <string>
+#include <cassert>
 
 using namespace leximaxIST;
 
@@ -37,7 +38,7 @@ using namespace leximaxIST;
  // Encoding of exactly-one constraints
  //
  ************************************************************************************************/
-void Encoder::encodeAMO(leximaxIST::Solver &solver, const std::vector<Lit> &lits) {
+void Encoder::encodeAMO(leximaxIST::Solver &solver, std::vector<Lit> &lits) {
 
   switch (amo_encoding) {
   // Currently only the ladder encoding is used for AMO constraints.
@@ -58,7 +59,7 @@ void Encoder::encodeAMO(leximaxIST::Solver &solver, const std::vector<Lit> &lits
  ************************************************************************************************/
 //
 // Manages the encoding of cardinality encodings.
-void Encoder::encodeCardinality(leximaxIST::Solver &solver, const std::vector<Lit> &lits, int64_t rhs) {
+void Encoder::encodeCardinality(leximaxIST::Solver &solver, std::vector<Lit> &lits, int64_t rhs) {
 
   switch (cardinality_encoding) {
   case _CARD_TOTALIZER_:
@@ -133,7 +134,7 @@ void Encoder::buildCardinality(leximaxIST::Solver &solver, const std::vector<Lit
 
 // Manages the incremental update of cardinality constraints.
 void Encoder::incUpdateCardinality(leximaxIST::Solver &solver, const std::vector<Lit> &join, const std::vector<Lit> &lits,
-                                   int64_t rhs, const std::vector<Lit> &assumptions) {
+                                   int64_t rhs, std::vector<Lit> &assumptions) {
   assert(incremental_strategy == _INCREMENTAL_ITERATIVE_ ||
          incremental_strategy == _INCREMENTAL_WEAKENING_);
   // Note: the assumption vector will be updated in this procedure
@@ -153,7 +154,7 @@ void Encoder::incUpdateCardinality(leximaxIST::Solver &solver, const std::vector
   }
 }
 
-void Encoder::joinEncoding(leximaxIST::Solver &solver, std::vector<Lit> &lits, int64_t rhs) {
+void Encoder::joinEncoding(leximaxIST::Solver &solver, const std::vector<Lit> &lits, int64_t rhs) {
 
   switch (cardinality_encoding) {
   case _CARD_TOTALIZER_:
@@ -194,14 +195,14 @@ void Encoder::encodePB(leximaxIST::Solver &solver, std::vector<Lit> &lits, std::
 //   case _PB_IGTE_:
 //     igte.encode(solver, lits, coeffs, rhs);
 //     break;
-    
+    /*
     case _PB_KP_:
     kp.encode(solver, lits, coeffs, rhs, _kp_sat4j_, _inc_); //inc
     break;
 
     case _PB_KP_MINISATP_:
     kp.encode(solver, lits, coeffs, rhs, 1); //_kp_minisatp_ (modo) -- full
-    break;
+    break;*/
     
     //TODO: Fazer as versoes incrementais do KP
   default:
@@ -256,7 +257,7 @@ void Encoder::updatePB(leximaxIST::Solver &solver, uint64_t rhs) {
 //   case _PB_IGTE_:
 //     igte.update(solver, rhs);
 //     break;
-    
+    /*
   case _PB_KP_:
     kp.update(solver, rhs);
     break;
@@ -264,7 +265,7 @@ void Encoder::updatePB(leximaxIST::Solver &solver, uint64_t rhs) {
   case _PB_KP_MINISATP_:
     kp.update(solver, rhs);
     break;
-
+*/
   default:
     print_error_msg("Invalid PB encoding : " + std::to_string(pb_encoding));
     exit(EXIT_FAILURE);
@@ -288,7 +289,7 @@ std::vector<Lit>& Encoder::getAssumptions(){
 // Incremental methods for PB encodings:
 //
 // Manages the incremental encode of PB encodings.
-void Encoder::incEncodePB(leximaxIST::Solver &solver, const std::vector<Lit> &lits, const std::vector<uint64_t> &coeffs,
+void Encoder::incEncodePB(leximaxIST::Solver &solver, std::vector<Lit> &lits, std::vector<uint64_t> &coeffs,
                           int64_t rhs, std::vector<Lit> &assumptions, int size) {
   assert(incremental_strategy == _INCREMENTAL_ITERATIVE_);
   
@@ -306,7 +307,7 @@ void Encoder::incEncodePB(leximaxIST::Solver &solver, const std::vector<Lit> &li
 }
 
 // Manages the incremental update of PB encodings.
-void Encoder::incUpdatePB(leximaxIST::Solver &solver, const std::vector<Lit> &lits, const std::vector<uint64_t> &coeffs,
+void Encoder::incUpdatePB(leximaxIST::Solver &solver, std::vector<Lit> &lits, std::vector<uint64_t> &coeffs,
                           int64_t rhs, std::vector<Lit> &assumptions) {
   assert(incremental_strategy == _INCREMENTAL_ITERATIVE_);
 
@@ -378,10 +379,10 @@ bool Encoder::hasPBEncoding() {
     return swc.hasCreatedEncoding();
   else if (pb_encoding == _PB_GTE_)
     return gte.hasCreatedEncoding();
-  else if (pb_encoding == _PB_KP_)
+  /*else if (pb_encoding == _PB_KP_)
     return kp.hasCreatedEncoding();
   else if (pb_encoding == _PB_KP_MINISATP_)
-    return kp.hasCreatedEncoding();
+    return kp.hasCreatedEncoding();*/
 
   return false;
 }
@@ -390,8 +391,9 @@ bool Encoder::hasPBEncoding() {
 void Encoder::getEncodeSizes(int *nvar, int *nclauses, int *nrootvars){
   if (pb_encoding == _PB_GTE_)
     return gte.getEncodeSizes(nvar, nclauses, nrootvars);
+  /*
   else if (pb_encoding == _PB_KP_)
     return kp.getEncodeSizes(nvar, nclauses, nrootvars);
   else if (pb_encoding == _PB_KP_MINISATP_)
-    return kp.getEncodeSizes(nvar, nclauses, nrootvars);
+    return kp.getEncodeSizes(nvar, nclauses, nrootvars);*/
 }

@@ -38,7 +38,7 @@
 #include <sstream>
 #include <string.h>
 #include <stdlib.h>
-
+#include <cassert>
 #include <MaxSATFormula.h>
 #include <maxConsts.h>
 
@@ -66,21 +66,21 @@ public:
   // Constructor/destructor.
   //-------------------------------------------------------------------------
 
-  ParserPB();
+  ParserPB(MaxSATFormula *m);
   virtual ~ParserPB();
 
   //-------------------------------------------------------------------------
   // Interface contract:
   //-------------------------------------------------------------------------
 
-  virtual int parse(char *fileName);
+  virtual int parse(const char *fileName);
 
-  void parsePBFormula(char *fileName, MaxSATFormula *max) {
+  /*void parsePBFormula(char *fileName, MaxSATFormula *max) {
     maxsat_formula = max;
     parse(fileName);
     snprintf(maxsat_formula->ifname,
 	     max::name, "%s",fileName);
-  }
+  }*/
 
 protected:
   // OPB instance parsing.

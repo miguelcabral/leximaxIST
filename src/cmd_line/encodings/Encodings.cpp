@@ -34,6 +34,7 @@ using namespace leximaxIST;
 // Miguel Cabral - my implementation for leximaxIST
 // this used to be implemented by the SAT solver, such as glucose or minisat
 // False means I want the variable, true means I want the negation of the variable
+/*
 Lit Encodings::mkLit(int var_id, bool sign = false)
 {
     if (!sign) {
@@ -45,6 +46,7 @@ Lit Encodings::mkLit(int var_id, bool sign = false)
         return l;
     }
 }
+*/
 
 // Creates an unit clause in the SAT solver
 void Encodings::addUnitClause(leximaxIST::Solver &S, Lit a, Lit blocking) {

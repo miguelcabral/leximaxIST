@@ -38,7 +38,7 @@
 #include <vector>
 #include <set>
 #include <maxConsts.h>
-using NSPACE::lbool;
+#include <iostream>
 
 namespace leximaxIST {
     
@@ -202,7 +202,7 @@ protected:
     void order_enc_rootvars(leximaxIST::Solver &S);
     
     // info functions
-    void printLit(Lit l) { printf("%s%d\n", sign(l) ? "-" : "", var(l) + 1); }
+    void printLit(Lit l) { std::cout << l << '\n'; }
     
     uint64_t ntmp_vars; //number of vars in PB that are not fixed by the solver
     

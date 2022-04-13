@@ -34,6 +34,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <iostream>
 
 namespace leximaxIST {
 struct wlitt {
@@ -92,7 +93,7 @@ public:
   }
 
 protected:
-  void printLit(Lit l) { printf("%s%d\n", sign(l) ? "-" : "", var(l) + 1); }
+  void printLit(Lit l) { std::cout << l << '\n'; }
 
   bool encodeLeq(uint64_t k, leximaxIST::Solver &S, const weightedlitst &iliterals,
                  wlit_mapt &oliterals);

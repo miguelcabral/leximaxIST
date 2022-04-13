@@ -28,6 +28,7 @@
 #include <Enc_Totalizer.h>
 #include <stdlib.h>
 #include <leximaxIST_printing.h>
+#include <cassert>
 
 using namespace leximaxIST;
 
@@ -67,7 +68,7 @@ void Totalizer::incremental(leximaxIST::Solver &solver, int64_t rhs) {
   }
 }
 
-void Totalizer::join(leximaxIST::Solver &solver, std::vector<Lit> &lits, int64_t rhs) {
+void Totalizer::join(leximaxIST::Solver &solver, const std::vector<Lit> &lits, int64_t rhs) {
 
   assert(incremental_strategy == _INCREMENTAL_ITERATIVE_);
 
@@ -145,7 +146,7 @@ void Totalizer::toCNF(leximaxIST::Solver &solver, std::vector<Lit> &lits) {
   std::vector<Lit> right;
 
   assert(lits.size() > 1);
-  int split = floor(lits.size() / 2);
+  int split = lits.size() / 2;
 
   for (int i = 0; i < lits.size(); i++) {
 
@@ -184,7 +185,7 @@ void Totalizer::toCNF(leximaxIST::Solver &solver, std::vector<Lit> &lits) {
   adder(solver, left, right, lits);
 }
 
-void Totalizer::update(leximaxIST::Solver &solver, int64_t rhs, std::vector<Lit> &lits,
+void Totalizer::update(leximaxIST::Solver &solver, int64_t rhs, const std::vector<Lit> &lits,
                        std::vector<Lit> &assumptions) {
 
   assert(hasEncoding);
@@ -279,7 +280,7 @@ void Totalizer::add(leximaxIST::Solver &solver, Totalizer &tot, int64_t rhs) {
   |    * hasEncoding is set to 'true'.
   |
   |________________________________________________________________________________________________@*/
-void Totalizer::build(leximaxIST::Solver &S, std::vector<Lit> &lits, int64_t rhs) {
+void Totalizer::build(leximaxIST::Solver &S, const std::vector<Lit> &lits, int64_t rhs) {
 
   cardinality_outlits.clear();
   hasEncoding = false;

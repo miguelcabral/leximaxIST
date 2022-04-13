@@ -30,48 +30,8 @@
 #include <numeric>
 #include <stdlib.h>
 #include <leximaxIST_printing.h>
+#include <cassert>
 
-// #define __DEBUG__
-/*
-#ifdef __DEBUG__
-    #define    DPRINTF(f,...)    fprintf(stderr,f,##__VA_ARGS__)
-#else
-    #define    DPRINTF(f,...)
-#endif
-*/
-
-
-/*
-void my_printPB( std::vector<Lit> &lits, std::vector<uint64_t> &coeffs,
-                 uint64_t rhs){
-#ifdef __DEBUG__
-    for (int i = 0; i < coeffs.size(); i++) {
-        printf("%d ", (int)coeffs[i]);
-        if (sign(lits[i]))
-            printf("-");
-        printf("y%d ", var(lits[i]) + 1);
-    }
-    printf("<= %lu\n", rhs);
-#endif
-}
-
-void my_printLit(Lit l){
-#ifdef __DEBUG__
-    printf(" ");
-    if (sign(l))
-        printf("-");
-    printf("y%d", var(l) + 1);
-#endif
-}
-
-
-void my_printLitNL(Lit l){
-#ifdef __DEBUG__
-    my_printLit(l);
-    printf("\n");
-#endif
-}
-*/
 using namespace leximaxIST;
 
 struct less_than_wlitt {

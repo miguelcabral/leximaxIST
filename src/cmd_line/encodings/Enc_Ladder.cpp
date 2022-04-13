@@ -26,6 +26,7 @@
  */
 
 #include <Enc_Ladder.h>
+#include <cassert>
 
 using namespace leximaxIST;
 
@@ -52,7 +53,7 @@ using namespace leximaxIST;
   |    * 'S' is updated with the clauses that encode the AMO constraint.
   |
   |________________________________________________________________________________________________@*/
-void Ladder::encode(leximaxIST::Solver &S, std::vector<Lit> &lits) {
+void Ladder::encode(leximaxIST::Solver &S, const std::vector<Lit> &lits) {
 
   assert(lits.size() != 0);
 

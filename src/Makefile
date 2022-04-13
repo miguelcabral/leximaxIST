@@ -6,46 +6,47 @@ SRCSTOOL += $(wildcard cmd_line/encodings/*.cpp)
 SRCSTOOL += $(wildcard cmd_line/*.cpp)
 OBJSLIB = $(SRCSLIB:.cpp=.o)
 OBJSTOOL = $(SRCSTOOL:.cpp=.o)
-LIBNAME = libleximaxIST.a
-TOOLNAME = leximaxIST
+OBJSTOOL := $(filter-out cmd_line/encodings/Enc_KPA.o,$(OBJSTOOL))
+LIB = ../lib/libleximaxIST.a
+TOOL = ../bin/leximaxIST
 
 # path to sat solver library and to leximaxIST library
-LIBDIR = -L ../lib -L ../cadical/build
+LN_PATHS = -L ../lib -L ../cadical/build
 
 # libraries' names
-LIBS = -lz -lcadical -lleximaxIST
+LN_NAMES = -lz -lcadical -lleximaxIST
 
 # path to sat solver include directory containing ipasir.h
 CFLAGS += -I ../cadical/src
 
 ifdef PROF
 	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
-	LFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
+	LNFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
 endif
 
 .PHONY: clean release debug
 
 release : CFLAGS += -O3 -w
-release : LFLAGS += -O3
-release : $(LIBNAME) $(TOOLNAME)
+release : LNFLAGS += -O3
+release : $(LIB) $(TOOL)
 
 debug : CFLAGS += -g -Wall -Wextra -pedantic
-debug : LFLAGS += -g
-debug : $(LIBNAME) $(TOOLNAME)
+debug : LNFLAGS += -g
+debug : $(LIB) $(TOOL)
 
-$(LIBNAME) : $(OBJSLIB)
-	@echo "Archiving: $(LIBNAME)"
-	ar -rcs ../lib/$(LIBNAME) $(OBJSLIB)
+$(LIB) : $(OBJSLIB)
+	@echo "Archiving: $(LIB)"
+	ar -rcs $(LIB) $(OBJSLIB)
 	
-$(TOOLNAME) : $(OBJSTOOL) $(LIBNAME)
+$(TOOL) : $(OBJSTOOL) $(LIB)
 	@echo "Linking: $@"
-	g++ $(OBJSTOOL) $(LFLAGS) $(LIBDIR) $(LIBS) -o $@
+	g++ $(OBJSTOOL) $(LNFLAGS) $(LN_PATHS) $(LN_NAMES) -o $@
 
 $(OBJSTOOL) : %.o: %.cpp
 	@echo "Compiling: $@"
 	g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
-	@echo "Removing: $(LIBNAME) $(OBJS)"
-	rm -f ../lib/$(LIBNAME) ../bin/$(TOOLNAME) $(OBJSTOOL)
+	@echo "Removing: $(LIB) $(TOOL) $(OBJS)"
+	rm -f $(LIB) $(TOOL) $(OBJSTOOL)
 	

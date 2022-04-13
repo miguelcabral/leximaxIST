@@ -28,6 +28,7 @@
 #include <Enc_SWC.h>
 #include <stdlib.h>
 #include <leximaxIST_printing.h>
+#include <cassert>
 
 using namespace leximaxIST;
 
@@ -303,8 +304,8 @@ void SWC::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, std::vector<uint
   current_pb_rhs = rhs;
   hasEncoding = true;
 
-  lits_inc.push_back(lits);
-  coeffs_inc.push_back(lits);
+  lits_inc = lits;
+  coeffs_inc = coeffs;
 }
 
 /*_________________________________________________________________________________________________

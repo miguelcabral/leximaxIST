@@ -108,10 +108,10 @@ namespace leximaxIST {
         else if (m_mss_add_cls == 2)
             std::cout << "Add only one\n";
         std::cout << "c \tIncremental enumeration: ";
-        std::cout << (m_mss_incremental ? "Yes\n" : "No\n");
+        std::cout << (m_mss_incr ? "Yes\n" : "No\n");
         std::cout << "c \tTimeout: ";
         const stream_config &old_config (set_cout());
-        std::cout << m_mss_timeout << '\n';
+        std::cout << m_approx_tout << '\n';
         set_cout(old_config);
         std::cout << "c \tLimit number of MSSes: ";
         if (m_mss_nb_limit <= 0)

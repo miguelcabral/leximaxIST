@@ -41,7 +41,7 @@
 #include <Enc_SWC.h>
 #include <Enc_Totalizer.h>
 #include <Enc_Adder.h>
-#include <Enc_KPA.h>
+//#include <Enc_KPA.h>
 
 #include <vector>
 
@@ -73,12 +73,12 @@ public:
   // At-most-one encodings:
   //
   // Encode exactly-one constraint into CNF.
-  void encodeAMO(leximaxIST::Solver &solver, const std::vector<int> &lits);
+  void encodeAMO(leximaxIST::Solver &solver, std::vector<int> &lits);
 
   // Cardinality encodings:
   //
   // Encode cardinality constraint into CNF.
-  void encodeCardinality(leximaxIST::Solver &solver, const std::vector<int> &lits, int64_t rhs);
+  void encodeCardinality(leximaxIST::Solver &solver, std::vector<int> &lits, int64_t rhs);
 
   // Update the rhs of an already existent cardinality constraint
   void updateCardinality(leximaxIST::Solver &solver, int64_t rhs);
@@ -93,12 +93,12 @@ public:
 
   // Incremental update for cardinality constraints;
   void incUpdateCardinality(leximaxIST::Solver &solver, const std::vector<int> &join, const std::vector<int> &lits,
-                            int64_t rhs, const std::vector<int> &assumptions);
+                            int64_t rhs, std::vector<int> &assumptions);
   void incUpdateCardinality(leximaxIST::Solver &solver, const std::vector<int> &lits, int64_t rhs,
-                            const std::vector<int> &assumptions) {
+                            std::vector<int> &assumptions) {
 
     std::vector<int> empty;
-    incUpdateCardinality(S, empty, lits, rhs, assumptions);
+    incUpdateCardinality(solver, empty, lits, rhs, assumptions);
   }
 
   // Add two disjoint cardinality constraints
@@ -111,16 +111,16 @@ public:
   // Update the rhs of an already existent pseudo-Boolean constraint.
   void updatePB(leximaxIST::Solver &solver, uint64_t rhs);
   // Predicts the number of clauses needed for the encoding
-  int predictPB(leximaxIST::Solver &solver, const std::vector<int> &lits, const std::vector<uint64_t> &coeffs, uint64_t rhs);
+  int predictPB(leximaxIST::Solver &solver, std::vector<int> &lits, std::vector<uint64_t> &coeffs, uint64_t rhs);
 
   // Incremental PB encodings:
   //
   // Incremental PB encoding.
-  void incEncodePB(leximaxIST::Solver &solver, const std::vector<int> &lits, const std::vector<uint64_t> &coeffs,
+  void incEncodePB(leximaxIST::Solver &solver, std::vector<int> &lits, std::vector<uint64_t> &coeffs,
                    int64_t rhs, std::vector<int> &assumptions, int size);
 
   // Incremental update of PB encodings.
-  void incUpdatePB(leximaxIST::Solver &solver, const std::vector<int> &lits, const std::vector<uint64_t> &coeffs,
+  void incUpdatePB(leximaxIST::Solver &solver, std::vector<int> &lits, std::vector<uint64_t> &coeffs,
                    int64_t rhs, std::vector<int> &assumptions);
 
   // Incremental update of assumptions.
@@ -149,9 +149,9 @@ public:
   void setAMOEncoding(int enc) { amo_encoding = enc; }
   int getAMOEncoding() { return amo_encoding; }
   
-  void setApproxRatio(leximaxIST::Solver &solver, double eps) {
-      epsilon = eps; if(pb_encoding == _PB_KP_) kp.setApproxRatio(S, eps);
-  }
+  /*void setApproxRatio(leximaxIST::Solver &solver, double eps) {
+      epsilon = eps; if(pb_encoding == _PB_KP_) kp.setApproxRatio(solver, eps);
+  }*/
 
 //   void setBlockingMode(int bm) { blockingMode = bm; igte.setBlockingMode(bm); }
   
@@ -177,7 +177,7 @@ public:
   std::vector<Lit> assumptions;
   
   void getEncodeSizes(int *nvar, int *nclauses, int *nrootvars); //AG
-  void kpa_fixed_vars(const std::set<Lit>& fv){kp.fixed_vars(fv);}
+  //void kpa_fixed_vars(const std::set<Lit>& fv){kp.fixed_vars(fv);}
   
 protected:
   int incremental_strategy;
@@ -200,7 +200,7 @@ protected:
   SWC swc;
   GTE gte;
 //   IGTE igte;
-  KPA kp;
+  //KPA kp;
 };
 } // namespace openwbo
 
