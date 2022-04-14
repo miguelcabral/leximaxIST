@@ -461,7 +461,7 @@ namespace leximaxIST {
             std::cout << std::unitbuf; // debug - flushes the output stream after any output operation       
         m_input_nb_vars = m_id_count;
         if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Optimising" + " using algorithm " + m_opt_mode + "...\n";
+            std::cout << "c Optimising using algorithm " << m_opt_mode << "...\n";
             std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
             std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
             std::cout << "c Number of objective functions: " << m_num_objectives << '\n';

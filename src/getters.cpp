@@ -21,7 +21,7 @@ namespace leximaxIST {
     std::vector<int> Solver::get_solution() const 
     {
         std::vector<int> assignment;
-        if (m_status != 's')
+        if (m_status == 'u' || m_status == '?')
             return assignment;
         assignment.resize(m_input_nb_vars + 1);
         for (int j (0); j <= m_input_nb_vars; ++j) {

@@ -498,7 +498,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      assert(m_leximax_solver != nullptr);
      /*size_t sorting_net_size (m_leximax_solver->get_sorting_net_size());
      std::cerr << "# Number of comparators of largest sorting network: " << sorting_net_size << '\n';*/
-     if (m_leximax_solver->get_status() == 's') {
+     if (m_leximax_solver->get_status() == 's' || m_leximax_solver->get_status() == 'o') {
      	const std::vector<int> obj_vector (m_leximax_solver->get_objective_vector());
      	std::cerr << "# Objective vector: ";
      	for (int o : obj_vector)
@@ -574,7 +574,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      m_leximax_solver->set_mss_add_cls(m_mss_add_cls);
      m_leximax_solver->set_mss_incr(m_mss_incr);
      m_leximax_solver->set_mss_nb_limit(m_mss_nb_limit);
-     m_leximax_solver->set_mss_tolerance(m_mss_tolerance);
+     m_leximax_solver->set_mss_tol(m_mss_tolerance);
      // other
      m_leximax_solver->set_verbosity(m_verbosity);
      m_leximax_solver->set_ext_solver_cmd(opt_solver_cmd);
@@ -592,12 +592,12 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
          m_leximax_solver->approximate();
          status = m_leximax_solver->get_status();
      }
-     if (!m_leximax_opt.empty()) { // optimisation
+     if (!m_leximax_opt.empty() && status != 'u') { // optimisation
          m_leximax_solver->set_opt_mode(m_leximax_opt);
          m_leximax_solver->optimise();
          status = m_leximax_solver->get_status();
      }
-     if (status == 's') {
+     if (status == 's' || status == 'o') {
         std::vector<int> sol (m_leximax_solver->get_solution());
         model.assign(sol.begin(), sol.end());
         print_leximax_info();
@@ -605,6 +605,6 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      else
          model.clear();
      // return did I find a solution? 
-     return status == 's';
+     return status == 's' || status == 'o';
  }
  

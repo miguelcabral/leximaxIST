@@ -12,7 +12,7 @@
 void print_header()
 {
     std::cout << "c -------------------------------------------------------------------------\n";
-    std::cout << "c leximaxIST - C++ Library for Boolean Leximax Optimisation\n";
+    std::cout << "c leximaxIST - Boolean Leximax Optimisation Solver\n";
     std::cout << "c Authors: Miguel Cabral, Mikolas Janota, Vasco Manquinho\n";
     std::cout << "c Contributors:\n";
     std::cout << "c     * From Open-WBO: João Cortes, Ruben Martins, Inês Lynce,\n";

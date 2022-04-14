@@ -390,10 +390,11 @@ namespace leximaxIST {
             return;
         }
         size_t i (0);
-        while (i < m_solution.size()) {
+        std::vector<int> solution (get_solution());
+        while (i < solution.size()) {
             std::string line ("v ");
-            while (line.size() < 80 && i < m_solution.size()) {
-                line += std::to_string(m_solution.at(i)) + ' '; // to string ???
+            while (line.size() < 80 && i < solution.size()) {
+                line += std::to_string(solution.at(i)) + ' '; // to string ???
                 ++i;
             }
             std::cout << line << '\n';
