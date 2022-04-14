@@ -1,42 +1,52 @@
 CFLAGS = -std=c++17
-CFLAGS += -I ../include
-SRCS1 = $(wildcard *.cc)
-SRCS2 = $(wildcard *.cpp)
-OBJS1 = $(SRCS1:.cc=.o)
-OBJS2 = $(SRCS2:.cpp=.o)
-OBJS := $(OBJS1)
-OBJS += $(OBJS2)
-LIBNAME = libleximaxIST.a
+CFLAGS += -I ../include -I ./cmd_line -I ./cmd_line/encodings
+SRCSLIB = $(wildcard *.cpp)
+SRCSTOOL = $(SRCSLIB)
+SRCSTOOL += $(wildcard cmd_line/encodings/*.cpp)
+SRCSTOOL += $(wildcard cmd_line/*.cpp)
+OBJSLIB = $(SRCSLIB:.cpp=.o)
+OBJSTOOL = $(SRCSTOOL:.cpp=.o)
+OBJSTOOL := $(filter-out cmd_line/encodings/Enc_KPA.o,$(OBJSTOOL))
+LIB = ../lib/libleximaxIST.a
+TOOL = ../bin/leximaxIST
 
-# Edit to change the path to sat solver include directory containing ipasir.h
+# path to sat solver library and to leximaxIST library
+LN_PATHS = -L ../lib -L ../cadical/build
+
+# libraries' names
+LN_NAMES = -lz -lcadical -lleximaxIST
+
+# path to sat solver include directory containing ipasir.h
 CFLAGS += -I ../cadical/src
 
 ifdef PROF
 	CFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
+	LNFLAGS+= -g -pg -fprofile-arcs -ftest-coverage
 endif
 
 .PHONY: clean release debug
 
 release : CFLAGS += -O3 -w
-release : $(LIBNAME)
+release : LNFLAGS += -O3
+release : $(LIB) $(TOOL)
 
 debug : CFLAGS += -g -Wall -Wextra -pedantic
-debug : $(LIBNAME)
+debug : LNFLAGS += -g
+debug : $(LIB) $(TOOL)
 
-$(LIBNAME) : $(OBJS)
-	@echo "Archiving: $(LIBNAME)"
-	ar -rcs ../lib/$(LIBNAME) $(OBJS)
+$(LIB) : $(OBJSLIB)
+	@echo "Archiving: $(LIB)"
+	ar -rcs $(LIB) $(OBJSLIB)
+	
+$(TOOL) : $(OBJSTOOL) $(LIB)
+	@echo "Linking: $@"
+	g++ $(OBJSTOOL) $(LNFLAGS) $(LN_PATHS) $(LN_NAMES) -o $@
 
-$(OBJS1) : %.o: %.cc
-	@echo "Compiling: $@"
-	g++ $(CFLAGS) -c -o $@ $<
-
-$(OBJS2) : %.o: %.cpp
+$(OBJSTOOL) : %.o: %.cpp
 	@echo "Compiling: $@"
 	g++ $(CFLAGS) -c -o $@ $<
 	
 clean :
-	@echo "Removing: $(LIBNAME) $(OBJS)"
-	rm -f ../lib/$(LIBNAME) *.o
+	@echo "Removing: $(LIB) $(TOOL) $(OBJS)"
+	rm -f $(LIB) $(TOOL) $(OBJSTOOL)
 	
-

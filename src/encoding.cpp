@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_rusage.h>
 #include <leximaxIST_printing.h>
 #include <stdlib.h>
@@ -15,7 +15,7 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
     
-    void Encoder::encode_sorted(const std::vector<int> &obj_vars, int i)
+    void Solver::encode_sorted(const std::vector<int> &obj_vars, int i)
     {
         if (!obj_vars.empty()) {
             const size_t nb_wires = obj_vars.size();
@@ -48,7 +48,7 @@ namespace leximaxIST {
             order_encoding(*(m_sorted_vecs.at(i)));*/
     }
 
-    void Encoder::all_subsets(std::list<int> set, int i, Clause &clause)
+    void Solver::all_subsets(std::list<int> set, int i, Clause &clause)
     {
         int size = clause.size();
         // Base of recursion: 
@@ -79,7 +79,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::at_most(const std::list<int> &set, int i)
+    void Solver::at_most(const std::list<int> &set, int i)
     {
         // implementation with naive encoding
         // for every combination of i + 1 vars, one of them must be false
@@ -89,7 +89,7 @@ namespace leximaxIST {
 
     // create new relaxation variables and sorted vectors after the relaxation
     // and add the relaxation constraints to the hard clauses
-    void Encoder::encode_relaxation(int i)
+    void Solver::encode_relaxation(int i)
     {
         std::list<int> relax_vars;
         for (int j = 0; j < m_num_objectives; ++j)
@@ -183,7 +183,7 @@ namespace leximaxIST {
         }
     }
 
-    size_t Encoder::largest_obj() const
+    size_t Solver::largest_obj() const
     {
         size_t largest = 0;
         for (const std::vector<int> &objective : m_objectives) {
@@ -193,7 +193,7 @@ namespace leximaxIST {
         return largest;
     }
 
-    void Encoder::componentwise_OR(int i, const std::vector<int> &max_vars)
+    void Solver::componentwise_OR(int i, const std::vector<int> &max_vars)
     {
         if (m_verbosity == 2)
             std::cout << "c ------------ Componentwise OR ------------\n";
@@ -230,7 +230,7 @@ namespace leximaxIST {
         }
     }
 
-    void Encoder::order_encoding(const std::vector<int>& vars)
+    void Solver::order_encoding(const std::vector<int>& vars)
     {
         if (m_verbosity == 2)
             std::cout << "c ------------ Order Encoding ------------\n";
@@ -241,7 +241,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::generate_soft_clauses(int i)
+    void Solver::generate_soft_clauses(int i)
     {
         // find size of largest objective function
         size_t largest = largest_obj();
@@ -262,7 +262,7 @@ namespace leximaxIST {
     /* returns the lower bound of the optimal i-th max
      * the upper bound might change and can be computed using get_objective_vector()
      */
-    int Encoder::encode_bounds(int i, int sum)
+    int Solver::encode_bounds(int i, int sum)
     {
         int lb (0);
         if (m_maxsat_presolve)
@@ -281,7 +281,7 @@ namespace leximaxIST {
      * and it can not be improved with just the minimum value of the sum,
      * because this information can not exclude the scenario with all objectives equal
      */
-    int Encoder::encode_lower_bound(int i, int sum)
+    int Solver::encode_lower_bound(int i, int sum)
     {
         std::vector<int> obj_vec (get_objective_vector());
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
@@ -322,7 +322,7 @@ namespace leximaxIST {
         return lb_soft;
     }
     
-    void Encoder::encode_lb_soft(int lb)
+    void Solver::encode_lb_soft(int lb)
     {
         if (m_verbosity == 2 && lb > 0)
             std::cout << "c ------------ Lower bound on soft clauses ------------\n";
@@ -333,7 +333,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::encode_lb_sorted(int lb)
+    void Solver::encode_lb_sorted(int lb)
     {
         if (m_verbosity == 2 && lb > 0)
             std::cout << "c ------------ Lower bound on Sorted Vecs ------------\n";
@@ -351,7 +351,7 @@ namespace leximaxIST {
     }
     
     // returns the upper bound of the optimal i-th max
-    int Encoder::encode_upper_bound(int i)
+    int Solver::encode_upper_bound(int i)
     {
         std::vector<int> obj_vec (get_objective_vector());
         std::sort (obj_vec.begin(), obj_vec.end(), descending_order);
@@ -379,7 +379,7 @@ namespace leximaxIST {
     }
     
     // upper bound on current maximum
-    void Encoder::encode_ub_soft(int max_i)
+    void Solver::encode_ub_soft(int max_i)
     {
         int pos (m_soft_clauses.size() - 1 - max_i);
         if (m_verbosity == 2) {
@@ -392,7 +392,7 @@ namespace leximaxIST {
     }
     
     // upper bound on all objective functions (first and second iterations)
-    void Encoder::encode_ub_sorted(int first_max)
+    void Solver::encode_ub_sorted(int first_max)
     {
         // refine upper bound on all obj functions (sorted vecs)
         if (m_verbosity == 2)
@@ -410,7 +410,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::fix_only_some()
+    void Solver::fix_only_some()
     {
         // y variables are sorted: 0...01...1
         // find first occurrence of 1
@@ -430,7 +430,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::fix_all(int i)
+    void Solver::fix_all(int i)
     {
         // Use objective vector because m_solution might not have the correct values
         std::vector<int> obj_vec (get_objective_vector());
@@ -447,7 +447,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::fix_soft_vars(int i)
+    void Solver::fix_soft_vars(int i)
     {
         if (m_verbosity == 2)
             std::cout << "c ---------- Fix value of current maximum ----------\n";
@@ -455,44 +455,58 @@ namespace leximaxIST {
         fix_all(i); // this may allow the sat solver to eliminate the order encoding
     }
     
-    void Encoder::solve()
+    void Solver::optimise()
     {
+        if (m_verbosity >= 2)
+            std::cout << std::unitbuf; // debug - flushes the output stream after any output operation       
+        m_input_nb_vars = m_id_count;
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            std::cout << "c Optimising using algorithm " << m_opt_mode << "...\n";
+            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
+            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
+            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
+        }
+        if (m_verbosity == 2) { // print obj functions
+            for (int k (0); k < m_num_objectives ; ++k)
+                print_obj_func(k);
+        }
         double initial_time (read_cpu_time());
         if (m_status != '?') {
-            print_error_msg("Called solve() twice. You must call set_problem() before calling solve()");
+            print_error_msg("Called optimise() twice without changing the formula.");
             exit(EXIT_FAILURE);
         }
         // check if solve() is called without a problem
         if (m_num_objectives == 0) {
-            print_error_msg("Can not solve - no objective function");
+            print_error_msg("The problem does not have an objective function");
             exit(EXIT_FAILURE);
         }
         if (m_input_hard.empty()) {
-            print_error_msg("Can not solve - no hard clauses");
+            print_error_msg("The problem does not have constraints");
             exit(EXIT_FAILURE);
         }
         if (m_num_objectives == 1) {
-            print_error_msg("Can not solve - single-objective problem");
+            print_error_msg("The problem is single-objective");
             exit(EXIT_FAILURE);
         }
-        // check if problem is satisfiable and compute bounds on first optimum
-        const int sum (presolve()); // sum is used to compute lower bounds
-        if (m_status == 'u')
-            return;   
+        // check if problem is satisfiable
+        if (!call_sat_solver(m_sat_solver, {})) {
+            m_status = 'u';
+            return;
+        }
+        m_status = 's'; // update status to SATISFIABLE
         if (m_opt_mode.substr(0, 4) == "core")
-            solve_core_guided();
+            optimise_core_guided();
         else
-            solve_first_enc(sum);            
+            optimise_non_core(0);            
         if (m_verbosity >= 1) // print total solving time
-            print_time(read_cpu_time() - initial_time, "c Total solving CPU time: ");
+            print_time(read_cpu_time() - initial_time, "c Optimisation CPU time: ");
+        m_status = 'o'; // update status to OPTIMUM FOUND
     }
     
     // sum is the minimum value of the sum of the objective functions in case of presolving
     // it is used to compute a lower bound of the optimal value of the first maximum
-    void Encoder::solve_first_enc(int sum)
+    void Solver::optimise_non_core(int sum)
     {
-        if (m_verbosity >= 1)
-            std::cout << "c Original SAT-based Algorithm - Solving...\n";
         // encode sorted vectors with sorting network
         for (int j (0); j < m_num_objectives; ++j)
             encode_sorted(m_objectives.at(j), j);
@@ -503,9 +517,7 @@ namespace leximaxIST {
             m_soft_clauses.clear();
             generate_soft_clauses(i);
             // encode bounds obtained from presolving or previous iteration
-            const int lb (encode_bounds(i, sum));
-            if (i == 0 && m_pareto_presolve)
-                pareto_presolve();
+            const int lb (encode_bounds(i, 0));
             if (i != 0) // in the first iteration i == 0 there is no relaxation
                 encode_relaxation(i);
             // encode the componentwise OR between sorted vectors (except maybe in the last iteration)
@@ -539,7 +551,7 @@ namespace leximaxIST {
         std::cout << '\n';
     }
     
-    void Encoder::gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
+    void Solver::gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
                      const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const
     {
         if (m_verbosity == 2)
@@ -551,7 +563,7 @@ namespace leximaxIST {
         }
         // determine size of assumps
         size_t new_size (0);
-        if (m_opt_mode == "core-static")
+        if (m_opt_mode == "core_static")
             new_size = max_vars_vec.at(0).size();
         else
             new_size = j*max_vars_vec.at(0).size();
@@ -560,7 +572,7 @@ namespace leximaxIST {
         assumps.resize(new_size);
         size_t pos (0); // position where we insert the literal in assumps
         size_t n (0);
-        if (m_opt_mode == "core-static")
+        if (m_opt_mode == "core_static")
             n = j - 1;
         while (n < j) {
             if (m_verbosity == 2)
@@ -601,7 +613,7 @@ namespace leximaxIST {
     /* Generate fresh variables corresponding to the variables whose sum is the ith max
      * Put the collection of those variables in entry i of max_vars_vec
      */
-    void Encoder::generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec)
+    void Solver::generate_max_vars(int i, std::vector<std::vector<int>> &max_vars_vec)
     {
         if (m_verbosity == 2)
             std::cout << "c " << ordinal(i + 1) << " maximum variables\n";
@@ -624,7 +636,7 @@ namespace leximaxIST {
     /* Remove the obj vars in inputs_not_sorted that are in core and put them in new_inputs
      * Return true if the core intersects the obj vars and false otherwise
      */
-    bool Encoder::find_vars_in_core(std::vector<std::vector<int>> &inputs_not_sorted, const std::vector<int> &core,
+    bool Solver::find_vars_in_core(std::vector<std::vector<int>> &inputs_not_sorted, const std::vector<int> &core,
                                     std::vector<std::vector<int>> &new_inputs) const
     {
         for (std::vector<int> &v : new_inputs)
@@ -703,7 +715,7 @@ namespace leximaxIST {
      * and this may allow an increase in the lower bound of the ith maximum
      * min_index : the maximum we are minimising
      */
-    void Encoder::change_lb_map(int min_index, std::vector<int> &lower_bounds, const std::vector<int> &core,
+    void Solver::change_lb_map(int min_index, std::vector<int> &lower_bounds, const std::vector<int> &core,
                       const std::vector<std::vector<int>> &max_vars_vec, std::unordered_map<int, int> &lb_map) const
     {
         std::vector<bool> intersect (m_num_objectives, false); // does the core intersect each obj
@@ -816,7 +828,7 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j)
+    void Solver::add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j)
     {
         // add unit_core_vars to the sorted vector
         for (int v : unit_core_vars.at(j))
@@ -830,7 +842,7 @@ namespace leximaxIST {
      * the sorting networks are generated with the variables from the cores
      * the lower bound of the optimum is increased, based on the cores
      */
-    bool Encoder::disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted,
+    bool Solver::disjoint_cores(std::vector<std::vector<int>> &inputs_not_sorted,
                                  std::vector<std::vector<int>> &unit_core_vars,
                                  std::vector<int> &lower_bounds, std::unordered_map<int, int> &lb_map)
     {
@@ -917,7 +929,7 @@ namespace leximaxIST {
     
     /* increase the ith lower bound, based on the core. It may increase by more than 1.
      */
-    void Encoder::increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
+    void Solver::increase_lb(std::vector<int> &lower_bounds, const std::vector<int> &core,
                               const std::vector<std::vector<int>> &max_vars_vec) const
     {
         // determine which maximum we are minimising
@@ -947,7 +959,7 @@ namespace leximaxIST {
     }
     
     // fix the value of the jth max in the hard clauses, not in assumps
-    void Encoder::fix_max(int j, const std::vector<std::vector<int>> &max_vars_vec, const std::vector<int> &lower_bounds)
+    void Solver::fix_max(int j, const std::vector<std::vector<int>> &max_vars_vec, const std::vector<int> &lower_bounds)
     {
         if (m_verbosity == 2)
             std::cout << "c Fixing the value of the " + ordinal(j + 1) + " maximum\n";
@@ -1001,7 +1013,7 @@ namespace leximaxIST {
      * the lower bound of f1 corresponds to the key 1
      * the lower bound of f2 + f3 corresponds to the key 23
      */
-    void Encoder::initialise_lb_map(std::unordered_map<int, int> &lb_map, int nb_objs) const
+    void Solver::initialise_lb_map(std::unordered_map<int, int> &lb_map, int nb_objs) const
     {
         std::vector<int> main_set;
         for (int j (1); j <= nb_objs; ++j)
@@ -1028,12 +1040,10 @@ namespace leximaxIST {
         }
     }
     
-    void Encoder::solve_core_guided()
+    void Solver::optimise_core_guided()
     {
-        if (m_verbosity >= 1)
-            std::cout << "c Core-guided Algorithm - Solving...\n";
         IpasirWrap *solver (m_sat_solver);
-        if (m_opt_mode == "core-rebuild") {
+        if (m_opt_mode == "core_rebuild") {
             solver = new IpasirWrap();
             solver->addClauses(m_input_hard);
         }
@@ -1046,18 +1056,18 @@ namespace leximaxIST {
         std::vector<int> assumps;
         for (int j (0); j < m_num_objectives; ++j)
             inputs_not_sorted.at(j) = m_objectives.at(j);
-        if (m_disjoint_cores && (m_opt_mode != "core-static")) {
+        if (m_disjoint_cores && (m_opt_mode != "core_static")) {
             if (disjoint_cores(inputs_not_sorted, unit_core_vars, lower_bounds, lb_map))
                 return;
         }
-        if (m_opt_mode == "core-static") {
+        if (m_opt_mode == "core_static") {
             for (int j (0); j < m_num_objectives; ++j)
                 encode_sorted(m_objectives.at(j), j);
         }
-        if ((m_opt_mode == "core-static") || m_disjoint_cores) {
+        if ((m_opt_mode == "core_static") || m_disjoint_cores) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
-            if (m_opt_mode == "core-rebuild")
+            if (m_opt_mode == "core_rebuild")
                 solver->addClauses(m_encoding); // add the encoding to the solver
         }
         if (m_verbosity >= 1)
@@ -1069,15 +1079,15 @@ namespace leximaxIST {
             if (m_verbosity >= 1)
                 std::cout << "c Minimising the " << ordinal(i + 1) << " maximum...\n";
             if (i > 0) { // check if the ith max can be zero
-                if (m_opt_mode == "core-static")
+                if (m_opt_mode == "core_static")
                     fix_max(i - 1, max_vars_vec, lower_bounds);
                 // encode relaxation and componentwise disjunction
-                if (m_opt_mode == "core-rebuild")
+                if (m_opt_mode == "core_rebuild")
                     m_encoding.clear();
                 encode_relaxation(i);
                 generate_max_vars(i, max_vars_vec);
                 componentwise_OR(i, max_vars_vec.at(i));
-                if (m_opt_mode == "core-rebuild")
+                if (m_opt_mode == "core_rebuild")
                     solver->addClauses(m_encoding);
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
@@ -1121,21 +1131,21 @@ namespace leximaxIST {
                         }
                     }
                     // increase sorting networks and repeat encoding
-                    if (m_opt_mode != "core-static") {
+                    if (m_opt_mode != "core_static") {
                         if (m_verbosity == 2)
                             print_objs_sorted(inputs_not_sorted);
-                        if (m_opt_mode == "core-merge")
+                        if (m_opt_mode == "core_merge")
                             merge_core_guided(inputs_to_sort, unit_core_vars);
-                        if (m_opt_mode == "core-rebuild") {
+                        if (m_opt_mode == "core_rebuild") {
                             m_encoding.clear();
                             reset_id_count(); // since some variables have been deleted
                         }
-                        if (m_opt_mode == "core-rebuild" || m_opt_mode == "core-rebuild-incr") {
+                        if (m_opt_mode == "core_rebuild" || m_opt_mode == "core_rebuild_incr") {
                             // rebuild the sorting networks
                             std::vector<std::vector<int>> inputs_sorted (m_num_objectives, std::vector<int>());
                             set_inputs_sorted(inputs_sorted, m_objectives, inputs_not_sorted, unit_core_vars);
                             for (int j (0); j < m_num_objectives; ++j) {
-                                if (m_opt_mode == "core-rebuild" || !inputs_to_sort.at(j).empty()) {
+                                if (m_opt_mode == "core_rebuild" || !inputs_to_sort.at(j).empty()) {
                                     // do not rebuild only if incremental and there are no new variables to add
                                     encode_sorted(inputs_sorted.at(j), j);
                                     add_unit_core_vars(unit_core_vars, j);
@@ -1148,7 +1158,7 @@ namespace leximaxIST {
                             generate_max_vars(j, max_vars_vec);
                             componentwise_OR(j, max_vars_vec.at(j));
                         }
-                        if (m_opt_mode == "core-rebuild") { // create a new sat solver and add clauses
+                        if (m_opt_mode == "core_rebuild") { // create a new sat solver and add clauses
                             delete solver;
                             solver = new IpasirWrap();
                             solver->addClauses(m_input_hard);
@@ -1163,7 +1173,7 @@ namespace leximaxIST {
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }
-        if (m_opt_mode == "core-rebuild")
+        if (m_opt_mode == "core_rebuild")
             delete solver;
     }
 

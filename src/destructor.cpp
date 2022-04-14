@@ -1,11 +1,11 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <vector>
 
 namespace leximaxIST {
     
     // members that are not a user parameter are cleared and set to initial value
-    void Encoder::clear()
+    void Solver::clear()
     {
         m_objectives.clear();
         m_sorted_vecs.clear();
@@ -29,7 +29,7 @@ namespace leximaxIST {
     }
     
     // remove temporary files and free memory
-    Encoder::~Encoder()
+    Solver::~Solver()
     {
         clear();
     }

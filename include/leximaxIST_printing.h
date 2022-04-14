@@ -2,7 +2,7 @@
 #define LEXIMAXIST_PRINTING
 #include <string>
 #include <iostream>
-# include <vector>
+#include <vector>
 #include <unordered_map>
 
 namespace leximaxIST {

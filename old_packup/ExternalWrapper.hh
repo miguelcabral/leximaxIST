@@ -29,7 +29,7 @@
 #include "id_manager.hh"
 #include "basic_clset.hh"
 #include "SolverWrapperBase.hh"
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 
 class ExternalWrapper : public SolverWrapperBase<BasicClause*> {
 public:
@@ -58,27 +58,24 @@ public:
     inline void set_multiplication_string(const string& _multiplication_string);
     inline void set_temporary_directory(const string& value);
     inline void set_leave_temporary_files(bool value=true);
-    inline void set_leximax(bool value=true);
     inline void set_simplify_last(bool value=true);
     inline void set_maxsat_presolve(bool value = true);
     inline void set_disjoint_cores(bool value = true);
     inline void set_lp_solver (const string &solver_name);
     inline void set_formalism (const string &format);
-    inline void set_opt_mode (const string &mode);
+    inline void set_leximax_opt (const string &mode);
+    inline void set_leximax_approx (const string &mode);
     inline void set_maxsat_psol_cmd (const string &cmd);
-    inline void set_mss_presolve(int v);
-    inline void set_pareto_presolve(int v);
-    inline void set_mss_incremental(int v);
-    inline void set_pareto_incremental(int v);
+    inline void set_mss_incr(int v);
+    inline void set_gia_incr(int v);
     inline void set_mss_add_cls(int v);
     inline void set_mss_tolerance(int v);
     inline void set_mss_nb_limit(int v);
-    inline void set_mss_timeout(double t);
-    inline void set_pareto_timeout(double t);
-    inline void set_truly_pareto(int v);
+    inline void set_approx_tout(double t);
+    inline void set_gia_pareto(int v);
     inline void set_verbosity (int val);
     void print_leximax_info();
-    leximaxIST::Encoder* get_leximax_enc() {return leximax_enc;}
+    leximaxIST::Solver* get_leximax_solver() {return m_leximax_solver;}
 
     void _output_clause (/*const*/ LiteralVector& literals);
     void _output_unary_clause(LINT l);
@@ -101,35 +98,32 @@ private:
     vector<BasicClauseVector>  clause_split;
     vector<LINT>               solution_weights;
     vector< vector <LINT>  >   functions;
-    leximaxIST::Encoder        *leximax_enc;
+    leximaxIST::Solver       *m_leximax_solver;
     IntVector      model;
     WeightSet      weights;
     vector<XLINT>  sorted_weights;
     int    call_counter;
     time_t stamp;
     string opt_solver_cmd;
-    bool    mss_presolve;
-    bool    pareto_presolve;
-    bool    mss_incremental;
-    bool    pareto_incremental;
-    bool    truly_pareto;
-    int    mss_tolerance;
-    int    mss_add_cls;
-    int    mss_nb_limit;
-    double mss_timeout;
-    double pareto_timeout;
+    bool   m_mss_incr;
+    bool   m_gia_incr;
+    bool   m_gia_pareto;
+    int    m_mss_tolerance;
+    int    m_mss_add_cls;
+    int    m_mss_nb_limit;
+    double m_approx_tout;
     string multiplication_string;
     string temporary_directory;
     bool   leave_temporary_files;
-    bool   leximax;
-    bool   simplify_last;
-    bool   maxsat_presolve;
-    bool   disjoint_cores;
-    int verbosity;
+    string m_leximax_approx;
+    string m_leximax_opt;
+    bool   m_simplify_last;
+    bool   m_maxsat_presolve;
+    bool   m_disjoint_cores;
+    int m_verbosity;
     string formalism;
-    string lp_solver;
-    string opt_mode;
-    string maxsat_psol_cmd;
+    string m_lp_solver;
+    string m_maxsat_psol_cmd;
 
     vector< vector<LINT> > constraints;
     void   split();
@@ -161,33 +155,30 @@ inline void ExternalWrapper::set_temporary_directory(const string& value) {
     temporary_directory = value; }
 inline void ExternalWrapper::set_leave_temporary_files(bool value/*=true*/) {
     leave_temporary_files = value; }
-inline void ExternalWrapper::set_leximax(bool value) {
-    leximax = value; }
+inline void ExternalWrapper::set_leximax_opt(const string& value) {
+    m_leximax_opt = value; }
 inline void ExternalWrapper::set_simplify_last(bool value) {
-    simplify_last = value; }
+    m_simplify_last = value; }
 inline void ExternalWrapper::set_maxsat_presolve(bool value) {
-    maxsat_presolve = value; }
+    m_maxsat_presolve = value; }
 inline void ExternalWrapper::set_disjoint_cores(bool value) {
-    disjoint_cores = value; }
+    m_disjoint_cores = value; }
 inline void ExternalWrapper::set_lp_solver (const string &solver_name) {
-    lp_solver = solver_name; }
+    m_lp_solver = solver_name; }
 inline void ExternalWrapper::set_formalism (const string &format) {
     formalism = format; }
-inline void ExternalWrapper::set_opt_mode (const string &mode) {
-    opt_mode = mode; }
+inline void ExternalWrapper::set_leximax_approx (const string &mode) {
+    m_leximax_approx = mode; }
 inline void ExternalWrapper::set_maxsat_psol_cmd (const string &cmd) {
-    maxsat_psol_cmd = cmd; }
+    m_maxsat_psol_cmd = cmd; }
 inline void ExternalWrapper::set_verbosity (int val) {
-    verbosity = val; }
-inline void ExternalWrapper::set_mss_presolve(int v) { mss_presolve = v; /*conversion from int to bool*/ }
-inline void ExternalWrapper::set_pareto_presolve(int v) { pareto_presolve = v; }
-inline void ExternalWrapper::set_mss_incremental(int v) { mss_incremental = v; }
-inline void ExternalWrapper::set_pareto_incremental(int v) { pareto_incremental = v; }
-inline void ExternalWrapper::set_mss_add_cls(int v) { mss_add_cls = v; }
-inline void ExternalWrapper::set_mss_tolerance(int v) { mss_tolerance = v; }
-inline void ExternalWrapper::set_mss_nb_limit(int v) { mss_nb_limit = v; }
-inline void ExternalWrapper::set_mss_timeout(double t) { mss_timeout = t; }
-inline void ExternalWrapper::set_pareto_timeout(double t) { pareto_timeout = t; }
-inline void ExternalWrapper::set_truly_pareto(int v) { truly_pareto = v; }
+    m_verbosity = val; }
+inline void ExternalWrapper::set_mss_incr(int v) { m_mss_incr = v; }
+inline void ExternalWrapper::set_gia_incr(int v) { m_gia_incr = v; }
+inline void ExternalWrapper::set_mss_add_cls(int v) { m_mss_add_cls = v; }
+inline void ExternalWrapper::set_mss_tolerance(int v) { m_mss_tolerance = v; }
+inline void ExternalWrapper::set_mss_nb_limit(int v) { m_mss_nb_limit = v; }
+inline void ExternalWrapper::set_approx_tout(double t) { m_approx_tout = t; }
+inline void ExternalWrapper::set_gia_pareto(int v) { m_gia_pareto = v; }
 #endif	/* EXTERNALWRAPPER_HH */
 

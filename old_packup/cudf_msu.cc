@@ -25,7 +25,7 @@
 #include "SolutionReader.hh"
 #include "SolverWrapperTypes.hh"
 #include "Options.hh"
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 using std::ifstream;
 
 static const char* dist_date = ""DISTDATE"";
@@ -60,11 +60,11 @@ bool parse_lexicographic_specification (const char* specification,vector<Objecti
 //#ifdef EXTERNAL_SOLVER
 static void SIG_handler(int signum) {
   cerr << "# received external signal " << signum << '\n'; 
-  leximaxIST::Encoder *leximax_enc (solver.get_leximax_enc());
-  if (leximax_enc != nullptr) {
-      //leximax_enc->terminate(); // terminate is not ready yet
-      if (leximax_enc->get_status() == 's')
-        solver.set_leximax_model(leximax_enc->get_solution());
+  leximaxIST::Solver *leximax_solver (solver.get_leximax_solver());
+  if (leximax_solver != nullptr) {
+      //leximax_solver->terminate(); // terminate is not ready yet
+      if (leximax_solver->get_status() == 's')
+        solver.set_leximax_model(leximax_solver->get_solution());
       else
           solver.set_leximax_model(std::vector<int>());
       solver.print_leximax_info();
@@ -96,8 +96,6 @@ void print_usage(ostream &output) {
     output << "--mstr | --multiplication-string <string>\t string used in the opb format"<< endl;
     output << "\t\t\t\t\t\t default '*'"<< endl;
     output << "--leave-temporary-files\t\t\t\t do not delete temporary files" << endl;
-    output << "--leximax\t\t\t\t\t Optimisation with the leximax order" << endl;
-    output << "\t\t\t\t\t\t default: lexicographic order"<< endl;
     output << "User criteria:" << endl;
     output << "-t \t\t\t\t\t\t trendy" << endl;
     output << "-p \t\t\t\t\t\t paranoid" << endl;
@@ -113,21 +111,25 @@ void print_usage(ostream &output) {
     output << "\t\t\t\t\t\t 1 - print general info"<< endl;
     output << "\t\t\t\t\t\t 2 - debug"<< endl;
     output << "--simplify-last\t\t\t\t\t use a simplified encoding in last iteration"<< endl;
-    output << "\t\t\t\t\t\t (Can not use with internal optimisation)" << endl;
+    output << "\t\t\t\t\t\t (This option is only avaible when using an external optimisation solver)" << endl;
     output << "\t\t\t\t\t\t default: off"<< endl;
-    output << "--opt-mode <string>\t\t\t\t optimisation mode"<< endl;
-    output << "\t\t\t\t\t\t 'Original SAT-based Algorithm:"<< endl;
+    output << "--leximax-opt <string>\t\t\t\t specify a leximax optimisation algorithm"<< endl;
+    output << "\t\t\t\t\t\t 'Non-core-guided SAT-based Algorithm:"<< endl;
     output << "\t\t\t\t\t\t -> 'external' - Call external MaxSAT/PBO/LP solver"<< endl;
     output << "\t\t\t\t\t\t -> 'bin' - binary search with incremental SAT solver (default)"<< endl;
-    output << "\t\t\t\t\t\t -> 'linear-su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;
-    output << "\t\t\t\t\t\t -> 'linear-us' - linear UNSAT-SAT search with incremental SAT solver"<< endl;
+    output << "\t\t\t\t\t\t -> 'lin_su' - linear SAT-UNSAT search with incremental SAT solver"<< endl;
+    output << "\t\t\t\t\t\t -> 'lin_us' - linear UNSAT-SAT search with incremental SAT solver"<< endl;
     output << "\t\t\t\t\t\t 'Core-guided SAT-based Algorithm:"<< endl;
-    output << "\t\t\t\t\t\t -> 'core-merge' - Dynamic sorting networks that grow using sort and merge"<< endl;
-    output << "\t\t\t\t\t\t -> 'core-rebuild' - Dynamic sorting networks that grow by rebuild"<< endl;
-    output << "\t\t\t\t\t\t -> 'core-rebuild-incr' - Dynamic sorting networks that grow by rebuild - incremental"<< endl;
-    output << "\t\t\t\t\t\t -> 'core-static' - Static sorting networks"<< endl;
-    output << "--disjoint-cores\t\t\t\t find disjoint cores before the core-guided algorithm"<< endl;
-    output << "--mss-presolve\t\t\t\t\t approximate the leximax-optimum with MSS enumeration"<< endl;
+    output << "\t\t\t\t\t\t -> 'core_merge' - Dynamic sorting networks that grow using sort and merge"<< endl;
+    output << "\t\t\t\t\t\t -> 'core_rebuild' - Dynamic sorting networks that grow by rebuild"<< endl;
+    output << "\t\t\t\t\t\t -> 'core_rebuild_incr' - Dynamic sorting networks that grow by rebuild - incremental"<< endl;
+    output << "\t\t\t\t\t\t -> 'core_static' - Static sorting networks"<< endl;
+    output << "--disjoint-cores\t\t\t\t use the disjoint cores strategy in the core-guided algorithm"<< endl;
+    output << "--leximax-approx <string>\t\t\t\t approximate the leximax-optimum using the algorithm in <string>"<< endl;
+    output << "\t\t\t\t\t\t -> 'mss' - Maximal Satisfiable Subset Enumeration using linear search to find MSSes"<< endl;
+    output << "\t\t\t\t\t\t -> 'gia' - An adaptation of the Guided Improvement Algorithm to the leximax criterion"<< endl;
+    output << "--approx-tout <float>\t\t\t\t Timeout for approximation"<< endl;
+    output << "\t\t\t\t\t\t default: 86400 (seconds) (1 day)"<< endl;
     output << "--mss-add-cls <int>\t\t\t\t how to add the clauses to the MSS in construction"<< endl;
     output << "\t\t\t\t\t\t 0 - add all satisfied clauses"<< endl;
     output << "\t\t\t\t\t\t 1 - add as much as possible while trying to even out the upper bounds (default)"<< endl;
@@ -136,18 +138,12 @@ void print_usage(ostream &output) {
     output << " tested for satisfiability, in the MSS linear search"<< endl;
     output << "\t\t\t\t\t\t Must be a percentage (an integer between 0 and 100)"<< endl;
     output << "\t\t\t\t\t\t default: 50"<< endl;
-    output << "--mss-timeout <float>\t\t\t\t Limit duration of the MSS enumeration"<< endl;
-    output << "\t\t\t\t\t\t default: 86400 (seconds) (1 day)"<< endl;
     output << "--mss-incr\t\t\t\t\t use the same ipasir solver in every MSS linear search"<< endl;
-    output << "--pareto-presolve\t\t\t\t approximate the leximax-optimum with a modified GIA"<< endl;
-    output << "\t\t\t\t\t\t (Guided Improvement Algorithm)"<< endl;
-    output << "--truly-pareto\t\t\t\t\t Guarantee intermediate Pareto-optimal solutions"<< endl;
-    output << "--pareto-incr\t\t\t\t\t use the same ipasir solver in every Pareto-optimal solution search"<< endl;
-    output << "--pareto-timeout <float>\t\t\t Limit duration of the Pareto presolving phase"<< endl;
-    output << "\t\t\t\t\t\t default: 86400 (seconds) (1 day)"<< endl;
-    output << "--maxsat-presolve\t\t\t\t Minimise the sum of the objectives"<< endl;
+    output << "--gia-pareto\t\t\t\t\t Guarantee intermediate Pareto-optimal solutions"<< endl;
+    output << "--gia-incr\t\t\t\t\t use the same ipasir solver in every Pareto-optimal solution search"<< endl;
+    /*output << "--maxsat-presolve\t\t\t\t Minimise the sum of the objectives"<< endl;
     output << "\t\t\t\t\t\t (Provides upper and lower bounds on the optimal maximum)"<< endl;
-    output << "--maxsat-psol-cmd <string>\t\t\t external MaxSAT solver command in presolve" << endl;
+    output << "--maxsat-psol-cmd <string>\t\t\t external MaxSAT solver command in presolve" << endl;*/
     output << "NOTE" << endl;
     output << "If the input file is '-', input is read from the standard input." << endl;
     output << "If the output filename is omitted, output is produced to the standard output." << endl;
@@ -236,22 +232,19 @@ int main(int argc, char** argv) {
     parser.get_encoder().set_opt_not_removed(true);    
 #ifdef EXTERNAL_SOLVER
     if (!options.get_opt_solver().empty())             solver.set_opt_solver_cmd(options.get_opt_solver ());
-    solver.set_mss_presolve(options.get_mss_presolve());
-    solver.set_pareto_presolve(options.get_pareto_presolve());
-    solver.set_mss_incremental(options.get_mss_incremental());
-    solver.set_pareto_incremental(options.get_pareto_incremental());
+    solver.set_leximax_approx(options.get_leximax_approx());
+    solver.set_mss_incr(options.get_mss_incr());
+    solver.set_gia_incr(options.get_gia_incr());
     solver.set_mss_add_cls(options.get_mss_add_cls());
     solver.set_mss_tolerance(options.get_mss_tolerance());
     solver.set_mss_nb_limit(options.get_mss_nb_limit());
-    solver.set_mss_timeout(options.get_mss_timeout());
-    solver.set_pareto_timeout(options.get_pareto_timeout());
-    solver.set_truly_pareto(options.get_truly_pareto());
+    solver.set_approx_tout(options.get_approx_tout());
+    solver.set_gia_pareto(options.get_gia_pareto());
     solver.set_verbosity(options.get_verbosity());
-    solver.set_opt_mode(options.get_opt_mode());
+    solver.set_leximax_opt(options.get_leximax_opt());
     solver.set_maxsat_psol_cmd(options.get_maxsat_psol_cmd());
     if (!options.get_multiplication_string().empty())  solver.set_multiplication_string(options.get_multiplication_string());
     if (options.get_leave_temporary_files())           solver.set_leave_temporary_files();
-    if (options.get_leximax())                         solver.set_leximax();
     if (options.get_simplify_last())                   solver.set_simplify_last();
     if (options.get_maxsat_presolve())                 solver.set_maxsat_presolve();
     if (options.get_disjoint_cores())                  solver.set_disjoint_cores();
