@@ -1180,9 +1180,9 @@ namespace leximaxIST {
             int k;
             if (m_opt_mode == "bin")
                 k = lb + (ub - lb)/2; // floor of half of the interval
-            else if (m_opt_mode == "linear-su")
+            else if (m_opt_mode == "lin_su")
                 k = ub - 1;
-            else if (m_opt_mode == "linear-us")
+            else if (m_opt_mode == "lin_us")
                 k = lb;
             // y <= k means size - k zeros; last position = size - k - 1
             // adding all neg vars to assumps may allow lb to increase by more than 1
@@ -1224,9 +1224,9 @@ namespace leximaxIST {
         if (m_verbosity >= 1) {
             if (m_opt_mode == "bin")
                 std::cout << "c Binary ";
-            else if (m_opt_mode == "linear-su")
+            else if (m_opt_mode == "lin_su")
                 std::cout << "c Linear SAT-UNSAT ";
-            else if (m_opt_mode == "linear-us")
+            else if (m_opt_mode == "lin_us")
                 std::cout << "c Linear UNSAT-SAT ";
             std::cout << "search of optimum with incremental SAT solver...\n";
         }

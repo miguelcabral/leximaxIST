@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     
     if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {
         print_header();
-        std::cout << "c Reading problem... file: " << options.get_input_file_name() << '\n';
+        std::cout << "c Parsing instance file " << options.get_input_file_name() << "...\n";
     }
     
     // read pbmo file

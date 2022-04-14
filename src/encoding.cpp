@@ -461,7 +461,7 @@ namespace leximaxIST {
             std::cout << std::unitbuf; // debug - flushes the output stream after any output operation       
         m_input_nb_vars = m_id_count;
         if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Optimising...\n";
+            std::cout << "c Optimising" + " using algorithm " + m_opt_mode + "...\n";
             std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
             std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
             std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
@@ -507,8 +507,6 @@ namespace leximaxIST {
     // it is used to compute a lower bound of the optimal value of the first maximum
     void Solver::optimise_non_core(int sum)
     {
-        if (m_verbosity >= 1)
-            std::cout << "c Original SAT-based Algorithm - Solving...\n";
         // encode sorted vectors with sorting network
         for (int j (0); j < m_num_objectives; ++j)
             encode_sorted(m_objectives.at(j), j);
@@ -565,7 +563,7 @@ namespace leximaxIST {
         }
         // determine size of assumps
         size_t new_size (0);
-        if (m_opt_mode == "core-static")
+        if (m_opt_mode == "core_static")
             new_size = max_vars_vec.at(0).size();
         else
             new_size = j*max_vars_vec.at(0).size();
@@ -574,7 +572,7 @@ namespace leximaxIST {
         assumps.resize(new_size);
         size_t pos (0); // position where we insert the literal in assumps
         size_t n (0);
-        if (m_opt_mode == "core-static")
+        if (m_opt_mode == "core_static")
             n = j - 1;
         while (n < j) {
             if (m_verbosity == 2)
@@ -1044,10 +1042,8 @@ namespace leximaxIST {
     
     void Solver::optimise_core_guided()
     {
-        if (m_verbosity >= 1)
-            std::cout << "c Core-guided Algorithm - Solving...\n";
         IpasirWrap *solver (m_sat_solver);
-        if (m_opt_mode == "core-rebuild") {
+        if (m_opt_mode == "core_rebuild") {
             solver = new IpasirWrap();
             solver->addClauses(m_input_hard);
         }
@@ -1060,18 +1056,18 @@ namespace leximaxIST {
         std::vector<int> assumps;
         for (int j (0); j < m_num_objectives; ++j)
             inputs_not_sorted.at(j) = m_objectives.at(j);
-        if (m_disjoint_cores && (m_opt_mode != "core-static")) {
+        if (m_disjoint_cores && (m_opt_mode != "core_static")) {
             if (disjoint_cores(inputs_not_sorted, unit_core_vars, lower_bounds, lb_map))
                 return;
         }
-        if (m_opt_mode == "core-static") {
+        if (m_opt_mode == "core_static") {
             for (int j (0); j < m_num_objectives; ++j)
                 encode_sorted(m_objectives.at(j), j);
         }
-        if ((m_opt_mode == "core-static") || m_disjoint_cores) {
+        if ((m_opt_mode == "core_static") || m_disjoint_cores) {
             generate_max_vars(0, max_vars_vec);
             componentwise_OR(0, max_vars_vec.at(0));
-            if (m_opt_mode == "core-rebuild")
+            if (m_opt_mode == "core_rebuild")
                 solver->addClauses(m_encoding); // add the encoding to the solver
         }
         if (m_verbosity >= 1)
@@ -1083,15 +1079,15 @@ namespace leximaxIST {
             if (m_verbosity >= 1)
                 std::cout << "c Minimising the " << ordinal(i + 1) << " maximum...\n";
             if (i > 0) { // check if the ith max can be zero
-                if (m_opt_mode == "core-static")
+                if (m_opt_mode == "core_static")
                     fix_max(i - 1, max_vars_vec, lower_bounds);
                 // encode relaxation and componentwise disjunction
-                if (m_opt_mode == "core-rebuild")
+                if (m_opt_mode == "core_rebuild")
                     m_encoding.clear();
                 encode_relaxation(i);
                 generate_max_vars(i, max_vars_vec);
                 componentwise_OR(i, max_vars_vec.at(i));
-                if (m_opt_mode == "core-rebuild")
+                if (m_opt_mode == "core_rebuild")
                     solver->addClauses(m_encoding);
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
@@ -1135,21 +1131,21 @@ namespace leximaxIST {
                         }
                     }
                     // increase sorting networks and repeat encoding
-                    if (m_opt_mode != "core-static") {
+                    if (m_opt_mode != "core_static") {
                         if (m_verbosity == 2)
                             print_objs_sorted(inputs_not_sorted);
-                        if (m_opt_mode == "core-merge")
+                        if (m_opt_mode == "core_merge")
                             merge_core_guided(inputs_to_sort, unit_core_vars);
-                        if (m_opt_mode == "core-rebuild") {
+                        if (m_opt_mode == "core_rebuild") {
                             m_encoding.clear();
                             reset_id_count(); // since some variables have been deleted
                         }
-                        if (m_opt_mode == "core-rebuild" || m_opt_mode == "core-rebuild-incr") {
+                        if (m_opt_mode == "core_rebuild" || m_opt_mode == "core_rebuild_incr") {
                             // rebuild the sorting networks
                             std::vector<std::vector<int>> inputs_sorted (m_num_objectives, std::vector<int>());
                             set_inputs_sorted(inputs_sorted, m_objectives, inputs_not_sorted, unit_core_vars);
                             for (int j (0); j < m_num_objectives; ++j) {
-                                if (m_opt_mode == "core-rebuild" || !inputs_to_sort.at(j).empty()) {
+                                if (m_opt_mode == "core_rebuild" || !inputs_to_sort.at(j).empty()) {
                                     // do not rebuild only if incremental and there are no new variables to add
                                     encode_sorted(inputs_sorted.at(j), j);
                                     add_unit_core_vars(unit_core_vars, j);
@@ -1162,7 +1158,7 @@ namespace leximaxIST {
                             generate_max_vars(j, max_vars_vec);
                             componentwise_OR(j, max_vars_vec.at(j));
                         }
-                        if (m_opt_mode == "core-rebuild") { // create a new sat solver and add clauses
+                        if (m_opt_mode == "core_rebuild") { // create a new sat solver and add clauses
                             delete solver;
                             solver = new IpasirWrap();
                             solver->addClauses(m_input_hard);
@@ -1177,7 +1173,7 @@ namespace leximaxIST {
                 gen_assumps(lower_bounds, max_vars_vec, inputs_not_sorted, assumps);
             }
         }
-        if (m_opt_mode == "core-rebuild")
+        if (m_opt_mode == "core_rebuild")
             delete solver;
     }
 

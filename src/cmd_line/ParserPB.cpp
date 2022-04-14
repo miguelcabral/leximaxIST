@@ -54,7 +54,7 @@ int ParserPB::parse(const char *fileName) {
       print_error_msg("Unable to open input stream for file " + fnamestr);
       exit(EXIT_FAILURE);
   }
-  cout << "c Instance file " << fileName << endl;
+  //cout << "c Instance file " << fileName << endl;
 
   struct stat statbuf;
   if (fstat(_fd, &statbuf) < 0) {
@@ -62,7 +62,7 @@ int ParserPB::parse(const char *fileName) {
       print_error_msg("Unable to get size of file " + fnamestr);
       exit(EXIT_FAILURE);
   }
-  cout << "c File size is " << statbuf.st_size << " bytes." << endl;
+  //cout << "c File size is " << statbuf.st_size << " bytes." << endl;
 
   if ((_fileStr = (char *)mmap(0, statbuf.st_size, PROT_READ, MAP_SHARED, _fd,
                                0)) == (caddr_t)-1)
@@ -187,6 +187,8 @@ int ParserPB::parseCostFunction() {
     
     int varID = getVariableID(varName + VNOffset, varNameSize);
     
+    //std::cout << "c varID (cost function): " << varID << '\n';
+    
     // cout << "c CF Product: " << coeff << " " << varName << " "
     // 	 << varNameSize << " " << varID << endl;
 //     of.addProduct(mkLit(varID), coeff); //original version (from openwbo)
@@ -280,6 +282,8 @@ int ParserPB::parseConstraint() {
     }
     
     int varID = getVariableID(varName+VNOffset, varNameSize);
+    
+    //std::cout << "c varID (constraints) = " << varID << '\n';
 
     //p->addProduct(mkLit(varID, litSign), coeff);
     p.addProduct(litSign ? -varID : varID, coeff);

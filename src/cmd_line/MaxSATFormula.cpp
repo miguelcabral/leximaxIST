@@ -170,7 +170,7 @@ void MaxSATFormula::addPBConstraint(PB &p) {
 int MaxSATFormula::newVarName(char *varName) {
   int id = varID(varName);
   if (id == var_Undef) {
-    id = nVars();
+    id = nVars() + 1;
     newVar();
     std::string s(varName);
     std::pair<std::string, int> nv(s, id);

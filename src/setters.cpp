@@ -82,9 +82,9 @@ namespace leximaxIST {
     
     void Solver::set_opt_mode(const std::string &mode)
     {
-        if (mode != "external" && mode != "bin" && mode != "linear-su" &&
-            mode != "linear-us" && mode != "core-static" && mode != "core-merge"
-            && mode != "core-rebuild" && mode != "core-rebuild-incr") {
+        if (mode != "external" && mode != "bin" && mode != "lin_su" &&
+            mode != "lin_us" && mode != "core_static" && mode != "core_merge"
+            && mode != "core_rebuild" && mode != "core_rebuild_incr") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }

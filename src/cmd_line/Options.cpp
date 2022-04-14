@@ -216,7 +216,7 @@ namespace leximaxIST {
         while (true) {
         /* getopt_long stores the option index here. */
         int option_index = 0;
-        c = getopt_long(argc, argv, "h", long_options, &option_index);
+        c = getopt_long(argc, argv, "hv:", long_options, &option_index);
         opterr = 0;
         /* Detect the end of the options. */
         if (c == -1) break;
