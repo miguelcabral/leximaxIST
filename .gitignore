@@ -1,7 +1,7 @@
 *.o
 cadical/*
 cbc/*
-examples/*
+examples/*.cnf
 *.gcda
 *.gcno
 gmon.out
