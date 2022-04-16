@@ -1,11 +1,11 @@
 echo "Removing old cadical, libleximax.a and cbc..." && \
-rm -rf cadical && rm -rf lib && rm -rf cbc && rm -rf mccs-1.1/objs \
+rm -rf cadical && rm -rf lib && rm -rf bin && rm -rf cbc && rm -rf mccs-1.1/objs \
 echo "Setting up CaDiCaL..." && \
 git clone https://github.com/arminbiere/cadical.git && \
 cd cadical && ./configure --competition && make && \
-echo "Compiling leximaxIST library..." && \
+echo "Compiling leximaxIST library and command line tool..." && \
 cd .. && \
-mkdir -v lib && \
+mkdir -v lib && mkdir -v bin && \
 cd src && make clean release && \
 echo "Compiling packup..." && \
 cd ../old_packup/ && make clean release  && \

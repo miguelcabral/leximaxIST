@@ -39,16 +39,13 @@ public:
     bool   parse(int count,char** arguments);
     int    get_solving_disabled()  const { return solving_disabled; }
     string get_opt_solver()   const { return opt_solver; }
-    int    get_mss_presolve()     const { return mss_presolve; }
-    int    get_pareto_presolve()     const { return pareto_presolve; }
     int    get_mss_tolerance()     const { return mss_tolerance; }
     int    get_mss_nb_limit()     const { return mss_nb_limit; }
     int    get_mss_add_cls()     const { return mss_add_cls; }
-    int    get_mss_incremental()     const { return mss_incremental; }
-    int    get_pareto_incremental()     const { return pareto_incremental; }
-    int    get_truly_pareto()          const { return truly_pareto; }
-    double get_mss_timeout()     const { return mss_timeout; }
-    double get_pareto_timeout()     const { return pareto_timeout; }
+    int    get_mss_incr()     const { return mss_incr; }
+    int    get_gia_incr()     const { return gia_incr; }
+    int    get_gia_pareto()          const { return gia_pareto; }
+    double get_approx_tout()     const { return approx_tout; }
     int    get_trendy()            const { return trendy; }
     int    get_paranoid()            const { return paranoid; }
     string get_solution_check()    const { return solution_check; }
@@ -61,12 +58,12 @@ public:
     int    get_leave_temporary_files() const { return leave_temporary_files; }
     const string&    get_formalism()   const { return formalism; }
     const string&    get_lp_solver()   const { return lp_solver; }
-    const string&    get_opt_mode()   const { return opt_mode; }
     const string&    get_maxsat_psol_cmd()   const { return maxsat_psol_cmd; }
+    const string&    get_leximax_approx()   const { return leximax_approx; }
+    const string&    get_leximax_opt()   const { return leximax_opt; }
     int    get_verbosity()             const { return verbosity; }
     int    get_help() const { return help; }
     int    get_disjoint_cores() const { return disjoint_cores; }
-    int    get_leximax() const { return leximax; }
     int    get_maxsat_presolve() const { return maxsat_presolve; }
     int    get_simplify_last() const { return simplify_last; }
     
@@ -87,22 +84,19 @@ private:
     int    leave_temporary_files;
     string temporary_directory;
     string formalism;
-    int    leximax;
     int    disjoint_cores;
     int    maxsat_presolve;
-    int    mss_presolve;
-    int    pareto_presolve;
-    int    mss_incremental;
-    int    pareto_incremental;
-    int    truly_pareto;
+    int    mss_incr;
+    int    gia_incr;
+    int    gia_pareto;
     int    mss_tolerance;
     int    mss_add_cls;
     int    mss_nb_limit;
-    double mss_timeout;
-    double pareto_timeout;
+    double approx_tout;
     int    simplify_last;
     string lp_solver;
-    string opt_mode;
+    string leximax_opt;
+    string leximax_approx;
     string maxsat_psol_cmd;
 };
 

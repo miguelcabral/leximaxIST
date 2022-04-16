@@ -1,4 +1,4 @@
-#include <leximaxIST_Encoder.h>
+#include <leximaxIST_Solver.h>
 #include <leximaxIST_printing.h>
 #include <vector>
 #include <utility>
@@ -16,7 +16,7 @@ namespace leximaxIST {
     bool descending_order (int i, int j) { return i > j; }
 
     // send signal signum to external solver if it is running, and get best solution
-    int Encoder::terminate()
+    int Solver::terminate()
     { // TODO: in the end also do clean up: free dynamically allocated memory
         // TODO MAYBE CHANGE THIS: set m_child_pid = 0 in the beggining of solving and in constructor
         // each time fork() is run you update m_child_pid. What can occur: m_child_pid may be from previous iteration
@@ -54,7 +54,7 @@ namespace leximaxIST {
             // in that case, kill() will fail because child does not exist any more
             if (kill(m_child_pid, SIGTERM) != 0) {
                 std::string errno_str (strerror(errno));
-                std::string errmsg ("In Encoder::terminate: when calling");
+                std::string errmsg ("In Solver::terminate: when calling");
                 errmsg += " kill() to send a signal to the external solver (pid ";
                 errmsg += m_child_pid + "): '" + errno_str + "'";
                 print_error_msg(errmsg);

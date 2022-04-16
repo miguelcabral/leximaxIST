@@ -38,23 +38,18 @@ Options::Options()
 , paranoid(0)
 , trendy(0)
 , leave_temporary_files(0)
-, leximax(0)
 , disjoint_cores(0)
 , maxsat_presolve(0)
-, mss_presolve(0)
-, pareto_presolve(0)
-, mss_incremental(0)
-, pareto_incremental(0)
-, truly_pareto(0)
+, mss_incr(0)
+, gia_incr(0)
+, gia_pareto(0)
 , mss_tolerance(0) // always choose the maximum
 , mss_add_cls(1) // add equally
 , mss_nb_limit(0) // no limit
-, mss_timeout(86400) // 24 hours
-, pareto_timeout(86400) // 24 hours
+, approx_tout(86400) // 24 hours
 , simplify_last(0)
 , verbosity(0)
 , formalism("wcnf")
-, opt_mode ("bin")
 , lp_solver("gurobi")
 {}
 
@@ -125,28 +120,25 @@ bool Options::parse(int argc,char **argv) {
        ,{"lpsolver",    required_argument,  0, 506}
        ,{"lpsol",    required_argument,  0, 506}
        ,{"mss-add-cls", required_argument,  0, 507}
-       ,{"opt-mode", required_argument,  0, 508}
+       ,{"leximax-approx", required_argument,  0, 508}
        ,{"maxsat-psol-cmd", required_argument,  0, 509}
        ,{"mss-tol", required_argument,  0, 510}
        ,{"mss-nb-lim", required_argument,  0, 511}
-       ,{"mss-timeout", required_argument,  0, 512}
-       ,{"pareto-timeout", required_argument,  0, 513}
+       ,{"approx-tout", required_argument,  0, 512}
+       ,{"leximax-opt", required_argument,  0, 513}
        ,{"leave-temporary-files",  no_argument,  &leave_temporary_files, 1}
        ,{"ltf",  no_argument,  &leave_temporary_files, 1}
        ,{"disjoint-cores",  no_argument,  &disjoint_cores, 1}
        ,{"maxsat-presolve",  no_argument,  &maxsat_presolve, 1}
-       ,{"mss-presolve",  no_argument,  &mss_presolve, 1}
-       ,{"pareto-presolve",  no_argument,  &pareto_presolve, 1}
-       ,{"mss-incr",  no_argument,  &mss_incremental, 1}
-       ,{"pareto-incr",  no_argument,  &pareto_incremental, 1}
-       ,{"truly-pareto",  no_argument,  &truly_pareto, 1}
-       ,{"leximax", no_argument,  &leximax, 1}
+       ,{"mss-incr",  no_argument,  &mss_incr, 1}
+       ,{"gia-incr",  no_argument,  &gia_incr, 1}
+       ,{"gia-pareto",  no_argument,  &gia_pareto, 1}
        ,{"simplify-last", no_argument,  &simplify_last, 1}
        ,{0, 0, 0, 0}
              };
 
     int c;
-    while (1) {
+    while (true) {
        /* getopt_long stores the option index here. */
        int option_index = 0;
        c = getopt_long(argc, argv, "hu:ptf:v:", long_options, &option_index);
@@ -187,7 +179,7 @@ bool Options::parse(int argc,char **argv) {
             case 507: if (!read_digit(optarg, "mss-add-cls", mss_add_cls))
                         return_value = false;
                     break;
-            case 508: opt_mode = optarg; break;
+            case 508: leximax_approx = optarg; break;
             case 509: maxsat_psol_cmd = optarg; break;
             case 510: if (!read_integer(optarg, "mss-tol", mss_tolerance))
                         return_value = false;
@@ -195,12 +187,10 @@ bool Options::parse(int argc,char **argv) {
             case 511: if (!read_integer(optarg, "mss-nb-lim", mss_nb_limit))
                         return_value = false;
                     break;
-            case 512: if (!read_double(optarg, "mss-timeout", mss_timeout))
+            case 512: if (!read_double(optarg, "approx-tout", approx_tout))
                         return_value = false;
                     break;
-            case 513: if (!read_double(optarg, "pareto-timeout", pareto_timeout))
-                        return_value = false;
-                    break;
+            case 513: leximax_opt = optarg; break;
            case '?':
              if ( (optopt == 'u') )
                fprintf(stderr, "Option -%c requires an argument.\n", optopt);
