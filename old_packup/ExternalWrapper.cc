@@ -63,7 +63,7 @@ void print_pb_constraint(Literator i, Literator end, std::ostream &os)
         os << (sign ? "+1" : "-1") << " x" << (sign ? literal : -literal) << " ";
         ++i;
     }
-    os << " >= " << 1 - num_negatives << " ;\n";
+    os << ">= " << 1 - num_negatives << " ;\n";
 }
 
 void ExternalWrapper::write_pbmo_file()
