@@ -8,7 +8,7 @@ This repository also contains the package upgradeability solver [packup](https:/
 We also provide a (slightly modified) copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html) [2] version 1.1, another package upgradeability solver based on Integer Linear Programming.
 
 ## Build
-Run `bash install.sh` to set up and install the leximax solver, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc) (release 2.10.7). The executable leximaxIST is in the folder bin and the library is in the folder lib.
+Run `bash install.sh` to set up and install the leximax solver, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver [Cbc](https://github.com/coin-or/Cbc) (release 2.10.7). The executable leximaxIST is in the folder `bin` and the library is in the folder `lib`.
 
 packup and leximaxIST dependencies: zlib library.
 
