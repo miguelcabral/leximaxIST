@@ -4,7 +4,7 @@ Boolean Leximax Optimisation solver based on iterative SAT solving.
 The solver can either be used as a C++ library or as a command line tool.
 By default, the leximax solver uses the SAT solver [CaDiCaL](https://github.com/arminbiere/cadical), but it can easily be replaced by another SAT solver that implements the well-known [IPASIR interface](https://baldur.iti.kit.edu/sat-race-2015/index.php?cat=rules#api).
 
-This repository also contains the package upgradeability solver [packup](https://sat.inesc-id.pt/~mikolas/sw/packup/) [1] (located in the folder old_packup). The leximax solver can be linked to packup to solve the Multi-Objective Package Upgradeability Optimisation problem using the leximax criterion.
+This repository also contains the package upgradeability solver [packup](https://sat.inesc-id.pt/~mikolas/sw/packup/) [1] (located in the folder `old_packup`). The leximax solver can be linked to packup to solve the Multi-Objective Package Upgradeability Optimisation problem using the leximax criterion.
 We also provide a (slightly modified) copy of the source code of [mccs](https://www.i3s.unice.fr/~cpjm/software.html) [2] version 1.1, another package upgradeability solver based on Integer Linear Programming.
 
 ## Build
