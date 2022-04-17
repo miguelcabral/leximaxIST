@@ -52,7 +52,7 @@ Lit Encodings::mkLit(int var_id, bool sign = false)
 void Encodings::addUnitClause(leximaxIST::Solver &S, Lit a, Lit blocking) {
   assert(clause.size() == 0);
   assert(a != lit_Undef);
-  assert(std::abs(a) < S.nVars());
+  //assert(std::abs(a) < S.nVars());
   clause.push_back(a);
   if (blocking != lit_Undef)
     clause.push_back(blocking);
@@ -64,7 +64,7 @@ void Encodings::addUnitClause(leximaxIST::Solver &S, Lit a, Lit blocking) {
 void Encodings::addBinaryClause(leximaxIST::Solver &S, Lit a, Lit b, Lit blocking) {
   assert(clause.size() == 0);
   assert(a != lit_Undef && b != lit_Undef);
-  assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars());
+  //assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars());
   clause.push_back(a);
   clause.push_back(b);
   if (blocking != lit_Undef)
@@ -77,7 +77,7 @@ void Encodings::addBinaryClause(leximaxIST::Solver &S, Lit a, Lit b, Lit blockin
 void Encodings::addTernaryClause(leximaxIST::Solver &S, Lit a, Lit b, Lit c, Lit blocking) {
   assert(clause.size() == 0);
   assert(a != lit_Undef && b != lit_Undef && c != lit_Undef);
-  assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars() && std::abs(c) < S.nVars());
+  //assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars() && std::abs(c) < S.nVars());
   clause.push_back(a);
   clause.push_back(b);
   clause.push_back(c);
@@ -92,8 +92,8 @@ void Encodings::addQuaternaryClause(leximaxIST::Solver &S, Lit a, Lit b, Lit c, 
                                     Lit blocking) {
   assert(clause.size() == 0);
   assert(a != lit_Undef && b != lit_Undef && c != lit_Undef && d != lit_Undef);
-  assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars() && std::abs(c) < S.nVars() &&
-         std::abs(d) < S.nVars());
+  //assert(std::abs(a) < S.nVars() && std::abs(b) < S.nVars() && std::abs(c) < S.nVars() &&
+  //       std::abs(d) < S.nVars());
   clause.push_back(a);
   clause.push_back(b);
   clause.push_back(c);
