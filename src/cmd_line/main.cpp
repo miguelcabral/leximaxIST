@@ -7,7 +7,11 @@
 #include <ParserPB.h>
 #include <Encoder.h>
 #include <string>
-#include <iostream> // std::cout, std::cin
+#include <iostream>
+#include <cstdlib>
+#include <signal.h>
+
+leximaxIST::Solver solver;
 
 void print_header()
 {
@@ -20,8 +24,21 @@ void print_header()
     std::cout << "c -------------------------------------------------------------------------\n";
 }
 
+void signal_handler(int signum) {
+  std::cout << "c Received external signal " << signum << '\n'; 
+  std::cout << "c Terminating...\n";
+  solver.print_solution();
+  exit(EXIT_SUCCESS);
+}
+
 int main(int argc, char *argv[])
 {
+    // signals
+    signal(SIGHUP, signal_handler);
+    signal(SIGTERM, signal_handler);
+    signal(SIGUSR1, signal_handler);
+    signal(SIGINT, signal_handler);    
+    
     /* parse options */
     leximaxIST::Options options;
     if (!options.parse(argc, argv)) {
@@ -33,8 +50,7 @@ int main(int argc, char *argv[])
         options.print_usage(std::cout);
         return 0;
     }
-    
-    leximaxIST::Solver solver;
+
     solver.set_verbosity(options.get_verbosity());
     
     if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {

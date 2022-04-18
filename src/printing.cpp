@@ -389,7 +389,7 @@ namespace leximaxIST {
             std::cout << "UNKNOWN\n";
             return;
         }
-        size_t i (0);
+        size_t i (1);
         std::vector<int> solution (get_solution());
         while (i < solution.size()) {
             std::string line ("v ");
