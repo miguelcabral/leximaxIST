@@ -38,7 +38,7 @@ namespace leximaxIST {
     , m_mss_incr (0)
     , m_gia_pareto (0)
     , m_gia_incr (0)
-    , m_pb_enc (_PB_GTE_)
+    , m_pb_enc (_PB_SWC_)
     , m_card_enc (_CARD_MTOTALIZER_)
     {
         // help

@@ -193,7 +193,17 @@ bool GTE::encodeLeq(uint64_t k, leximaxIST::Solver &S, const weightedlitst &ilit
 void GTE::encode(leximaxIST::Solver &S, std::vector<Lit> &lits, std::vector<uint64_t> &coeffs,
                  uint64_t rhs) {
   // FIXME: do not change coeffs in this method. Make coeffs const.
-
+    /*
+    std::cout << "c Encoding PB constraint: ";
+    for (size_t i (0); i < lits.size(); ++i) {
+        std::cout << coeffs.at(i) << " * " << 'y' << lits.at(i);
+        if (i != lits.size() - 1)
+            std::cout << " + ";
+        else
+            std::cout << " <= " << rhs << '\n';
+    }
+    */
+    
   // If the rhs is larger than INT32_MAX is not feasible to encode this
   // pseudo-Boolean constraint to CNF.
   if (rhs >= UINT64_MAX) {
