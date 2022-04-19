@@ -9,10 +9,9 @@ namespace leximaxIST {
     {
         m_objectives.clear();
         m_sorted_vecs.clear();
-        // clear relaxation variables
         m_all_relax_vars.clear();
         m_sorted_relax_collection.clear();
-        m_input_hard.clear();
+        m_formula.clear();
         m_encoding.clear();
         m_soft_clauses.clear();
         m_solution.clear();
@@ -22,7 +21,6 @@ namespace leximaxIST {
         m_child_pid = 0;
         m_status = '?';
         m_snet_info.clear();
-        //m_times.clear();
         // clear sat solver
         delete m_sat_solver;
         m_sat_solver = nullptr;

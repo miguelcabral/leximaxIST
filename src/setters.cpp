@@ -13,26 +13,20 @@ namespace leximaxIST {
     
     bool descending_order (int i, int j);
     
-    // set_of_clauses can be m_input_hard for input hard clauses or m_encoding for encoding hard clauses
-    void Solver::add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses)
+    // this is public, one can use it to add input hard clauses
+    void Solver::add_hard_clause(const Clause &cl)
     {
         if (cl.empty()) {
             print_error_msg("Empty hard clause");
             exit(EXIT_FAILURE);
         }
         update_id_count(cl);
-        set_of_clauses.push_back(cl);
-        if (m_verbosity == 2)
-            print_clause(std::cout, cl, "c ");
-    }
-    
-    // this is public, one can use it to add input hard clauses
-    void Solver::add_hard_clause(const Clause &cl)
-    {
         if (m_sat_solver == nullptr)
             m_sat_solver = new IpasirWrap();
-        add_clause(cl, m_input_hard);
+        m_formula.addHardClause(cl);
         m_sat_solver->addClause(cl);
+        if (m_verbosity == 2)
+            print_clause(std::cout, cl, "c ");
         // update status - if unsat it remains unsat, otherwise set to unknown
         if (m_status != 'u')
             m_status = '?';
@@ -40,10 +34,19 @@ namespace leximaxIST {
     
     void Solver::add_clause_enc(const Clause &cl)
     {
-        add_clause(cl, m_encoding);
+        if (cl.empty()) {
+            print_error_msg("Empty hard clause");
+            exit(EXIT_FAILURE);
+        }
+        update_id_count(cl);
+        m_encoding.push_back(cl);
+        if (m_verbosity == 2)
+            print_clause(std::cout, cl, "c ");
         // In 'core-rebuild' we create a new ipasir solver everytime the sorting networks grow
         // is this really necessary ?  maybe I can remove the if
         if (m_opt_mode != "core-rebuild")
+            m_sat_solver->addClause(cl);
+        else
             m_sat_solver->addClause(cl);
     }
 
@@ -226,7 +229,8 @@ namespace leximaxIST {
     }
     
     // add an objective function in the form of a set of soft clauses (so the goal is to minimise clause falsification)
-    void Solver::add_soft_clauses(const std::vector<Clause> &soft_clauses)
+    // input: each soft clause is a std::pair<Clause, int>. the first element contains the literals, the second is the weight
+    void Solver::add_soft_clauses(const std::vector<std::pair<Clause, int>> &soft_clauses)
     {
         if (soft_clauses.empty()) {
             print_error_msg("In function leximaxIST::Solver::add_soft_clauses, empty objective function");
@@ -241,8 +245,8 @@ namespace leximaxIST {
         m_all_relax_vars.resize(m_num_objectives);
         // set m_sorted_relax_collection to a vector of empty vectors
         m_sorted_relax_collection.resize(m_num_objectives);
-        for (const Clause &soft_clause : soft_clauses)
-            update_id_count(soft_clause);
+        for (const std::pair<Clause, int> &sc : soft_clauses )
+            update_id_count(sc.first);
         // convert clause satisfiaction maximisation to minimisation of sum of variables
         if (m_verbosity == 2)
             std::cout << "c ---- Input soft clauses conversion to variables ----\n";

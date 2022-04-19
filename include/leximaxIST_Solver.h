@@ -15,24 +15,15 @@ namespace leximaxIST
 {
 
     class Solver {
-        /* TODO: check if pointers can be removed without affecting performance
-         * The problem is reallocation of vector while growing
-         * It seems that it is not mandatory that the implementation of the STL
-         * uses the move constructor while copying the elements of the vector
-         * So it is not guaranteed for every compiler that the performance will
-         * not be affected
-         * TODO: signal handling: (1) external solver (2) internal ipasir solver
-         */
 
     private:
 
         int m_verbosity; // 0: nothing, 1: solving phases, time + obj vector, 2: everything including encoding
         int m_id_count;
         int m_input_nb_vars; // number of vars of input problem - useful to return assignment of only these variables
-        std::vector<Clause> m_input_hard; // also contains the equivalence between soft clauses and obj variables
+        MaxSATFormula m_formula; // contains input constraints (hard clauses and/or pb constraints) and the objectives
         std::vector<Clause> m_encoding; // encoding clauses
         std::vector<int> m_soft_clauses; // unit clauses
-        std::vector<std::vector<int>> m_objectives;
         int m_num_objectives;
         std::vector<std::vector<int>> m_sorted_vecs;
         std::vector<std::vector<std::vector<int>>>  m_sorted_relax_collection;
@@ -48,7 +39,7 @@ namespace leximaxIST
         pid_t m_child_pid;
         double m_timeout; // timeout for signal handling in milliseconds
         bool m_leave_tmp_files;
-        bool m_simplify_last; // if true the algorithm does not use the sorting networks in the last iteration
+        bool m_simplify_last; // if true the non core-guided algorithm does not use the sorting networks in the last iteration
         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, '?' for UNKNOWN, 'o' for OPTIMUM FOUND
         double m_approx_tout; // timeout for approximation
         bool m_gia_incr; // whether to use the same SAT solver in every Pareto-optimal solution search
@@ -59,9 +50,6 @@ namespace leximaxIST
         int m_mss_tolerance; // tolerance for choosing the next clause from a maximum objective
         bool m_maxsat_presolve; // to get lower bound (and upper bound) of optimum
         std::string m_maxsat_psol_cmd;
-        // the next one is usefull if computation is stopped and you get an intermediate solution
-        // you want to know which values of the objective vector are in theory guaranteed to be optimal
-        //int m_num_opts; // number of optimal values found: 0 = none; 1 = first maximum is optimal; 2 = first and second; ...
         std::string m_multiplication_string;
         std::vector<int> m_solution;
         std::vector<std::pair<int, int>> m_snet_info; // first = nb wires and second = nb comparators 
@@ -98,7 +86,7 @@ namespace leximaxIST
         
         void add_hard_clause(const Clause &cl);
         
-        void add_soft_clauses(const std::vector<Clause> &soft_clauses);
+        void add_soft_clauses(const std::vector<std::pair<Clause, int>> &soft_clauses); // clause and weight
         
         void set_simplify_last(bool val);
         
@@ -174,8 +162,6 @@ namespace leximaxIST
         std::vector<int> get_objective_vector(const std::vector<int> &assignment) const;
         
         // constructors.cpp
-        
-        void add_clause(const Clause &cl, std::vector<Clause> &set_of_clauses);
         
         void add_clause_enc(const Clause &cl);
         
