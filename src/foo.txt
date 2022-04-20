@@ -1,0 +1,760 @@
+Removing: ../lib/libleximaxIST.a ../bin/leximaxIST 
+rm -f ../lib/libleximaxIST.a ../bin/leximaxIST printing.o setters.o getters.o solver_call.o signal_handling.o destructor.o IpasirWrap.o sorting_net.o encoding.o constructors.o cmd_line/encodings/Enc_Ladder.o cmd_line/encodings/Enc_SWC.o cmd_line/encodings/Encodings.o cmd_line/encodings/Enc_Totalizer.o cmd_line/encodings/Enc_Adder.o cmd_line/encodings/Enc_CNetworks.o cmd_line/encodings/Enc_MTotalizer.o cmd_line/encodings/Enc_GTE.o cmd_line/MaxSATFormula.o cmd_line/Options.o cmd_line/Encoder.o cmd_line/main.o cmd_line/ParserPB.o
+Compiling: printing.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o printing.o printing.cpp
+printing.cpp: In function ‘void leximaxIST::print_lower_bounds(const std::vector<int>&)’:
+printing.cpp:41:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int j (1); j < lower_bounds.size(); ++j)
+                         ~~^~~~~~~~~~~~~~~~~~~~~
+Compiling: setters.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o setters.o setters.cpp
+Compiling: getters.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o getters.o getters.cpp
+Compiling: solver_call.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o solver_call.o solver_call.cpp
+solver_call.cpp:258:13: warning: "/*" within comment [-Wcomment]
+             /*command_split.clear();
+              
+solver_call.cpp:278:32: warning: "/*" within comment [-Wcomment]
+             /*if (execv(args[0]/*ola.c_str()*//*, args.data()) == -1) {
+                                 
+solver_call.cpp:295:9: warning: "/*" within comment [-Wcomment]
+         /*if (WEXITSTATUS(pid_status)) {
+          
+solver_call.cpp: In member function ‘void leximaxIST::Solver::read_cplex_output(std::vector<int>&, bool&, leximaxIST::StreamBuffer&)’:
+solver_call.cpp:80:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (size_t v (1); v < m_id_count + 1; ++v)
+                            ~~^~~~~~~~~~~~~~~~
+solver_call.cpp: In member function ‘void leximaxIST::Solver::split_command(const string&, std::vector<std::__cxx11::basic_string<char> >&)’:
+solver_call.cpp:188:39: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+                     for (int i (0); i < quote_pos; ++i) {
+                                     ~~^~~~~~~~~~~
+solver_call.cpp: In function ‘int leximaxIST::mss_choose_obj_seq(const std::vector<std::vector<int> >&)’:
+solver_call.cpp:476:39: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (obj_index = 0; obj_index < todo_vec.size(); ++obj_index) {
+                             ~~~~~~~~~~^~~~~~~~~~~~~~~~~
+solver_call.cpp:480:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if (obj_index == todo_vec.size()) // all empty
+             ~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+solver_call.cpp: In function ‘int leximaxIST::mss_choose_obj_max(const std::vector<std::vector<int> >&, const std::vector<int>&)’:
+solver_call.cpp:495:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i (0); i < todo_vec.size(); ++i) {
+                         ~~^~~~~~~~~~~~~~~~~
+Compiling: signal_handling.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o signal_handling.o signal_handling.cpp
+Compiling: destructor.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o destructor.o destructor.cpp
+Compiling: IpasirWrap.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o IpasirWrap.o IpasirWrap.cpp
+Compiling: sorting_net.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o sorting_net.o sorting_net.cpp
+Compiling: encoding.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o encoding.o encoding.cpp
+encoding.cpp: In member function ‘void leximaxIST::Solver::optimise_non_core(int)’:
+encoding.cpp:508:40: warning: unused parameter ‘sum’ [-Wunused-parameter]
+     void Solver::optimise_non_core(int sum)
+                                        ^~~
+encoding.cpp: In member function ‘void leximaxIST::Solver::generate_max_vars(int, std::vector<std::vector<int> >&)’:
+encoding.cpp:629:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int j (0); j < max_size; ++j) {
+                         ~~^~~~~~~~~~
+encoding.cpp:633:39: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+             if (m_verbosity == 2 && j == max_size - 1)
+                                     ~~^~~~~~~~~~~~~~~
+encoding.cpp: In member function ‘void leximaxIST::Solver::change_lb_map(int, std::vector<int>&, const std::vector<int>&, const std::vector<std::vector<int> >&, std::unordered_map<int, int>&) const’:
+encoding.cpp:803:39: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+                     for (int p (0); p < comb.size(); ++p)
+                                     ~~^~~~~~~~~~~~~
+encoding.cpp: In member function ‘void leximaxIST::Solver::increase_lb(std::vector<int>&, const std::vector<int>&, const std::vector<std::vector<int> >&) const’:
+encoding.cpp:948:31: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+             for (int k (0); k < max_vars_ith.size(); ++k) {
+                             ~~^~~~~~~~~~~~~~~~~~~~~
+encoding.cpp: In member function ‘void leximaxIST::Solver::fix_max(int, const std::vector<std::vector<int> >&, const std::vector<int>&)’:
+encoding.cpp:969:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int k (0); k < max_vars_vec.at(j).size(); ++k) {
+                         ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+encoding.cpp:971:19: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+             if (k >= max_vars_vec.at(j).size() - obj_val)
+                 ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+encoding.cpp: In instantiation of ‘void leximaxIST::combinations(std::vector<std::vector<T> >&, std::vector<T>, std::vector<T>, int) [with T = int]’:
+encoding.cpp:800:54:   required from here
+encoding.cpp:700:34: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         else if (main_set.size() == n) {
+Compiling: constructors.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o constructors.o constructors.cpp
+In file included from constructors.cpp:1:0:
+../include/leximaxIST_Solver.h: In constructor ‘leximaxIST::Solver::Solver()’:
+../include/leximaxIST_Solver.h:52:14: warning: ‘leximaxIST::Solver::m_status’ will be initialized after [-Wreorder]
+         char m_status; // 's' for SATISFIABLE, 'u' for UNSATISFIABLE, '?' for UNKNOWN, 'o' for OPTIMUM FOUND
+              ^~~~~~~~
+../include/leximaxIST_Solver.h:46:21: warning:   ‘std::__cxx11::string leximaxIST::Solver::m_approx’ [-Wreorder]
+         std::string m_approx; // approximation algorithm : mss, gia
+                     ^~~~~~~~
+constructors.cpp:7:5: warning:   when initialized here [-Wreorder]
+     Solver::Solver() :
+     ^~~~~~
+In file included from constructors.cpp:1:0:
+../include/leximaxIST_Solver.h:65:21: warning: ‘leximaxIST::Solver::m_multiplication_string’ will be initialized after [-Wreorder]
+         std::string m_multiplication_string;
+                     ^~~~~~~~~~~~~~~~~~~~~~~
+In file included from constructors.cpp:1:0:
+../include/leximaxIST_Solver.h:45:21: warning:   ‘std::__cxx11::string leximaxIST::Solver::m_opt_mode’ [-Wreorder]
+         std::string m_opt_mode; // optimisation algorithm : lin-su, lin-us, bin, core-merge, ...
+                     ^~~~~~~~~~
+constructors.cpp:7:5: warning:   when initialized here [-Wreorder]
+     Solver::Solver() :
+     ^~~~~~
+Archiving: ../lib/libleximaxIST.a
+ar -rcs ../lib/libleximaxIST.a printing.o setters.o getters.o solver_call.o signal_handling.o destructor.o IpasirWrap.o sorting_net.o encoding.o constructors.o
+Compiling: cmd_line/encodings/Enc_Ladder.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_Ladder.o cmd_line/encodings/Enc_Ladder.cpp
+cmd_line/encodings/Enc_Ladder.cpp: In member function ‘void leximaxIST::Ladder::encode(leximaxIST::Solver&, const std::vector<int>&)’:
+cmd_line/encodings/Enc_Ladder.cpp:66:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < lits.size() - 1; i++) {
+                     ~~^~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Ladder.cpp:72:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Ladder.cpp:77:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       } else if (i == lits.size() - 1) {
+                  ~~^~~~~~~~~~~~~~~~~~
+Compiling: cmd_line/encodings/Enc_SWC.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_SWC.o cmd_line/encodings/Enc_SWC.cpp
+In file included from cmd_line/encodings/Enc_SWC.cpp:28:0:
+./cmd_line/encodings/Enc_SWC.h: In member function ‘void leximaxIST::SWC::updateAssumptions(leximaxIST::Solver&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_SWC.h:60:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < unit_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_SWC.h:57:46: warning: unused parameter ‘S’ [-Wunused-parameter]
+   void updateAssumptions(leximaxIST::Solver &S, std::vector<Lit> &assumptions) {
+                                              ^
+cmd_line/encodings/Enc_SWC.cpp: In member function ‘void leximaxIST::SWC::encode(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t)’:
+cmd_line/encodings/Enc_SWC.cpp:80:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp: In member function ‘void leximaxIST::SWC::encode(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t, std::vector<int>&, int)’:
+cmd_line/encodings/Enc_SWC.cpp:206:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_unit_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:222:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:233:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < unit_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:242:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < unit_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:301:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < unit_lits.size(); i++)
+                   ~~^~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_SWC.cpp:31:
+cmd_line/encodings/Enc_SWC.cpp: In member function ‘void leximaxIST::SWC::update(leximaxIST::Solver&, uint64_t, std::vector<int>&)’:
+cmd_line/encodings/Enc_SWC.cpp:388:42: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       assert(seq_auxiliary_inc[i].size() > j);
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+cmd_line/encodings/Enc_SWC.cpp:396:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 1; i < lits_inc.size(); i++)
+                   ~~^~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_SWC.cpp:31:
+cmd_line/encodings/Enc_SWC.cpp:397:40: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     assert(seq_auxiliary_inc[i].size() == (int)rhs + 1);
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:414:44: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         assert(seq_auxiliary_inc[i].size() > j);
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+cmd_line/encodings/Enc_SWC.cpp:429:46: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+              seq_auxiliary_inc[i - 1].size() > (int)rhs + 1 - (int)wi);
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:431:33: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       assert(i - 1 > 0 && i - 1 < lits_inc.size());
+                           ~~~~~~^~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:365:73: warning: unused parameter ‘assumptions’ [-Wunused-parameter]
+ void SWC::update(leximaxIST::Solver &S, uint64_t rhs, std::vector<Lit> &assumptions) {
+                                                                         ^~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp: In member function ‘void leximaxIST::SWC::join(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_SWC.cpp:485:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_unit_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:496:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:507:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   if (lits_inc.size() == lhs_join)
+       ~~~~~~~~~~~~~~~~^~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_SWC.cpp:31:
+cmd_line/encodings/Enc_SWC.cpp:530:40: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     assert(seq_auxiliary_inc[i].size() == rhs + 1);
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:542:44: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         assert(seq_auxiliary_inc[i].size() > j);
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+cmd_line/encodings/Enc_SWC.cpp:543:48: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         assert(seq_auxiliary_inc[i - 1].size() > j);
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+cmd_line/encodings/Enc_SWC.cpp:550:44: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         assert(seq_auxiliary_inc[i].size() > j);
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~
+cmd_line/encodings/Enc_SWC.cpp:551:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         assert(i - 1 < lits_inc.size() && i - 1 >= 0);
+                ~~~~~~^~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:565:46: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       assert(seq_auxiliary_inc[i - 1].size() > rhs + 1 - wi);
+              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:566:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       assert(i - 1 < lits_inc.size() && i - 1 >= 0);
+              ~~~~~~^~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_SWC.cpp:464:34: warning: unused parameter ‘assumptions’ [-Wunused-parameter]
+                std::vector<Lit> &assumptions) {
+                                  ^~~~~~~~~~~
+Compiling: cmd_line/encodings/Encodings.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Encodings.o cmd_line/encodings/Encodings.cpp
+Compiling: cmd_line/encodings/Enc_Totalizer.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_Totalizer.o cmd_line/encodings/Enc_Totalizer.cpp
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::incremental(leximaxIST::Solver&, int64_t)’:
+cmd_line/encodings/Enc_Totalizer.cpp:37:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int z = 0; z < totalizerIterative_rhs.size(); z++) {
+                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:40:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i <= totalizerIterative_left[z].size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:41:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int j = 0; j <= totalizerIterative_right[z].size(); j++) {
+                       ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::join(leximaxIST::Solver&, const std::vector<int>&, int64_t)’:
+cmd_line/encodings/Enc_Totalizer.cpp:79:29: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     build(solver, lits, rhs < lits.size() ? rhs : lits.size());
+                         ~~~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:90:10: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+        i < left_cardinality_outlits.size() + right_cardinality_outlits.size();
+        ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:105:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++)
+                   ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::adder(leximaxIST::Solver&, std::vector<int>&, std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_Totalizer.cpp:120:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i <= left.size(); i++) {
+                   ~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:121:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int j = 0; j <= right.size(); j++) {
+                     ~~^~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::toCNF(leximaxIST::Solver&, std::vector<int>&)’:
+cmd_line/encodings/Enc_Totalizer.cpp:151:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::update(leximaxIST::Solver&, int64_t, const std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_Totalizer.cpp:195:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = rhs; i < cardinality_outlits.size(); i++)
+                       ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:203:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < disable_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:210:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = rhs; i < cardinality_outlits.size(); i++)
+                       ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:217:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = rhs; i < cardinality_outlits.size(); i++)
+                       ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:224:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = rhs; i < cardinality_outlits.size(); i++)
+                       ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::add(leximaxIST::Solver&, leximaxIST::Totalizer&, int64_t)’:
+cmd_line/encodings/Enc_Totalizer.cpp:238:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < tot.totalizerIterative_rhs.size(); ++i) {
+                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:249:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < left.size() + right.size(); ++i) {
+                   ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp: In member function ‘void leximaxIST::Totalizer::build(leximaxIST::Solver&, const std::vector<int>&, int64_t)’:
+cmd_line/encodings/Enc_Totalizer.cpp:289:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < lits.size(); i++)
+                     ~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_Totalizer.cpp:31:
+cmd_line/encodings/Enc_Totalizer.cpp:294:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(rhs >= 1 && rhs <= lits.size());
+                      ~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:296:57: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   if (incremental_strategy == _INCREMENTAL_NONE_ && rhs == lits.size()) {
+                                                     ~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:300:11: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   if (rhs == lits.size() && !joinMode)
+       ~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:303:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Totalizer.cpp:335:86: warning: format ‘%d’ expects argument of type ‘int’, but argument 4 has type ‘std::vector<int>::size_type {aka long unsigned int}’ [-Wformat=]
+   printf("c totalizer %d %d %d\n", n_variables, n_clauses, cardinality_outlits.size());
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~^
+Compiling: cmd_line/encodings/Enc_Adder.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_Adder.o cmd_line/encodings/Enc_Adder.cpp
+In file included from cmd_line/encodings/Enc_Adder.cpp:29:0:
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbSort(std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:119:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbFilter(uint64_t, leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:131:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp: In member function ‘void leximaxIST::Adder::lessThanOrEqual(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&)’:
+cmd_line/encodings/Enc_Adder.cpp:160:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for ( int i = 0; i < xs.size(); ++i ) {
+                    ~~^~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp:168:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for ( int j = i + 1; j < xs.size(); ++j )
+                            ~~^~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp: In member function ‘void leximaxIST::Adder::lessThanOrEqualInc(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_Adder.cpp:206:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for ( int i = 0; i < xs.size(); ++i ) {
+                    ~~^~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp:214:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for ( int j = i + 1; j < xs.size(); ++j )
+                            ~~^~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp: In member function ‘void leximaxIST::Adder::encode(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t)’:
+cmd_line/encodings/Enc_Adder.cpp:280:34: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for ( int iVar = 0; iVar < lits.size(); ++iVar ) {
+                             ~~~~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_Adder.cpp: In member function ‘void leximaxIST::Adder::encodeInc(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t, std::vector<int>&)’:
+cmd_line/encodings/Enc_Adder.cpp:305:34: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for ( int iVar = 0; iVar < lits.size(); ++iVar ) {
+                             ~~~~~^~~~~~~~~~~~~
+Compiling: cmd_line/encodings/Enc_CNetworks.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_CNetworks.o cmd_line/encodings/Enc_CNetworks.cpp
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::encode(leximaxIST::Solver&, const std::vector<int>&, int64_t)’:
+cmd_line/encodings/Enc_CNetworks.cpp:71:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < lits.size(); i++)
+                     ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:105:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < units.size(); i++)
+                   ~~^~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_CNetworks.cpp:29:
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::update(leximaxIST::Solver&, int64_t)’:
+cmd_line/encodings/Enc_CNetworks.cpp:141:49: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(cardinality_outlits.size() != 0 && rhs < cardinality_outlits.size());
+                                             ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::CN_hmerge(leximaxIST::Solver&, std::vector<int>&, std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_CNetworks.cpp:178:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < a_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:181:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < a_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:184:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < b_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:187:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < b_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:195:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < a_s.size(); ++i) {
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:201:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < a_s.size() - 1; ++i) {
+                     ~~^~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:209:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < a_s.size(); ++i) {
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::CN_hsort(leximaxIST::Solver&, std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_CNetworks.cpp:237:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < (a_s.size() / 2); i++) {
+                     ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:247:38: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = (a_s.size() / 2); i < a_s.size(); i++)
+                                    ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::CN_smerge(leximaxIST::Solver&, std::vector<int>&, std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_CNetworks.cpp:279:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < a_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:282:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < a_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:285:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < b_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:288:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < b_s.size(); i = i + 2)
+                     ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:296:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i < (a_s.size() / 2) + 1; ++i) {
+                     ~~^~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:302:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < (a_s.size() / 2) + 1; ++i) {
+                     ~~^~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:308:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 1; i <= (a_s.size() / 2); ++i) {
+                     ~~^~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_CNetworks.cpp:29:
+cmd_line/encodings/Enc_CNetworks.cpp: In member function ‘void leximaxIST::CNetworks::CN_encode(leximaxIST::Solver&, std::vector<int>&, std::vector<int>&, int64_t)’:
+cmd_line/encodings/Enc_CNetworks.cpp:322:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(c_s.size() == rhs);
+          ~~~~~~~~~~~^~~~
+cmd_line/encodings/Enc_CNetworks.cpp:324:18: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   if (a_s.size() == rhs) {
+       ~~~~~~~~~~~^~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:342:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = rhs; i < a_s.size(); i++) {
+                       ~~^~~~~~~~~~~~
+cmd_line/encodings/Enc_CNetworks.cpp:347:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < c_s.size(); i++)
+                     ~~^~~~~~~~~~~~
+Compiling: cmd_line/encodings/Enc_MTotalizer.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_MTotalizer.o cmd_line/encodings/Enc_MTotalizer.cpp
+cmd_line/encodings/Enc_MTotalizer.cpp: In member function ‘void leximaxIST::MTotalizer::encode(leximaxIST::Solver&, const std::vector<int>&, int64_t)’:
+cmd_line/encodings/Enc_MTotalizer.cpp:66:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < lits.size(); i++)
+                     ~~^~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_MTotalizer.cpp:29:
+cmd_line/encodings/Enc_MTotalizer.cpp:71:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(rhs >= 1 && rhs <= lits.size());
+                      ~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:73:11: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   if (rhs == lits.size()) {
+       ~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:88:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size() / mod; i++) {
+                   ~~^~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_MTotalizer.cpp:29:
+cmd_line/encodings/Enc_MTotalizer.cpp: In member function ‘void leximaxIST::MTotalizer::encode_output(leximaxIST::Solver&, int64_t)’:
+cmd_line/encodings/Enc_MTotalizer.cpp:167:17: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(ulimit <= cardinality_upoutlits.size());
+          ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:168:17: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   assert(llimit <= cardinality_lwoutlits.size());
+          ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:170:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = ulimit; i < cardinality_upoutlits.size(); i++)
+                        ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:174:32: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = llimit - 1; i < cardinality_lwoutlits.size(); i++)
+                              ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:180:34: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int i = llimit - 1; i < cardinality_lwoutlits.size(); i++) {
+                                ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp: In member function ‘void leximaxIST::MTotalizer::adder(leximaxIST::Solver&, int, std::vector<int>&, std::vector<int>&, std::vector<int>&, std::vector<int>&, std::vector<int>&, std::vector<int>&)’:
+cmd_line/encodings/Enc_MTotalizer.cpp:282:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i <= llower.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:283:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int j = 0; j <= rlower.size(); j++) {
+                     ~~^~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/7/cassert:44:0,
+                 from cmd_line/encodings/Enc_MTotalizer.cpp:29:
+cmd_line/encodings/Enc_MTotalizer.cpp:308:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+             assert(i + j - 1 < lower.size());
+                    ~~~~~~~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:328:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i <= lupper.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:329:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int j = 0; j <= rupper.size(); j++) {
+                       ~~^~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:348:37: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if (i + j != 0 && i + j - 1 < upper.size())
+                           ~~~~~~~~~~^~~~~~~~~~~~~~
+cmd_line/encodings/Enc_MTotalizer.cpp:351:19: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if (i + j < upper.size()) {
+             ~~~~~~^~~~~~~~~~~~~~
+Compiling: cmd_line/encodings/Enc_GTE.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/encodings/Enc_GTE.o cmd_line/encodings/Enc_GTE.cpp
+cmd_line/encodings/Enc_GTE.cpp: In member function ‘void leximaxIST::GTE::encode(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t)’:
+cmd_line/encodings/Enc_GTE.cpp:219:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_GTE.cpp:249:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~
+cmd_line/encodings/Enc_GTE.cpp: In member function ‘int leximaxIST::GTE::predict(leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, uint64_t)’:
+cmd_line/encodings/Enc_GTE.cpp:445:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < simp_lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~~~~~~
+cmd_line/encodings/Enc_GTE.cpp:464:21: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for (int i = 0; i < lits.size(); i++) {
+                   ~~^~~~~~~~~~~~~
+Compiling: cmd_line/MaxSATFormula.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/MaxSATFormula.o cmd_line/MaxSATFormula.cpp
+In file included from ./cmd_line/MaxSATFormula.h:44:0,
+                 from cmd_line/MaxSATFormula.cpp:29:
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::Card::Card(const std::vector<int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:50:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int i = 0; i < _lits.size(); i++) {
+                       ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::print()’:
+./cmd_line/FormulaPB.h:65:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:78:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PB::PB(std::vector<int>&, std::vector<long unsigned int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:105:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i< coeffs.size(); i++) ub += coeffs[i];
+                        ~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::changeSign()’:
+./cmd_line/FormulaPB.h:136:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isClause()’:
+./cmd_line/FormulaPB.h:154:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isCardinality()’:
+./cmd_line/FormulaPB.h:169:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::print()’:
+./cmd_line/FormulaPB.h:188:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:209:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PBObjFunction::PBObjFunction(const std::vector<int>&, const std::vector<long unsigned int>&, int64_t)’:
+./cmd_line/FormulaPB.h:245:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < coeffs.size(); i++){
+                        ~~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PBObjFunction::my_print(leximaxIST::indexMap, bool, int)’:
+./cmd_line/FormulaPB.h:277:47: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+         printf("c\tmin (%d)\t", _coeffs.size());
+                                 ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:282:42: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < maxsize && i < _coeffs.size(); i++) {
+                                        ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h:294:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if(_coeffs.size() > maxsize)
+            ~~~~~~~~~~~~~~~^~~~~~~~~
+./cmd_line/FormulaPB.h:295:51: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+             printf("... (%d lits)", _coeffs.size());
+                                     ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:299:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < _coeffs.size(); i++)
+                         ~~^~~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp: In member function ‘void leximaxIST::Hard::my_print(leximaxIST::indexMap)’:
+cmd_line/MaxSATFormula.cpp:248:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for(int i = 0; i < clause.size(); i++)
+                    ~~^~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp: In member function ‘void leximaxIST::Soft::my_print(leximaxIST::indexMap)’:
+cmd_line/MaxSATFormula.cpp:259:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for(int i = 0; i < clause.size(); i++)
+                    ~~^~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp:267:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for(int i = 0; i < relaxation_vars.size(); i++)
+                    ~~^~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp: In member function ‘void leximaxIST::MaxSATFormula::my_print()’:
+cmd_line/MaxSATFormula.cpp:291:81: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<leximaxIST::PB>::size_type {aka long unsigned int}’ [-Wformat=]
+     printf("c ------- PB Constraints (%d) ------------\n", pb_constraints.size());
+                                                            ~~~~~~~~~~~~~~~~~~~~~^
+cmd_line/MaxSATFormula.cpp:292:22: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for(int i = 0; i < pb_constraints.size(); i++){
+                    ~~^~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp:296:90: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<leximaxIST::Card>::size_type {aka long unsigned int}’ [-Wformat=]
+     printf("c ------- Cardinality Constr (%d) --------\n", cardinality_constraints.size());
+                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+cmd_line/MaxSATFormula.cpp:297:39: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     if(cardinality_constraints.size() < maxcs){
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+cmd_line/MaxSATFormula.cpp:298:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < cardinality_constraints.size(); i++){
+                        ~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp:304:79: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<leximaxIST::Hard>::size_type {aka long unsigned int}’ [-Wformat=]
+     printf("c ------- Hard clauses (%d) --------------\n", hard_clauses.size());
+                                                            ~~~~~~~~~~~~~~~~~~~^
+cmd_line/MaxSATFormula.cpp:305:28: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     if(hard_clauses.size() < maxcs){
+        ~~~~~~~~~~~~~~~~~~~~^~~~~~~
+cmd_line/MaxSATFormula.cpp:306:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < hard_clauses.size(); i++){
+                        ~~^~~~~~~~~~~~~~~~~~~~~
+cmd_line/MaxSATFormula.cpp:310:79: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<leximaxIST::Soft>::size_type {aka long unsigned int}’ [-Wformat=]
+     printf("c ------- Soft clauses (%d) --------------\n", soft_clauses.size());
+                                                            ~~~~~~~~~~~~~~~~~~~^
+cmd_line/MaxSATFormula.cpp:311:28: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     if(soft_clauses.size() < maxcs){
+        ~~~~~~~~~~~~~~~~~~~~^~~~~~~
+cmd_line/MaxSATFormula.cpp:312:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < soft_clauses.size(); i++){
+                        ~~^~~~~~~~~~~~~~~~~~~~~
+Compiling: cmd_line/Options.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/Options.o cmd_line/Options.cpp
+Compiling: cmd_line/Encoder.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/Encoder.o cmd_line/Encoder.cpp
+In file included from ./cmd_line/Encoder.h:41:0,
+                 from cmd_line/Encoder.cpp:28:
+./cmd_line/encodings/Enc_SWC.h: In member function ‘void leximaxIST::SWC::updateAssumptions(leximaxIST::Solver&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_SWC.h:60:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < unit_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_SWC.h:57:46: warning: unused parameter ‘S’ [-Wunused-parameter]
+   void updateAssumptions(leximaxIST::Solver &S, std::vector<Lit> &assumptions) {
+                                              ^
+In file included from ./cmd_line/Encoder.h:43:0,
+                 from cmd_line/Encoder.cpp:28:
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbSort(std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:119:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbFilter(uint64_t, leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:131:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+Compiling: cmd_line/main.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/main.o cmd_line/main.cpp
+In file included from cmd_line/main.cpp:5:0:
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::Card::Card(const std::vector<int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:50:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int i = 0; i < _lits.size(); i++) {
+                       ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::print()’:
+./cmd_line/FormulaPB.h:65:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:78:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PB::PB(std::vector<int>&, std::vector<long unsigned int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:105:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i< coeffs.size(); i++) ub += coeffs[i];
+                        ~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::changeSign()’:
+./cmd_line/FormulaPB.h:136:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isClause()’:
+./cmd_line/FormulaPB.h:154:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isCardinality()’:
+./cmd_line/FormulaPB.h:169:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::print()’:
+./cmd_line/FormulaPB.h:188:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:209:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PBObjFunction::PBObjFunction(const std::vector<int>&, const std::vector<long unsigned int>&, int64_t)’:
+./cmd_line/FormulaPB.h:245:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < coeffs.size(); i++){
+                        ~~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PBObjFunction::my_print(leximaxIST::indexMap, bool, int)’:
+./cmd_line/FormulaPB.h:277:47: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+         printf("c\tmin (%d)\t", _coeffs.size());
+                                 ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:282:42: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < maxsize && i < _coeffs.size(); i++) {
+                                        ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h:294:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if(_coeffs.size() > maxsize)
+            ~~~~~~~~~~~~~~~^~~~~~~~~
+./cmd_line/FormulaPB.h:295:51: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+             printf("... (%d lits)", _coeffs.size());
+                                     ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:299:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < _coeffs.size(); i++)
+                         ~~^~~~~~~~~~~~~~~~
+In file included from ./cmd_line/Encoder.h:41:0,
+                 from cmd_line/main.cpp:8:
+./cmd_line/encodings/Enc_SWC.h: In member function ‘void leximaxIST::SWC::updateAssumptions(leximaxIST::Solver&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_SWC.h:60:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < unit_lits.size(); i++)
+                     ~~^~~~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_SWC.h:57:46: warning: unused parameter ‘S’ [-Wunused-parameter]
+   void updateAssumptions(leximaxIST::Solver &S, std::vector<Lit> &assumptions) {
+                                              ^
+In file included from ./cmd_line/Encoder.h:43:0,
+                 from cmd_line/main.cpp:8:
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbSort(std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:119:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+./cmd_line/encodings/Enc_Adder.h: In member function ‘void leximaxIST::Adder::wbFilter(uint64_t, leximaxIST::Solver&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&, std::vector<long unsigned int>&, std::vector<int>&)’:
+./cmd_line/encodings/Enc_Adder.h:131:20: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+   for(int i = 0; i < weights.size(); i++) {
+                  ~~^~~~~~~~~~~~~~~~
+cmd_line/main.cpp: In function ‘int main(int, char**)’:
+cmd_line/main.cpp:51:30: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (size_t pos (0); pos < maxsat_formula.nHard(); ++pos) {
+                          ~~~~^~~~~~~~~~~~~~~~~~~~~~~~
+cmd_line/main.cpp:87:31: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+             for (int k (1); k <= obj._coeffs.at(j); ++k) {
+                             ~~^~~~~~~~~~~~~~~~~~~~
+Compiling: cmd_line/ParserPB.o
+g++ -std=c++17 -I ../include -I ./cmd_line -I ./cmd_line/encodings -I ../cadical/src -g -Wall -Wextra -pedantic -c -o cmd_line/ParserPB.o cmd_line/ParserPB.cpp
+In file included from ./cmd_line/MaxSATFormula.h:44:0,
+                 from ./cmd_line/ParserPB.h:42,
+                 from cmd_line/ParserPB.cpp:33:
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::Card::Card(const std::vector<int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:50:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+       for (int i = 0; i < _lits.size(); i++) {
+                       ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::print()’:
+./cmd_line/FormulaPB.h:65:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::Card::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:78:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _lits.size(); i++) {
+                     ~~^~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PB::PB(std::vector<int>&, std::vector<long unsigned int>&, int64_t, bool)’:
+./cmd_line/FormulaPB.h:105:25: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i< coeffs.size(); i++) ub += coeffs[i];
+                        ~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::changeSign()’:
+./cmd_line/FormulaPB.h:136:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isClause()’:
+./cmd_line/FormulaPB.h:154:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘bool leximaxIST::PB::isCardinality()’:
+./cmd_line/FormulaPB.h:169:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::print()’:
+./cmd_line/FormulaPB.h:188:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PB::my_print(leximaxIST::indexMap, bool)’:
+./cmd_line/FormulaPB.h:209:23: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+     for (int i = 0; i < _coeffs.size(); i++) {
+                     ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In constructor ‘leximaxIST::PBObjFunction::PBObjFunction(const std::vector<int>&, const std::vector<long unsigned int>&, int64_t)’:
+./cmd_line/FormulaPB.h:245:26: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for(int i = 0; i < coeffs.size(); i++){
+                        ~~^~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h: In member function ‘void leximaxIST::PBObjFunction::my_print(leximaxIST::indexMap, bool, int)’:
+./cmd_line/FormulaPB.h:277:47: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+         printf("c\tmin (%d)\t", _coeffs.size());
+                                 ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:282:42: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < maxsize && i < _coeffs.size(); i++) {
+                                        ~~^~~~~~~~~~~~~~~~
+./cmd_line/FormulaPB.h:294:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         if(_coeffs.size() > maxsize)
+            ~~~~~~~~~~~~~~~^~~~~~~~~
+./cmd_line/FormulaPB.h:295:51: warning: format ‘%d’ expects argument of type ‘int’, but argument 2 has type ‘std::vector<long unsigned int>::size_type {aka long unsigned int}’ [-Wformat=]
+             printf("... (%d lits)", _coeffs.size());
+                                     ~~~~~~~~~~~~~~^
+./cmd_line/FormulaPB.h:299:27: warning: comparison between signed and unsigned integer expressions [-Wsign-compare]
+         for (int i = 0; i < _coeffs.size(); i++)
+                         ~~^~~~~~~~~~~~~~~~
+cmd_line/ParserPB.cpp: In member function ‘virtual int leximaxIST::ParserPB::getVariableID(char*, int)’:
+cmd_line/ParserPB.cpp:348:48: warning: unused parameter ‘varNameSize’ [-Wunused-parameter]
+ int ParserPB::getVariableID(char *varName, int varNameSize) {
+                                                ^~~~~~~~~~~
+Linking: ../bin/leximaxIST
+g++ printing.o setters.o getters.o solver_call.o signal_handling.o destructor.o IpasirWrap.o sorting_net.o encoding.o constructors.o cmd_line/encodings/Enc_Ladder.o cmd_line/encodings/Enc_SWC.o cmd_line/encodings/Encodings.o cmd_line/encodings/Enc_Totalizer.o cmd_line/encodings/Enc_Adder.o cmd_line/encodings/Enc_CNetworks.o cmd_line/encodings/Enc_MTotalizer.o cmd_line/encodings/Enc_GTE.o cmd_line/MaxSATFormula.o cmd_line/Options.o cmd_line/Encoder.o cmd_line/main.o cmd_line/ParserPB.o -g -L ../lib -L ../cadical/build -lz -lcadical -lleximaxIST -o ../bin/leximaxIST

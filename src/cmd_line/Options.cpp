@@ -1,4 +1,4 @@
-#include <leximaxIST_Options.h>
+#include <Options.h>
 #include <leximaxIST_types.h>
 #include <leximaxIST_printing.h>
 #include <stdlib.h>

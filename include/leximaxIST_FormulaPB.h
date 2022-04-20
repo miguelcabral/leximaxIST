@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef FormulaPB_h
-#define FormulaPB_h
+#ifndef LEXIMAXIST_FORMULAPB
+#define LEXIMAXIST_FORMULAPB
 
 #include <leximaxIST_types.h>
 #include <vector>

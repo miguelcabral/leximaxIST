@@ -25,8 +25,8 @@
  *
  */
 
-#ifndef MaxSATFormula_h
-#define MaxSATFormula_h
+#ifndef LEXIMAXIST_MAXSATFORMULA
+#define LEXIMAXIST_MAXSATFORMULA
 
 //max number of objective functions
 #define MAXDIM 10
@@ -236,6 +236,6 @@ protected:
 
 };
 
-} // namespace openwbo
+} // namespace leximaxIST
 
 #endif

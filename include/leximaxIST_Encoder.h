@@ -26,8 +26,8 @@
  *
  */
 
-#ifndef Encoder_h
-#define Encoder_h
+#ifndef LEXIMAXIST_ENCODER
+#define LEXIMAXIST_ENCODER
 
 #include <leximaxIST_types.h>
 #include <leximaxIST_Solver.h>
@@ -202,6 +202,6 @@ protected:
 //   IGTE igte;
   //KPA kp;
 };
-} // namespace openwbo
+} // namespace leximaxIST
 
 #endif

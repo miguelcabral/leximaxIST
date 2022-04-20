@@ -1,12 +1,12 @@
 CFLAGS = -std=c++17
-CFLAGS += -I ../include -I ./cmd_line -I ./cmd_line/encodings
+CFLAGS += -I ../include -I ./cmd_line -I ./encodings
 SRCSLIB = $(wildcard *.cpp)
+SRCSLIB += $(wildcard encodings/*.cpp)
 SRCSTOOL = $(SRCSLIB)
-SRCSTOOL += $(wildcard cmd_line/encodings/*.cpp)
 SRCSTOOL += $(wildcard cmd_line/*.cpp)
 OBJSLIB = $(SRCSLIB:.cpp=.o)
 OBJSTOOL = $(SRCSTOOL:.cpp=.o)
-OBJSTOOL := $(filter-out cmd_line/encodings/Enc_KPA.o,$(OBJSTOOL))
+#OBJSTOOL := $(filter-out cmd_line/encodings/Enc_KPA.o,$(OBJSTOOL))
 LIB = ../lib/libleximaxIST.a
 TOOL = ../bin/leximaxIST
 

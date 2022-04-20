@@ -1,5 +1,5 @@
-#ifndef LEXIMAXIST_OPTIONS
-#define LEXIMAXIST_OPTIONS
+#ifndef OPTIONS
+#define OPTIONS
 #include <string>
 
 namespace leximaxIST {

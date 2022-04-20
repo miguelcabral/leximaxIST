@@ -455,52 +455,113 @@ namespace leximaxIST {
         fix_all(i); // this may allow the sat solver to eliminate the order encoding
     }
     
-    void Solver::optimise()
+    void Solver::update_lb(int &lb)
     {
-        if (m_verbosity >= 2)
-            std::cout << std::unitbuf; // debug - flushes the output stream after any output operation       
-        m_input_nb_vars = m_id_count;
-        if (m_verbosity > 0 && m_verbosity <= 2) {
-            std::cout << "c Optimising using algorithm " << m_opt_mode << "...\n";
-            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
-            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
-            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
+        const std::vector<int> &core (m_sat_solver->conflict());
+        // get the position in m_soft_clauses of the var with the greatest id in the core
+        // NOTE: we assume m_soft_clauses is sorted in increasing order
+        for (int pos (m_soft_clauses.size() - 1); pos >= 0; --pos) {
+            const int var (std::abs(m_soft_clauses.at(pos)));
+            // try to find var in core
+            bool found (false);
+            for (int lit : core) {
+                if (std::abs(lit) == var) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) { // update lower bound and return
+                // update the lower bound pos = size - lb, hence, lb = size - pos
+                const int new_lb = m_soft_clauses.size() - pos;
+                if (new_lb <= lb) {
+                    print_error_msg("In Solver::update_lb(), lb did not increase");
+                    exit(EXIT_FAILURE);
+                }
+                lb = new_lb;
+                break;
+            }
         }
-        if (m_verbosity == 2) { // print obj functions
-            for (int k (0); k < m_num_objectives ; ++k)
-                print_obj_func(k);
+        // check core size. If core size > 1, get the relevant variable and add it as hard
+        // cost >= lb means at least lb ones
+        // size - 1 means 1 one, size - 2 means 2 ones, ...
+        if (m_verbosity >= 1)
+            std::cout << "c core size: " << core.size() << '\n';
+        if (core.size() > 1) {
+            const int size (m_soft_clauses.size());
+            const int sc = m_soft_clauses.at(size - lb);
+            add_clause(-sc);
         }
-        double initial_time (read_cpu_time());
-        if (m_status != '?') {
-            print_error_msg("Called optimise() twice without changing the formula.");
-            exit(EXIT_FAILURE);
+    }
+    
+    void Solver::search(int i, int lb, int ub)
+    {
+        int nb_calls (0);
+        if (m_verbosity >= 1)
+            std::cout << "c lb = " << lb << " ub = " << ub << '\n';
+        int size (m_soft_clauses.size());
+        while (ub != lb) {
+            int k;
+            if (m_opt_mode == "bin")
+                k = lb + (ub - lb)/2; // floor of half of the interval
+            else if (m_opt_mode == "lin_su")
+                k = ub - 1;
+            else if (m_opt_mode == "lin_us")
+                k = lb;
+            // y <= k means size - k zeros; last position = size - k - 1
+            // adding all neg vars to assumps may allow lb to increase by more than 1
+            const int limit (size - k - 1);
+            std::vector<int> assumps (limit + 1);
+            for (int j (0); j <= limit; ++j)
+                assumps.at(j) = m_soft_clauses.at(j);
+            if (m_verbosity >= 1)
+                std::cout << "c Calling SAT solver...\n";
+            double initial_time (read_cpu_time());
+            const int rv (m_sat_solver->solve(assumps));
+            if (m_verbosity >= 1)
+                print_time(read_cpu_time() - initial_time, "c SAT call CPU time: ");
+            if (rv == 0) {
+                print_error_msg("SAT solver interrupted with no timeout!");
+                exit(EXIT_FAILURE);
+            }
+            if (rv == 10) { // cost <= k
+                // get solution and refine upper bound
+                std::vector<int> s_obj_vec (set_solution(m_sat_solver->model()));
+                std::sort (s_obj_vec.begin(), s_obj_vec.end(), descending_order);
+                ub = s_obj_vec.at(i); // if obj value is, by chance, less than k
+                encode_ub_soft(ub); // bound the cost in hard clauses, not as assumptions
+            }
+            else { // cost >= k + 1
+                // inspect core and check if lb can be increased by more than 1
+                update_lb(lb);
+            }
+            ++nb_calls;
+            if (m_verbosity >= 1)
+                std::cout << "c lb = " << lb << " ub = " << ub << '\n';
         }
-        // check if solve() is called without a problem
-        if (m_num_objectives == 0) {
-            print_error_msg("The problem does not have an objective function");
-            exit(EXIT_FAILURE);
+        if (m_verbosity >= 1)
+            std::cout << "c Number of SAT calls: " << nb_calls << '\n';
+    }
+    
+    void Solver::internal_solve(const int i, const int lb)
+    {
+        if (m_verbosity >= 1) {
+            if (m_opt_mode == "bin")
+                std::cout << "c Binary ";
+            else if (m_opt_mode == "lin_su")
+                std::cout << "c Linear SAT-UNSAT ";
+            else if (m_opt_mode == "lin_us")
+                std::cout << "c Linear UNSAT-SAT ";
+            std::cout << "search of optimum with incremental SAT solver...\n";
         }
-        if (m_input_hard.empty()) {
-            print_error_msg("The problem does not have constraints");
-            exit(EXIT_FAILURE);
-        }
-        if (m_num_objectives == 1) {
-            print_error_msg("The problem is single-objective");
-            exit(EXIT_FAILURE);
-        }
-        // check if problem is satisfiable
-        if (!call_sat_solver(m_sat_solver, {})) {
-            m_status = 'u';
-            return;
-        }
-        m_status = 's'; // update status to SATISFIABLE
-        if (m_opt_mode.substr(0, 4) == "core")
-            optimise_core_guided();
-        else
-            optimise_non_core(0);            
-        if (m_verbosity >= 1) // print total solving time
-            print_time(read_cpu_time() - initial_time, "c Optimisation CPU time: ");
-        m_status = 'o'; // update status to OPTIMUM FOUND
+        std::vector<int> s_obj_vec (get_objective_vector());
+        std::sort(s_obj_vec.begin(), s_obj_vec.end(), descending_order);
+        const int ub (s_obj_vec.at(i));
+        double initial_time;
+        if (m_verbosity >= 1)
+            initial_time = read_cpu_time();
+        search(i, lb, ub);
+        if (m_verbosity >= 1)
+            print_time(read_cpu_time() - initial_time, "c Minimisation CPU time: ");
     }
     
     // sum is the minimum value of the sum of the objective functions in case of presolving
@@ -1044,6 +1105,10 @@ namespace leximaxIST {
     {
         // generate objective functions as sum of variables (the weights are represented
         // as the repetition of variables)
+        // for large weights this is bad. Instead, a more sophisticated encoding of the
+        // sorting networks should be used
+        std::vector<std::vector<int>> objectives;
+        gen_objs_repeat(objectives);
         IpasirWrap *solver (m_sat_solver);
         if (m_opt_mode == "core_rebuild") {
             solver = new IpasirWrap();
