@@ -31,14 +31,6 @@
 //max number of objective functions
 #define MAXDIM 10
 
-/*
-#ifdef SIMP
-#include "simp/SimpSolver.h"
-#else
-#include "core/Solver.h"
-#endif
-*/
-
 #include <leximaxIST_types.h>
 #include <maxConsts.h>
 #include <FormulaPB.h>
@@ -51,10 +43,10 @@ namespace leximaxIST {
 typedef std::map<std::string, int> nameMap;
 typedef std::map<int, std::string> indexMap;
 
-class Soft {
+/*class Soft {
 
 public:
-  /*! The soft class is used to model the soft clauses in a MaxSAT formula. */
+  // The soft class is used to model the soft clauses in a MaxSAT formula.
   Soft(const std::vector<Lit> &soft, uint64_t soft_weight, Lit assump_var,
        const std::vector<Lit> &relax) {
       clause = soft;
@@ -76,10 +68,10 @@ public:
                             //! soft clause
                             
   void my_print(indexMap indexToName);
-};
-
+};*/
+/*
 class Hard {
-  /*! The hard class is used to model the hard clauses in a MaxSAT formula. */
+  // The hard class is used to model the hard clauses in a MaxSAT formula.
 public:
   Hard(const std::vector<Lit> &hard) { clause = hard; }
 
@@ -89,22 +81,22 @@ public:
   std::vector<Lit> clause; //!< Hard clause
   
   void my_print(indexMap indexToName);
-};
+};*/
 
 class MaxSATFormula {
-  /*! This class contains the MaxSAT formula and methods for adding soft and
-   * hard clauses. */
+  /* This class models a generalised MaxSAT formula. It stores hard clauses as well as PB constraints,
+   * and multiple objective functions, with weights.
+   */
 public:
   MaxSATFormula()
-      : hard_weight(UINT64_MAX), problem_type(_UNWEIGHTED_), n_vars(0),
-        n_soft(0), n_hard(0), n_initial_vars(0), sum_soft_weight(0),
-        max_soft_weight(0) {
+      : hard_weight(UINT64_MAX), /*problem_type(_UNWEIGHTED_),*/ n_vars(0),
+        /*n_soft(0),*/ n_hard(0), n_initial_vars(0), sum_soft_weight(0),
+        max_soft_weight(0), n_objf(0) {
 //     objective_function = NULL;
-    format = _FORMAT_PB_;
-    n_objf = 0;
+    //format = _FORMAT_PB_;
   }
 
-  ~MaxSATFormula() {
+  ~MaxSATFormula() {/*
     for (int i = 0; i < nSoft(); i++) {
       soft_clauses[i].clause.clear();
       soft_clauses[i].relaxation_vars.clear();
@@ -113,10 +105,10 @@ public:
 
     for (int i = 0; i < nHard(); i++)
       hard_clauses[i].clause.clear();
-    hard_clauses.clear();
+    hard_clauses.clear();*/
   }
 
-  MaxSATFormula *copyMaxSATFormula();
+  //MaxSATFormula *copyMaxSATFormula();
 
   //min, lower and upper bounds, and max value.
   uint64_t  bounds[MAXDIM][4];
@@ -125,17 +117,17 @@ public:
   void addHardClause(const std::vector<Lit> &lits);
 
   /*! Add a new soft clause. */
-  void addSoftClause(uint64_t weight, const std::vector<Lit> &lits);
+  //void addSoftClause(uint64_t weight, const std::vector<Lit> &lits);
 
   /*! Add a new soft clause with predefined relaxation variables. */
-  void addSoftClause(uint64_t weight, const std::vector<Lit> &lits, const std::vector<Lit> &vars);
+  //void addSoftClause(uint64_t weight, const std::vector<Lit> &lits, const std::vector<Lit> &vars);
 
   int nVars() const;   // Number of variables.
-  int nSoft() const;   // Number of soft clauses.
+  //int nSoft() const;   // Number of soft clauses.
   int nHard() const;   // Number of hard clauses.
   void newVar(int v = -1); // New variable. Set to the given value.
 
-  Lit newLiteral(bool sign = false); // Make a new literal.
+  //Lit newLiteral(bool sign = false); // Make a new literal.
 
   void setProblemType(int type); // Set problem type.
   int getProblemType();          // Get problem type.
@@ -156,7 +148,7 @@ public:
   void setInitialVars(int vars);
 
   /*! Return i-soft clause. */
-  Soft &getSoftClause(int pos);
+  //Soft &getSoftClause(int pos);
 
   /*! Return i-hard clause. */
   Hard &getHardClause(int pos);
@@ -194,9 +186,9 @@ public:
 
   //void convertPBtoMaxSAT();
 
-  void setFormat(int form) { format = form; }
+  //void setFormat(int form) { format = form; }
 
-  int getFormat() { return format; }
+  //int getFormat() { return format; }
 
   indexMap &getIndexToName() { return _indexToName; }
   nameMap &getNameToIndex() { return _nameToIndex; } //
@@ -210,14 +202,9 @@ public:
   //void sync_first(Glucose::Solver* s);  
   //const std::set<Lit>& fixed_vars(){return fv;};
 protected:
-  // MaxSAT database
-  //
-  std::vector<Soft> soft_clauses; //<! Stores the soft clauses of the MaxSAT formula.
-  std::vector<Hard> hard_clauses; //<! Stores the hard clauses of the MaxSAT formula.
 
-  // PB database
-  //
-//   PBObjFunction *objective_function;   //<! Objective function for PB.
+  //std::vector<Soft> soft_clauses; //<! Stores the soft clauses of the MaxSAT formula.
+  std::vector<Clause> hard_clauses; //<! Stores the hard clauses of the MaxSAT formula.
   std::vector<PBObjFunction> objective_functions;  //AG  //<! Objective function for PB.
   std::vector<Card> cardinality_constraints; //<! Stores the cardinality constraints.
   std::vector<PB> pb_constraints;            //<! Stores the PB constraints.
@@ -225,10 +212,10 @@ protected:
 
   // Properties of the MaxSAT formula
   //
-  uint64_t hard_weight; //<! Weight of the hard clauses.
-  int problem_type;     //<! Stores the type of the MaxSAT problem.
+  //uint64_t hard_weight; //<! Weight of the hard clauses.
+  //int problem_type;     //<! Stores the type of the MaxSAT problem.
   int n_vars;           //<! Number of variables used in the SAT solver.
-  int n_soft;           //<! Number of soft clauses.
+  //int n_soft;           //<! Number of soft clauses.
   int n_hard;           //<! Number of hard clauses.
   int n_initial_vars;   //<! Number of variables of the initial MaxSAT formula.
   uint64_t sum_soft_weight; //<! Sum of weights of soft clauses.
@@ -241,7 +228,7 @@ protected:
 
   // Format
   //
-  int format;
+  //int format;
     
   // store variables that are found to be fixed from the start
   //std::set<Lit> fv{};

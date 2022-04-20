@@ -15,11 +15,11 @@ namespace leximaxIST {
     std::string ordinal (int i)
     {
         std::string i_str (std::to_string(i));
-        if (i_str.back() == '1')
+        if (i_str.back() == '1' && i != 11)
             i_str += "st";
-        else if (i_str.back() == '2')
+        else if (i_str.back() == '2' && i != 12)
             i_str += "nd";
-        else if (i_str.back() == '3')
+        else if (i_str.back() == '3' && i != 13)
             i_str += "rd";
         else
             i_str += "th";

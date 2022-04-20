@@ -35,11 +35,15 @@ namespace leximaxIST {
     {
         std::vector<int> objective_vector;
         if (!assignment.empty()) {
-            for (const std::vector<int> &obj_func : m_objectives) {
-                int obj_value (0);
-                for (int var : obj_func) {
-                    if (assignment.at(var) > 0)
-                        ++obj_value;
+            for (int i (0); i < m_num_objectives; ++i) {
+                const PBObjFunction &obj_func (m_formula.getObjFunction(i));
+                int obj_value (obj_func._const);
+                for (size_t j (0); j < obj_func._lits.size(); ++j) {
+                    int var (std::abs(obj_func._lits.at(j)));
+                    int val (obj_func._coeffs.at(j));
+                    val *= assignment.at(var) > 0 ? 1 : -1;
+                    val *= obj_func._lits.at(j) > 0 ? 1 : -1;
+                    obj_value += val;
                 }
                 objective_vector.push_back(obj_value);
             }
@@ -49,18 +53,7 @@ namespace leximaxIST {
 
     std::vector<int> Solver::get_objective_vector() const
     {
-        std::vector<int> objective_vector;
-        if (!m_solution.empty()) {
-            for (const std::vector<int> &obj_func : m_objectives) {
-                int obj_value (0);
-                for (int var : obj_func) {
-                    if (m_solution[var] > 0)
-                        ++obj_value;
-                }
-                objective_vector.push_back(obj_value);
-            }
-        }
-        return objective_vector;
+        return get_objective_vector(m_solution);
     }
 
 }/* namespace leximaxIST */

@@ -22,7 +22,7 @@ namespace leximaxIST
         int m_id_count;
         int m_input_nb_vars; // number of vars of input problem - useful to return assignment of only these variables
         MaxSATFormula m_formula; // contains input constraints (hard clauses and/or pb constraints) and the objectives
-        std::vector<Clause> m_encoding; // encoding clauses
+        std::vector<Clause> m_sat_encoding; // encoding clauses of sat-based algorithms
         std::vector<int> m_soft_clauses; // unit clauses
         int m_num_objectives;
         std::vector<std::vector<int>> m_sorted_vecs;
@@ -84,9 +84,16 @@ namespace leximaxIST
         // empty if unsat; not a const reference because it is not a member variable
         std::vector<int> get_objective_vector() const;
         
+        /* receives the variables, the coefficients and the right hand side of the constraint
+         * the sign of the constraint is assumed to be '<='
+         * the variables are positive integers
+         * the coefficients and the right hand side can be positive or negative
+         */
+        void add_PB_constraint(const std::vector<int> &vars, const std::vector<int> &coefs, int rhs);
+        
         void add_hard_clause(const Clause &cl);
         
-        void add_soft_clauses(const std::vector<std::pair<Clause, int>> &soft_clauses); // clause and weight
+        void add_objective(const std::vector<std::pair<int, int>> &objective);
         
         void set_simplify_last(bool val);
         

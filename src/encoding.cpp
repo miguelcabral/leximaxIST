@@ -1042,6 +1042,8 @@ namespace leximaxIST {
     
     void Solver::optimise_core_guided()
     {
+        // generate objective functions as sum of variables (the weights are represented
+        // as the repetition of variables)
         IpasirWrap *solver (m_sat_solver);
         if (m_opt_mode == "core_rebuild") {
             solver = new IpasirWrap();

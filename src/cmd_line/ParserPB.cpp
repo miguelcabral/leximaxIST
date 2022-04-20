@@ -39,7 +39,13 @@ using namespace leximaxIST;
 // Constructor/destructor.
 //-------------------------------------------------------------------------
 
-ParserPB::ParserPB(MaxSATFormula *m) : _highestCoeffSum(0), maxsat_formula(m) {}
+ParserPB::ParserPB(MaxSATFormula *m) : _highestCoeffSum(0), maxsat_formula(m)
+{
+    if (m == nullptr) {
+        print_error_msg("Null pointer to MaxSATFormula in ParserPB");
+        exit(EXIT_FAILURE);
+    }
+}
 
 ParserPB::~ParserPB() {}
 

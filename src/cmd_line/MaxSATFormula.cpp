@@ -30,7 +30,7 @@
 #include <cassert>
 
 using namespace leximaxIST;
-
+/*
 MaxSATFormula *MaxSATFormula::copyMaxSATFormula() {
   assert(format == _FORMAT_MAXSAT_);
 
@@ -53,15 +53,15 @@ MaxSATFormula *MaxSATFormula::copyMaxSATFormula() {
 
   return copymx;
 }
-
+*/
 // Adds a new hard clause to the hard clause database.
 void MaxSATFormula::addHardClause(const std::vector<Lit> &lits) {
-  Hard hc (lits);
-  hard_clauses.push_back(hc);
+  hard_clauses.push_back(lits);
   n_hard++;
 }
 
 // Adds a new soft clause to the hard clause database.
+/*
 void MaxSATFormula::addSoftClause(uint64_t weight, const std::vector<Lit> &lits) {
   std::vector<Lit> vars;
   Lit assump = lit_Undef;
@@ -69,9 +69,10 @@ void MaxSATFormula::addSoftClause(uint64_t weight, const std::vector<Lit> &lits)
   soft_clauses.push_back(sc);
   n_soft++;
 }
-
+*/
 // Adds a new soft clause to the hard clause database with predefined relaxation
 // variables.
+/*
 void MaxSATFormula::addSoftClause(uint64_t weight, const std::vector<Lit> &lits,
                                   const std::vector<Lit> &vars) {
   Lit assump = lit_Undef;
@@ -79,7 +80,7 @@ void MaxSATFormula::addSoftClause(uint64_t weight, const std::vector<Lit> &lits,
   soft_clauses.push_back(sc);
   n_soft++;
 }
-
+*/
 int MaxSATFormula::nInitialVars() const {
   return n_initial_vars;
 } // Returns the number of variables in the working MaxSAT formula.
@@ -89,11 +90,11 @@ void MaxSATFormula::setInitialVars(int vars) { n_initial_vars = vars; }
 int MaxSATFormula::nVars() const {
   return n_vars;
 } // Returns the number of variables in the working MaxSAT formula.
-
+/*
 int MaxSATFormula::nSoft() const {
   return n_soft;
 } // Returns the number of soft clauses in the working MaxSAT formula.
-
+*/
 int MaxSATFormula::nHard() const {
   return n_hard;
 } // Returns the number of hard clauses in the working MaxSAT formula.
@@ -104,12 +105,13 @@ void MaxSATFormula::newVar(int v) {
 } // Increases the number of variables in the working MaxSAT formula.
 
 // Makes a new literal to be used in the working MaxSAT formula.
+/*
 Lit MaxSATFormula::newLiteral(bool sign) {
     Lit p = sign ? -nVars() : nVars();
     newVar();
     return p;
-}
-
+}*/
+/*
 void MaxSATFormula::setProblemType(int type) {
   problem_type = type;
 } // Sets the problem type.
@@ -117,7 +119,7 @@ void MaxSATFormula::setProblemType(int type) {
 int MaxSATFormula::getProblemType() {
   return problem_type; // Return the problem type.
 }
-
+*/
 // 'ubCost' is initialized to the sum of weights of the soft clauses.
 void MaxSATFormula::updateSumWeights(uint64_t weight) {
   if (weight != hard_weight)
@@ -242,7 +244,7 @@ void MaxSATFormula::convertPBtoMaxSAT() {
   
 }
 */
-
+/*
 void Hard:: my_print(indexMap indexToName){   
     printf("c\t");
     for(int i = 0; i < clause.size(); i++)
@@ -252,8 +254,8 @@ void Hard:: my_print(indexMap indexToName){
         else
             printf(" %s%s", (clause[i] < 0) ? "~" : "", "X");
     printf("\n");
-}
-
+}*/
+/*
 void Soft:: my_print(indexMap indexToName){   
     printf("c\t");
     for(int i = 0; i < clause.size(); i++)
@@ -269,7 +271,7 @@ void Soft:: my_print(indexMap indexToName){
     printf("]");
     printf(" A(%d)\n", std::abs(assumption_var));
 }
-
+*/
 
 
 void MaxSATFormula::my_print(){
@@ -304,15 +306,23 @@ void MaxSATFormula::my_print(){
     printf("c ------- Hard clauses (%d) --------------\n", hard_clauses.size());
     if(hard_clauses.size() < maxcs){
         for(int i = 0; i < hard_clauses.size(); i++){
-            hard_clauses[i].my_print(_indexToName);
+            const Clause &clause (hard_clauses.at(i));
+            printf("c\t");
+            for(size_t j = 0; j < clause.size(); j++)
+                if(_indexToName.find(std::abs(clause.at(j))) != _indexToName.end())
+                    printf(" %s%s", (clause.at(j) < 0) ? "~" : "", _indexToName.at(std::abs(clause[i])).c_str());
+                else
+                    printf(" %s%s", (clause.at(j) < 0) ? "~" : "", "X");
+            printf("\n");
         }
     }
+    /*
     printf("c ------- Soft clauses (%d) --------------\n", soft_clauses.size());
     if(soft_clauses.size() < maxcs){
         for(int i = 0; i < soft_clauses.size(); i++){
             soft_clauses[i].my_print(_indexToName);
         }
-    }
+    }*/
     
     printf("c ---------------------------------------\n");
     

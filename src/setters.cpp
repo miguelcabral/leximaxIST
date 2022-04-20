@@ -21,15 +21,30 @@ namespace leximaxIST {
             exit(EXIT_FAILURE);
         }
         update_id_count(cl);
-        if (m_sat_solver == nullptr)
-            m_sat_solver = new IpasirWrap();
         m_formula.addHardClause(cl);
-        m_sat_solver->addClause(cl);
         if (m_verbosity == 2)
             print_clause(std::cout, cl, "c ");
         // update status - if unsat it remains unsat, otherwise set to unknown
         if (m_status != 'u')
             m_status = '?';
+    }
+    
+    // add PB constraint to m_formula
+    // vars are variable ids - they must be positive
+    // the constraint is assumed to have sign '<=' (less than or equal to)
+    void Solver::add_PB_constraint(const std::vector<int> &vars, const std::vector<int> &coefs, int rhs)
+    {
+        for (const int v : vars) {
+            if (v <= 0) {
+                print_error_msg("Tried to add a PB constraint with a non positive variable");
+                exit(EXIT_FAILURE);
+            }
+            // update id_count
+            if (v > m_id_count)
+                m_id_count = v;
+        }
+        PB constraint (vars, coefs, rhs, true); // 'true' means constraint sign '<='
+        m_formula.addPBConstraint(constraint);       
     }
     
     void Solver::add_clause_enc(const Clause &cl)
@@ -39,15 +54,16 @@ namespace leximaxIST {
             exit(EXIT_FAILURE);
         }
         update_id_count(cl);
-        m_encoding.push_back(cl);
+        m_sat_encoding.push_back(cl);
         if (m_verbosity == 2)
             print_clause(std::cout, cl, "c ");
+        /*
         // In 'core-rebuild' we create a new ipasir solver everytime the sorting networks grow
         // is this really necessary ?  maybe I can remove the if
         if (m_opt_mode != "core-rebuild")
             m_sat_solver->addClause(cl);
         else
-            m_sat_solver->addClause(cl);
+            m_sat_solver->addClause(cl);*/
     }
 
     void Solver::add_clause(int l)
@@ -228,15 +244,18 @@ namespace leximaxIST {
         }
     }
     
-    // add an objective function in the form of a set of soft clauses (so the goal is to minimise clause falsification)
-    // input: each soft clause is a std::pair<Clause, int>. the first element contains the literals, the second is the weight
-    void Solver::add_soft_clauses(const std::vector<std::pair<Clause, int>> &soft_clauses)
+    // add objective function
+    // we assume minimisation
+    // input: the first element is a variable id, the second is the weight/coefficient
+    // the variable and the weight are both assumed to be positive
+    void Solver::add_objective(const std::vector<std::pair<int, int>> &objective)
     {
-        if (soft_clauses.empty()) {
-            print_error_msg("In function leximaxIST::Solver::add_soft_clauses, empty objective function");
+        if (objective.empty()) {
+            print_error_msg("Empty objective function");
             exit(EXIT_FAILURE);
         }
         ++m_num_objectives;
+        /*
         // set m_snet_info to a vector of (0,0) pairs
         m_snet_info.resize(m_num_objectives, std::pair(0,0));
         m_objectives.resize(m_num_objectives);
@@ -244,14 +263,24 @@ namespace leximaxIST {
         // set m_all_relax_vars to a vector of empty lists
         m_all_relax_vars.resize(m_num_objectives);
         // set m_sorted_relax_collection to a vector of empty vectors
-        m_sorted_relax_collection.resize(m_num_objectives);
-        for (const std::pair<Clause, int> &sc : soft_clauses )
-            update_id_count(sc.first);
-        // convert clause satisfiaction maximisation to minimisation of sum of variables
-        if (m_verbosity == 2)
+        m_sorted_relax_collection.resize(m_num_objectives);*/
+        for (const std::pair<int, int> &prod : objective ) {
+            if (prod.first <= 0 || prod.second <= 0) {
+                std::string msg ("In the " + ordinal(m_num_objectives) + " objective");
+                msg += " function, invalid variable or coefficient - they must be positive!"; 
+                print_error_msg(msg);
+                exit(EXIT_FAILURE);
+            }
+            // update id count
+            if (prod.first > m_id_count)
+                m_id_count = prod.first;
+        }
+        // convert clause satisfaction maximisation to minimisation of sum of variables
+        /*if (m_verbosity == 2)
             std::cout << "c ---- Input soft clauses conversion to variables ----\n";
         int i (m_num_objectives - 1); // position in m_objectives of the current objective
-        for (const std::vector<int> &soft_clause : soft_clauses) {
+        for (const std::pair<Clause, int> &soft_clause : soft_clauses) {
+            // if soft_clause is a unit clause then just flip the sign of the coefficient
             // neg fresh_var implies soft_clause
             int fresh_var (fresh());
             Clause hard_clause (soft_clause); // copy constructor
@@ -263,7 +292,7 @@ namespace leximaxIST {
                 Clause cl {-soft_lit, -fresh_var};
                 add_hard_clause(cl);
             }
-        }
+        }*/
         // update status - if optimum found then it becomes sat, otherwise status is not changed
         if (m_status == 'o')
             m_status = 's';
