@@ -184,6 +184,23 @@ namespace leximaxIST {
         }
     }
     
+    void Solver::print_obj_func_repeat(const std::vector<std::vector<int>> &objectives) const
+    {
+        for (size_t i (0); i < objectives.size(); ++i) {
+            std::cout << "c --------------- Objective Function " << i << " (size = ";
+            std::cout << objectives.size() << ") --------------\n";
+            std::string line ("c ");
+            for (int v : objectives.at(i)) {
+                line += std::to_string(v) + " ";
+                if (line.size() >= 80) { // print lines with around 80 characters
+                    std::cout << line << '\n';
+                    line = "c ";
+                }
+            }
+            std::cout << line << '\n';
+        }
+    }
+    
     void Solver::print_obj_func(int i) const
     {
         const std::vector<int> &objective (m_objectives.at(i));

@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <list>
 #include <cmath>
+#include <cassert>
 
 namespace leximaxIST {
 
@@ -1099,6 +1100,47 @@ namespace leximaxIST {
                 lb_map.insert(std::make_pair(key, 0));
             }
         }
+    }
+    
+    /* the input objectives is changed to store the objective functions as the sum of variables
+     * with unitary coefficients - which means that for weighted instances, the variables are
+     * repeated according to the weight
+     * This is a temporary/preliminary way of handling weighted instances. This should be improved
+     * so each entry of objectives is a collection of variable ids
+     */
+    void Solver::gen_objs_repeat(std::vector<std::vector<int>> &objectives)
+    {
+        if (m_verbosity >= 2) {
+            std::cout << "c ---- Converting weighted objective functions to sums";
+            std::cout << " of variables by repeating them\n";
+        }
+        objectives.clear();
+        objectives.resize(m_num_objectives);
+        for (int i (0); i < m_num_objectives ; ++i) {
+            const PBObjFunction &pb_obj (m_formula.getObjFunction(i));
+            assert(pb_obj._const == 0); // I assume the constant is zero
+            // if the coefficient is negative, then create fresh variable
+            // equivalent to the negation of the pb_obj variable
+            for (size_t j (0); j < pb_obj._lits.size(); ++j) {
+                int lit (pb_obj._lits.at(j));
+                int var;
+                if (lit < 0) {
+                    var = fresh();
+                    Clause cl;
+                    cl.push_back(-var, lit); // var -> lit
+                    add_hard_clause(cl);
+                    cl.clear();
+                    cl.push_back(-lit, var); // lit -> var
+                    add_hard_clause(cl);
+                }
+                else
+                    var = lit;
+                for (int k (1); k <= pb_obj._coeffs.at(j); ++k)
+                    objectives.at(i).push_back(var);
+            }
+        }
+        if (m_verbosity >= 2)
+            print_obj_func_repeat(objectives);
     }
     
     void Solver::optimise_core_guided()

@@ -195,7 +195,7 @@ namespace leximaxIST
         
         //void delete_snet(SNET &sorting_network);
         
-        // encoding.cpp
+        // alg_opt_sat.cpp
         
         void encode_sorted(const std::vector<int> &inputs_to_sort, int i);
         
@@ -233,6 +233,8 @@ namespace leximaxIST
         
         void fix_only_some();
         
+        void gen_objs_repeat(std::vector<std::vector<int>> &objectives);
+        
         void optimise_non_core(int sum);
         
         void optimise_core_guided();
@@ -261,33 +263,15 @@ namespace leximaxIST
                       
         void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j);
         
-        // solver_call.cpp
-        
-        bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
-        
-        void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
-        
-        void fix_previous_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
-        
-        void decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
-        
-        void gia();
-        
-        int pareto_search(int &max_index, IpasirWrap *solver);
-        
         void internal_solve(const int i, const int lb);
         
         void update_lb(int &lb);
         
         void search(int i, int lb, int ub);
         
-        void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
+        // solver_call.cpp
         
-        int mss_choose_obj (const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss, const int best_max) const;
-        
-        int mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max);
-        
-        void mss_enumerate();
+        bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
         
         int get_lower_bound(const std::vector<int> &model);
         
@@ -374,7 +358,31 @@ namespace leximaxIST
         
         void print_pb_constraint(const Clause &cl, std::ostream &output) const;
         
+        void Solver::print_obj_func_repeat(const std::vector<std::vector<int>> &objectives) const;
+        
 //         void print_sum_equals_pb(int i, std::ostream &output) const;
+        
+        // alg_mss.cpp
+        
+        void mss_add_falsified (IpasirWrap *solver, const std::vector<int> &model, std::vector<std::vector<int>> &mss, std::vector<std::vector<int>> &todo_vec, std::vector<int> &assumps);
+        
+        int mss_choose_obj (const std::vector<std::vector<int>> &todo_vec, const std::vector<std::vector<int>> &mss, const int best_max) const;
+        
+        int mss_linear_search(std::vector<std::vector<int>> &mss, IpasirWrap *solver, int &best_max);
+        
+        void mss_enumerate();
+        
+        // alg_gia.cpp
+        
+        void bound_objs(std::vector<int> &unit_clauses, int max, const std::vector<int> &obj_vec) const;
+        
+        void fix_previous_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
+        
+        void decrease_max(std::vector<int> &unit_clauses, int max_index, const std::vector<int> &obj_vec) const;
+        
+        void gia();
+        
+        int pareto_search(int &max_index, IpasirWrap *solver);
         
         /* Friend classes:
          * openwbo PB encodings so that they can call fresh() to produce new variables
