@@ -496,6 +496,8 @@ namespace leximaxIST {
         m_status = 's'; // update status to SATISFIABLE
         if (m_opt_mode.substr(0, 4) == "core")
             optimise_core_guided();
+        else if (m_opt_mode == "ilp")
+            optimise_ilp();
         else
             optimise_non_core(0);            
         if (m_verbosity >= 1) // print total solving time

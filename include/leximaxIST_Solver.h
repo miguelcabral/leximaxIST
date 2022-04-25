@@ -267,6 +267,10 @@ namespace leximaxIST
                       
         void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j);
         
+        // alg_opt_ilp.cpp
+        
+        void optimise_ilp();
+        
         // solver_call.cpp
         
         bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
