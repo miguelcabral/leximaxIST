@@ -6,6 +6,7 @@
 #include <zlib.h>
 #include <sys/wait.h>
 #include <sys/resource.h> // for getrusage()
+#include <sys/types.h> // getpid(), I think
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h> // for errno
@@ -131,12 +132,16 @@ namespace leximaxIST {
         }
     }
     
-    void Solver::read_solver_output(std::vector<int> &model)
+    /* opens the file where the solution of the external solver is stored and
+     * writes the solution in the variable 'model'
+     * 'i' refers to the iteration of the optimisation algorithm - ilp or sat-based.
+     */
+    void Solver::read_solver_output(std::vector<int> &model, int i)
     {
-        std::string output_filename (m_file_name + ".sol");
-        gzFile of = gzopen(output_filename.c_str(), "rb");
+        const std::string filename (std::to_string(getpid()) + "_" + std::to_string(i) + ".sol");
+        gzFile of = gzopen(filename.c_str(), "rb");
         if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + output_filename + "' for reading");
+            print_error_msg("Can't open file '" + filename + "' for reading");
             if (!m_leave_tmp_files)
                 remove_tmp_files();
             exit(EXIT_FAILURE);
@@ -410,7 +415,7 @@ namespace leximaxIST {
         }
         // read output of solver
         std::vector<int> model;
-        read_solver_output(model);
+        read_solver_output(model, i);
         // if ext solver is killed before it finds a sol, the problem might not be unsat
         set_solution(model); // update solution and print obj vector
         if (!m_leave_tmp_files)
@@ -458,6 +463,40 @@ namespace leximaxIST {
             output << "x" << j << '\n';
         output << "End";
         output.close();
+    }
+    
+    void Solver::write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const
+    {
+        const std::string filename (std::to_string(getpid()) + "_" + std::to_string(i) + ".lp");
+        std::ofstream os(filename); 
+        if (!os) {
+            print_error_msg("Could not open '" + filename + "' for writing");
+            exit(EXIT_FAILURE);
+        }
+        // prepare input for the solver
+        os << "Minimize\n";
+        os << " obj: " << "x" << max_vars.at(i) << '\n';
+        os << "Subject To\n";
+        // print constraints
+        for (const ILPConstraint &ilpc : constraints)
+            ilpc.print(os);
+        os << "Binaries\n";
+        // print all variables except for the maximum integer variables
+        for (int j (1); j <= m_id_count; ++j) {
+            // find j in max_vars
+            bool in_max_vars (false);
+            for (int max_v : max_vars) {
+                if (max_v == j)
+                    in_max_vars = true;
+            }
+            if (!in_max_vars)
+                os << "x" << j << '\n';
+        }
+        os << "Generals\n";
+        for (size_t j (0); j < max_vars.size(); ++j)
+            os << "x" << max_vars.at(j) << '\n';
+        os << "End";
+        os.close();
     }
     
     void Solver::remove_tmp_files() const

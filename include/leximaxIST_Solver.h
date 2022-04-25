@@ -3,6 +3,7 @@
 #include <leximaxIST_types.h>
 #include <IpasirWrap.h>
 #include <leximaxIST_parsing_utils.h>
+#include <leximaxIST_ILPConstraint.h>
 #include <string> // std::string
 #include <vector> // std::vector
 #include <unordered_map> // std::unordered_map
@@ -271,7 +272,11 @@ namespace leximaxIST
         
         void optimise_ilp();
         
+        int ilp_bound() const;
+        
         // solver_call.cpp
+        
+        void write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const;
         
         bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
         
@@ -311,7 +316,7 @@ namespace leximaxIST
         
         void call_ext_solver(const std::string &cmd);
         
-        void read_solver_output(std::vector<int> &model);
+        void read_solver_output(std::vector<int> &model, int i);
         
         void external_solve(int i);
         
@@ -400,8 +405,9 @@ namespace leximaxIST
         friend class CNetworks;
         friend class GTE;
         
-    }; /* Solver class declaration */
+    }; /* Solver class definition */
 
 } /* namespace leximaxIST */
+
 
 #endif

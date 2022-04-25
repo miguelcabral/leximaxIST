@@ -1,52 +1,17 @@
 #include <leximaxIST_Solver.h>
+#include <leximaxIST_ILPConstraint.h>
 #include <leximaxIST_rusage.h>
 #include <leximaxIST_printing.h>
-#include <cassert>
 #include <string>
 #include <vector>
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <sys/types.h>
+#include <unistd.h>
+#include <algorithm>
 
 namespace leximaxIST {
-    
-    class ILPConstraint {
-    public:
-        ILPConstraint(const std::vector<int> &vars,
-            const std::vector<int> &coeffs,
-            const std::string &sign,
-            int rhs
-        )
-        m_vars(vars),
-        m_coeffs(coeffs),
-        m_sign(sign),
-        m_rhs(rhs)
-        {
-            assert(m_sign == ">=" || m_sign == "<=" || m_sign == "=");
-            assert(m_vars.size() == m_coeffs.size());
-        }
-        
-        std::vector<int> m_vars;
-        std::vector<int> m_coeffs;
-        std::string m_sign; // can be either '<=', '>=' or '='
-        int m_rhs;
-        
-        void print(std::ostream &os) const
-        {
-            std::string line ("");
-            for (size_t i (0); i < m_vars.size(); ++i) {
-                line += (m_coeffs.at(i) > 0) ? " + " : " - ";
-                line += std::string(std::abs(m_coeffs.at(i)));
-                line += " x" + m_vars.at(i) + " ";
-                if (line.size() >= 80) {
-                    os << line << '\n';
-                    line = "";
-                }
-            }
-            line += m_sign + " " + m_rhs;
-        }
-        
-    }
 
     void Solver::optimise_ilp()
     {
@@ -75,12 +40,13 @@ namespace leximaxIST {
         }        
         // next, iteratively solve single-objective by calling gurobi external executable
         // the constraints are added in each iteration
-        std::vector<int>
+        std::vector<int> max_vars;
         for (int i (0); i < m_num_objectives; ++i) {
             if (m_verbosity >= 1)
                 std::cout << "c Minimising the " << ordinal(i + 1) << " maximum...\n";
             // ith maximum
             int max_i (fresh());
+            max_vars.push_back(max_i);
             if (m_verbosity >= 2) {
                 std::cout << "c " << ordinal(i + 1) << " maximum integer variable: ";
                 std::cout << max_i << '\n'; 
@@ -97,7 +63,7 @@ namespace leximaxIST {
                 for (int j (0); j < m_num_objectives; ++j) {
                     relax_vars.push_back(fresh());
                     if (m_verbosity >= 2)
-                        std::cout << relax_vars.at(j) << ' '
+                        std::cout << relax_vars.at(j) << ' ';
                 }
                 if (m_verbosity >= 2)
                     std::cout << '\n';
@@ -106,11 +72,11 @@ namespace leximaxIST {
             for (int j (0); j < m_num_objectives; ++j) {
                 std::vector<int> constr_vars;
                 std::vector<int> coeffs;
-                constexpr std::string sign ("<=");
+                const std::string sign ("<=");
                 constexpr int rhs (0);
                 // add jth objective function variables
                 for (int v : m_objectives.at(j)) {
-                    constr_vars.push_back(constr_vars);
+                    constr_vars.push_back(v);
                     coeffs.push_back(1);
                 }
                 // add ith maximum integer var
@@ -123,29 +89,29 @@ namespace leximaxIST {
                 }
                 ILPConstraint ilpc (constr_vars, coeffs, sign, rhs);
                 constraints.push_back(ilpc);
-                if (m_verbosity >= 2) {
+                /*if (m_verbosity >= 2) {
                     std::cout << "c Added ILP constraint:\n";
                     ilpc.print(std::cout);
-                }
+                }*/
             }           
             // write lp file for gurobi
-            write_lp_file(constraints, max_i);
+            write_lp_file(constraints, max_vars, i);
             // call gurobi
+            const std::string pid (std::to_string(getpid()));
             std::string command ("gurobi_cl");
-            command += " Threads=1 ResultFile=" + m_file_name + ".sol";
+            command += " Threads=1 ResultFile=" + pid + "_" + std::to_string(i) + ".sol";
             command += " LogFile= LogToConsole=0 "; // disable logging
-            command += m_file_name + " &> " + m_file_name + ".err";;
+            command += pid + "_" + std::to_string(i) + ".sol";
+            command += " &> " + pid + "_" + std::to_string(i) + ".err";
             system(command.c_str());
             // read gurobi .sol file and update m_solution
             // read output of solver
             std::vector<int> model;
-            read_solver_output(model);
+            read_solver_output(model, i);
             // if ext solver is killed before it finds a sol, the problem might not be unsat
             set_solution(model); // update solution and print obj vector
             if (!m_leave_tmp_files)
                 remove_tmp_files();
-            // set m_file_name back to pid
-            reset_file_name();
             // fix ith maximum (add to constraints)
             std::vector<int> vars {max_i};
             std::vector<int> coeffs {1};
@@ -157,6 +123,16 @@ namespace leximaxIST {
             ILPConstraint ilpc (vars, coeffs, sign, rhs);
             constraints.push_back(ilpc);
         }
+    }
+    
+    /* returns the bound used in the relaxation of the constraints
+     * at the moment it simply is an upper bound on the value of the 1st maximum
+     * it may be possible to improve the bound, e.g. by using lower bounds on the sum of the objectives
+     */
+    int Solver::ilp_bound() const
+    {
+        const std::vector<int> obj_vec (get_objective_vector());
+        return *std::max_element(obj_vec.begin(), obj_vec.end());
     }
 
 } /* namespace leximaxIST */

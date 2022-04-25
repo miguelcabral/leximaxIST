@@ -72,6 +72,7 @@ namespace leximaxIST {
         description += values_tab + "core_merge (default) - core-guided unsat-sat search using dynamic sorting networks that grow by sort and merge\n";
         description += values_tab + "core_rebuild - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (not incremental)\n";
         description += values_tab + "core_rebuild_incr - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (incremental)\n";
+        description += values_tab + "ilp - ILP-based algorithm that iteratively calls Gurobi\n";
         m_optimise.set_description(description);
         
         // disjoint cores strategy
