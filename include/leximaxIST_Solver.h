@@ -68,6 +68,7 @@ namespace leximaxIST
         std::vector<std::pair<int, int>> m_snet_info; // first = nb wires and second = nb comparators 
         //std::vector<double> m_times; // time of each step of solving (only external solver times)
         IpasirWrap *m_sat_solver;
+        std::vector<std::string> m_tmp_files; // container with the names of all temporary files used by the solver
         
     public:    
 
@@ -276,6 +277,8 @@ namespace leximaxIST
         
         // solver_call.cpp
         
+        void call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i);
+        
         void write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const;
         
         bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
@@ -310,13 +313,13 @@ namespace leximaxIST
         
         int presolve();
         
-        void remove_tmp_files() const;
+        void remove_tmp_files();
 
         void split_command(const std::string &command, std::vector<std::string> &command_split);
         
         void call_ext_solver(const std::string &cmd);
         
-        void read_solver_output(std::vector<int> &model, int i);
+        void read_solver_output(std::vector<int> &model, const std::string &filename);
         
         void external_solve(int i);
         

@@ -11,6 +11,7 @@ namespace leximaxIST {
     // getters
     int Options::get_help() {return m_help.get_data();}
     int Options::get_verbosity() {return m_verbosity.get_data();}
+    int Options::get_leave_tmp_files() {return m_leave_tmp_files.get_data();}
     int Options::get_disjoint_cores() {return m_disjoint_cores.get_data();}
     std::string Options::get_optimise() {return m_optimise.get_data();}
     std::string Options::get_approx() {return m_approx.get_data();}
@@ -40,6 +41,7 @@ namespace leximaxIST {
     , m_gia_incr (0)
     , m_pb_enc (_PB_SWC_)
     , m_card_enc (_CARD_MTOTALIZER_)
+    , m_leave_tmp_files (0)
     {
         // help
         const std::string name_tab (2, ' ');
@@ -79,6 +81,11 @@ namespace leximaxIST {
         description = name_tab + "--dcs\n";
         description += exp_tab + "when optimising, use the disjoint cores strategy\n";
         m_disjoint_cores.set_description(description);
+        
+        // leave_tmp_files
+        description = name_tab + "--ltf\n";
+        description += exp_tab + "leave temporary files (when solving using an external solver)\n";
+        m_leave_tmp_files.set_description(description);
         
         // approx
         description = name_tab + "--approx <string>\n";
@@ -204,6 +211,7 @@ namespace leximaxIST {
             {"mss-incr",  no_argument,  &(m_mss_incr.get_data()), 1},
             {"gia-incr",  no_argument,  &(m_gia_incr.get_data()), 1},
             {"gia-pareto",  no_argument,  &(m_gia_pareto.get_data()), 1},
+            {"ltf",  no_argument,  &(m_leave_tmp_files.get_data()), 1},
             {"optimise",  required_argument,  0, 500},
             {"approx",  required_argument,  0, 501},
             {"mss-tol",  required_argument,  0, 502},
@@ -274,6 +282,7 @@ namespace leximaxIST {
         os << m_verbosity.get_description();
         os << m_optimise.get_description();
         os << m_disjoint_cores.get_description();
+        os << m_leave_tmp_files.get_description();
         os << m_approx.get_description();
         os << m_timeout.get_description();
         os << m_mss_incr.get_description();

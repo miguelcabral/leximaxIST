@@ -25,6 +25,34 @@
 namespace leximaxIST {
 
     bool descending_order (int i, int j);
+
+    void Solver::call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i)
+    {
+        // temporary file names
+        const std::string base (std::to_string(getpid()) + "_" + std::to_string(i));
+        const std::string input_file_name (base + ".lp");
+        const std::string sol_file_name (base + ".sol");
+        const std::string err_file_name (base + ".err");
+        m_tmp_files.push_back(input_file_name);
+        m_tmp_files.push_back(sol_file_name);
+        m_tmp_files.push_back(err_file_name);
+        // write lp file for gurobi
+        write_lp_file(constraints, max_vars, i);
+        // call gurobi
+        std::string command ("gurobi_cl");
+        command += " Threads=1 ResultFile=" + sol_file_name;
+        command += " LogFile= LogToConsole=0 "; // disable logging
+        command += input_file_name + " &> " + err_file_name;
+        system(command.c_str());
+        // read gurobi .sol file and update m_solution
+        // read output of solver
+        std::vector<int> model;
+        read_solver_output(model, sol_file_name);
+        // if ext solver is killed before it finds a sol, the problem might not be unsat
+        set_solution(model); // update solution and print obj vector
+        if (!m_leave_tmp_files)
+            remove_tmp_files();
+    }
     
     void Solver::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
@@ -136,9 +164,8 @@ namespace leximaxIST {
      * writes the solution in the variable 'model'
      * 'i' refers to the iteration of the optimisation algorithm - ilp or sat-based.
      */
-    void Solver::read_solver_output(std::vector<int> &model, int i)
+    void Solver::read_solver_output(std::vector<int> &model, const std::string &filename)
     {
-        const std::string filename (std::to_string(getpid()) + "_" + std::to_string(i) + ".sol");
         gzFile of = gzopen(filename.c_str(), "rb");
         if (of == Z_NULL) {
             print_error_msg("Can't open file '" + filename + "' for reading");
@@ -149,13 +176,14 @@ namespace leximaxIST {
         StreamBuffer r(of);
         bool sat = false;
         model.resize(static_cast<size_t>(m_id_count + 1), 0);
-        if (m_formalism == "wcnf" || m_formalism == "opb")
+        read_gurobi_output(model, sat, r);
+        /*if (m_formalism == "wcnf" || m_formalism == "opb")
             read_sat_output(model, sat, r);
         else if (m_formalism == "lp") {
             if (m_lp_solver == "cplex")
                 read_cplex_output(model, sat, r);
             else if (m_lp_solver == "gurobi")
-                read_gurobi_output(model, sat, r);
+                read_gurobi_output(model, sat, r);*/
             /*else if (m_lp_solver == "glpk")
                 read_glpk_output(model, sat, r);
             else if (m_lp_solver == "scip")
@@ -164,7 +192,7 @@ namespace leximaxIST {
                 read_cbc_output(model, sat, r);
             else if (m_lp_solver == "lpsolve")
                 read_lpsolve_output(model, sat, r);*/
-        }
+        //}
         if (!sat)
             model.clear();
         gzclose(of);
@@ -415,7 +443,7 @@ namespace leximaxIST {
         }
         // read output of solver
         std::vector<int> model;
-        read_solver_output(model, i);
+        read_solver_output(model, m_file_name + ".sol");
         // if ext solver is killed before it finds a sol, the problem might not be unsat
         set_solution(model); // update solution and print obj vector
         if (!m_leave_tmp_files)
@@ -499,13 +527,11 @@ namespace leximaxIST {
         os.close();
     }
     
-    void Solver::remove_tmp_files() const
+    void Solver::remove_tmp_files()
     {
-        std::string output_filename (m_file_name + ".sol");
-        std::string error_filename (m_file_name + ".err");
-        remove(m_file_name.c_str());
-        remove(output_filename.c_str());
-        remove(error_filename.c_str());
+        for (const std::string &tmp_file : m_tmp_files)
+            remove(tmp_file.c_str());
+        m_tmp_files.clear();
     }
     
     int mss_choose_obj_seq (const std::vector<std::vector<int>> &todo_vec)

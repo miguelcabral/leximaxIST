@@ -41,6 +41,7 @@ namespace leximaxIST {
     private:
         Option<int> m_help;
         Option<int> m_verbosity;
+        Option<int> m_leave_tmp_files;
         Option<std::string> m_optimise;
         Option<std::string> m_input_file_name;
         Option<int> m_disjoint_cores;
@@ -60,6 +61,7 @@ namespace leximaxIST {
         void print_usage(std::ostream &os);
         int get_help();
         int get_verbosity();
+        int get_leave_tmp_files();
         int get_disjoint_cores();
         std::string get_optimise();
         std::string get_approx();

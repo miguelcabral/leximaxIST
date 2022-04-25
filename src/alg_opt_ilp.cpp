@@ -93,25 +93,8 @@ namespace leximaxIST {
                     std::cout << "c Added ILP constraint:\n";
                     ilpc.print(std::cout);
                 }*/
-            }           
-            // write lp file for gurobi
-            write_lp_file(constraints, max_vars, i);
-            // call gurobi
-            const std::string pid (std::to_string(getpid()));
-            std::string command ("gurobi_cl");
-            command += " Threads=1 ResultFile=" + pid + "_" + std::to_string(i) + ".sol";
-            command += " LogFile= LogToConsole=0 "; // disable logging
-            command += pid + "_" + std::to_string(i) + ".sol";
-            command += " &> " + pid + "_" + std::to_string(i) + ".err";
-            system(command.c_str());
-            // read gurobi .sol file and update m_solution
-            // read output of solver
-            std::vector<int> model;
-            read_solver_output(model, i);
-            // if ext solver is killed before it finds a sol, the problem might not be unsat
-            set_solution(model); // update solution and print obj vector
-            if (!m_leave_tmp_files)
-                remove_tmp_files();
+            }
+            call_ilp_solver(constraints, max_vars, i);
             // fix ith maximum (add to constraints)
             std::vector<int> vars {max_i};
             std::vector<int> coeffs {1};

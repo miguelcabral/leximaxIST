@@ -52,6 +52,7 @@ int main(int argc, char *argv[])
     }
 
     solver.set_verbosity(options.get_verbosity());
+    solver.set_leave_tmp_files(options.get_leave_tmp_files());
     
     if (options.get_verbosity() > 0 && options.get_verbosity() <= 2) {
         print_header();
