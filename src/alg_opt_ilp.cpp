@@ -73,7 +73,7 @@ namespace leximaxIST {
                 std::vector<int> constr_vars;
                 std::vector<int> coeffs;
                 const std::string sign ("<=");
-                constexpr int rhs (0);
+                const int rhs (0);
                 // add jth objective function variables
                 for (int v : m_objectives.at(j)) {
                     constr_vars.push_back(v);
@@ -102,7 +102,7 @@ namespace leximaxIST {
             std::vector<int> obj_vec (get_objective_vector());
             if (obj_vec.empty())
                 return;
-            int rhs (obj_vec.at(i));
+            const int rhs (obj_vec.at(i));
             ILPConstraint ilpc (vars, coeffs, sign, rhs);
             constraints.push_back(ilpc);
         }

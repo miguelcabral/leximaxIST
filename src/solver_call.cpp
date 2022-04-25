@@ -29,7 +29,7 @@ namespace leximaxIST {
     void Solver::call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i)
     {
         // temporary file names
-        const std::string base (std::to_string(getpid()) + "_" + std::to_string(i));
+        const std::string base ("/tmp/" std::to_string(getpid()) + "_" + std::to_string(i));
         const std::string input_file_name (base + ".lp");
         const std::string sol_file_name (base + ".sol");
         const std::string err_file_name (base + ".err");
@@ -168,7 +168,8 @@ namespace leximaxIST {
     {
         gzFile of = gzopen(filename.c_str(), "rb");
         if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + filename + "' for reading");
+            const std::string errmsg (strerror(errno));
+            print_error_msg("Can't open file '" + filename + "' for reading - " + errmsg);
             if (!m_leave_tmp_files)
                 remove_tmp_files();
             exit(EXIT_FAILURE);

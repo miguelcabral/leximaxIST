@@ -43,6 +43,7 @@ namespace leximaxIST {
                 }
             }
             line += m_sign + " " + std::to_string(m_rhs);
+            os << line << '\n';
         }
     }; // ILPConstraint definition
 
