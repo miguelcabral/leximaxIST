@@ -68,7 +68,7 @@ namespace leximaxIST {
                 if (m_verbosity >= 2)
                     std::cout << '\n';
             }
-            // add constraints
+            // add bound constraints
             for (int j (0); j < m_num_objectives; ++j) {
                 std::vector<int> constr_vars;
                 std::vector<int> coeffs;
@@ -94,11 +94,22 @@ namespace leximaxIST {
                     ilpc.print(std::cout);
                 }*/
             }
+            // add atmost i constraint setting the number of satisfied relaxation variables
+            if (i > 0) {
+                std::vector<int> vars;
+                std::vector<int> coeffs (m_num_objectives, 1);
+                const std::string sign ("<=");
+                const int rhs (i);
+                for (int v : relax_vars)
+                    vars.push_back(v);
+                ILPConstraint ilpc (vars, coeffs, sign, rhs);
+                constraints.push_back(ilpc);
+            }
             call_ilp_solver(constraints, max_vars, i);
             // fix ith maximum (add to constraints)
             std::vector<int> vars {max_i};
             std::vector<int> coeffs {1};
-            std::string sign ("=");
+            const std::string sign ("=");
             std::vector<int> obj_vec (get_objective_vector());
             if (obj_vec.empty())
                 return;
