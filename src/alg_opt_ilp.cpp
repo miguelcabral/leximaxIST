@@ -12,6 +12,8 @@
 #include <algorithm>
 
 namespace leximaxIST {
+    
+    bool descending_order (int i, int j);
 
     void Solver::optimise_ilp()
     {
@@ -113,6 +115,7 @@ namespace leximaxIST {
             std::vector<int> obj_vec (get_objective_vector());
             if (obj_vec.empty())
                 return;
+            std::sort(obj_vec.begin(), obj_vec.end(), descending_order);
             const int rhs (obj_vec.at(i));
             ILPConstraint ilpc (vars, coeffs, sign, rhs);
             constraints.push_back(ilpc);
