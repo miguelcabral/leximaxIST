@@ -62,21 +62,27 @@ namespace leximaxIST {
                 sat = true;
                 ++r;
                 const int var = parseInt(r);
-                assert(model.size()>(size_t)var);
-                ++r; // skip whitespace
-                if (*r == '1')
-                    model[var] = var;
-                else if (*r == '0')
-                    model[var] = -var;
+                // skip the variables that have larger id than model.size()
+                // those variables are produced by the encoding and some of them may be integer
+                // we only care about the assignment to the input variables
+                if (var > m_input_nb_vars)
+                    skipLine(r);
                 else {
-                    std::string errmsg ("Can't read gurobi output '" + m_file_name + ".sol");
-                    char current_char (*r);
-                    std::string current_char_str (1, current_char);
-                    errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
-                    print_error_msg(errmsg);
-                    if (!m_leave_tmp_files)
-                        remove_tmp_files();
-                    exit(EXIT_FAILURE);
+                    ++r; // skip whitespace
+                    if (*r == '1')
+                        model.at(var) = var;
+                    else if (*r == '0')
+                        model.at(var) = -var;
+                    else {
+                        std::string errmsg ("Can't read gurobi output '" + m_file_name + ".sol");
+                        char current_char (*r);
+                        std::string current_char_str (1, current_char);
+                        errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
+                        print_error_msg(errmsg);
+                        if (!m_leave_tmp_files)
+                            remove_tmp_files();
+                        exit(EXIT_FAILURE);
+                    }
                 }
             }
         }
@@ -175,7 +181,7 @@ namespace leximaxIST {
         }
         StreamBuffer r(of);
         bool sat = false;
-        model.resize(static_cast<size_t>(m_id_count + 1), 0);
+        model.resize(static_cast<size_t>(m_input_nb_vars + 1), 0);
         read_gurobi_output(model, sat, r);
         /*if (m_formalism == "wcnf" || m_formalism == "opb")
             read_sat_output(model, sat, r);
