@@ -29,20 +29,19 @@ namespace leximaxIST {
     void Solver::call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i)
     {
         // temporary file names
-        const std::string base ("/tmp/" std::to_string(getpid()) + "_" + std::to_string(i));
+        const std::string base ("/tmp/" + std::to_string(getpid()) + "_" + std::to_string(i));
         const std::string input_file_name (base + ".lp");
         const std::string sol_file_name (base + ".sol");
-        const std::string err_file_name (base + ".err");
         m_tmp_files.push_back(input_file_name);
         m_tmp_files.push_back(sol_file_name);
-        m_tmp_files.push_back(err_file_name);
         // write lp file for gurobi
         write_lp_file(constraints, max_vars, i);
         // call gurobi
         std::string command ("gurobi_cl");
         command += " Threads=1 ResultFile=" + sol_file_name;
+        //command += " Threads=1 ResultFile=/tmp/foo.sol";
         command += " LogFile= LogToConsole=0 "; // disable logging
-        command += input_file_name + " &> " + err_file_name;
+        command += input_file_name;
         system(command.c_str());
         // read gurobi .sol file and update m_solution
         // read output of solver
@@ -496,7 +495,7 @@ namespace leximaxIST {
     
     void Solver::write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const
     {
-        const std::string filename (std::to_string(getpid()) + "_" + std::to_string(i) + ".lp");
+        const std::string filename ("/tmp/" + std::to_string(getpid()) + "_" + std::to_string(i) + ".lp");
         std::ofstream os(filename); 
         if (!os) {
             print_error_msg("Could not open '" + filename + "' for writing");
