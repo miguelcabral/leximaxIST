@@ -34,14 +34,23 @@ namespace leximaxIST {
         const std::string sol_file_name (base + ".sol");
         m_tmp_files.push_back(input_file_name);
         m_tmp_files.push_back(sol_file_name);
-        // write lp file for gurobi
+        // write lp file for ilp solver
         write_lp_file(constraints, max_vars, i);
+        /*
         // call gurobi
         std::string command ("gurobi_cl");
         command += " Threads=1 ResultFile=" + sol_file_name;
         //command += " Threads=1 ResultFile=/tmp/foo.sol";
         command += " LogFile= LogToConsole=0 "; // disable logging
         command += input_file_name;
+        */
+        std::string command ("cplex -c");
+        command += " \"set threads 1\""; // set threads to 1
+        command += " \"set logfile *\""; // disable log file cplex.log
+        command += " \"read " + input_file_name + "\""; // read input
+        command += " \"optimize\" \"display solution variables -\""; // solve and print solution to stdout
+        command += " &> " + sol_file_name; // redirect stdout to the solution file
+        // call solver
         system(command.c_str());
         // read gurobi .sol file and update m_solution
         // read output of solver
@@ -111,7 +120,7 @@ namespace leximaxIST {
     void Solver::read_cplex_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // set all variables to false, because we only get the variables that are true
-        for (size_t v (1); v < m_id_count + 1; ++v)
+        for (size_t v (1); v < m_input_nb_vars + 1; ++v)
             model.at(v) = -v;
         while (*r != EOF) {
             if (*r != 'C') {// ignore all the other lines
@@ -130,9 +139,14 @@ namespace leximaxIST {
                             skipLine(r);
                         else {
                             ++r;
-                            const int l = parseInt(r);
-                            assert(model.size()>(size_t)l);
-                            model.at(l) = l;
+                            const int var = parseInt(r);
+                            // skip the variables that have larger id than model.size()
+                            // those variables are produced by the encoding and some of them may be integer
+                            // we only care about the assignment to the input variables
+                            if (var > m_input_nb_vars)
+                                skipLine(r);
+                            else
+                                model.at(var) = var;
                         }
                     }
                 }
@@ -182,7 +196,8 @@ namespace leximaxIST {
         StreamBuffer r(of);
         bool sat = false;
         model.resize(static_cast<size_t>(m_input_nb_vars + 1), 0);
-        read_gurobi_output(model, sat, r);
+        read_cplex_output(model, sat, r);
+        //read_gurobi_output(model, sat, r);
         /*if (m_formalism == "wcnf" || m_formalism == "opb")
             read_sat_output(model, sat, r);
         else if (m_formalism == "lp") {
