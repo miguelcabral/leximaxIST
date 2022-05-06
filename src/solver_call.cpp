@@ -45,11 +45,11 @@ namespace leximaxIST {
         command += input_file_name;
         */
         std::string command ("cplex -c");
-        command += " \"set threads 1\""; // set threads to 1
         command += " \"set logfile *\""; // disable log file cplex.log
+        command += " \"set threads 1\""; // set threads to 1
         command += " \"read " + input_file_name + "\""; // read input
         command += " \"optimize\" \"display solution variables -\""; // solve and print solution to stdout
-        command += " &> " + sol_file_name; // redirect stdout to the solution file
+        command += " > " + sol_file_name; // redirect stdout to the solution file
         // call solver
         system(command.c_str());
         // read gurobi .sol file and update m_solution
