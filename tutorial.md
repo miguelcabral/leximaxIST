@@ -2,13 +2,7 @@
 ## C++ Library
 The leximax solver is essentially the class leximaxIST::Solver, defined in the header file leximaxIST_Solver.h.
 To manipulate and configure the solver and to retrive information from it, one uses its public member functions.
-Most of them are of the form `set_something()` which is used to configure parameters and to provide the input multi-objective instance.
-The member functions
-```cpp
-std::vector<int> get_solution() const;
-std::vector<int> get_objective_vector() const;
-```
-are used to get the satisfying assignment and the corresponding objective vector.
+
 In order to obtain a leximax-optimal solution of a certain multi-objective instance, one must start by creating a Solver object:
 ```cpp
 #include <leximaxIST_Solver.h>
@@ -23,13 +17,16 @@ c.push_back(1); // add literal 1 to c
 c.push_back(-2); // add literal -2 (negation of variable 2) to c
 solver.add_hard_clause(c);
 ```
-The variables and literals are represented as in the SAT solver [DIMACS format](https://jix.github.io/varisat/manual/0.2.0/formats/dimacs.html). So, a variable is a positive integer and literals are integers. The negation of a variable k is -k.
+The variables and literals are represented as in the SAT solver [DIMACS format](https://jix.github.io/varisat/manual/0.2.0/formats/dimacs.html). So, a variable is a positive integer and literals are integers. The negation of a variable *k* is *-k*.
 
 An objective function is added in the form of soft clauses, by using the member function:
 ```
 void add_soft_clauses(const std::vector<Clause> &soft_clauses);
 ```
 The objective function to be minimised corresponds to the sum of falsified soft clauses.
+
+Weights can be added by repetition of soft clauses, but the encoding currently used in the library does not handle well large weights.
+
 Here is an example:
 ```cpp
 leximaxIST::Solver solver;
@@ -47,19 +44,20 @@ Finally, the following line runs the leximax optimisation algorithm:
 ```cpp
 solver.optimise(); // run optimisation algorithm
 ```
-In order to retrieve the leximax-optimal solution found, one writes:
+To retrieve the leximax-optimal solution found, one can write:
 ```cpp
 std::vector<int> solution (solver.get_solution());
 ```
 The vector `solution` corresponds to an assignment.
-Entry `i` of `solution` is either `i`, meaning variable `i` is true, or `-i`, meaning variable `i` is false.
-To obtain the corresponding objective vector, one writes:
+Entry i of `solution` is either i, meaning variable i is true, or -i, meaning variable i is false.
+
+To obtain the corresponding objective vector, one can write:
 ```cpp
 std::vector<int> obj_vec (solver.get_objective_vector());
 ```
-Entry `i` of `obj_vec` is the value of the i-th objective function under the assignment found.
+Entry i of `obj_vec` is the value of the i-th objective function under the assignment found.
 
-Besides optimising, the solver also allows to approximate the leximax-optimum, if one is interested in finding a feasible solution quickly and leximax optimisation is taking too long. For that, one can run the following member function:
+Besides optimising, the solver also allows to approximate the leximax-optimum, if one is interested in finding a feasible solution quickly and leximax optimisation is taking too long. For that, one can run the following:
 ```cpp
 solver.approximate();
 ```
@@ -67,6 +65,7 @@ solver.approximate();
 ### Parameters and Solver Configuration
 
 | Member function | Description |
+| ------ | ------ |
 | `void set_opt_mode(const std::string &mode);` | Set the optimisation algorithm |
 | `void set_verbosity(int v);` | Set verbosity - what information gets printed to stdout |
 | `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
