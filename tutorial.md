@@ -1,0 +1,119 @@
+# leximaxIST - Guide
+## C++ Library
+The leximax solver is essentially the class leximaxIST::Solver, defined in the header file leximaxIST_Solver.h.
+To manipulate and configure the solver and to retrive information from it, one uses its public member functions.
+Most of them are of the form `set_something()` which is used to configure parameters and to provide the input multi-objective instance.
+The member functions
+```sh
+std::vector<int> get_solution() const;
+std::vector<int> get_objective_vector() const;
+```
+are used to get the satisfying assignment and the corresponding objective vector.
+In order to obtain a leximax-optimal solution of a certain multi-objective instance, one must start by creating a Solver object:
+```sh
+#include <leximaxIST_Solver.h>
+...
+leximaxIST::Solver solver;
+```
+The hard clauses of the instance can be added one at a time:
+```sh
+leximaxIST::Solver solver;
+leximaxIST::Clause c; // create empty clause c
+c.push_back(1); // add literal 1 to c
+c.push_back(-2); // add literal -2 (negation of variable 2) to c
+solver.add_hard_clause(c);
+```
+The variables and literals are represented as in the SAT solver [DIMACS format](https://jix.github.io/varisat/manual/0.2.0/formats/dimacs.html). So, a variable is a positive integer and literals are integers. The negation of a variable k is -k.
+
+An objective function is added in the form of soft clauses, by using the member function:
+```
+void add_soft_clauses(const std::vector<Clause> &soft_clauses);
+```
+The objective function to be minimised corresponds to the sum of falsified soft clauses.
+Here is an example:
+```sh
+leximaxIST::Solver solver;
+leximaxIST::Clause c; // create empty clause c
+c.push_back(1); // add literal 1 to c
+c.push_back(-2); // add literal -2 (negation of variable 2) to c
+std::vector<Clause> soft_clauses;
+soft_clauses.push_back(c); // copy c to the set of soft clauses
+c.clear(); // c is now empty
+c.push_back(3); // add literal 3 to c
+soft_clauses.push_back(c); // add unit clause to the set of soft clauses
+solver.add_soft_clauses(soft_clauses); // add objective function
+```
+Finally, the following line runs the leximax optimisation algorithm:
+```sh
+solver.optimise(); // run optimisation algorithm
+```
+In order to retrieve the leximax-optimal solution found, one writes:
+```sh
+std::vector<int> solution (solver.get_solution());
+```
+The vector `solution` corresponds to an assignment.
+Entry `i` of `solution` is either `i`, meaning variable `i` is true, or `-i`, meaning variable `i` is false.
+To obtain the corresponding objective vector, one writes:
+```sh
+std::vector<int> obj_vec (solver.get_objective_vector());
+```
+Entry `i` of `obj_vec` is the value of the i-th objective function under the assignment found.
+
+Besides optimising, the solver also allows to approximate the leximax-optimum, if one is interested in finding a feasible solution quickly and leximax optimisation is taking too long. For that, one can run the following member function:
+```sh
+solver.approximate();
+```
+
+### Parameters and Solver Configuration
+
+| Member function | Description |
+| `void set_opt_mode(const std::string &mode);` | Set the optimisation algorithm |
+| `void set_verbosity(int v);` | Set verbosity - what information gets printed to stdout |
+| `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
+| `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
+
+## Examples - Package Upgradeability
+The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
+Example:
+```
+./packup -u '-removed,-changed' -v1 --leximax-opt core_merge --disjoint-cores examples/rand692.cudf &> solution.txt
+```
+The option `-v` sets the verbosity of the output.
+`-v1` prints some interesting information about the algorithm, like the CPU time of every SAT call, the values of the objective functions as soon as a leximax-better solution is found,... `-v2` is for debugging. `-v0` only prints the solution.
+The option `-u` sets the objective functions. The objective functions can be removed, changed, notuptodate, unmet_recommends or new.
+The options `--disjoint-cores` and `--leximax-opt` set the leximax optimisation algorithm.
+Without the option `--leximax-opt` or the option `--leximax-approx` (to do approximation instead of optimisation), packup uses the lexicographic criterion, and an external MaxSAT or PBO solver must be provided.
+Run: `./packup -h` for more information.
+The next example shows how to run mccs with Cbc to minimise the objective functions removed, notuptodate and new using the leximax criterion:
+```
+./mccs -v1 -i <instance> -lp './cbclp' -leximax[-removed,-notuptodate,-new] &> solution.txt
+```
+where `<instance>` is the input file (e.g. `../old_packup/examples/rand692.cudf`).
+
+## Examples - PBMO
+The command line tool receives as input an instance file in the pbmo format, which is the same as the Pseudo-Boolean input [opb format](https://www.cril.univ-artois.fr/PB12/format.pdf), but with multiple objective functions. The solver converts the Pseudo-Boolean constraints to CNF (using encodings taken from [Open-WBO](https://github.com/sat-group/open-wbo)) and then runs the SAT-based algorithm.
+
+The output format is similar to the [MaxSAT solver format](https://maxsat-evaluations.github.io/2022/rules.html).
+The solver outputs the line
+```
+s UNSATISFIABLE
+```
+if the input instance is unsatisfiable. It outputs the line
+```
+s OPTIMUM FOUND
+```
+if a leximax-optimal solution was found. It outputs the line
+```
+s SATISFIABLE
+```
+if the instance is satisfiable but the solver does not know if the best solution so far is optimal. In all other cases, the solver outputs
+```
+s UNKNOWN
+```
+Whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') with the model.
+The folder `examples` contains a benchmark of the set covering problem (put here name of file).
+Example:
+```
+./bin/leximaxIST --optimise core_merge --dcs <input-file>
+```
+Run `./bin/leximaxIST --help` for more information.
