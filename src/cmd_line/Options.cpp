@@ -149,10 +149,10 @@ namespace leximaxIST {
         m_card_enc.set_description(description);
         
         // ilp-solver
-        description = name_tab + "--ilp-solver <int>\n";
+        description = name_tab + "--ilp-solver <string>\n";
         description += exp_tab + "Specify the ILP solver to use in the ILP-based algorithm\n";
-        description += values_tab + "gurobi (default)\n";
-        description += values_tab + "cplex\n";
+        description += values_tab + "'gurobi' (default)\n";
+        description += values_tab + "'cplex'\n";
         m_ilp_solver.set_description(description);
     }
 
