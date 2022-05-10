@@ -36,22 +36,30 @@ namespace leximaxIST {
         m_tmp_files.push_back(sol_file_name);
         // write lp file for ilp solver
         write_lp_file(constraints, max_vars, i);
-        /*
-        // call gurobi
-        std::string command ("gurobi_cl");
-        command += " Threads=1 ResultFile=" + sol_file_name;
-        //command += " Threads=1 ResultFile=/tmp/foo.sol";
-        command += " LogFile= LogToConsole=0 "; // disable logging
-        command += input_file_name;
-        */
-        std::string command ("cplex -c");
-        command += " \"set logfile *\""; // disable log file cplex.log
-        command += " \"set threads 1\""; // set threads to 1
-        command += " \"read " + input_file_name + "\""; // read input
-        command += " \"optimize\" \"display solution variables -\""; // solve and print solution to stdout
-        command += " > " + sol_file_name; // redirect stdout to the solution file
-        // call solver
-        system(command.c_str());
+        if (m_ilp_solver == "gurobi") {
+            // call gurobi
+            std::string command ("gurobi_cl");
+            command += " Threads=1 ResultFile=" + sol_file_name;
+            //command += " Threads=1 ResultFile=/tmp/foo.sol";
+            command += " LogFile= LogToConsole=0 "; // disable logging
+            command += input_file_name;
+            // call solver
+            system(command.c_str());
+        }
+        else if (m_ilp_solver == "cplex") {
+            std::string command ("cplex -c");
+            command += " \"set logfile *\""; // disable log file cplex.log
+            command += " \"set threads 1\""; // set threads to 1
+            command += " \"read " + input_file_name + "\""; // read input
+            command += " \"optimize\" \"display solution variables -\""; // solve and print solution to stdout
+            command += " > " + sol_file_name; // redirect stdout to the solution file
+            // call solver
+            system(command.c_str());
+        }
+        else {
+            print_error_msg("Invalid ILP solver '" + m_ilp_solver + "'");
+            exit(EXIT_FAILURE);
+        }
         // read gurobi .sol file and update m_solution
         // read output of solver
         std::vector<int> model;
@@ -181,7 +189,6 @@ namespace leximaxIST {
     
     /* opens the file where the solution of the external solver is stored and
      * writes the solution in the variable 'model'
-     * 'i' refers to the iteration of the optimisation algorithm - ilp or sat-based.
      */
     void Solver::read_solver_output(std::vector<int> &model, const std::string &filename)
     {
@@ -196,22 +203,28 @@ namespace leximaxIST {
         StreamBuffer r(of);
         bool sat = false;
         model.resize(static_cast<size_t>(m_input_nb_vars + 1), 0);
-        read_cplex_output(model, sat, r);
-        //read_gurobi_output(model, sat, r);
+        if (m_ilp_solver == "cplex")
+            read_cplex_output(model, sat, r);
+        else if (m_ilp_solver == "gurobi")
+            read_gurobi_output(model, sat, r);
+        else {
+            print_error_msg("Invalid ILP solver '" + m_ilp_solver + "'");
+            exit(EXIT_FAILURE);
+        }
         /*if (m_formalism == "wcnf" || m_formalism == "opb")
             read_sat_output(model, sat, r);
         else if (m_formalism == "lp") {
-            if (m_lp_solver == "cplex")
+            if (m_ilp_solver == "cplex")
                 read_cplex_output(model, sat, r);
-            else if (m_lp_solver == "gurobi")
+            else if (m_ilp_solver == "gurobi")
                 read_gurobi_output(model, sat, r);*/
-            /*else if (m_lp_solver == "glpk")
+            /*else if (m_ilp_solver == "glpk")
                 read_glpk_output(model, sat, r);
-            else if (m_lp_solver == "scip")
+            else if (m_ilp_solver == "scip")
                 read_scip_output(model, sat, r);
-            else if (m_lp_solver == "cbc")
+            else if (m_ilp_solver == "cbc")
                 read_cbc_output(model, sat, r);
-            else if (m_lp_solver == "lpsolve")
+            else if (m_ilp_solver == "lpsolve")
                 read_lpsolve_output(model, sat, r);*/
         //}
         if (!sat)
@@ -274,7 +287,7 @@ namespace leximaxIST {
         if (pid == 0) { // child process -> external solver
             // open output_filename and error_filename
             FILE *my_out_stream (nullptr);
-            if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+            if (m_formalism != "lp" || m_ilp_solver != "gurobi") {
                 my_out_stream = fopen(output_filename.c_str(), "w");
                 if (my_out_stream == nullptr) {
                     print_error_msg("Can't open '" + output_filename + "' for writing");
@@ -288,7 +301,7 @@ namespace leximaxIST {
                 exit(-1);
             }
             // redirect std output to output_filename and std error to error_filename (if not gurobi)
-            if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+            if (m_formalism != "lp" || m_ilp_solver != "gurobi") {
                 if (dup2(fileno(my_out_stream), 1) == -1) {
                     print_error_msg("Can't redirect Standard Output of external solver");
                     exit(-1);
@@ -417,9 +430,9 @@ namespace leximaxIST {
         else if (m_formalism == "opb")
             write_opb_file(i);
         else if (m_formalism == "lp") {
-            if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
+            if (m_ilp_solver == "gurobi" || m_ilp_solver == "scip")
                 write_opb_file(i);
-            if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
+            if (m_ilp_solver == "cplex" || m_ilp_solver == "cbc")
                 write_lp_file(i);
         }
     }
@@ -436,13 +449,13 @@ namespace leximaxIST {
         }
         std::string command (m_ext_solver_cmd + " ");
         if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
-            if (m_lp_solver == "cplex")
+            if (m_ilp_solver == "cplex")
                 command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
-            if (m_lp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
+            if (m_ilp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
                 command += m_file_name + " solve solution $";
-            if (m_lp_solver == "scip")
+            if (m_ilp_solver == "scip")
                 command += "-f " + m_file_name;
-            if (m_lp_solver == "gurobi") {
+            if (m_ilp_solver == "gurobi") {
                 command = "gurobi_cl";
                 command += " Threads=1 ResultFile=" + m_file_name + ".sol";
                 command += " LogFile=\"\" LogToConsole=0 "; // disable logging
@@ -451,7 +464,7 @@ namespace leximaxIST {
         }
         else
             command += m_file_name;
-        if (m_formalism != "lp" || m_lp_solver != "gurobi")
+        if (m_formalism != "lp" || m_ilp_solver != "gurobi")
             command += " > " + m_file_name + ".sol";
         command += " 2> " + m_file_name + ".err";
         double initial_time, final_time;

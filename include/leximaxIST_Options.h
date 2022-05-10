@@ -54,6 +54,7 @@ namespace leximaxIST {
         Option<int> m_gia_incr;
         Option<int> m_pb_enc;
         Option<int> m_card_enc;
+        Option<std::string> m_ilp_solver;
         
     public:
         Options(); // starts Options with default settings and descriptions
@@ -63,9 +64,9 @@ namespace leximaxIST {
         int get_verbosity();
         int get_leave_tmp_files();
         int get_disjoint_cores();
-        std::string get_optimise();
-        std::string get_approx();
-        std::string get_input_file_name();
+        const std::string& get_optimise();
+        const std::string& get_approx();
+        const std::string& get_input_file_name();
         double get_timeout();
         int get_mss_tol();
         int get_mss_add_cls();
@@ -74,6 +75,7 @@ namespace leximaxIST {
         int get_gia_incr();
         int get_pb_enc();
         int get_card_enc();
+        const std::string& get_ilp_solver();
         
     private:
         void read_integer(const char *optarg, const std::string &optname, int &i);

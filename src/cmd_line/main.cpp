@@ -124,6 +124,7 @@ int main(int argc, char *argv[])
     // optimisation
     if (!options.get_optimise().empty() && solver.get_status() != 'u') {
         solver.set_disjoint_cores(options.get_disjoint_cores());
+        solver.set_ilp_solver(options.get_ilp_solver());
         solver.set_opt_mode(options.get_optimise());
         solver.optimise();
     }

@@ -40,8 +40,7 @@ namespace leximaxIST
         std::vector<std::list<int>> m_all_relax_vars; // relax_vars of each iteration
         std::string m_ext_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
-        std::string m_lp_solver;
-        std::string m_valid_lp_solvers[6];
+        std::string m_ilp_solver; // ilp solver for the ilp-based algorithm
         std::string m_file_name;
         std::string m_opt_mode; // optimisation algorithm : lin-su, lin-us, bin, core-merge, ...
         std::string m_approx; // approximation algorithm : mss, gia
@@ -114,7 +113,7 @@ namespace leximaxIST
         
         void set_verbosity(int v); // if value is invalid the program is terminated
         
-        void set_lp_solver(const std::string &lp_solver);
+        void set_ilp_solver(const std::string &ilp_solver);
         
         void set_leave_tmp_files(bool val);
         
