@@ -4,19 +4,19 @@ The leximax solver is essentially the class leximaxIST::Solver, defined in the h
 To manipulate and configure the solver and to retrive information from it, one uses its public member functions.
 Most of them are of the form `set_something()` which is used to configure parameters and to provide the input multi-objective instance.
 The member functions
-```sh
+```cpp
 std::vector<int> get_solution() const;
 std::vector<int> get_objective_vector() const;
 ```
 are used to get the satisfying assignment and the corresponding objective vector.
 In order to obtain a leximax-optimal solution of a certain multi-objective instance, one must start by creating a Solver object:
-```sh
+```cpp
 #include <leximaxIST_Solver.h>
 ...
 leximaxIST::Solver solver;
 ```
 The hard clauses of the instance can be added one at a time:
-```sh
+```cpp
 leximaxIST::Solver solver;
 leximaxIST::Clause c; // create empty clause c
 c.push_back(1); // add literal 1 to c
@@ -31,7 +31,7 @@ void add_soft_clauses(const std::vector<Clause> &soft_clauses);
 ```
 The objective function to be minimised corresponds to the sum of falsified soft clauses.
 Here is an example:
-```sh
+```cpp
 leximaxIST::Solver solver;
 leximaxIST::Clause c; // create empty clause c
 c.push_back(1); // add literal 1 to c
@@ -44,23 +44,23 @@ soft_clauses.push_back(c); // add unit clause to the set of soft clauses
 solver.add_soft_clauses(soft_clauses); // add objective function
 ```
 Finally, the following line runs the leximax optimisation algorithm:
-```sh
+```cpp
 solver.optimise(); // run optimisation algorithm
 ```
 In order to retrieve the leximax-optimal solution found, one writes:
-```sh
+```cpp
 std::vector<int> solution (solver.get_solution());
 ```
 The vector `solution` corresponds to an assignment.
 Entry `i` of `solution` is either `i`, meaning variable `i` is true, or `-i`, meaning variable `i` is false.
 To obtain the corresponding objective vector, one writes:
-```sh
+```cpp
 std::vector<int> obj_vec (solver.get_objective_vector());
 ```
 Entry `i` of `obj_vec` is the value of the i-th objective function under the assignment found.
 
 Besides optimising, the solver also allows to approximate the leximax-optimum, if one is interested in finding a feasible solution quickly and leximax optimisation is taking too long. For that, one can run the following member function:
-```sh
+```cpp
 solver.approximate();
 ```
 
