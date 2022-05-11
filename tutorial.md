@@ -64,12 +64,47 @@ solver.approximate();
 
 ### Parameters and Solver Configuration
 
+#### General Options
+
 | Member function | Description |
 | ------ | ------ |
 | `void set_opt_mode(const std::string &mode);` | Set the optimisation algorithm |
+| `void set_approx(const std::string &algorithm);` | Set the approximation algorithm |
 | `void set_verbosity(int v);` | Set verbosity - what information gets printed to stdout |
+
+| Verbosity Values | Description |
+| ------ | ------ |
+| 0 | prints nothing |
+| 1 | prints some information about the algorithm - CPU times, encoding, ... |
+| 2 | prints detailed information for debugging |
+
+#### Optimisation Algorithms
+
+| Member function | Description |
+| ------ | ------ |
 | `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
 | `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
+| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off |
+
+| Optimisation Algorithms | Description |
+| ------ | ------ |
+| 'lin_su' | Linear search SAT-UNSAT with static sorting networks |
+| 'lin_us' | Linear search UNSAT-SAT with static sorting networks |
+| 'bin' | Binary search with static sorting networks |
+| 'core_static' | Core-guided UNSAT-SAT search with static sorting networks |
+| 'core_merge' | Core-guided UNSAT-SAT search with dynamic sorting networks that grow incrementally with sort-and-merge |
+| 'core_rebuild' | Core-guided UNSAT-SAT search with dynamic sorting networks that are rebuilt non-incrementally |
+| 'core_rebuild_incr' | Core-guided UNSAT-SAT search with dynamic sorting networks that are rebuilt incrementally |
+| 'ilp' | ILP-based Algorithm (solvers available: Gurobi and CPLEX) |
+
+#### Approximation Algorithms
+
+| Member function | Description |
+| ------ | ------ |
+| `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
+| `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
+| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off |
+| `` | |
 
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
