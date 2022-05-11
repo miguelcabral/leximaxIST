@@ -20,6 +20,9 @@ We also provide a (slightly modified) copy of the source code of [mccs](https://
 ## Build
 Run `bash install.sh` to set up and install the leximax solver, the SAT solver CaDiCaL, the package upgradeability solvers packup and mccs, and the ILP solver (for mccs) [Cbc](https://github.com/coin-or/Cbc) (release 2.10.7). The executable `leximaxIST` is in the folder `bin` and the library `libleximaxIST.a` is in the folder `lib`.
 
+To use the ILP-based algorithm in leximaxIST, the installation of either Gurobi or CPLEX is required.
+Moreover, one must include in the environment variable PATH the path to the ILP solver executable (`gurobi_cl` or `cplex`).
+
 packup and leximaxIST dependencies: zlib library.
 
 ## Tutorial
