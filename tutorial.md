@@ -80,12 +80,6 @@ solver.approximate();
 
 #### Optimisation Algorithms
 
-| Member function | Description |
-| ------ | ------ |
-| `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
-| `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
-| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off |
-
 | Optimisation Algorithms | Description |
 | ------ | ------ |
 | 'lin_su' | Linear search SAT-UNSAT with static sorting networks |
@@ -97,14 +91,27 @@ solver.approximate();
 | 'core_rebuild_incr' | Core-guided UNSAT-SAT search with dynamic sorting networks that are rebuilt incrementally |
 | 'ilp' | ILP-based Algorithm (solvers available: Gurobi and CPLEX) |
 
-#### Approximation Algorithms
-
 | Member function | Description |
 | ------ | ------ |
 | `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
 | `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
+| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off (when using SAT-based algorithm) |
+
+#### Approximation Algorithms
+
+| Approximation Algorithms | Description |
+| ------ | ------ |
+| 'mss' | Compute Maximal Satisfiable Subsets (MSSes) using linear search SAT-UNSAT |
+| 'gia' | Guided Improvement Algorithm (GIA) adapted to leximax |
+
+| Member function | Description |
+| ------ | ------ |
+| `void set_gia_incr(bool v);` | Switch on/off the use of fully incremental SAT solving during the GIA |
+| `void set_gia_pareto(bool v);` | Switch on/off the search for guaranteed Pareto-optimal solutions during the GIA |
+| `void set_mss_add_cls(int v);` | specify how to add the clauses to the MSS in construction during MSS search |
 | `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off |
-| `` | |
+| `void set_mss_incr(bool v);` | Switch on/off the use of fully incremental SAT solving during the MSS search |
+| `void set_mss_tol(int t);` | Control the choice of which clause is to be tested next to be added to the MSS |
 
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
