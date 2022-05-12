@@ -1,7 +1,6 @@
 # leximaxIST - Guide
 ## C++ Library
 The leximax solver is essentially the class leximaxIST::Solver, defined in the header file leximaxIST_Solver.h.
-To manipulate and configure the solver and to retrive information from it, one uses its public member functions.
 
 In order to obtain a leximax-optimal solution of a certain multi-objective instance, one must start by creating a Solver object:
 ```cpp
@@ -128,6 +127,34 @@ solver.set_mss_incr(false);
 solver.set_mss_tol(0);
 ```
 
+## Command-line Tool
+Usage: `./leximaxIST [<options>] (--approx <string>|--optimise <string>) <input_file>`.
+
+To see all the available options run `./leximaxIST -h`.
+
+### Input Format
+The command-line tool reads an input file with the Multi-Objective Boolean Optimisation instance written in PBMO format, which is the same as the Pseudo-Boolean solver input [OPB format](https://www.cril.univ-artois.fr/PB12/format.pdf), but with multiple objective functions. leximaxIST converts the Pseudo-Boolean constraints to CNF (using encodings taken from [Open-WBO](https://github.com/sat-group/open-wbo)) before running the algorithms.
+
+### Output Format
+The output format is similar to the [MaxSAT solver format](https://maxsat-evaluations.github.io/2022/rules.html).
+The solver outputs the line
+```
+s UNSATISFIABLE
+```
+if the input instance is unsatisfiable. It outputs the line
+```
+s OPTIMUM FOUND
+```
+if a leximax-optimal solution was found. It outputs the line
+```
+s SATISFIABLE
+```
+if the instance is satisfiable but the solver does not know if the best solution so far is optimal. In all other cases, the solver outputs
+```
+s UNKNOWN
+```
+Whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') with the model.
+
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
 Example:
@@ -149,24 +176,7 @@ where `<instance>` is the input file (e.g. `../old_packup/examples/rand692.cudf`
 ## Examples - PBMO
 The command line tool receives as input an instance file in the pbmo format, which is the same as the Pseudo-Boolean input [opb format](https://www.cril.univ-artois.fr/PB12/format.pdf), but with multiple objective functions. The solver converts the Pseudo-Boolean constraints to CNF (using encodings taken from [Open-WBO](https://github.com/sat-group/open-wbo)) and then runs the SAT-based algorithm.
 
-The output format is similar to the [MaxSAT solver format](https://maxsat-evaluations.github.io/2022/rules.html).
-The solver outputs the line
-```
-s UNSATISFIABLE
-```
-if the input instance is unsatisfiable. It outputs the line
-```
-s OPTIMUM FOUND
-```
-if a leximax-optimal solution was found. It outputs the line
-```
-s SATISFIABLE
-```
-if the instance is satisfiable but the solver does not know if the best solution so far is optimal. In all other cases, the solver outputs
-```
-s UNKNOWN
-```
-Whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') with the model.
+
 The folder `examples` contains a benchmark of the set covering problem (put here name of file).
 Example:
 ```
