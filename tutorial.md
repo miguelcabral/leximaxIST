@@ -94,7 +94,7 @@ solver.approximate();
 | ------ | ------ |
 | `void set_ilp_solver(const std::string &ilp_solver);` | Select the ILP solver for the ILP-based algorithm |
 | `void set_leave_tmp_files(bool val);` | Whether to leave temporary input and output files of the ILP solver |
-| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off (when using SAT-based algorithm) |
+| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off (SAT-based algorithm) |
 
 #### Approximation Algorithms
 
@@ -154,6 +154,11 @@ The solver outputs one of the following lines:
 - `s UNKNOWN` (in all other cases).
 
 Moreover, whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') showing the satisfying assignment, as in the MaxSAT evaluation output format.
+
+**Note:** If the verbosity level is set to 1 or higher, the solver also prints lines starting with the character 'o' every time a leximax-better solution is found. The character 'o' is followed by the values of the objective functions for that feasible solution.
+
+#### Signal Handling
+The command-line tool, upon receiving one of the signals SIGUSR1, SIGHUP, SIGINT or SIGTERM, prints the solution status and the assignment, in the previously mentioned format, and terminates.
 
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
