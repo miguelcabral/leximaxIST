@@ -286,7 +286,7 @@ namespace leximaxIST {
     
     void Options::print_usage(std::ostream &os)
     {
-        os << "Usage: ./leximaxIST [<options>] <input_file>\n";
+        os << "Usage: ./leximaxIST [<options>] -h|--help|((--approx <string>)|(--optimise <string>) <input_file>)\n";
         os << m_input_file_name.get_description();
         os << "Options:\n";
         os << m_help.get_description();

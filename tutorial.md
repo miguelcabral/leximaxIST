@@ -128,58 +128,66 @@ solver.set_mss_tol(0);
 ```
 
 ## Command-line Tool
-Usage: `./leximaxIST [<options>] (--approx <string>|--optimise <string>) <input_file>`.
+Usage: `./leximaxIST [<options>] -h|--help|((--approx <string>)|(--optimise <string>) <input_file>)`.
+
+Example: `./leximaxIST --optimise ilp formula.pbmo` (Find a leximax-optimal solution of the instance described in file `formula.pbmo`, using the ILP-based algorithm.)
+
+Example: `./leximaxIST --timeout 10 --approx mss formula.pbmo` (Find a feasible solution as close to leximax-optimal as possible, using the approximation algorithm based on Maximal Satisfiable Subsets (MSSes), with a time limit of 10 seconds.)
 
 To see all the available options run `./leximaxIST -h`.
 
 ### Input Format
 The command-line tool reads an input file with the Multi-Objective Boolean Optimisation instance written in PBMO format, which is the same as the Pseudo-Boolean solver input [OPB format](https://www.cril.univ-artois.fr/PB12/format.pdf), but with multiple objective functions. leximaxIST converts the Pseudo-Boolean constraints to CNF (using encodings taken from [Open-WBO](https://github.com/sat-group/open-wbo)) before running the algorithms.
 
+In folder `examples` there is an example PBMO instance `bp-100-20-3-10-10192-SC.pbmo`, from the set covering problem.
+
 ### Output Format
-The output format is similar to the [MaxSAT solver format](https://maxsat-evaluations.github.io/2022/rules.html).
-The solver outputs the line
-```
-s UNSATISFIABLE
-```
-if the input instance is unsatisfiable. It outputs the line
-```
-s OPTIMUM FOUND
-```
-if a leximax-optimal solution was found. It outputs the line
-```
-s SATISFIABLE
-```
-if the instance is satisfiable but the solver does not know if the best solution so far is optimal. In all other cases, the solver outputs
-```
-s UNKNOWN
-```
-Whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') with the model.
+The output format is similar to the [MaxSAT evaluation output format](https://maxsat-evaluations.github.io/2022/rules.html).
+The solver outputs one of the following lines:
+
+- `s UNSATISFIABLE` (if the input instance is unsatisfiable);
+
+- `s OPTIMUM FOUND` (if a leximax-optimal solution was found);
+
+- `s SATISFIABLE` (if a feasible solution was found that is not guaranteed to be optimal);
+
+- `s UNKNOWN` (in all other cases).
+
+Moreover, whenever the instance is satisfiable, the solver outputs one or more lines (starting with the character 'v') showing the satisfying assignment, as in the MaxSAT evaluation output format.
 
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
+
 Example:
 ```
 ./packup -u '-removed,-changed' -v1 --leximax-opt core_merge --disjoint-cores examples/rand692.cudf &> solution.txt
 ```
-The option `-v` sets the verbosity of the output.
+
+- The option `-v` sets the verbosity of the output.
 `-v1` prints some interesting information about the algorithm, like the CPU time of every SAT call, the values of the objective functions as soon as a leximax-better solution is found,... `-v2` is for debugging. `-v0` only prints the solution.
-The option `-u` sets the objective functions. The objective functions can be removed, changed, notuptodate, unmet_recommends or new.
-The options `--disjoint-cores` and `--leximax-opt` set the leximax optimisation algorithm.
+
+- The option `-u` sets the objective functions.
+
+packup accepts the following objective functions:
+
+| Objective Function | Description |
+| --- | --- |
+| `-removed` | Minimise the number of removed packages |
+| `-changed` | Minimise the number of changed packages |
+| `-notuptodate` | Minimise the number of not-up-to-date packages |
+| `-unmet_recommends` | Minimise the number of packages with unsatisfied recommendations |
+| `-new` | Minimise the number of newly installed packages |
+
+For the package upgradeability solver mccs, the `unmet_recommends` objective function corresponds to `-nunsat[recommends:]`.
+
+- The option `--leximax-opt` tells the solver to do leximax optimisation with a specific algorithm.
+
 Without the option `--leximax-opt` or the option `--leximax-approx` (to do approximation instead of optimisation), packup uses the lexicographic criterion, and an external MaxSAT or PBO solver must be provided.
+
 Run: `./packup -h` for more information.
+
 The next example shows how to run mccs with Cbc to minimise the objective functions removed, notuptodate and new using the leximax criterion:
 ```
 ./mccs -v1 -i <instance> -lp './cbclp' -leximax[-removed,-notuptodate,-new] &> solution.txt
 ```
 where `<instance>` is the input file (e.g. `../old_packup/examples/rand692.cudf`).
-
-## Examples - PBMO
-The command line tool receives as input an instance file in the pbmo format, which is the same as the Pseudo-Boolean input [opb format](https://www.cril.univ-artois.fr/PB12/format.pdf), but with multiple objective functions. The solver converts the Pseudo-Boolean constraints to CNF (using encodings taken from [Open-WBO](https://github.com/sat-group/open-wbo)) and then runs the SAT-based algorithm.
-
-
-The folder `examples` contains a benchmark of the set covering problem (put here name of file).
-Example:
-```
-./bin/leximaxIST --optimise core_merge --dcs <input-file>
-```
-Run `./bin/leximaxIST --help` for more information.
