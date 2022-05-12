@@ -101,17 +101,32 @@ solver.approximate();
 
 | Approximation Algorithms | Description |
 | ------ | ------ |
-| 'mss' | Compute Maximal Satisfiable Subsets (MSSes) using linear search SAT-UNSAT |
+| 'mss' | Compute Maximal Satisfiable Subsets (MSSes) using extended linear search |
 | 'gia' | Guided Improvement Algorithm (GIA) adapted to leximax |
 
 | Member function | Description |
 | ------ | ------ |
+| `void set_approx_tout(double t);` | Set a timeout in seconds for the approximation algorithm |
 | `void set_gia_incr(bool v);` | Switch on/off the use of fully incremental SAT solving during the GIA |
 | `void set_gia_pareto(bool v);` | Switch on/off the search for guaranteed Pareto-optimal solutions during the GIA |
 | `void set_mss_add_cls(int v);` | specify how to add the clauses to the MSS in construction during MSS search |
-| `void set_disjoint_cores(bool v);` | Switches the disjoint cores strategy on/off |
 | `void set_mss_incr(bool v);` | Switch on/off the use of fully incremental SAT solving during the MSS search |
 | `void set_mss_tol(int t);` | Control the choice of which clause is to be tested next to be added to the MSS |
+
+`void set_mss_tol(int t);` receives an integer t between 0 and 100 (percentage). When finding an MSS using extended linear search, in each iteration, a clause is selected from the set of soft clauses to be tested if it can be added to the MSS in construction. In the multi-objective case, we can select a clause from multiple objective functions. Also, in each iteration, the MSS in construction fixes upper bounds on the objective functions. The choice of the next clause is done via this parameter t. If t <= (max-min)\*100/max, then the next clause is taken from an objective function with the largest upper bound, otherwise, the next clause is chosen sequentially. Here, max and min are the maximum and minimum upper bounds, respectively. Essentially, for small values of t the algorithm tends to select clauses from an objective function with the largest upper bound; and for large values of t the algorithm tends to select clauses from an objective function sequentially.
+
+`void set_mss_add_cls(int v);` accepts the following values: 0, 1, 2. During MSS extended linear search, after each satisfiable SAT solver call, we can add to the MSS in construction any of the satisfied soft clauses. This function sets the parameter which controls how and which of those clauses are actually added to the MSS.
+- 0 : add all the satisfied soft clauses to the MSS;
+- 1 : add as many satisfied soft clauses as possible while trying to even out the upper bounds of the objective functions;
+- 2 : add only the soft clause tested in the SAT call.
+
+Based on experimental data on the Multi-Objective Package Upgradeability Optimisation problem, the best performing approximation algorithm is 'mss' with the following configuration:
+```cpp
+solver.set_approx('mss');
+solver.set_mss_add_cls(1);
+solver.set_mss_incr(false);
+solver.set_mss_tol(0);
+```
 
 ## Examples - Package Upgradeability
 The folder `old_packup/examples` contains a package upgradeability benchmark (rand692.cudf). More benchmarks from the [Mancoosi International Solver Competition 2011](https://www.mancoosi.org/misc-2011/index.html) can be found [here](http://data.mancoosi.org/misc2011/problems/).
