@@ -599,7 +599,7 @@ namespace leximaxIST {
     }
     
     /* choose next obj in todo using an heuristic - choose the maximum if
-     * the ratio between the min and the max of upper_bounds is greater than m_mss_tolerance
+     * the ratio between the min and the max of upper_bounds is greater than m_mss_tol
      * returns the index of the objective that we will try to minimise next
      * if the maximum can not be improved, then stop, that is, return -1
      * check how much each objective can decrease: check todo and upper_bounds
