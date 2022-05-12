@@ -187,7 +187,7 @@ For the package upgradeability solver mccs, the `unmet_recommends` objective fun
 
 - The option `--leximax-opt` tells the solver to do leximax optimisation with a specific algorithm.
 
-Without the option `--leximax-opt` or the option `--leximax-approx` (to do approximation instead of optimisation), packup uses the lexicographic criterion, and an external MaxSAT or PBO solver must be provided.
+Without the option `--leximax-opt` or the option `--leximax-approx` (to do approximation instead of optimisation), packup optimises using the lexicographic criterion, and an external MaxSAT or PBO solver must be provided via the option `--external-solver`.
 
 Run: `./packup -h` for more information.
 
