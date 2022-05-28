@@ -274,6 +274,10 @@ namespace leximaxIST
         
         int ilp_bound() const;
         
+        // alg_opt_hs.cpp
+        
+        void optimise_hs();
+        
         // solver_call.cpp
         
         void call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i);

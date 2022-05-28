@@ -498,6 +498,8 @@ namespace leximaxIST {
             optimise_core_guided();
         else if (m_opt_mode == "ilp")
             optimise_ilp();
+        else if (m_opt_mode == "hs")
+            optimise_hs();
         else
             optimise_non_core(0);            
         if (m_verbosity >= 1) // print total solving time
