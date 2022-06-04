@@ -84,7 +84,7 @@ namespace leximaxIST {
     {
         if (mode != "external" && mode != "bin" && mode != "lin_su" &&
             mode != "lin_us" && mode != "core_static" && mode != "core_merge"
-            && mode != "core_rebuild" && mode != "core_rebuild_incr") {
+            && mode != "core_rebuild" && mode != "core_rebuild_incr" && mode != "ilp") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }
@@ -120,21 +120,23 @@ namespace leximaxIST {
 
     void Solver::set_timeout(double val) { m_timeout = val; }
     
-    void Solver::set_lp_solver(const std::string &lp_solver)
+    void Solver::set_ilp_solver(const std::string &ilp_solver)
     {
+        //const std::vector<std::string> valid_ilp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"};
+        const std::string valid_ilp_solvers[2] {"cplex", "gurobi"};
         bool found (false);
-        for (std::string &valid_lp_solver : m_valid_lp_solvers)
-            if (lp_solver == valid_lp_solver)
+        for (const std::string &valid_ilp_solver : valid_ilp_solvers)
+            if (ilp_solver == valid_ilp_solver)
                 found = true;
         if (!found) {
-            std::string msg = "The lp solver name entered: '" + lp_solver + "' is not valid\n";
-            msg += "Valid lp solvers: ";
-            for (std::string &valid_lp_solver : m_valid_lp_solvers)
-                msg += valid_lp_solver + ' ';
+            std::string msg = "The ILP solver name entered: '" + ilp_solver + "' is not valid\n";
+            msg += "Valid ILP solvers: ";
+            for (const std::string &valid_ilp_solver : valid_ilp_solvers)
+                msg += valid_ilp_solver + ' ';
             print_error_msg(msg);
             exit(EXIT_FAILURE);
         }
-        m_lp_solver = lp_solver;
+        m_ilp_solver = ilp_solver;
     }
 
     void Solver::set_simplify_last(bool val) { m_simplify_last = val; }

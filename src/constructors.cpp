@@ -10,8 +10,7 @@ namespace leximaxIST {
         m_input_nb_vars(0),
         m_num_objectives(0),
         m_formalism("wcnf"),
-        m_lp_solver("gurobi"),
-        m_valid_lp_solvers {"cplex", "gurobi", "glpk", "scip", "cbc", "lpsolve"},
+        m_ilp_solver("gurobi"),
         m_child_pid(0),
         m_timeout(3000.0), // 3 seconds
         m_leave_tmp_files(false),

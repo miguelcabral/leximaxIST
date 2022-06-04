@@ -3,6 +3,7 @@
 #include <leximaxIST_types.h>
 #include <IpasirWrap.h>
 #include <leximaxIST_parsing_utils.h>
+#include <leximaxIST_ILPConstraint.h>
 #include <string> // std::string
 #include <vector> // std::vector
 #include <unordered_map> // std::unordered_map
@@ -39,8 +40,7 @@ namespace leximaxIST
         std::vector<std::list<int>> m_all_relax_vars; // relax_vars of each iteration
         std::string m_ext_solver_cmd; // for external call to optimisation solver
         std::string m_formalism;
-        std::string m_lp_solver;
-        std::string m_valid_lp_solvers[6];
+        std::string m_ilp_solver; // ilp solver for the ilp-based algorithm
         std::string m_file_name;
         std::string m_opt_mode; // optimisation algorithm : lin-su, lin-us, bin, core-merge, ...
         std::string m_approx; // approximation algorithm : mss, gia
@@ -67,6 +67,7 @@ namespace leximaxIST
         std::vector<std::pair<int, int>> m_snet_info; // first = nb wires and second = nb comparators 
         //std::vector<double> m_times; // time of each step of solving (only external solver times)
         IpasirWrap *m_sat_solver;
+        std::vector<std::string> m_tmp_files; // container with the names of all temporary files used by the solver
         
     public:    
 
@@ -112,7 +113,7 @@ namespace leximaxIST
         
         void set_verbosity(int v); // if value is invalid the program is terminated
         
-        void set_lp_solver(const std::string &lp_solver);
+        void set_ilp_solver(const std::string &ilp_solver);
         
         void set_leave_tmp_files(bool val);
         
@@ -267,7 +268,17 @@ namespace leximaxIST
                       
         void add_unit_core_vars(const std::vector<std::vector<int>> &unit_core_vars, int j);
         
+        // alg_opt_ilp.cpp
+        
+        void optimise_ilp();
+        
+        int ilp_bound() const;
+        
         // solver_call.cpp
+        
+        void call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i);
+        
+        void write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const;
         
         bool call_sat_solver(IpasirWrap *solver, const std::vector<int> &assumps);
         
@@ -301,13 +312,13 @@ namespace leximaxIST
         
         int presolve();
         
-        void remove_tmp_files() const;
+        void remove_tmp_files();
 
         void split_command(const std::string &command, std::vector<std::string> &command_split);
         
         void call_ext_solver(const std::string &cmd);
         
-        void read_solver_output(std::vector<int> &model);
+        void read_solver_output(std::vector<int> &model, const std::string &filename);
         
         void external_solve(int i);
         
@@ -396,8 +407,9 @@ namespace leximaxIST
         friend class CNetworks;
         friend class GTE;
         
-    }; /* Solver class declaration */
+    }; /* Solver class definition */
 
 } /* namespace leximaxIST */
+
 
 #endif

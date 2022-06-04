@@ -11,10 +11,11 @@ namespace leximaxIST {
     // getters
     int Options::get_help() {return m_help.get_data();}
     int Options::get_verbosity() {return m_verbosity.get_data();}
+    int Options::get_leave_tmp_files() {return m_leave_tmp_files.get_data();}
     int Options::get_disjoint_cores() {return m_disjoint_cores.get_data();}
-    std::string Options::get_optimise() {return m_optimise.get_data();}
-    std::string Options::get_approx() {return m_approx.get_data();}
-    std::string Options::get_input_file_name() {return m_input_file_name.get_data();}
+    const std::string& Options::get_optimise() {return m_optimise.get_data();}
+    const std::string& Options::get_approx() {return m_approx.get_data();}
+    const std::string& Options::get_input_file_name() {return m_input_file_name.get_data();}
     double Options::get_timeout() {return m_timeout.get_data();}
     int Options::get_mss_tol() {return m_mss_tol.get_data();}
     int Options::get_mss_add_cls() {return m_mss_add_cls.get_data();}
@@ -23,6 +24,7 @@ namespace leximaxIST {
     int Options::get_gia_incr() {return m_gia_incr.get_data();}
     int Options::get_pb_enc() {return m_pb_enc.get_data();}
     int Options::get_card_enc() {return m_card_enc.get_data();}
+    const std::string& Options::get_ilp_solver() {return m_ilp_solver.get_data();}
     
     // constructor
     Options::Options()
@@ -40,6 +42,8 @@ namespace leximaxIST {
     , m_gia_incr (0)
     , m_pb_enc (_PB_SWC_)
     , m_card_enc (_CARD_MTOTALIZER_)
+    , m_leave_tmp_files (0)
+    , m_ilp_solver ("gurobi")
     {
         // help
         const std::string name_tab (2, ' ');
@@ -72,12 +76,18 @@ namespace leximaxIST {
         description += values_tab + "core_merge (default) - core-guided unsat-sat search using dynamic sorting networks that grow by sort and merge\n";
         description += values_tab + "core_rebuild - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (not incremental)\n";
         description += values_tab + "core_rebuild_incr - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (incremental)\n";
+        description += values_tab + "ilp - ILP-based algorithm\n";
         m_optimise.set_description(description);
         
         // disjoint cores strategy
         description = name_tab + "--dcs\n";
         description += exp_tab + "when optimising, use the disjoint cores strategy\n";
         m_disjoint_cores.set_description(description);
+        
+        // leave_tmp_files
+        description = name_tab + "--ltf\n";
+        description += exp_tab + "leave temporary files (when solving using an external solver)\n";
+        m_leave_tmp_files.set_description(description);
         
         // approx
         description = name_tab + "--approx <string>\n";
@@ -137,6 +147,13 @@ namespace leximaxIST {
         description += values_tab + "1 - totalizer\n";
         description += values_tab + "2 (default) - modulo totalizer\n";
         m_card_enc.set_description(description);
+        
+        // ilp-solver
+        description = name_tab + "--ilp-solver <string>\n";
+        description += exp_tab + "Specify the ILP solver to use in the ILP-based algorithm\n";
+        description += values_tab + "'gurobi' (default)\n";
+        description += values_tab + "'cplex'\n";
+        m_ilp_solver.set_description(description);
     }
 
     /* converts optarg to a double and stores it in d
@@ -203,6 +220,7 @@ namespace leximaxIST {
             {"mss-incr",  no_argument,  &(m_mss_incr.get_data()), 1},
             {"gia-incr",  no_argument,  &(m_gia_incr.get_data()), 1},
             {"gia-pareto",  no_argument,  &(m_gia_pareto.get_data()), 1},
+            {"ltf",  no_argument,  &(m_leave_tmp_files.get_data()), 1},
             {"optimise",  required_argument,  0, 500},
             {"approx",  required_argument,  0, 501},
             {"mss-tol",  required_argument,  0, 502},
@@ -210,6 +228,7 @@ namespace leximaxIST {
             {"mss-add-cls",  required_argument,  0, 504},
             {"pb-enc",  required_argument,  0, 505},
             {"card-enc",  required_argument,  0, 506},
+            {"ilp-solver",  required_argument,  0, 507},
             {0, 0, 0, 0}
                 };
         int c;
@@ -232,6 +251,7 @@ namespace leximaxIST {
                 case 504: read_digit(optarg, "--mss-add-cls", m_mss_add_cls.get_data()); break;
                 case 505: read_digit(optarg, "--pb-enc", m_pb_enc.get_data()); break;
                 case 506: read_digit(optarg, "--card-enc", m_card_enc.get_data()); break;
+                case 507: m_ilp_solver.get_data() = optarg; break;
                 case '?':
                     if (isprint (optopt))
                         fprintf (stderr, "Unknown option `-%c'.\n", optopt);
@@ -266,13 +286,15 @@ namespace leximaxIST {
     
     void Options::print_usage(std::ostream &os)
     {
-        os << "Usage: ./leximaxIST [<options>] <input_file>\n";
+        os << "Usage: ./leximaxIST [<options>] -h|--help|((--approx <string>)|(--optimise <string>) <input_file>)\n";
         os << m_input_file_name.get_description();
         os << "Options:\n";
         os << m_help.get_description();
         os << m_verbosity.get_description();
         os << m_optimise.get_description();
+        os << m_ilp_solver.get_description();
         os << m_disjoint_cores.get_description();
+        os << m_leave_tmp_files.get_description();
         os << m_approx.get_description();
         os << m_timeout.get_description();
         os << m_mss_incr.get_description();

@@ -6,6 +6,7 @@
 #include <zlib.h>
 #include <sys/wait.h>
 #include <sys/resource.h> // for getrusage()
+#include <sys/types.h> // getpid(), I think
 #include <unistd.h>
 #include <assert.h>
 #include <errno.h> // for errno
@@ -24,6 +25,50 @@
 namespace leximaxIST {
 
     bool descending_order (int i, int j);
+
+    void Solver::call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i)
+    {
+        // temporary file names
+        const std::string base ("/tmp/" + std::to_string(getpid()) + "_" + std::to_string(i));
+        const std::string input_file_name (base + ".lp");
+        const std::string sol_file_name (base + ".sol");
+        m_tmp_files.push_back(input_file_name);
+        m_tmp_files.push_back(sol_file_name);
+        // write lp file for ilp solver
+        write_lp_file(constraints, max_vars, i);
+        if (m_ilp_solver == "gurobi") {
+            // call gurobi
+            std::string command ("gurobi_cl");
+            command += " Threads=1 ResultFile=" + sol_file_name;
+            //command += " Threads=1 ResultFile=/tmp/foo.sol";
+            command += " LogFile= LogToConsole=0 "; // disable logging
+            command += input_file_name;
+            // call solver
+            system(command.c_str());
+        }
+        else if (m_ilp_solver == "cplex") {
+            std::string command ("cplex -c");
+            command += " \"set logfile *\""; // disable log file cplex.log
+            command += " \"set threads 1\""; // set threads to 1
+            command += " \"read " + input_file_name + "\""; // read input
+            command += " \"optimize\" \"display solution variables -\""; // solve and print solution to stdout
+            command += " > " + sol_file_name; // redirect stdout to the solution file
+            // call solver
+            system(command.c_str());
+        }
+        else {
+            print_error_msg("Invalid ILP solver '" + m_ilp_solver + "'");
+            exit(EXIT_FAILURE);
+        }
+        // read gurobi .sol file and update m_solution
+        // read output of solver
+        std::vector<int> model;
+        read_solver_output(model, sol_file_name);
+        // if ext solver is killed before it finds a sol, the problem might not be unsat
+        set_solution(model); // update solution and print obj vector
+        if (!m_leave_tmp_files)
+            remove_tmp_files();
+    }
     
     void Solver::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
@@ -34,21 +79,27 @@ namespace leximaxIST {
                 sat = true;
                 ++r;
                 const int var = parseInt(r);
-                assert(model.size()>(size_t)var);
-                ++r; // skip whitespace
-                if (*r == '1')
-                    model[var] = var;
-                else if (*r == '0')
-                    model[var] = -var;
+                // skip the variables that have larger id than model.size()
+                // those variables are produced by the encoding and some of them may be integer
+                // we only care about the assignment to the input variables
+                if (var > m_input_nb_vars)
+                    skipLine(r);
                 else {
-                    std::string errmsg ("Can't read gurobi output '" + m_file_name + ".sol");
-                    char current_char (*r);
-                    std::string current_char_str (1, current_char);
-                    errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
-                    print_error_msg(errmsg);
-                    if (!m_leave_tmp_files)
-                        remove_tmp_files();
-                    exit(EXIT_FAILURE);
+                    ++r; // skip whitespace
+                    if (*r == '1')
+                        model.at(var) = var;
+                    else if (*r == '0')
+                        model.at(var) = -var;
+                    else {
+                        std::string errmsg ("Can't read gurobi output '" + m_file_name + ".sol");
+                        char current_char (*r);
+                        std::string current_char_str (1, current_char);
+                        errmsg += "' - expecting '1' or '0' but instead got '" + current_char_str + "'";
+                        print_error_msg(errmsg);
+                        if (!m_leave_tmp_files)
+                            remove_tmp_files();
+                        exit(EXIT_FAILURE);
+                    }
                 }
             }
         }
@@ -77,7 +128,7 @@ namespace leximaxIST {
     void Solver::read_cplex_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
     {
         // set all variables to false, because we only get the variables that are true
-        for (size_t v (1); v < m_id_count + 1; ++v)
+        for (size_t v (1); v < m_input_nb_vars + 1; ++v)
             model.at(v) = -v;
         while (*r != EOF) {
             if (*r != 'C') {// ignore all the other lines
@@ -96,9 +147,14 @@ namespace leximaxIST {
                             skipLine(r);
                         else {
                             ++r;
-                            const int l = parseInt(r);
-                            assert(model.size()>(size_t)l);
-                            model.at(l) = l;
+                            const int var = parseInt(r);
+                            // skip the variables that have larger id than model.size()
+                            // those variables are produced by the encoding and some of them may be integer
+                            // we only care about the assignment to the input variables
+                            if (var > m_input_nb_vars)
+                                skipLine(r);
+                            else
+                                model.at(var) = var;
                         }
                     }
                 }
@@ -131,35 +187,46 @@ namespace leximaxIST {
         }
     }
     
-    void Solver::read_solver_output(std::vector<int> &model)
+    /* opens the file where the solution of the external solver is stored and
+     * writes the solution in the variable 'model'
+     */
+    void Solver::read_solver_output(std::vector<int> &model, const std::string &filename)
     {
-        std::string output_filename (m_file_name + ".sol");
-        gzFile of = gzopen(output_filename.c_str(), "rb");
+        gzFile of = gzopen(filename.c_str(), "rb");
         if (of == Z_NULL) {
-            print_error_msg("Can't open file '" + output_filename + "' for reading");
+            const std::string errmsg (strerror(errno));
+            print_error_msg("Can't open file '" + filename + "' for reading - " + errmsg);
             if (!m_leave_tmp_files)
                 remove_tmp_files();
             exit(EXIT_FAILURE);
         }
         StreamBuffer r(of);
         bool sat = false;
-        model.resize(static_cast<size_t>(m_id_count + 1), 0);
-        if (m_formalism == "wcnf" || m_formalism == "opb")
+        model.resize(static_cast<size_t>(m_input_nb_vars + 1), 0);
+        if (m_ilp_solver == "cplex")
+            read_cplex_output(model, sat, r);
+        else if (m_ilp_solver == "gurobi")
+            read_gurobi_output(model, sat, r);
+        else {
+            print_error_msg("Invalid ILP solver '" + m_ilp_solver + "'");
+            exit(EXIT_FAILURE);
+        }
+        /*if (m_formalism == "wcnf" || m_formalism == "opb")
             read_sat_output(model, sat, r);
         else if (m_formalism == "lp") {
-            if (m_lp_solver == "cplex")
+            if (m_ilp_solver == "cplex")
                 read_cplex_output(model, sat, r);
-            else if (m_lp_solver == "gurobi")
-                read_gurobi_output(model, sat, r);
-            /*else if (m_lp_solver == "glpk")
+            else if (m_ilp_solver == "gurobi")
+                read_gurobi_output(model, sat, r);*/
+            /*else if (m_ilp_solver == "glpk")
                 read_glpk_output(model, sat, r);
-            else if (m_lp_solver == "scip")
+            else if (m_ilp_solver == "scip")
                 read_scip_output(model, sat, r);
-            else if (m_lp_solver == "cbc")
+            else if (m_ilp_solver == "cbc")
                 read_cbc_output(model, sat, r);
-            else if (m_lp_solver == "lpsolve")
+            else if (m_ilp_solver == "lpsolve")
                 read_lpsolve_output(model, sat, r);*/
-        }
+        //}
         if (!sat)
             model.clear();
         gzclose(of);
@@ -220,7 +287,7 @@ namespace leximaxIST {
         if (pid == 0) { // child process -> external solver
             // open output_filename and error_filename
             FILE *my_out_stream (nullptr);
-            if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+            if (m_formalism != "lp" || m_ilp_solver != "gurobi") {
                 my_out_stream = fopen(output_filename.c_str(), "w");
                 if (my_out_stream == nullptr) {
                     print_error_msg("Can't open '" + output_filename + "' for writing");
@@ -234,7 +301,7 @@ namespace leximaxIST {
                 exit(-1);
             }
             // redirect std output to output_filename and std error to error_filename (if not gurobi)
-            if (m_formalism != "lp" || m_lp_solver != "gurobi") {
+            if (m_formalism != "lp" || m_ilp_solver != "gurobi") {
                 if (dup2(fileno(my_out_stream), 1) == -1) {
                     print_error_msg("Can't redirect Standard Output of external solver");
                     exit(-1);
@@ -363,9 +430,9 @@ namespace leximaxIST {
         else if (m_formalism == "opb")
             write_opb_file(i);
         else if (m_formalism == "lp") {
-            if (m_lp_solver == "gurobi" || m_lp_solver == "scip")
+            if (m_ilp_solver == "gurobi" || m_ilp_solver == "scip")
                 write_opb_file(i);
-            if (m_lp_solver == "cplex" || m_lp_solver == "cbc")
+            if (m_ilp_solver == "cplex" || m_ilp_solver == "cbc")
                 write_lp_file(i);
         }
     }
@@ -382,13 +449,13 @@ namespace leximaxIST {
         }
         std::string command (m_ext_solver_cmd + " ");
         if (m_formalism == "lp") { // TODO: set CPLEX parameters : number of threads, tolerance, etc.
-            if (m_lp_solver == "cplex")
+            if (m_ilp_solver == "cplex")
                 command += "-c \"read " + m_file_name + "\" \"optimize\" \"display solution variables -\"";
-            if (m_lp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
+            if (m_ilp_solver == "cbc") // TODO: set solver parameters for scip and cbc as well
                 command += m_file_name + " solve solution $";
-            if (m_lp_solver == "scip")
+            if (m_ilp_solver == "scip")
                 command += "-f " + m_file_name;
-            if (m_lp_solver == "gurobi") {
+            if (m_ilp_solver == "gurobi") {
                 command = "gurobi_cl";
                 command += " Threads=1 ResultFile=" + m_file_name + ".sol";
                 command += " LogFile=\"\" LogToConsole=0 "; // disable logging
@@ -397,7 +464,7 @@ namespace leximaxIST {
         }
         else
             command += m_file_name;
-        if (m_formalism != "lp" || m_lp_solver != "gurobi")
+        if (m_formalism != "lp" || m_ilp_solver != "gurobi")
             command += " > " + m_file_name + ".sol";
         command += " 2> " + m_file_name + ".err";
         double initial_time, final_time;
@@ -410,7 +477,7 @@ namespace leximaxIST {
         }
         // read output of solver
         std::vector<int> model;
-        read_solver_output(model);
+        read_solver_output(model, m_file_name + ".sol");
         // if ext solver is killed before it finds a sol, the problem might not be unsat
         set_solution(model); // update solution and print obj vector
         if (!m_leave_tmp_files)
@@ -460,13 +527,45 @@ namespace leximaxIST {
         output.close();
     }
     
-    void Solver::remove_tmp_files() const
+    void Solver::write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const
     {
-        std::string output_filename (m_file_name + ".sol");
-        std::string error_filename (m_file_name + ".err");
-        remove(m_file_name.c_str());
-        remove(output_filename.c_str());
-        remove(error_filename.c_str());
+        const std::string filename ("/tmp/" + std::to_string(getpid()) + "_" + std::to_string(i) + ".lp");
+        std::ofstream os(filename); 
+        if (!os) {
+            print_error_msg("Could not open '" + filename + "' for writing");
+            exit(EXIT_FAILURE);
+        }
+        // prepare input for the solver
+        os << "Minimize\n";
+        os << " obj: " << "x" << max_vars.at(i) << '\n';
+        os << "Subject To\n";
+        // print constraints
+        for (const ILPConstraint &ilpc : constraints)
+            ilpc.print(os);
+        os << "Binaries\n";
+        // print all variables except for the maximum integer variables
+        for (int j (1); j <= m_id_count; ++j) {
+            // find j in max_vars
+            bool in_max_vars (false);
+            for (int max_v : max_vars) {
+                if (max_v == j)
+                    in_max_vars = true;
+            }
+            if (!in_max_vars)
+                os << "x" << j << '\n';
+        }
+        os << "Generals\n";
+        for (size_t j (0); j < max_vars.size(); ++j)
+            os << "x" << max_vars.at(j) << '\n';
+        os << "End";
+        os.close();
+    }
+    
+    void Solver::remove_tmp_files()
+    {
+        for (const std::string &tmp_file : m_tmp_files)
+            remove(tmp_file.c_str());
+        m_tmp_files.clear();
     }
     
     int mss_choose_obj_seq (const std::vector<std::vector<int>> &todo_vec)
@@ -500,7 +599,7 @@ namespace leximaxIST {
     }
     
     /* choose next obj in todo using an heuristic - choose the maximum if
-     * the ratio between the min and the max of upper_bounds is greater than m_mss_tolerance
+     * the ratio between the min and the max of upper_bounds is greater than m_mss_tol
      * returns the index of the objective that we will try to minimise next
      * if the maximum can not be improved, then stop, that is, return -1
      * check how much each objective can decrease: check todo and upper_bounds
