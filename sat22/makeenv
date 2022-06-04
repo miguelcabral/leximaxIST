@@ -1,0 +1,2 @@
+LATEXARGS=-file-line-error
+POST_CMD=&& /bin/cp -fv $(TRGT).pdf ~/win/Documents/
