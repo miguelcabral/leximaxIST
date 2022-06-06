@@ -547,14 +547,6 @@ namespace leximaxIST {
             print_sorted_true();
     }
     
-    void print_core(const std::vector<int> &core)
-    {
-        std::cout << "c Core: ";
-        for (int l : core)
-            std::cout << l << " ";
-        std::cout << '\n';
-    }
-    
     void Solver::gen_assumps(const std::vector<int> &lower_bounds, const std::vector<std::vector<int>> &max_vars_vec,
                      const std::vector<std::vector<int>> &inputs_not_sorted, std::vector<int> &assumps) const
     {

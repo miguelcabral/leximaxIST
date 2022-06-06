@@ -40,7 +40,7 @@ namespace leximaxIST {
             ILPConstraint ilpc (vars, coeffs, sign, rhs);
             constraints.push_back(ilpc);
         }        
-        // next, iteratively solve single-objective by calling gurobi external executable
+        // next, iteratively solve single-objective by calling gurobi/cplex external executable
         // the constraints are added in each iteration
         std::vector<int> max_vars;
         for (int i (0); i < m_num_objectives; ++i) {

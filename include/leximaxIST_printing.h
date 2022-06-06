@@ -11,6 +11,8 @@ namespace leximaxIST {
     
     void print_time(double t, const std::string &s);
     
+    void print_core(const std::vector<int> &core);
+    
     std::string ordinal(int i);
     
     void print_lb_map(const std::unordered_map<int, int> &lb_map);

@@ -207,13 +207,10 @@ namespace leximaxIST {
         return old_obj_vec; // the obj vecs are leximax-equal
     }
     
-    // set m_id_count to the maximum id without the encoding - m_input_nb_vars + obj vars
+    // set m_id_count to the maximum id without the encoding: m_input_nb_vars
     void Solver::reset_id_count()
     {
         m_id_count = m_input_nb_vars;
-        for (const std::vector<int> &objective : m_objectives) {
-            m_id_count += objective.size();
-        }
         if (m_verbosity == 2)
             std::cout << "c Resetting m_id_count... m_id_count = " << m_id_count << '\n';
     }

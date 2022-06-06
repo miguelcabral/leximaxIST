@@ -43,6 +43,14 @@ namespace leximaxIST {
         std::cout << '\n';
     }
     
+    void print_core(const std::vector<int> &core)
+    {
+        std::cout << "c Core: ";
+        for (int l : core)
+            std::cout << l << " ";
+        std::cout << '\n';
+    }
+    
     stream_config set_cout()
     {
         stream_config old_config;

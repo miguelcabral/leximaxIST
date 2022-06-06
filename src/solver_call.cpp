@@ -26,7 +26,10 @@ namespace leximaxIST {
 
     bool descending_order (int i, int j);
 
-    void Solver::call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i)
+    // returns the model, as it is useful for the hitting set algorithm
+    std::vector<int> Solver::call_ilp_solver( const std::vector<ILPConstraint> &constraints,
+                                 const std::vector<int> &max_vars, 
+                                 int i)
     {
         // temporary file names
         const std::string base ("/tmp/" + std::to_string(getpid()) + "_" + std::to_string(i));
@@ -65,9 +68,11 @@ namespace leximaxIST {
         std::vector<int> model;
         read_solver_output(model, sol_file_name);
         // if ext solver is killed before it finds a sol, the problem might not be unsat
-        set_solution(model); // update solution and print obj vector
+        if (m_opt_mode != "hs") // in the hitting set algorithm, the model is just the hitting set
+            set_solution(model); // update solution and print obj vector
         if (!m_leave_tmp_files)
             remove_tmp_files();
+        return model;
     }
     
     void Solver::read_gurobi_output(std::vector<int> &model, bool &sat, StreamBuffer &r)
@@ -896,6 +901,15 @@ namespace leximaxIST {
     
     void Solver::approximate()
     {
+        if (m_verbosity >= 2)
+            std::cout << std::unitbuf; // debug - flushes the output stream after any output operation       
+        m_input_nb_vars = m_id_count; // store number of input variables
+        if (m_verbosity > 0 && m_verbosity <= 2) {
+            std::cout << "c Approximating using algorithm " << m_opt_mode << "...\n";
+            std::cout << "c Number of input variables: " << m_input_nb_vars << '\n';
+            std::cout << "c Number of input hard clauses: " << m_input_hard.size() << '\n';
+            std::cout << "c Number of objective functions: " << m_num_objectives << '\n';
+        }
         double initial_time (read_cpu_time());
         // check if problem is satisfiable
         if (!call_sat_solver(m_sat_solver, {})) {
@@ -904,8 +918,6 @@ namespace leximaxIST {
         }
         m_status = 's'; // update status to SATISFIABLE
         if (m_approx == "gia") {
-            if (m_verbosity >= 1)
-                std::cout << "c Approximating using Guided Improvement Algorithm (GIA)...\n";
             // encode sorted vectors with sorting network
             for (int j (0); j < m_num_objectives; ++j)
                 encode_sorted(m_objectives.at(j), j);
@@ -913,8 +925,6 @@ namespace leximaxIST {
             gia();
         }
         else if (m_approx == "mss") {
-            if (m_verbosity >= 1)
-                std::cout << "c Approximating using Maximal Satisfiable Subsets...\n";
             mss_enumerate();
         }
         else {

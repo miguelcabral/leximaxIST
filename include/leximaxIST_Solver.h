@@ -278,9 +278,13 @@ namespace leximaxIST
         
         void optimise_hs();
         
+        void gen_assumps_hs(const std::vector<int> &model, std::vector<int> &assumps) const;
+        
+        void find_minimum_hs(std::vector<int> &assumps, const std::vector<std::vector<int>> &cores);
+        
         // solver_call.cpp
         
-        void call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i);
+        std::vector<int> call_ilp_solver(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i);
         
         void write_lp_file(const std::vector<ILPConstraint> &constraints, const std::vector<int> &max_vars, int i) const;
         
