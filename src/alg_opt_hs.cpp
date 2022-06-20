@@ -3,7 +3,7 @@
 #include <leximaxIST_printing.h>
 #include <leximaxIST_rusage.h>
 #include <vector>
-#include <forward_list>
+#include <string>
 #include <cassert>
 #include <algorithm>
 
@@ -23,6 +23,11 @@ namespace leximaxIST {
         // check if formula minus hitting set is satisfiable, if not get core
         // set variables in the hitting set to true and the remaining ones to false (as assumptions)
         std::vector<int> assumps;
+		// first try to satisfy all soft clauses in assumps
+		for (const auto &obj : m_objectives) {
+			for (int v : obj)
+				assumps.push_back(-v);
+		}
         while (!call_sat_solver(m_sat_solver, assumps)) {
             std::vector<int> core (m_sat_solver->conflict());
             cores.push_back(core);
@@ -36,6 +41,7 @@ namespace leximaxIST {
             find_minimum_hs(assumps, cores);
             if (m_verbosity >= 1)
                 print_time(read_cpu_time() - initial_time, "c Hitting Set (ILP) CPU time: ");
+			return; // NOTE: This is for debugging purposes only, please comment or remove
         }
     }
     
@@ -79,7 +85,7 @@ namespace leximaxIST {
                 std::cout << max_i << '\n'; 
             }
             // relaxation variables
-            std::vector<int> relax_vars;
+            std::list<int> relax_vars;
             int bound (0);
             if (i > 0) {
                 const std::vector<int> obj_vec (get_objective_vector(model));
@@ -91,7 +97,7 @@ namespace leximaxIST {
                 for (int j (0); j < m_num_objectives; ++j) {
                     relax_vars.push_back(fresh());
                     if (m_verbosity >= 2)
-                        std::cout << relax_vars.at(j) << ' ';
+                        std::cout << relax_vars.back() << ' ';
                 }
                 if (m_verbosity >= 2)
                     std::cout << '\n';
@@ -150,6 +156,17 @@ namespace leximaxIST {
             for (int v : objective)
                 assumps.push_back(model.at(v));
         }
+		if (m_verbosity >= 2) {
+			std::cout << "c ------------------ Assumptions ------------------\n";
+			std::string line ("c ");
+			for (int v : assumps) {
+				line += std::to_string(v) + " ";
+				if (line.size() >= 80) {
+					std::cout << line << '\n';
+					line.clear();	
+				}
+			}
+		}
     }
 
 } // namespace leximaxIST
