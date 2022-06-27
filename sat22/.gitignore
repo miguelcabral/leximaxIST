@@ -1,0 +1,13 @@
+*.pyc
+*.out
+*.log
+*.blg
+paper.pdf
+paper.vtc
+paper.aux
+paper.bbl
+paper.synctex.gz
+paper.fdb_latexmk
+*.fls
+gnuplot-lua-tikz.sty
+makeenv
