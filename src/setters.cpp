@@ -84,7 +84,8 @@ namespace leximaxIST {
     {
         if (mode != "external" && mode != "bin" && mode != "lin_su" &&
             mode != "lin_us" && mode != "core_static" && mode != "core_merge"
-            && mode != "core_rebuild" && mode != "core_rebuild_incr" && mode != "ilp") {
+            && mode != "core_rebuild" && mode != "core_rebuild_incr"
+		   	&& mode != "ilp" && mode != "hs") {
             print_error_msg("Invalid optimisation mode: '" + mode + "'");
             exit(EXIT_FAILURE);
         }

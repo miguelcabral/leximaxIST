@@ -548,17 +548,26 @@ namespace leximaxIST {
         for (const ILPConstraint &ilpc : constraints)
             ilpc.print(os);
         os << "Binaries\n";
-        // print all variables except for the maximum integer variables
-        for (int j (1); j <= m_id_count; ++j) {
-            // find j in max_vars
-            bool in_max_vars (false);
-            for (int max_v : max_vars) {
-                if (max_v == j)
-                    in_max_vars = true;
-            }
-            if (!in_max_vars)
-                os << "x" << j << '\n';
-        }
+		if (m_opt_mode == "hs") {
+			// print all obj variables
+			for (const auto &obj : m_objectives) {
+				for (int v : obj)
+					os << "x" << v << '\n';
+			}
+		}
+		else if (m_opt_mode == "ilp") {
+        	// print all variables except for the maximum integer variables
+        	for (int j (1); j <= m_id_count; ++j) {
+            	// find j in max_vars
+           		bool in_max_vars (false);
+            	for (int max_v : max_vars) {
+                	if (max_v == j)
+                    	in_max_vars = true;
+            	}
+            	if (!in_max_vars)
+                	os << "x" << j << '\n';
+        	}
+		}
         os << "Generals\n";
         for (size_t j (0); j < max_vars.size(); ++j)
             os << "x" << max_vars.at(j) << '\n';

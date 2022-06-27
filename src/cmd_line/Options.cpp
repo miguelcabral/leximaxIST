@@ -77,6 +77,7 @@ namespace leximaxIST {
         description += values_tab + "core_rebuild - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (not incremental)\n";
         description += values_tab + "core_rebuild_incr - core-guided unsat-sat search using dynamic sorting networks that grow by rebuild (incremental)\n";
         description += values_tab + "ilp - ILP-based algorithm\n";
+        description += values_tab + "hs - hitting-set-based algorithm (extention of MaxHS's algorithm to leximax)\n";
         m_optimise.set_description(description);
         
         // disjoint cores strategy
