@@ -100,6 +100,8 @@ namespace leximaxIST
         void add_hard_clause(const Clause &cl);
         
         void add_soft_clauses(const std::vector<Clause> &soft_clauses);
+
+        void add_soft_clauses(const std::vector<std::pair<uint64_t, Clause>> &soft_clauses);
         
         void set_simplify_last(bool val);
         

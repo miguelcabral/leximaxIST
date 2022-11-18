@@ -97,15 +97,12 @@ int main(int argc, char *argv[])
     
     // add objective functions
     for (int i (0); i < maxsat_formula.nObjFunctions(); ++i) {
-        std::vector<leximaxIST::Clause> soft_clauses;
+        std::vector<std::pair<uint64_t, leximaxIST::Clause>> soft_clauses;
         const leximaxIST::PBObjFunction &obj (maxsat_formula.getObjFunction(i));
         for (size_t j (0); j < obj._lits.size(); ++j) {
-            // repeat the clause according to its weight (for now this is how we do this)
-            for (int k (1); k <= obj._coeffs.at(j); ++k) {
-                leximaxIST::Clause sc;
-                sc.push_back(-(obj._lits.at(j)));
-                soft_clauses.push_back(sc);
-            }            
+            leximaxIST::Clause sc;
+            sc.push_back(-(obj._lits.at(j)));
+            soft_clauses.push_back(std::make_pair(obj._coeffs.at(j), sc));
         }
         solver.add_soft_clauses(soft_clauses);
     }

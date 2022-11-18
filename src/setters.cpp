@@ -266,6 +266,47 @@ namespace leximaxIST {
         if (m_status == 'o')
             m_status = 's';
     }
+
+    void Solver::add_soft_clauses(const std::vector<std::pair<uint64_t, Clause>> &soft_clauses)
+    {
+        if (soft_clauses.empty()) {
+            print_error_msg("In function leximaxIST::Solver::add_soft_clauses, empty objective function");
+            exit(EXIT_FAILURE);
+        }
+        ++m_num_objectives;
+        // set m_snet_info to a vector of (0,0) pairs
+        m_snet_info.resize(m_num_objectives, std::pair(0,0));
+        m_objectives.resize(m_num_objectives);
+        m_sorted_vecs.resize(m_num_objectives);
+        // set m_all_relax_vars to a vector of empty lists
+        m_all_relax_vars.resize(m_num_objectives);
+        // set m_sorted_relax_collection to a vector of empty vectors
+        m_sorted_relax_collection.resize(m_num_objectives);
+        for (const auto &soft_clause : soft_clauses)
+            update_id_count(soft_clause.second);
+        // convert clause satisfiaction maximisation to minimisation of sum of variables
+        if (m_verbosity == 2)
+            std::cout << "c ---- Input soft clauses conversion to variables ----\n";
+        int i (m_num_objectives - 1); // position in m_objectives of the current objective
+        for (const auto &soft_clause : soft_clauses) {
+            // neg fresh_var implies soft_clause
+            int fresh_var (fresh());
+            Clause hard_clause (soft_clause.second); // copy constructor
+            hard_clause.push_back(fresh_var);
+            add_hard_clause(hard_clause);
+            // Add the blocking literal weight times to "simulate" weighted clause
+            for (size_t j = 0; j < soft_clause.first; ++j)
+                m_objectives.at(i).push_back(fresh_var);
+            // // other implication: soft_clause implies neg fresh_var
+            // for (const int soft_lit : soft_clause) {
+            //     Clause cl {-soft_lit, -fresh_var};
+            //     add_hard_clause(cl);
+            // }
+        }
+        // update status - if optimum found then it becomes sat, otherwise status is not changed
+        if (m_status == 'o')
+            m_status = 's';
+    }
         
     void Solver::set_gia_incr(bool v) { m_gia_incr = v; }
     

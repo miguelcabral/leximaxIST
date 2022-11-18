@@ -1,5 +1,5 @@
 *.o
-cadical/*
+cadical/
 cbc/*
 examples/*.cnf
 *.gcda
