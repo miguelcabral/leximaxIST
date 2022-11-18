@@ -581,7 +581,7 @@ void ExternalWrapper::print_clause(XLINT weight, ostream& out, BasicClause& clau
      m_leximax_solver->set_multiplication_string(multiplication_string);
      m_leximax_solver->set_leave_tmp_files(leave_temporary_files);
      m_leximax_solver->set_formalism(formalism);
-     m_leximax_solver->set_lp_solver(m_lp_solver); 
+     m_leximax_solver->set_ilp_solver(m_lp_solver);
      m_leximax_solver->set_maxsat_presolve(m_maxsat_presolve);
      if (!m_maxsat_psol_cmd.empty())
         m_leximax_solver->set_maxsat_psol_cmd(m_maxsat_psol_cmd);

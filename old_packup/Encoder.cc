@@ -893,7 +893,7 @@ void Encoder::encode_changed(XLINT& total_weight,bool maximize)
             LINT l = unit.installed ? neg(unit.variable) : unit.variable;
             literals.push_back(l);
             // unchanged implies negation of disjunction
-            solver.output_binary_clause(neg(unchanged),neg(l));
+            solver.output_binary_clause(neg(unchanged),-l);
         }
         literals.push_back(unchanged);
         // changed implies disjunction
