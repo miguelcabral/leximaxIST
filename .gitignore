@@ -1,5 +1,5 @@
 *.o
-cadical/*
+cadical/
 cbc/*
 examples/*.cnf
 *.gcda
@@ -7,3 +7,7 @@ examples/*.cnf
 gmon.out
 lib/*
 bin/*
+.vscode/
+maxpre/
+old_packup/packup
+mccs-1.1/objs/
